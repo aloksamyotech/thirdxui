@@ -58,14 +58,14 @@ const dashboard = {
           id: 'mailing-list',
           title: 'Mailing List',
           type: 'item',
-          url: '/dashboard/people',
+          url: '/dashboard/mail',
           breadcrumbs: false
         },
         {
           id: 'new-referral',
           title: 'New Referral',
           type: 'item',
-          url: '/dashboard/people',
+          url: '/dashboard/referral',
           breadcrumbs: false
         }
       ]

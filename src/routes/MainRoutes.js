@@ -6,10 +6,10 @@ import Loadable from 'ui-component/Loadable';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
-const LeadManagement = Loadable(lazy(() => import('views/Lead')));
+const PeopleManagement = Loadable(lazy(() => import('views/People')));
 const ContactManagement = Loadable(lazy(() => import('views/Contact')));
 const Call = Loadable(lazy(() => import('views/Calls')));
-const Policy = Loadable(lazy(() => import('views/Policy')));
+const Case = Loadable(lazy(() => import('views/Case')));
 const Metting = Loadable(lazy(() => import('views/Metting')));
 const Email = Loadable(lazy(() => import('views/Email')));
 const Task = Loadable(lazy(() => import('views/Task')));
@@ -41,8 +41,8 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'lead',
-          element: <LeadManagement />
+          path: 'people',
+          element: <PeopleManagement />
         }
       ]
     },
@@ -59,29 +59,29 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'call',
-          element: <Call />
+          path: 'case',
+          element: <Case />
         }
       ]
     },
-    {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'policy',
-          element: <Policy />
-        }
-      ]
-    },
-    {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'policy',
-          element: <Policy />
-        }
-      ]
-    },
+    // {
+    //   path: 'dashboard',
+    //   children: [
+    //     {
+    //       path: 'policy',
+    //       element: <Policy />
+    //     }
+    //   ]
+    // },
+    // {
+    //   path: 'dashboard',
+    //   children: [
+    //     {
+    //       path: 'policy',
+    //       element: <Policy />
+    //     }
+    //   ]
+    // },
     {
       path: 'dashboard',
       children: [

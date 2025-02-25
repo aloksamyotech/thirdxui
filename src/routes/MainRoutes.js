@@ -50,7 +50,7 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'contact',
+          path: 'services',
           element: <ContactManagement />
         }
       ]

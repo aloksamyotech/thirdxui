@@ -51,21 +51,21 @@ const dashboard = {
           id: 'all-service-users',
           title: 'All Service Users',
           type: 'item',
-          url: '/dashboard/lead',
+          url: '/dashboard/people',
           breadcrumbs: false
         },
         {
           id: 'mailing-list',
           title: 'Mailing List',
           type: 'item',
-          url: '/dashboard/lead',
+          url: '/dashboard/people',
           breadcrumbs: false
         },
         {
           id: 'new-referral',
           title: 'New Referral',
           type: 'item',
-          url: '/dashboard/lead',
+          url: '/dashboard/people',
           breadcrumbs: false
         }
       ]
@@ -82,7 +82,7 @@ const dashboard = {
       id: '03',
       title: 'Cases',
       type: 'item',
-      url: '/dashboard/policy',
+      url: '/dashboard/case',
       icon: icons.IconFileInvoice,
       breadcrumbs: false
     },

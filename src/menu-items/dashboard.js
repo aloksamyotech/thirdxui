@@ -74,7 +74,7 @@ const dashboard = {
       id: '02',
       title: 'Services',
       type: 'item',
-      url: '/dashboard/contact',
+      url: '/dashboard/services',
       icon: icons.IconSettingsAutomation,
       breadcrumbs: false
     },

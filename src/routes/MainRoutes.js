@@ -7,12 +7,12 @@ import Loadable from 'ui-component/Loadable';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
-const ContactManagement = Loadable(lazy(() => import('views/Contact')));
+const ContactManagement = Loadable(lazy(() => import('views/Service')));
 const Call = Loadable(lazy(() => import('views/Calls')));
 const Case = Loadable(lazy(() => import('views/Case')));
 const Metting = Loadable(lazy(() => import('views/Metting')));
-const Email = Loadable(lazy(() => import('views/Email')));
-const Task = Loadable(lazy(() => import('views/Task')));
+const Mail = Loadable(lazy(() => import('views/Mail')));
+const NewReferral = Loadable(lazy(() => import('views/NewReferral')));
 const EmailTemplates = Loadable(lazy(() => import('views/EmailTemplates')));
 const Document = Loadable(lazy(() => import('views/Documents')));
 const Calender = Loadable(lazy(() => import('views/Calender')));
@@ -86,8 +86,8 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'task',
-          element: <Task />
+          path: 'referral',
+          element: <NewReferral />
         }
       ]
     },
@@ -95,8 +95,8 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'email',
-          element: <Email />
+          path: 'mail',
+          element: <Mail />
         }
       ]
     },

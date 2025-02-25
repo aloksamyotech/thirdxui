@@ -8,7 +8,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import ActionCalenderDropDown from './ActionCalenderDropDown';
-import AddTask from 'views/Task/AddTask';
 import AddCalls from 'views/Calls/Addcalls';
 import AddMeetings from 'views/Metting/Addmeetings';
 
@@ -39,8 +38,6 @@ const Calender = () => {
   const handleCloseCall = () => setOpenCall(false);
   return (
     <>
-      {/* Add Task Model */}
-      <AddTask open={openTask} handleClose={handleCloseTask} lead="lead" contact="contact" />
 
       {/* Add Meeting Model */}
       <AddMeetings open={openMeeting} handleClose={handleCloseMeeting} />

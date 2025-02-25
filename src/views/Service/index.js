@@ -1,82 +1,98 @@
 import { useState } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, MenuItem, IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, MenuItem, IconButton, Tooltip, Chip, InputAdornment } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TableStyle from '../../ui-component/TableStyle';
-import CheckIcon from '@mui/icons-material/Check';
-import LoopIcon from '@mui/icons-material/Loop';
-import AddCaseForm from './AddCase.js';
+import SearchIcon from '@mui/icons-material/Search';
+import AddService from './AddService.js';
 
 const Lead = () => {
   const [district, setDistrict] = useState('');
-  const [owner, setOwner] = useState('');
   const [status, setStatus] = useState('');
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleFilterApply = () => {
-    console.log('Filters Applied:', { district, owner, status, fromDate, toDate });
+    console.log('Filters Applied:', { district, status, fromDate, toDate });
   };
 
   const columns = [
-    { field: 'caseId', headerName: 'CASE ID', width: 100 },
-    { field: 'serviceUser', headerName: 'SERVICE USER', width: 150 },
-    { field: 'owner', headerName: 'OWNER', width: 120 },
+    {
+      field: 'details',
+      headerName: 'SERVICE LIST',
+      flex: 2,
+      headerAlign: 'left',
+      align: 'left',
+      renderCell: (params) => (
+        <Stack>
+          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            {params.value.title}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            {params.value.date}
+          </Typography>
+        </Stack>
+      )
+    },
     {
       field: 'status',
       headerName: 'STATUS',
-      width: 120,
+      flex: 1,
+      headerAlign: 'right',
+      align: 'right',
       renderCell: (params) => (
         <Chip
           label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
           sx={{
-            borderColor: params.value === 'Open' ? 'green' : 'gray'
+            color: params.value === 'Active' ? '#79dbfb' : '#ff6a67',
+            backgroundColor: params.value === 'Active' ? '#e5f8fe' : '#ffeae9'
           }}
         />
       )
-    },
-    { field: 'service', headerName: 'SERVICE', width: 120 },
-    { field: 'dateOpened', headerName: 'DATE OPENED', width: 150 },
-    { field: 'dateClosed', headerName: 'DATE CLOSED', width: 150 }
+    }
   ];
 
   const rows = [
     {
-      id: 1,
-      caseId: 'C-001',
-      serviceUser: 'John Doe',
-      owner: 'Admin',
-      status: 'Open',
-      service: 'IT Support',
-      dateOpened: '2024-02-01',
-      dateClosed: '2025-08-10'
+      id: '1',
+      details: { title: 'JACS: Communication  #127553', date: 'Sat May 25 2024' },
+      status: 'Active'
     },
     {
-      id: 2,
-      caseId: 'C-002',
-      serviceUser: 'Jane Smith',
-      owner: 'Manager',
-      status: 'Close',
-      service: 'HR Support',
-      dateOpened: '2024-01-25',
-      dateClosed: '2024-02-10'
+      id: '2',
+      details: { title: 'JACS: Counseling  #127554', date: 'Sat May 25 2024' },
+      status: 'Inactive'
+    },
+    {
+      id: '3',
+      details: { title: 'JACS: Therapy Session  #127555', date: 'Sat May 25 2024' },
+      status: 'Active'
+    },
+    {
+      id: '4',
+      details: { title: 'JACS: Rehabilitation  #127556', date: 'Sat May 25 2024' },
+      status: 'Inactive'
+    },
+    {
+      id: '5',
+      details: { title: 'JACS: Vaccination  #127557', date: 'Sat May 25 2024' },
+      status: 'Active'
     }
   ];
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       {showForm ? (
-        <AddCaseForm onCancel={() => setShowForm(false)} />
+        <AddService onCancel={() => setShowForm(false)} />
       ) : (
         <Grid>
           <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4">Add Cases</Typography>
+            <Typography variant="h4">Add Services</Typography>
             <Tooltip title="Add Case" arrow>
               <IconButton
                 onClick={() => setShowForm(true)}
@@ -124,20 +140,6 @@ const Lead = () => {
 
                 <TextField
                   select
-                  label="Select Owner"
-                  value={owner}
-                  onChange={(e) => setOwner(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  InputLabelProps={{ shrink: false }}
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="Owner 1">Owner 1</MenuItem>
-                  <MenuItem value="Owner 2">Owner 2</MenuItem>
-                </TextField>
-
-                <TextField
-                  select
                   label="Select Status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
@@ -152,7 +154,7 @@ const Lead = () => {
 
                 <Box sx={{ width: 150 }}>
                   <DatePicker
-                    label="From"
+                    label="Start Date"
                     value={fromDate}
                     onChange={(newValue) => setFromDate(newValue)}
                     slotProps={{
@@ -174,7 +176,7 @@ const Lead = () => {
 
                 <Box sx={{ width: 150 }}>
                   <DatePicker
-                    label="To"
+                    label="End Date"
                     value={toDate}
                     onChange={(newValue) => setToDate(newValue)}
                     slotProps={{
@@ -198,25 +200,41 @@ const Lead = () => {
                   Apply
                 </Button>
 
-                <FilterAltOffOutlinedIcon color="grey" />
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  placeholder="Search People..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  sx={{ width: 200 }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon color="action" />
+                      </InputAdornment>
+                    )
+                  }}
+                />
               </Stack>
             </LocalizationProvider>
           </Card>
           <TableStyle>
             <Box width="100%">
-              <Card style={{ height: '600px' }}>
+              <Card style={{ height: '500px' }}>
                 <DataGrid
                   rows={rows}
                   columns={columns}
-                  rowHeight={60}
-                  checkboxSelection
+                  rowHeight={65}
                   getRowId={(row) => row.id}
                   pageSize={5}
                   rowsPerPageOptions={[5, 10]}
+                  getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                   sx={{
+                    '& .even-row': { backgroundColor: '#ffffff' },
+                    '& .odd-row': { backgroundColor: '#f5f5f5' },
                     '& .MuiDataGrid-row': {
                       borderBottom: '1px solid #ccc'
-                    },
+                    }
                   }}
                 />
               </Card>

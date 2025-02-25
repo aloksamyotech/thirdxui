@@ -6,14 +6,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const AddCaseForm = ({ onCancel }) => {
   const [caseData, setCaseData] = useState({
-    caseId: '',
-    serviceUser: '',
+    code: '',
+    name: '',
     service: '',
-    owner: '',
-    status: '',
     startDate: null,
     endDate: null,
-    caseTag: '',
+    description: '',
     file: null
   });
 
@@ -32,7 +30,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   return (
     <Card sx={{ padding: 3, position: 'relative', backgroundColor: '#eef2f6' }}>
-      <Typography variant="h4">Add New Case</Typography>
+      <Typography variant="h4">Add Services</Typography>
       <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 10, right: 10, fontSize: 32 }}>
         <CancelIcon sx={{ fontSize: 32, color: 'grey' }} />
       </IconButton>
@@ -40,42 +38,27 @@ const AddCaseForm = ({ onCancel }) => {
       <Card sx={{ padding: 2, marginTop: 2 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Case ID" name="caseId" value={caseData.caseId} onChange={handleChange} />
+            <TextField fullWidth label="Service Name" name="name" value={caseData.name} onChange={handleChange} />
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="Service User" name="serviceUser" value={caseData.serviceUser} onChange={handleChange}>
-              <MenuItem value="User1">User 1</MenuItem>
-              <MenuItem value="User2">User 2</MenuItem>
-            </TextField>
+            <TextField fullWidth label="Service Code" name="code" value={caseData.code} onChange={handleChange} />
           </Grid>
+
           <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="Service" name="service" value={caseData.service} onChange={handleChange}>
+            <TextField fullWidth label="Service Description" name="description" value={caseData.description} onChange={handleChange} />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <TextField select fullWidth label="Service Type" name="service" value={caseData.service} onChange={handleChange}>
               <MenuItem value="Service A">Service A</MenuItem>
               <MenuItem value="Service B">Service B</MenuItem>
             </TextField>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="Owner" name="owner" value={caseData.owner} onChange={handleChange}>
-              <MenuItem value="Admin">Admin</MenuItem>
-              <MenuItem value="Manager">Manager</MenuItem>
-            </TextField>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="Status" name="status" value={caseData.status} onChange={handleChange}>
-              <MenuItem value="Active">Active</MenuItem>
-              <MenuItem value="Inactive">Inactive</MenuItem>
-            </TextField>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Case Tag" name="caseTag" value={caseData.caseTag} onChange={handleChange} />
           </Grid>
 
           <Grid item xs={12} sm={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="Start Date"
+                label="From Date"
                 value={caseData.startDate}
                 onChange={(newValue) => setCaseData({ ...caseData, startDate: newValue })}
                 renderInput={(params) => <TextField {...params} fullWidth />}
@@ -85,7 +68,7 @@ const AddCaseForm = ({ onCancel }) => {
           <Grid item xs={12} sm={4}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="End Date"
+                label="To Date"
                 value={caseData.endDate}
                 onChange={(newValue) => setCaseData({ ...caseData, endDate: newValue })}
                 renderInput={(params) => <TextField {...params} fullWidth />}

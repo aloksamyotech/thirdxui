@@ -12,12 +12,13 @@ import {
   InputLabel,
   OutlinedInput,
   Stack,
-  Accordion,
-  AccordionSummary,
+  Divider,
+  Grid,
   AccordionDetails,
   Typography
 } from '@mui/material';
 import * as Yup from 'yup';
+import Google from 'assets/images/icons/social-google.svg';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import useScriptRef from 'hooks/useScriptRef.js';
@@ -25,7 +26,7 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Link } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import the Copy Icon
 
 const AuthLogin = ({ ...others }) => {
@@ -52,11 +53,14 @@ const AuthLogin = ({ ...others }) => {
   };
 
   const handleCopyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      toast.success('Copied to clipboard!');
-    }).catch(() => {
-      toast.error('Failed to copy!');
-    });
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        toast.success('Copied to clipboard!');
+      })
+      .catch(() => {
+        toast.error('Failed to copy!');
+      });
   };
 
   return (
@@ -127,7 +131,7 @@ const AuthLogin = ({ ...others }) => {
                 mb: 2
               }}
             >
-              <InputLabel htmlFor="outlined-adornment-email-login">Email Address</InputLabel>
+              <InputLabel htmlFor="outlined-adornment-email-login">Email</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 type="email"
@@ -178,7 +182,7 @@ const AuthLogin = ({ ...others }) => {
               />
               {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
             </FormControl>
-            {/* <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -190,9 +194,12 @@ const AuthLogin = ({ ...others }) => {
                 }
                 label="Remember me"
               />
-            </Stack> */}
+              <Typography variant="subtitle1" color="#009ec6" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
+                Forgot Password?
+              </Typography>
+            </Stack>
 
-            <Box sx={{ width: '100%' }}>
+            {/* <Box sx={{ width: '100%' }}>
               <Accordion expanded={expanded === 'panel1'} onChange={handleAccordian('panel1')}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
                   <Typography variant="h5">Admin Credentials</Typography>
@@ -268,29 +275,43 @@ const AuthLogin = ({ ...others }) => {
                   </Box>
                 </AccordionDetails>
               </Accordion>
-            </Box>
+            </Box> */}
+            <Box sx={{ mt: 2 }}>
+              <Button
+                disableElevation
+                fullWidth
+                size="small"
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: '#f7931e !important'
+                }}
+                onClick={() => navigate('/dashboard/default')}
+              >
+                LOGIN
+              </Button>
 
-            <Box  sx={{display: 'flex', justifyContent: 'center' }}>
-              <AnimateButton>
-                <Button
-                  disableElevation
-                  disabled={isSubmitting}
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
-                  sx={{
-                    background: 'linear-gradient(45deg, #441572, #7c4bad)',
-                    borderRadius: '50px',
-                    '&:hover': {
-                      background: 'linear-gradient(to right, #4b6cb7, #182848)',
-                      boxShadow: '2'
-                    },
-                  }}
-                >
-                  {isSubmitting ? 'Logging in...' : 'Sign in'}
-                </Button>
-              </AnimateButton>
+              <Grid item xs={12} mt={2}>
+                <Grid item container direction="column" alignItems="center" xs={12}>
+                  <Typography variant="subtitle1" sx={{ textDecoration: 'none', color: 'black' }}>
+                    New on our platform?{' '}
+                    <Typography
+                      component={Link}
+                      to="/register"
+                      variant="subtitle1"
+                      sx={{ textDecoration: 'none', color: '#15a6ca', display: 'inline' }}
+                    >
+                      Create an account
+                    </Typography>
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
+                <img src={Google} alt="google" width={24} height={24} />
+              </Box>
             </Box>
           </form>
         )}

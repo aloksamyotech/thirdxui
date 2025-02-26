@@ -81,7 +81,7 @@ const Lead = () => {
               <IconButton
                 onClick={() => setShowForm(true)}
                 sx={{
-                  backgroundColor: '#2196f3',
+                  backgroundColor: '#41C048',
                   borderRadius: '50%',
                   width: '35px',
                   height: '35px',
@@ -92,7 +92,7 @@ const Lead = () => {
                   color: 'white',
                   cursor: 'pointer',
                   '&:hover': {
-                    backgroundColor: '#1565c0',
+                    backgroundColor: '#41C048',
                     color: '#ffffff'
                   }
                 }}
@@ -194,7 +194,7 @@ const Lead = () => {
                   />
                 </Box>
 
-                <Button variant="contained" color="primary" sx={{ height: 40, borderRadius: '12px' }}>
+                <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
                   Apply
                 </Button>
 

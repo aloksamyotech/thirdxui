@@ -56,17 +56,22 @@ const Emails = () => {
               <FormControlLabel control={<Switch checked={caseData.locked} onChange={handleToggle} name="locked" />} label="Locked" />
             </Grid>
 
+            <Grid item xs={12} sm={2}>
+              <FormControlLabel control={<Switch checked={caseData.locked} onChange={handleToggle} name="locked" />} label="Show in Menu" />
+            </Grid>
+
             {[
               { label: 'Service', name: 'service' },
               { label: 'Session', name: 'session' },
               { label: 'Age', name: 'age' },
               { label: 'Gender', name: 'gender' },
+              { label: 'Ethnicity', name: 'ethnicity' },
               { label: 'Country of Origin', name: 'countryOfOrigin' },
               { label: 'District', name: 'district' },
               { label: 'Key Indicators', name: 'keyIndicators' },
               { label: 'Referral Type', name: 'referralType' },
-              { label: 'Ethnicity', name: 'ethnicity' },
-              { label: 'Choose Channel Settings', name: 'chooseChannelSettings' }
+              { label: 'Choose Channel Settings', name: 'chooseChannelSettings' },
+              { label: 'Choose Purpose Settings', name: 'chooseChannelSettings' }
             ].map((field) => (
               <Grid item xs={12} sm={3} key={field.name}>
                 <TextField select fullWidth label={field.label} name={field.name} value={caseData[field.name]} onChange={handleChange}>
@@ -76,8 +81,6 @@ const Emails = () => {
                 </TextField>
               </Grid>
             ))}
-
-            <Grid item sm={6}></Grid>
 
             <Grid item xs={12} sm={6}>
               <FormControlLabel
@@ -89,12 +92,12 @@ const Emails = () => {
 
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end'}}>
             <Grid item>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
+              <Button variant="contained" color="secondary" onClick={handleSubmit}>
                 Save
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="primary">
+              <Button variant="outlined" color="error">
                 Cancel
               </Button>
             </Grid>

@@ -26,7 +26,7 @@ import {
   Switch,
   Typography
 } from '@mui/material';
-
+import TranslateIcon from '@mui/icons-material/Translate';
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -89,20 +89,24 @@ const ProfileSection = () => {
 
   return (
     <>
+      <Stack direction="row" spacing={3} alignItems="center">
+      <Box>
+        <TranslateIcon />
+      </Box>
       <Chip
         sx={{
           height: '48px',
           alignItems: 'center',
           borderRadius: '27px',
           transition: 'all .2s ease-in-out',
-          borderColor: theme.palette.primary.light,
-          backgroundColor: theme.palette.primary.light,
+          borderColor: 'white',
+          backgroundColor: 'white',
           '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.primary.main,
-            background: `${theme.palette.primary.main}!important`,
-            color: theme.palette.primary.light,
+            borderColor: 'white',
+            background: `${'white'}!important`,
+            color: 'white',
             '& svg': {
-              stroke: theme.palette.primary.light
+              stroke: 'white'
             }
           },
           '& .MuiChip-label': {
@@ -123,14 +127,15 @@ const ProfileSection = () => {
             color="inherit"
           />
         }
-        label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
-        variant="outlined"
+        // label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+        // variant="outlined"
         ref={anchorRef}
         aria-controls={open ? 'menu-list-grow' : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
         color="primary"
       />
+      </Stack>
       <Popper
         placement="bottom-end"
         open={open}
@@ -157,14 +162,13 @@ const ProfileSection = () => {
                   <Box sx={{ p: 2 }}>
                     <Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning,</Typography>
+                        <Typography variant="h4">Greetings,</Typography>
                         <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Johne Doe
+                          User
                         </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
                     </Stack>
-                    <OutlinedInput
+                    {/* <OutlinedInput
                       sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
                       id="input-search-profile"
                       value={value}
@@ -180,11 +184,11 @@ const ProfileSection = () => {
                         'aria-label': 'weight'
                       }}
                     />
-                    <Divider />
+                    <Divider /> */}
                   </Box>
                   <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                     <Box sx={{ p: 2 }}>
-                      <UpgradePlanCard />
+                      {/* <UpgradePlanCard /> */}
                       <Divider />
                       <Card
                         sx={{
@@ -192,7 +196,7 @@ const ProfileSection = () => {
                           my: 2
                         }}
                       >
-                        <CardContent>
+                        {/* <CardContent>
                           <Grid container spacing={3} direction="column">
                             <Grid item>
                               <Grid item container alignItems="center" justifyContent="space-between">
@@ -226,9 +230,8 @@ const ProfileSection = () => {
                               </Grid>
                             </Grid>
                           </Grid>
-                        </CardContent>
+                        </CardContent> */}
                       </Card>
-                      <Divider />
                       <List
                         component="nav"
                         sx={{
@@ -255,7 +258,7 @@ const ProfileSection = () => {
                           </ListItemIcon>
                           <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
                         </ListItemButton>
-                        <ListItemButton
+                        {/* <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 1}
                           onClick={(event) => handleListItemClick(event, 1, '#')}
@@ -271,7 +274,6 @@ const ProfileSection = () => {
                                 </Grid>
                                 <Grid item>
                                   <Chip
-                                    label="02"
                                     size="small"
                                     sx={{
                                       bgcolor: theme.palette.warning.dark,
@@ -282,7 +284,7 @@ const ProfileSection = () => {
                               </Grid>
                             }
                           />
-                        </ListItemButton>
+                        </ListItemButton> */}
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 4}

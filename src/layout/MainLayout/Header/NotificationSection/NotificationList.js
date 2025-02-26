@@ -16,7 +16,8 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-
+import TranslateIcon from '@mui/icons-material/Translate';
+// third-party
 // assets
 import { IconBrandTelegram, IconBuildingStore, IconMailbox, IconPhoto } from '@tabler/icons';
 import User1 from 'assets/images/users/user-round.svg';
@@ -63,6 +64,7 @@ const NotificationList = () => {
   };
 
   return (
+    
     <List
       sx={{
         width: '100%',
@@ -83,7 +85,7 @@ const NotificationList = () => {
         }
       }}
     >
-      <ListItemWrapper>
+      {/* <ListItemWrapper>
         <ListItem alignItems="center">
           <ListItemAvatar>
             <Avatar alt="John Doe" src={User1} />
@@ -114,8 +116,8 @@ const NotificationList = () => {
             </Grid>
           </Grid>
         </Grid>
-      </ListItemWrapper>
-      <Divider />
+      </ListItemWrapper> */}
+      {/* <Divider />
       <ListItemWrapper>
         <ListItem alignItems="center">
           <ListItemAvatar>
@@ -154,7 +156,7 @@ const NotificationList = () => {
           </Grid>
         </Grid>
       </ListItemWrapper>
-      <Divider />
+      <Divider /> */}
       <ListItemWrapper>
         <ListItem alignItems="center">
           <ListItemAvatar>
@@ -196,7 +198,7 @@ const NotificationList = () => {
         </Grid>
       </ListItemWrapper>
       <Divider />
-      <ListItemWrapper>
+      {/* <ListItemWrapper>
         <ListItem alignItems="center">
           <ListItemAvatar>
             <Avatar alt="John Doe" src={User1} />
@@ -244,8 +246,8 @@ const NotificationList = () => {
             </Grid>
           </Grid>
         </Grid>
-      </ListItemWrapper>
-      <Divider />
+      </ListItemWrapper> */}
+      {/* <Divider />
       <ListItemWrapper>
         <ListItem alignItems="center">
           <ListItemAvatar>
@@ -274,7 +276,7 @@ const NotificationList = () => {
             </Grid>
           </Grid>
         </Grid>
-      </ListItemWrapper>
+      </ListItemWrapper> */}
     </List>
   );
 };

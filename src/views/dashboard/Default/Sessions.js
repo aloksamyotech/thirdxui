@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const Sessions = () => {
     return (
-        <Box sx={{ bgcolor: '#fff', p: '10px' }}>
+        <Box sx={{ bgcolor: '#fff', p: '10px',borderRadius:'10px' }}>
             <Stack direction='row' sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography>Current Sessions</Typography>
                 <Stack direction='row'>

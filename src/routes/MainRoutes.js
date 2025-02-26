@@ -1,10 +1,7 @@
 import { lazy } from 'react';
-
-// project imports
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 
-// dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
 const ContactManagement = Loadable(lazy(() => import('views/Service')));
@@ -17,8 +14,6 @@ const EmailTemplates = Loadable(lazy(() => import('views/EmailTemplates')));
 const Document = Loadable(lazy(() => import('views/Documents')));
 const Calender = Loadable(lazy(() => import('views/Calender')));
 const AddTemplates = Loadable(lazy(() => import('views/EmailTemplates/AddTemplates')));
-
-// ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
   path: '/',

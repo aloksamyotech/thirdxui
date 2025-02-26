@@ -13,6 +13,7 @@ import MenuList from './MenuList';
 import LogoSection from '../LogoSection';
 import MenuCard from './MenuCard';
 import { drawerWidth } from 'store/constant';
+import UpgradePlanCard from '../Header/ProfileSection/UpgradePlanCard';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
@@ -37,6 +38,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
           }}
         >
           <MenuList />
+          <UpgradePlanCard />
         </PerfectScrollbar>
       </BrowserView>
       <MobileView>

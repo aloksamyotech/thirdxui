@@ -39,16 +39,16 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container >
           <Grid item xs={3}>
-            <DashboardCard />
+            <DashboardCard title='Actice Service User' num1='234' num2='119' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
           </Grid>
           <Grid item xs={3}>
-            <DashboardCard />
+            <DashboardCard title='Accepted referal this year' num1='71' num2='119' color='linear-gradient(135deg, rgb(135, 206, 250) 0%, rgb(70, 130, 180) 100%)' color2='#4682b4' />
           </Grid>
           <Grid item xs={3}>
-            <DashboardCard />
+            <DashboardCard title='Open Cases' num1='145' num2='62' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
           </Grid>
           <Grid item xs={3}>
-            <DashboardCard />
+            <DashboardCard title='Sessions Delievered' num1='34' num2='19' color='linear-gradient(135deg, rgb(135, 206, 250) 0%, rgb(70, 130, 180) 100%)' color2='#4682b4' />
           </Grid>
         </Grid>
       </Grid>
@@ -95,16 +95,16 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container >
           <Grid item xs={3}>
-            <NewDashboardCard />
+            <NewDashboardCard val1='Company Value' val2='Year of 2024' val3='$5000' val4='+15.6%' />
           </Grid>
           <Grid item xs={3}>
-            <NewDashboardCard />
+            <NewDashboardCard val1='Expenses' val2='Last month' val3='$4450' val4='+10%' />
           </Grid>
           <Grid item xs={3}>
-            <NewDashboardCard />
+            <NewDashboardCard val1='Spendings' val2='Year of 2024' val3='$1.5M' val4='+22%' />
           </Grid>
           <Grid item xs={3}>
-            <NewDashboardCard />
+            <NewDashboardCard val1='Totals' val2='Last month' val3='$31,564' val4='+14%' />
           </Grid>
         </Grid>
       </Grid>

@@ -57,24 +57,28 @@ const Dashboard = () => {
           <Grid item xs={7}>
             <TotalGrowthBarChart isLoading={isLoading} />
           </Grid>
-          <Grid item xs={5}>
-            <AppTrafficBySite
-              title="Recent Media"
-              list={[
-                { name: 'Football', image: footballImg },
-                { name: 'Volleyball', image: volleyballImg },
-                { name: 'Group Work', image: groupWorkImg },
-                { name: 'Arts & Craft', image: artsImg }
-              ]}
-            />
-            <AppTasks
-              title="My Task"
-              list={[
-                { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
-                { id: '2', label: 'Tasj call due for Anindya on 12/01/2023 Comment: call himand confirm commented by HeadSalesMarketing' },
-                { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
-              ]}
-            />
+          <Grid item container xs={5}>
+            <Grid item xs={12}>
+              <AppTasks
+                title="My Task"
+                list={[
+                  { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
+                  { id: '2', label: 'Tasj call due for Anindya on 12/01/2023 Comment: call himand confirm commented by HeadSalesMarketing' },
+                  { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
+                ]}
+              />
+            </Grid>
+            <Grid item xs={12} >
+              <AppTrafficBySite
+                title="Recent Media"
+                list={[
+                  { name: 'Football', image: footballImg },
+                  { name: 'Volleyball', image: volleyballImg },
+                  { name: 'Group Work', image: groupWorkImg },
+                  { name: 'Arts & Craft', image: artsImg }
+                ]}
+              />
+            </Grid>
           </Grid>
         </Grid>
       </Grid>

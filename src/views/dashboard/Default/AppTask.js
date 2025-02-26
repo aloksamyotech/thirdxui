@@ -3,10 +3,11 @@ import { useState } from 'react';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
-import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, CardHeader, FormControlLabel } from '@mui/material';
+import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton,Box,Typography, CardHeader, FormControlLabel } from '@mui/material';
 // components
 
 import Iconify from '../../../ui-component/iconify';
+import SearchIcon from '@mui/icons-material/Search';
 
 // ----------------------------------------------------------------------
 
@@ -25,7 +26,16 @@ export default function AppTasks({ title, subheader, list, ...other }) {
 
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader title={title} subheader={subheader}
+         action={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Type to filter
+            </Typography>
+            <SearchIcon sx={{ color: 'gray' }} />
+          </Box>
+        } />
+      <Divider />
       <Controller
         name="taskCompleted"
         control={control}
@@ -39,7 +49,7 @@ export default function AppTasks({ title, subheader, list, ...other }) {
                 <TaskItem
                   key={task.id}
                   task={task}
-                  checked={field.value.includes(task.id)}
+                  // checked={field.value.includes(task.id)}
                   onChange={() => field.onChange(onSelected(task.id))}
                 />
               ))}

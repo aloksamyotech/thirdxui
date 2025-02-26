@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // material-ui
-import { Grid } from '@mui/material';
+import { Grid, Avatar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
@@ -17,6 +17,10 @@ import Iconify from '../../../ui-component/iconify';
 import AppTasks from './AppTask';
 import AppConversionRates from './AppConversionCard';
 import AppCurrentVisits from './AppCurrentVisitCard';
+import footballImg from 'assets/images/football.jpg';
+import volleyballImg from 'assets/images/volleyball.jpg';
+import groupWorkImg from 'assets/images/groupWork.jpg';
+import artsImg from 'assets/images/arts.jpg';
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
@@ -91,42 +95,25 @@ const Dashboard = () => {
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
-          <Grid item xs={12} md={6} lg={5}>
+          <Grid item xs={12} md={7}>
             <AppTrafficBySite
-              title="Traffic by Site"
+              title="Recent Media"
               list={[
-                {
-                  name: 'FaceBook',
-                  value: 323234,
-                  icon: <Iconify icon={'eva:facebook-fill'} color="#1877F2" width={32} />
-                },
-                {
-                  name: 'Google',
-                  value: 341212,
-                  icon: <Iconify icon={'eva:google-fill'} color="#DF3E30" width={32} />
-                },
-                {
-                  name: 'Linkedin',
-                  value: 411213,
-                  icon: <Iconify icon={'eva:linkedin-fill'} color="#006097" width={32} />
-                },
-                {
-                  name: 'Twitter',
-                  value: 443232,
-                  icon: <Iconify icon={'eva:twitter-fill'} color="#1C9CEA" width={32} />
-                }
+                { name: 'Football', image: footballImg },
+                { name: 'Volleyball', image: volleyballImg },
+                { name: 'Group Work', image: groupWorkImg },
+                { name: 'Arts & Craft', image: artsImg }
               ]}
             />
           </Grid>
+          ;
           <Grid item xs={12} md={7}>
             <AppTasks
-              title="Tasks"
+              title="My Task"
               list={[
-                { id: '1', label: 'Create FireStone Logo' },
-                { id: '2', label: 'Add SCSS and JS files if required' },
-                { id: '3', label: 'Stakeholder Meeting' },
-                { id: '4', label: 'Scoping & Estimations' },
-                { id: '5', label: 'Sprint Showcase' }
+                { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
+                { id: '2', label: 'Tasj call due for Anindya on 12/01/2023 Comment: call himand confirm commented by HeadSalesMarketing' },
+                { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
               ]}
             />
           </Grid>

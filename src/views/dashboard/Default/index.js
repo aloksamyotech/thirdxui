@@ -17,6 +17,10 @@ import Iconify from '../../../ui-component/iconify';
 import AppTasks from './AppTask';
 import AppConversionRates from './AppConversionCard';
 import AppCurrentVisits from './AppCurrentVisitCard';
+import DashboardCard from 'ui-component/cards/DashboardCard';
+import NewDashboardCard from 'ui-component/cards/NewDashboardCard';
+import Sessions from './Sessions';
+import Map from '../Map';
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
@@ -29,6 +33,22 @@ const Dashboard = () => {
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
+        <Grid container >
+          <Grid item xs={3}>
+            <DashboardCard />
+          </Grid>
+          <Grid item xs={3}>
+            <DashboardCard />
+          </Grid>
+          <Grid item xs={3}>
+            <DashboardCard />
+          </Grid>
+          <Grid item xs={3}>
+            <DashboardCard />
+          </Grid>
+        </Grid>
+      </Grid>
+      {/* <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} md={6} sm={6} xs={12}>
             <TotalOrderLineChartCard isLoading={isLoading} />
@@ -44,7 +64,7 @@ const Dashboard = () => {
             <EarningCard isLoading={isLoading} />
           </Grid>
         </Grid>
-      </Grid>
+      </Grid> */}
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12} md={8}>
@@ -55,7 +75,7 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12} md={6} lg={6}>
             <AppConversionRates
@@ -88,47 +108,30 @@ const Dashboard = () => {
             />
           </Grid>
         </Grid>
+      </Grid> */}
+      <Grid item xs={12}>
+        <Grid container spacing={1}>
+          <Grid item xs={6}>
+            <Sessions />
+          </Grid>
+          <Grid item xs={6}>
+            <Map />
+          </Grid>
+        </Grid>
       </Grid>
       <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          <Grid item xs={12} md={6} lg={5}>
-            <AppTrafficBySite
-              title="Traffic by Site"
-              list={[
-                {
-                  name: 'FaceBook',
-                  value: 323234,
-                  icon: <Iconify icon={'eva:facebook-fill'} color="#1877F2" width={32} />
-                },
-                {
-                  name: 'Google',
-                  value: 341212,
-                  icon: <Iconify icon={'eva:google-fill'} color="#DF3E30" width={32} />
-                },
-                {
-                  name: 'Linkedin',
-                  value: 411213,
-                  icon: <Iconify icon={'eva:linkedin-fill'} color="#006097" width={32} />
-                },
-                {
-                  name: 'Twitter',
-                  value: 443232,
-                  icon: <Iconify icon={'eva:twitter-fill'} color="#1C9CEA" width={32} />
-                }
-              ]}
-            />
+        <Grid container >
+          <Grid item xs={3}>
+            <NewDashboardCard />
           </Grid>
-          <Grid item xs={12} md={7}>
-            <AppTasks
-              title="Tasks"
-              list={[
-                { id: '1', label: 'Create FireStone Logo' },
-                { id: '2', label: 'Add SCSS and JS files if required' },
-                { id: '3', label: 'Stakeholder Meeting' },
-                { id: '4', label: 'Scoping & Estimations' },
-                { id: '5', label: 'Sprint Showcase' }
-              ]}
-            />
+          <Grid item xs={3}>
+            <NewDashboardCard />
+          </Grid>
+          <Grid item xs={3}>
+            <NewDashboardCard />
+          </Grid>
+          <Grid item xs={3}>
+            <NewDashboardCard />
           </Grid>
         </Grid>
       </Grid>

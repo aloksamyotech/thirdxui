@@ -1,153 +1,133 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-
-// material-ui
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
   Checkbox,
-  Divider,
   FormControl,
   FormControlLabel,
   FormHelperText,
-  Grid,
   IconButton,
   InputAdornment,
   InputLabel,
   OutlinedInput,
   Stack,
-  Typography,
-  useMediaQuery
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography
 } from '@mui/material';
-
-// third party
 import * as Yup from 'yup';
+import { toast } from 'react-toastify';
 import { Formik } from 'formik';
-
-// project imports
-import useScriptRef from 'hooks/useScriptRef';
+import useScriptRef from 'hooks/useScriptRef.js';
 import AnimateButton from 'ui-component/extended/AnimateButton';
-
-// assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import the Copy Icon
 
-import Google from 'assets/images/icons/social-google.svg';
-
-// ============================|| FIREBASE - LOGIN ||============================ //
-
-const FirebaseLogin = ({ ...others }) => {
+const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const scriptedRef = useScriptRef();
-  const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
-  const customization = useSelector((state) => state.customization);
-  const [checked, setChecked] = useState(true);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
+  const [expanded, setExpanded] = useState(false);
 
-  const googleHandler = async () => {
-    console.error('Login');
+  const handleAccordian = (panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
   };
 
-  const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
+  const handleCopyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success('Copied to clipboard!');
+    }).catch(() => {
+      toast.error('Failed to copy!');
+    });
+  };
+
   return (
     <>
-      <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid item xs={12}>
-          <AnimateButton>
-            <Button
-              disableElevation
-              fullWidth
-              onClick={googleHandler}
-              size="large"
-              variant="outlined"
-              sx={{
-                color: 'grey.700',
-                backgroundColor: theme.palette.grey[50],
-                borderColor: theme.palette.grey[100]
-              }}
-            >
-              <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
-                <img src={Google} alt="google" width={16} height={16} style={{ marginRight: matchDownSM ? 8 : 16 }} />
-              </Box>
-              Sign in with Google
-            </Button>
-          </AnimateButton>
-        </Grid>
-        <Grid item xs={12}>
-          <Box
-            sx={{
-              alignItems: 'center',
-              display: 'flex'
-            }}
-          >
-            <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-
-            <Button
-              variant="outlined"
-              sx={{
-                cursor: 'unset',
-                m: 2,
-                py: 0.5,
-                px: 7,
-                borderColor: `${theme.palette.grey[100]} !important`,
-                color: `${theme.palette.grey[900]}!important`,
-                fontWeight: 500,
-                borderRadius: `${customization.borderRadius}px`
-              }}
-              disableRipple
-              disabled
-            >
-              OR
-            </Button>
-
-            <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-          </Box>
-        </Grid>
-        <Grid item xs={12} container alignItems="center" justifyContent="center">
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1">Sign in with Email address</Typography>
-          </Box>
-        </Grid>
-      </Grid>
-
       <Formik
         initialValues={{
-          email: 'info@codedthemes.com',
-          password: '123456',
-          submit: null
+          email: '',
+          password: ''
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().max(255).required('Password is required')
+          password: Yup.string().required('Password is required')
         })}
-        onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+        onSubmit={async (values, { setErrors, setStatus }) => {
           try {
-            if (scriptedRef.current) {
-              setStatus({ success: true });
-              setSubmitting(false);
+            setIsSubmitting(true);
+            const res = await addApi('/user/login/', values);
+
+            if (res?.data && res?.data?.jwtToken && res?.data?.user) {
+              const storageMethod = rememberMe ? localStorage : sessionStorage;
+              storageMethod.setItem('imstoken', JSON.stringify(res.data.jwtToken));
+              storageMethod.setItem('user', JSON.stringify(res.data.user));
+              storageMethod.setItem('userId', res.data.user._id);
+              storageMethod.setItem('email', res.data.user.email);
+              storageMethod.setItem('role', res.data.user.role);
+              storageMethod.setItem('permissions', res.data.user.permissions || []);
+
+              if (res.data.user.role === 'user') {
+                navigate('/dashboard/default');
+                window.location.reload();
+              } else if (res.data.user.role === 'admin') {
+                navigate('/dashboard/admin');
+                window.location.reload();
+              } else if (res.data.user.role === 'employee') {
+                const permissions = (localStorage.getItem('permissions') || '').split(',');
+                const filteredMenu = filterMenuItems(dashboard.children, permissions);
+                const firstAvailableRoute = filteredMenu.length > 0 ? filteredMenu[0].url : '/dashboard/default';
+
+                window.location.replace(firstAvailableRoute);
+              }
+
+              toast.success('Logged in successfully');
+            } else {
+              throw new Error('Unexpected response structure');
             }
-          } catch (err) {
-            console.error(err);
-            if (scriptedRef.current) {
-              setStatus({ success: false });
-              setErrors({ submit: err.message });
-              setSubmitting(false);
-            }
+          } catch (error) {
+            console.log(error);
+            toast.error(error.response?.data?.message || 'Logged in failed');
+          } finally {
+            setIsSubmitting(false);
           }
         }}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+        {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldValue }) => (
           <form noValidate onSubmit={handleSubmit} {...others}>
-            <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-              <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
+            <FormControl
+              fullWidth
+              error={Boolean(touched.email && errors.email)}
+              sx={{
+                '& .MuiFormLabel-root': {
+                  color: '#000066'
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: errors.email ? '#000066' : ''
+                  }
+                },
+                mb: 2
+              }}
+            >
+              <InputLabel htmlFor="outlined-adornment-email-login">Email Address</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
                 type="email"
@@ -155,17 +135,24 @@ const FirebaseLogin = ({ ...others }) => {
                 name="email"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                label="Email Address / Username"
-                inputProps={{}}
+                label="Email Address"
               />
-              {touched.email && errors.email && (
-                <FormHelperText error id="standard-weight-helper-text-email-login">
-                  {errors.email}
-                </FormHelperText>
-              )}
+              {touched.email && errors.email && <FormHelperText error>{errors.email}</FormHelperText>}
             </FormControl>
-
-            <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
+            <FormControl
+              fullWidth
+              error={Boolean(touched.password && errors.password)}
+              sx={{
+                '& .MuiFormLabel-root': {
+                  color: '#000066'
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: errors.email ? '#000066' : ''
+                  }
+                }
+              }}
+            >
               <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password-login"
@@ -181,42 +168,127 @@ const FirebaseLogin = ({ ...others }) => {
                       onClick={handleClickShowPassword}
                       onMouseDown={handleMouseDownPassword}
                       edge="end"
-                      size="large"
+                      size="small"
                     >
                       {showPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
                 }
                 label="Password"
-                inputProps={{}}
               />
-              {touched.password && errors.password && (
-                <FormHelperText error id="standard-weight-helper-text-password-login">
-                  {errors.password}
-                </FormHelperText>
-              )}
+              {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
             </FormControl>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+            {/* <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
               <FormControlLabel
                 control={
-                  <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} name="checked" color="primary" />
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(event) => setRememberMe(event.target.checked)}
+                    name="rememberMe"
+                    color="primary"
+                  />
                 }
                 label="Remember me"
               />
-              <Typography variant="subtitle1" color="secondary" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
-                Forgot Password?
-              </Typography>
-            </Stack>
-            {errors.submit && (
-              <Box sx={{ mt: 3 }}>
-                <FormHelperText error>{errors.submit}</FormHelperText>
-              </Box>
-            )}
+            </Stack> */}
 
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ width: '100%' }}>
+              <Accordion expanded={expanded === 'panel1'} onChange={handleAccordian('panel1')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
+                  <Typography variant="h5">Admin Credentials</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      Email: admin@gmail.com
+                      <IconButton
+                        aria-label="copy email"
+                        size="small"
+                        onClick={() => {
+                          handleCopyToClipboard('admin@gmail.com');
+                          setFieldValue('email', 'admin@gmail.com');
+                        }}
+                        sx={{ marginLeft: 1 }}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      Password: admin123
+                      <IconButton
+                        aria-label="copy password"
+                        size="small"
+                        onClick={() => {
+                          handleCopyToClipboard('admin123');
+                          setFieldValue('password', 'admin123');
+                        }}
+                        sx={{ marginLeft: 1 }}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Typography>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+
+              <Accordion expanded={expanded === 'panel2'} onChange={handleAccordian('panel2')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel2-content" id="panel2-header">
+                  <Typography variant="h5">User Credentials</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      Email: samyotech@gmail.com
+                      <IconButton
+                        aria-label="copy email"
+                        size="small"
+                        onClick={() => {
+                          handleCopyToClipboard('samyotech@gmail.com');
+                          setFieldValue('email', 'samyotech@gmail.com');
+                        }}
+                        sx={{ marginLeft: 1 }}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                      Password: 123456
+                      <IconButton
+                        aria-label="copy password"
+                        size="small"
+                        onClick={() => {
+                          handleCopyToClipboard('123456');
+                          setFieldValue('password', '123456');
+                        }}
+                        sx={{ marginLeft: 1 }}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Typography>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            </Box>
+
+            <Box  sx={{display: 'flex', justifyContent: 'center' }}>
               <AnimateButton>
-                <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="secondary">
-                  Sign in
+                <Button
+                  disableElevation
+                  disabled={isSubmitting}
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  sx={{
+                    background: 'linear-gradient(45deg, #441572, #7c4bad)',
+                    borderRadius: '50px',
+                    '&:hover': {
+                      background: 'linear-gradient(to right, #4b6cb7, #182848)',
+                      boxShadow: '2'
+                    },
+                  }}
+                >
+                  {isSubmitting ? 'Logging in...' : 'Sign in'}
                 </Button>
               </AnimateButton>
             </Box>
@@ -227,4 +299,4 @@ const FirebaseLogin = ({ ...others }) => {
   );
 };
 
-export default FirebaseLogin;
+export default AuthLogin;

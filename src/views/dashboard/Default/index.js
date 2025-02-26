@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // material-ui
-import { Grid } from '@mui/material';
+import { Grid, Avatar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
@@ -17,6 +17,10 @@ import Iconify from '../../../ui-component/iconify';
 import AppTasks from './AppTask';
 import AppConversionRates from './AppConversionCard';
 import AppCurrentVisits from './AppCurrentVisitCard';
+import footballImg from 'assets/images/football.jpg';
+import volleyballImg from 'assets/images/volleyball.jpg';
+import groupWorkImg from 'assets/images/groupWork.jpg';
+import artsImg from 'assets/images/arts.jpg';
 import DashboardCard from 'ui-component/cards/DashboardCard';
 import NewDashboardCard from 'ui-component/cards/NewDashboardCard';
 import Sessions from './Sessions';
@@ -72,6 +76,23 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <PopularCard isLoading={isLoading} />
+            <AppTrafficBySite
+              title="Recent Media"
+              list={[
+                { name: 'Football', image: footballImg },
+                { name: 'Volleyball', image: volleyballImg },
+                { name: 'Group Work', image: groupWorkImg },
+                { name: 'Arts & Craft', image: artsImg }
+              ]}
+            />
+            <AppTasks
+              title="My Task"
+              list={[
+                { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
+                { id: '2', label: 'Tasj call due for Anindya on 12/01/2023 Comment: call himand confirm commented by HeadSalesMarketing' },
+                { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
+              ]}
+            />
           </Grid>
         </Grid>
       </Grid>

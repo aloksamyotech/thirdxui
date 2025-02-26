@@ -2,12 +2,13 @@
 import {
   IconHome,
   IconSettingsAutomation,
-  IconMail,
+  IconChartBar,
+  IconRefresh,
   IconFileUpload,
   IconFileInvoice,
-  IconPhoneCall,
+  IconSettings,
   IconAntennaBars5,
-  IconChecklist,
+  IconClipboardData,
   IconNotebook,
   IconPhoneCheck,
   IconUser
@@ -17,12 +18,13 @@ import {
 const icons = {
   IconHome,
   IconSettingsAutomation,
-  IconMail,
+  IconChartBar,
+  IconRefresh,
   IconFileUpload,
   IconFileInvoice,
-  IconPhoneCall,
+  IconSettings,
   IconAntennaBars5,
-  IconChecklist,
+  IconClipboardData,
   IconNotebook,
   IconPhoneCheck,
   IconUser
@@ -86,38 +88,38 @@ const dashboard = {
       icon: icons.IconFileInvoice,
       breadcrumbs: false
     },
-    // {
-    //   id: '04',
-    //   title: 'Tasks',
-    //   type: 'item',
-    //   url: '/dashboard/task',
-    //   icon: icons.IconChecklist,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: '05',
-    //   title: 'Meeting',
-    //   type: 'item',
-    //   url: '/dashboard/meeting',
-    //   icon: icons.IconUsers,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: '06',
-    //   title: 'Calls',
-    //   type: 'item',
-    //   url: '/dashboard/call',
-    //   icon: icons.IconPhoneCall,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: '07',
-    //   title: 'Emails',
-    //   type: 'item',
-    //   url: '/dashboard/email',
-    //   icon: icons.IconMail,
-    //   breadcrumbs: false
-    // },
+    {
+      id: '04',
+      title: 'Forms',
+      type: 'item',
+      url: '/dashboard/default',
+      icon: icons.IconClipboardData,
+      breadcrumbs: false
+    },
+    {
+      id: '05',
+      title: 'Report',
+      type: 'item',
+      url: '/dashboard/default',
+      icon: icons.IconChartBar,
+      breadcrumbs: false
+    },
+    {
+      id: '06',
+      title: 'Configuration',
+      type: 'item',
+      url: '/dashboard/default',
+      icon: icons.IconSettings,
+      breadcrumbs: false
+    },
+    {
+      id: '07',
+      title: 'Data Management',
+      type: 'item',
+      url: '/dashboard/default',
+      icon: icons.IconRefresh,
+      breadcrumbs: false
+    },
     // {
     //   id: '08',
     //   title: 'Calender',
@@ -142,6 +144,8 @@ const dashboard = {
     //   icon: icons.IconFileInvoice,
     //   breadcrumbs: false
     // }
+
+    
   ]
 };
 

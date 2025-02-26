@@ -37,25 +37,14 @@ const AddCaseForm = ({ onCancel }) => {
 
       <Card sx={{ padding: 2, marginTop: 2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <TextField fullWidth label="Service Name" name="name" value={caseData.name} onChange={handleChange} />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <TextField fullWidth label="Service Code" name="code" value={caseData.code} onChange={handleChange} />
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Service Description" name="description" value={caseData.description} onChange={handleChange} />
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <TextField select fullWidth label="Service Type" name="service" value={caseData.service} onChange={handleChange}>
-              <MenuItem value="Service A">Service A</MenuItem>
-              <MenuItem value="Service B">Service B</MenuItem>
-            </TextField>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="From Date"
@@ -65,7 +54,7 @@ const AddCaseForm = ({ onCancel }) => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="To Date"
@@ -76,27 +65,46 @@ const AddCaseForm = ({ onCancel }) => {
             </LocalizationProvider>
           </Grid>
 
+          <Grid item xs={12} sm={3}>
+            <TextField fullWidth label="Service Description" name="description" value={caseData.description} onChange={handleChange} />
+          </Grid>
+
+          <Grid item xs={12} sm={3}>
+            <TextField select fullWidth label="Service Type" name="service" value={caseData.service} onChange={handleChange}>
+              <MenuItem value="Service A">Service A</MenuItem>
+              <MenuItem value="Service B">Service B</MenuItem>
+            </TextField>
+          </Grid>
+
           <Grid item xs={12}>
             <Typography variant="h6" sx={{ marginTop: 2 }}>
               Attachments
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Button variant="contained" component="label">
+            <Typography
+              component="label"
+              htmlFor="upload-file"
+              sx={{
+                color: '#714dba',
+                textDecoration: 'underline',
+                cursor: 'pointer'
+              }}
+            >
               Upload File
-              <input type="file" hidden onChange={handleFileChange} />
-            </Button>
+            </Typography>
+            <input id="upload-file" type="file" hidden onChange={handleFileChange} />
           </Grid>
         </Grid>
 
         <Grid container spacing={2} sx={{ justifyContent: 'flex-end' }}>
           <Grid item>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <Button variant="contained" color="secondary" onClick={handleSubmit}>
               Save
             </Button>
           </Grid>
           <Grid item>
-            <Button variant="outlined" color="primary" onClick={onCancel}>
+            <Button variant="outlined" color="error" onClick={onCancel}>
               Cancel
             </Button>
           </Grid>

@@ -19,7 +19,7 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-
+import { useNavigate } from 'react-router';
 import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
@@ -30,6 +30,7 @@ const AuthRegister = ({ ...others }) => {
   const scriptedRef = useScriptRef();
   const [showPassword, setShowPassword] = useState(false);
   const [checked, setChecked] = useState(true);
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -225,26 +226,19 @@ const AuthRegister = ({ ...others }) => {
           )}
 
           <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
-            <AnimateButton>
-              <Button
+          <Button
                 disableElevation
-                disabled={isSubmitting}
-                size="large"
+                fullWidth
+                size="small"
                 type="submit"
                 variant="contained"
-                color="secondary"
                 sx={{
-                  background: 'linear-gradient(45deg, #441572, #7c4bad)',
-                  borderRadius: '50px',
-                  '&:hover': {
-                    background: 'linear-gradient(to right, #4b6cb7, #182848)',
-                    boxShadow: '2'
-                  }
+                  backgroundColor: '#f7931e !important'
                 }}
+                onClick={() => navigate('/dashboard/default')}
               >
-                Register
+                REGISTER
               </Button>
-            </AnimateButton>
           </Box>
         </form>
       )}

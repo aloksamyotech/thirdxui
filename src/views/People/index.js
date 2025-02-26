@@ -135,7 +135,7 @@ const Lead = () => {
               <IconButton
                 onClick={handleOpenDialog}
                 sx={{
-                  backgroundColor: '#2196f3',
+                  backgroundColor: '#41C048',
                   borderRadius: '50%',
                   width: '35px',
                   height: '35px',
@@ -146,7 +146,7 @@ const Lead = () => {
                   color: 'white',
                   cursor: 'pointer',
                   '&:hover': {
-                    backgroundColor: '#1565c0',
+                    backgroundColor: '#41C048',
                     color: '#ffffff'
                   }
                 }}

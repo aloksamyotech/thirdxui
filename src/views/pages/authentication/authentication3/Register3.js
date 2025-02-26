@@ -6,8 +6,8 @@ import { Divider, Grid, Stack, Typography, useMediaQuery, Box } from '@mui/mater
 import AuthWrapper1 from '../AuthWrapper1.js';
 import AuthCardWrapper from '../AuthCardWrapper.js';
 import AuthRegister from '../auth-forms/AuthRegister.js';
-import AuthFooter from 'ui-component/cards/AuthFooter.js';
-// import InventoryImage from 'assets/images/inventory_management_image.png';
+import LoginImage from 'assets/images/login-image.png';
+
 // ===============================|| AUTH3 - REGISTER ||=============================== //
 
 const Register = () => {
@@ -16,54 +16,7 @@ const Register = () => {
 
   return (
     <AuthWrapper1>
-      <Grid container sx={{ minHeight: '100vh', backgroundColor: '#441572' }}>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#2f124c',
-              padding: '4px',
-              flexDirection: 'column'
-            }}
-          >
-            <Box
-              component="img"
-              // src={InventoryImage}
-              alt="Inventory Management"
-              sx={{
-                maxWidth: '60%',
-                maxHeight: '60%',
-                objectFit: 'contain',
-                borderRadius: '20px'
-              }}
-            />
-            <Typography
-              variant="h2"
-              sx={{
-                color: 'white',
-                fontWeight: 'bold',
-                textAlign: 'center',
-                marginTop: '16px'
-              }}
-            >
-              Inventory Management System <br />
-              <span style={{ fontSize: '12px' }}>Streamline your inventory, track your products, and manage supplies effortlessly.</span>
-            </Typography>
-          </Box>
-        </Grid>
+      <Grid container sx={{ minHeight: '100vh', backgroundColor: '#053146' }}>
 
         <Grid
           item
@@ -112,11 +65,55 @@ const Register = () => {
                     '&:hover': { textDecoration: 'underline' }
                   }}
                 >
-                  Already have an account?<span style={{ color: '#441572', fontWeight: 'bold' }}>Login</span>
+                  Already have an account?<span style={{ color: '#15a6ca', fontWeight: 'bold' }}>Login</span>
                 </Typography>
               </Grid>
             </Grid>
           </AuthCardWrapper>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            backgroundColor: '#2f124c'
+          }}
+        >
+          <Box
+            component="img"
+            src={LoginImage}
+            alt="Thirdex"
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: '0px',
+            }}
+          />
+
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '70%',
+              left: '5%',
+              color: 'white',
+              textAlign: 'left',
+              maxWidth: '50%',
+              transform: 'translateY(-50%)'
+            }}
+          >
+            <Typography variant="h2" sx={{ color: 'white' }}>
+              Thirdex helps you win!
+            </Typography>
+            <Typography variant="body2" sx={{ fontSize: '14px', mt: 1, color: 'white' }}>
+              Organize your forms, events, workshops, and more with our CRM suite.
+            </Typography>
+          </Box>
         </Grid>
       </Grid>
     </AuthWrapper1>

@@ -8,6 +8,7 @@ import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, Box, Typ
 
 import Iconify from '../../../ui-component/iconify';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 
 // ----------------------------------------------------------------------
 
@@ -28,11 +29,18 @@ export default function AppTasks({ title, subheader, list, ...other }) {
     <Card {...other} sx={{ paddingY: '20px' }}>
       <CardHeader title={title} subheader={subheader}
         action={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Type to filter
-            </Typography>
-            <SearchIcon sx={{ color: 'gray' }} />
+          <Box sx={{
+            color: '#fff',
+            bgcolor: '#41c048',
+            borderRadius: '100%',
+            width: '35px',
+            height: '35px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow: 3,
+          }}>
+            <AddIcon />
           </Box>
         } />
       <Divider />

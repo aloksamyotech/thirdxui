@@ -92,7 +92,7 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Grid container >
           <Grid item xs={3}>
             <NewDashboardCard val1='Company Value' val2='Year of 2024' val3='$5000' val4='+15.6%' />
@@ -107,7 +107,7 @@ const Dashboard = () => {
             <NewDashboardCard val1='Totals' val2='Last month' val3='$31,564' val4='+14%' />
           </Grid>
         </Grid>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };

@@ -59,24 +59,33 @@ const MainRoutes = {
         }
       ]
     },
-    // {
-    //   path: 'dashboard',
-    //   children: [
-    //     {
-    //       path: 'policy',
-    //       element: <Policy />
-    //     }
-    //   ]
-    // },
-    // {
-    //   path: 'dashboard',
-    //   children: [
-    //     {
-    //       path: 'policy',
-    //       element: <Policy />
-    //     }
-    //   ]
-    // },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'manage-form',
+          element: <Case />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'appearance',
+          element: <Case />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'history',
+          element: <Case />
+        }
+      ]
+    },
     {
       path: 'dashboard',
       children: [

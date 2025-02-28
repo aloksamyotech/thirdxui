@@ -89,12 +89,33 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: '04',
+      id: 'forms',
       title: 'Forms',
-      type: 'item',
-      url: '/dashboard/default',
+      type: 'collapse', 
       icon: icons.IconClipboardData,
-      breadcrumbs: false
+      children: [
+        {
+          id: 'manage-form',
+          title: 'Manage Form',
+          type: 'item',
+          url: '/dashboard/manage-form',
+          breadcrumbs: false
+        },
+        {
+          id: 'appearance',
+          title: 'Appearance',
+          type: 'item',
+          url: '/dashboard/appearance',
+          breadcrumbs: false
+        },
+        {
+          id: 'history',
+          title: 'History',
+          type: 'item',
+          url: '/dashboard/history',
+          breadcrumbs: false
+        }
+      ]
     },
     {
       id: '05',
@@ -105,47 +126,70 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: '06',
+      id: 'configuration',
       title: 'Configuration',
-      type: 'item',
-      url: '/dashboard/default',
+      type: 'collapse', 
       icon: icons.IconSettings,
-      breadcrumbs: false
+      children: [
+        {
+          id: 'tags',
+          title: 'Tags',
+          type: 'item',
+          url: '/dashboard/tags',
+          breadcrumbs: false
+        },
+        {
+          id: 'users',
+          title: 'Users',
+          type: 'item',
+          url: '/dashboard/users',
+          breadcrumbs: false
+        },
+        {
+          id: 'account',
+          title: 'Account',
+          type: 'item',
+          url: '/dashboard/account',
+          breadcrumbs: false
+        }
+      ]
     },
     {
-      id: '07',
+      id: 'data',
       title: 'Data Management',
-      type: 'item',
-      url: '/dashboard/default',
+      type: 'collapse', 
       icon: icons.IconRefresh,
-      breadcrumbs: false
-    },
-    // {
-    //   id: '08',
-    //   title: 'Calender',
-    //   type: 'item',
-    //   url: '/dashboard/calender',
-    //   icon: icons.IconCalendarEvent,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: '09',
-    //   title: 'Document Management',
-    //   type: 'item',
-    //   url: '/dashboard/document',
-    //   icon: icons.IconFileUpload,
-    //   breadcrumbs: false
-    // },
-    // {
-    //   id: '10',
-    //   title: 'Email Template',
-    //   type: 'item',
-    //   url: '/dashboard/emailtemplate',
-    //   icon: icons.IconFileInvoice,
-    //   breadcrumbs: false
-    // }
-
-    
+      children: [
+        {
+          id: 'bulkupload',
+          title: 'Bulk Upload',
+          type: 'item',
+          url: '/dashboard/bulkupload',
+          breadcrumbs: false
+        },
+        {
+          id: 'duplicate',
+          title: 'Duplicate',
+          type: 'item',
+          url: '/dashboard/duplicate',
+          breadcrumbs: false
+        },
+        {
+          id: 'bulkdelete',
+          title: 'Bulk Delete',
+          type: 'item',
+          url: '/dashboard/bulkdelete',
+          breadcrumbs: false
+        },
+        {
+          id: 'archives',
+          title: 'Archives',
+          type: 'item',
+          url: '/dashboard/archives',
+          breadcrumbs: false
+        }
+      ]
+    },    
   ]
 };
 

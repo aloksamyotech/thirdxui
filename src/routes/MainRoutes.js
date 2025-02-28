@@ -196,7 +196,7 @@ const MainRoutes = {
       children: [
         {
           path: 'duplicate',
-          element: <BulkUpload />
+          element: <Duplicate />
         }
       ]
     },
@@ -214,7 +214,7 @@ const MainRoutes = {
       children: [
         {
           path: 'bulkdelete',
-          element: <BulkUpload />
+          element: <BulkDelete />
         }
       ]
     }

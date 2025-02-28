@@ -1,4 +1,4 @@
-import { Box, Stack } from '@mui/system'
+import { Box, Container, Stack } from '@mui/system'
 import React from 'react'
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -15,7 +15,6 @@ const Chart = () => {
   const [three, setThree] = useState('');
   const [four, setFour] = useState('');
   const [filter, setFilter] = useState(false);
-  console.log(filter);
 
   return (
     <>
@@ -84,13 +83,13 @@ const Chart = () => {
             <MenuItem value="District 2">District 2</MenuItem>
           </TextField>
           <Button color='secondary' variant='contained'>Apply</Button>
-          <Stack sx={{
-            display: 'inline',
-            marginTop: '5px'
-          }}>
-            <FilterAltIcon fontSize='medium' sx={{ marginX: '4px', borderRadius: '100%', boxShadow: '1px 1px 5px #d4d4d4', cursor: 'pointer' }} onClick={() => setFilter(false)} />
+          <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
+            <FilterAltIcon
+              fontSize='medium'
+              sx={{ m: '4px', cursor: 'pointer' }}
+              onClick={() => setFilter(false)} />
           </Stack>
-          <Stack direction='row' sx={{ marginLeft: '10px' }}>
+          <Stack direction='row' sx={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
             <DownloadIcon fontSize='small' sx={{ marginX: '4px' }} />
             <PrintIcon fontSize='small' sx={{ marginX: '4px' }} />
             <SystemUpdateAltIcon fontSize='small' sx={{ marginX: '4px' }} />

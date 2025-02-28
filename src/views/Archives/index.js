@@ -14,7 +14,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button
+  Button,
+  TextField
 } from '@mui/material';
 import { DataGrid, GridToolbarContainer } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,6 +24,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import CloseIcon from '@mui/icons-material/Close';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+
 const Archieves = () => {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
@@ -33,6 +36,12 @@ const Archieves = () => {
     setShowForm(true);
     handleCloseDialog();
   };
+  const [one, setOne] = useState('');
+  const [two, setTwo] = useState('');
+  const [three, setThree] = useState('');
+  const [four, setFour] = useState('');
+  const [filter, setFilter] = useState(false)
+
   const CustomHeader = ({ pageSize, setPageSize, page, setPage, totalPages }) => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -116,73 +125,75 @@ const Archieves = () => {
   return (
     <Card sx={{ backgroundColor: '#EEF2F6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-            Archives
-          </Typography>
-        </Stack>
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: { minHeight: 300, maxHeight: 350 }
-          }}
-        >
-          <DialogTitle sx={{ fontSize: '1rem', textAlign: 'center' }}>
-            Choose which type of person you would like to add
-            <IconButton onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            <Stack direction="row" spacing={4} justifyContent="center">
-              <Box
-                onClick={handleSelectPerson}
-                sx={{
-                  width: 160,
-                  height: 160,
-                  bgcolor: '#E0E0E0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  transition: '0.3s',
-                  '&:hover': { bgcolor: '#D6D6D6' }
-                }}
-              >
-                <PersonIcon sx={{ fontSize: 50, color: '#333' }} />
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                  Service User
-                </Typography>
-              </Box>
-              <Box
-                onClick={handleSelectPerson}
-                sx={{
-                  width: 160,
-                  height: 160,
-                  bgcolor: '#E0E0E0',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  transition: '0.3s',
-                  '&:hover': { bgcolor: '#D6D6D6' }
-                }}
-              >
-                <VolunteerActivismIcon sx={{ fontSize: 50, color: '#333' }} />
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                  Volunteer
-                </Typography>
-              </Box>
+        {!filter &&
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
+            <Typography>Archives</Typography>
+            <FilterAltIcon fontSize='small' sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
+          </Box>
+        }
+        {filter &&
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
+            <TextField
+              select
+              label="Chooose Your Field"
+              value={one}
+              onChange={(e) => setOne(e.target.value)}
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: false }}
+              sx={{ width: 200 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+            <TextField
+              select
+              label="Service Date"
+              value={two}
+              onChange={(e) => setTwo(e.target.value)}
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: false }}
+              sx={{ width: 100 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+            <TextField
+              select
+              label="Referral Date"
+              value={three}
+              onChange={(e) => setThree(e.target.value)}
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: false }}
+              sx={{ width: 120 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+            <TextField
+              select
+              label="Age"
+              value={four}
+              onChange={(e) => setFour(e.target.value)}
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: false }}
+              sx={{ width: 150 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+            <Button color='secondary' variant='contained'>Apply</Button>
+            <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
+              <FilterAltIcon
+                fontSize='medium'
+                sx={{ m: '4px', cursor: 'pointer' }}
+                onClick={() => setFilter(false)} />
             </Stack>
-          </DialogContent>
-        </Dialog>
+          </Box >
+        }
         <Box width="100%">
           <Card style={{ height: '600px' }}>
             <DataGrid

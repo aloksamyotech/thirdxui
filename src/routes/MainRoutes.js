@@ -15,11 +15,12 @@ const Configuration = Loadable(lazy(() => import('views/Configuration')));
 const Document = Loadable(lazy(() => import('views/Documents')));
 const Calender = Loadable(lazy(() => import('views/Calender')));
 const Report = Loadable(lazy(() => import('views/Report')));
-const AddTemplates = Loadable(lazy(() => import('views/EmailTemplates/AddTemplates')));
+const User = Loadable(lazy(() => import('views/User')));
 const BulkUpload = Loadable(lazy(() => import('views/BulkUpload')));
 const BulkDelete = Loadable(lazy(() => import('views/BulkDelete')));
 const Archives = Loadable(lazy(() => import('views/Archives')));
 const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
+const Tag = Loadable(lazy(() => import('views/Tag')));
 
 const MainRoutes = {
   path: '/',
@@ -151,7 +152,7 @@ const MainRoutes = {
       children: [
         {
           path: 'tags',
-          element: <Configuration />
+          element: <Tag />
         }
       ]
     },
@@ -160,7 +161,7 @@ const MainRoutes = {
       children: [
         {
           path: 'users',
-          element: <Configuration />
+          element: <User />
         }
       ]
     },

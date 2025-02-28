@@ -21,6 +21,7 @@ const BulkDelete = Loadable(lazy(() => import('views/BulkDelete')));
 const Archives = Loadable(lazy(() => import('views/Archives')));
 const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
 const Tag = Loadable(lazy(() => import('views/Tag')));
+const UserAccount = Loadable(lazy(() => import('views/UserAccount')));
 
 const MainRoutes = {
   path: '/',
@@ -170,7 +171,7 @@ const MainRoutes = {
       children: [
         {
           path: 'account',
-          element: <Configuration />
+          element: <UserAccount />
         }
       ]
     },

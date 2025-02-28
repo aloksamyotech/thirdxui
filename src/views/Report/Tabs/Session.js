@@ -17,7 +17,7 @@ const Session = () => {
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} >
+          <TabList onChange={handleChange} textColor="secondary" indicatorColor="secondary">
             <Tab label="Chart View" value="2" />
             <Tab label="List View" value="1" />
           </TabList>

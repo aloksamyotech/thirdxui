@@ -46,7 +46,7 @@ const dashboard = {
     {
       id: 'people',
       title: 'People',
-      type: 'collapse', 
+      type: 'collapse',
       icon: icons.IconUser,
       children: [
         {
@@ -91,7 +91,7 @@ const dashboard = {
     {
       id: 'forms',
       title: 'Forms',
-      type: 'collapse', 
+      type: 'collapse',
       icon: icons.IconClipboardData,
       children: [
         {
@@ -121,14 +121,14 @@ const dashboard = {
       id: '05',
       title: 'Report',
       type: 'item',
-      url: '/dashboard/default',
+      url: '/dashboard/report',
       icon: icons.IconChartBar,
       breadcrumbs: false
     },
     {
       id: 'configuration',
       title: 'Configuration',
-      type: 'collapse', 
+      type: 'collapse',
       icon: icons.IconSettings,
       children: [
         {
@@ -157,7 +157,7 @@ const dashboard = {
     {
       id: 'data',
       title: 'Data Management',
-      type: 'collapse', 
+      type: 'collapse',
       icon: icons.IconRefresh,
       children: [
         {
@@ -189,7 +189,7 @@ const dashboard = {
           breadcrumbs: false
         }
       ]
-    },    
+    },
   ]
 };
 

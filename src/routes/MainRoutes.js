@@ -13,7 +13,12 @@ const NewReferral = Loadable(lazy(() => import('views/NewReferral')));
 const EmailTemplates = Loadable(lazy(() => import('views/EmailTemplates')));
 const Document = Loadable(lazy(() => import('views/Documents')));
 const Calender = Loadable(lazy(() => import('views/Calender')));
+const Report = Loadable(lazy(() => import('views/Report')));
 const AddTemplates = Loadable(lazy(() => import('views/EmailTemplates/AddTemplates')));
+const BulkUpload = Loadable(lazy(() => import('views/BulkUpload')));
+const BulkDelete = Loadable(lazy(() => import('views/BulkDelete')));
+const Archives = Loadable(lazy(() => import('views/Archives')));
+const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
 
 const MainRoutes = {
   path: '/',
@@ -146,6 +151,51 @@ const MainRoutes = {
         {
           path: 'emailtemplate/addTemplates',
           element: <AddTemplates />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'report',
+          element: <Report />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'bulkupload',
+          element: <BulkUpload />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'duplicate',
+          element: <Duplicate />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'archives',
+          element: <Archives />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'bulkdelete',
+          element: <BulkDelete />
         }
       ]
     }

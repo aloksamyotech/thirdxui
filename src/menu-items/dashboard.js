@@ -132,6 +132,13 @@ const dashboard = {
       icon: icons.IconSettings,
       children: [
         {
+          id: 'configuration',
+          title: 'Configuration',
+          type: 'item',
+          url: '/dashboard/configuration',
+          breadcrumbs: false
+        },
+        {
           id: 'tags',
           title: 'Tags',
           type: 'item',

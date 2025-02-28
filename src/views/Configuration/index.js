@@ -191,18 +191,6 @@ const TabbedDataGrid = () => {
           </Box>
         </Modal>
 
-        {/* <Tabs
-          value={selectedTab}
-          onChange={(e, newValue) => setSelectedTab(newValue)}
-          variant="scrollable"
-          scrollButtons="auto"
-          sx={{ '& .MuiTab-root': { fontSize: '0.85rem' } }}
-        >
-          {tabLabels.map((label, index) => (
-            <Tab key={index} label={label} />
-          ))}
-        </Tabs> */}
-
         <Box sx={{ height: 'auto', mt: 2 }}>
           <DataGrid
             rows={tabData[tabLabels[selectedTab]] || []}

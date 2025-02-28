@@ -131,7 +131,7 @@ const Lead = () => {
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
               Add People
             </Typography>
-            <Tooltip title="Add Case" arrow>
+            <Tooltip title="Add People" arrow>
               <IconButton
                 onClick={handleOpenDialog}
                 sx={{

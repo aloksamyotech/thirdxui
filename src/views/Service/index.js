@@ -93,7 +93,7 @@ const Lead = () => {
         <Grid>
           <Stack direction="row" alignItems="center" mb={2} spacing={2}>
             <Typography variant="h4">Add Services</Typography>
-            <Tooltip title="Add Case" arrow>
+            <Tooltip title="Add Services" arrow>
               <IconButton
                 onClick={() => setShowForm(true)}
                 sx={{

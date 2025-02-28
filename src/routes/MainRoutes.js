@@ -5,12 +5,13 @@ import Loadable from 'ui-component/Loadable';
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
 const ContactManagement = Loadable(lazy(() => import('views/Service')));
-const Call = Loadable(lazy(() => import('views/Calls')));
+const ManageForm = Loadable(lazy(() => import('views/ManageForm')));
+const History = Loadable(lazy(() => import('views/History')));
 const Case = Loadable(lazy(() => import('views/Case')));
 const Metting = Loadable(lazy(() => import('views/Metting')));
 const Mail = Loadable(lazy(() => import('views/Mail')));
 const NewReferral = Loadable(lazy(() => import('views/NewReferral')));
-const EmailTemplates = Loadable(lazy(() => import('views/EmailTemplates')));
+const Configuration = Loadable(lazy(() => import('views/Configuration')));
 const Document = Loadable(lazy(() => import('views/Documents')));
 const Calender = Loadable(lazy(() => import('views/Calender')));
 const AddTemplates = Loadable(lazy(() => import('views/EmailTemplates/AddTemplates')));
@@ -64,7 +65,7 @@ const MainRoutes = {
       children: [
         {
           path: 'manage-form',
-          element: <Case />
+          element: <ManageForm />
         }
       ]
     },
@@ -73,7 +74,7 @@ const MainRoutes = {
       children: [
         {
           path: 'appearance',
-          element: <Case />
+          element: <ManageForm />
         }
       ]
     },
@@ -82,7 +83,7 @@ const MainRoutes = {
       children: [
         {
           path: 'history',
-          element: <Case />
+          element: <History />
         }
       ]
     },
@@ -135,8 +136,8 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'emailtemplate',
-          element: <EmailTemplates />
+          path: 'configuration',
+          element: <Configuration />
         }
       ]
     },
@@ -144,11 +145,29 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
-          path: 'emailtemplate/addTemplates',
-          element: <AddTemplates />
+          path: 'tags',
+          element: <Configuration />
         }
       ]
-    }
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'users',
+          element: <Configuration />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'account',
+          element: <Configuration />
+        }
+      ]
+    },
   ]
 };
 

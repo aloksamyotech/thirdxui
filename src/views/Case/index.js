@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, MenuItem, IconButton, Tooltip, Chip } from '@mui/material';
+import React, { useState } from 'react';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, Menu, MenuItem, IconButton,InputAdornment, Tooltip, Chip, Toolbar } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
@@ -10,6 +10,7 @@ import TableStyle from '../../ui-component/TableStyle';
 import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
 import AddCaseForm from './AddCase.js';
+import { Search, Download, PictureAsPdf, Print, ExpandMore, Archive, Edit, MergeType, Delete } from '@mui/icons-material';
 
 const Lead = () => {
   const [district, setDistrict] = useState('');
@@ -18,6 +19,18 @@ const Lead = () => {
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+
+  const toggleSearch = () => setShowSearch((prev) => !prev);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleFilterApply = () => {
     console.log('Filters Applied:', { district, owner, status, fromDate, toDate });
@@ -202,6 +215,58 @@ const Lead = () => {
               </Stack>
             </LocalizationProvider>
           </Card>
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack direction="row" spacing={1}>
+              <TextField
+                variant="outlined"
+                size="small"
+                placeholder="Quick Action"
+                onClick={handleClick}
+                InputProps={{
+                  readOnly: true,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleClick}>
+                        <ExpandMore />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                sx={{ maxWidth: 180 }}
+              />
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                <MenuItem onClick={handleClose}>
+                  <Archive fontSize="small" sx={{ mr: 1 }} /> Archive
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <MergeType fontSize="small" sx={{ mr: 1 }} /> Merge
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
+                </MenuItem>
+              </Menu>
+            </Stack>
+
+            <Stack direction="row">
+              <IconButton onClick={toggleSearch}>
+                <Search />
+              </IconButton>
+              {showSearch && <TextField variant="outlined" size="small" placeholder="Search..." autoFocus />}
+              <IconButton>
+                <Download />
+              </IconButton>
+              <IconButton>
+                <PictureAsPdf />
+              </IconButton>
+              <IconButton>
+                <Print />
+              </IconButton>
+            </Stack>
+          </Stack>
           <TableStyle>
             <Box width="100%">
               <Card style={{ height: '600px' }}>
@@ -216,7 +281,7 @@ const Lead = () => {
                   sx={{
                     '& .MuiDataGrid-row': {
                       borderBottom: '1px solid #ccc'
-                    },
+                    }
                   }}
                 />
               </Card>

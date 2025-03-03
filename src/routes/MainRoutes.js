@@ -22,6 +22,7 @@ const Archives = Loadable(lazy(() => import('views/Archives')));
 const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
 const Tag = Loadable(lazy(() => import('views/Tag')));
 const UserAccount = Loadable(lazy(() => import('views/UserAccount')));
+const Appearance = Loadable(lazy(() => import('views/Appearance')));
 
 const MainRoutes = {
   path: '/',
@@ -81,7 +82,7 @@ const MainRoutes = {
       children: [
         {
           path: 'appearance',
-          element: <ManageForm />
+          element: <Appearance />
         }
       ]
     },

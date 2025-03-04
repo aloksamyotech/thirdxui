@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Avatar, Button, Card, Grid, IconButton, MenuItem, Pagination, Select, TextField, Tooltip, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
@@ -105,77 +105,93 @@ const BulkDelete = () => {
 
   return (
     <Box sx={{ width: '100%', typography: 'body1', bgcolor: '#fff', borderRadius: '10px', minHeight: '100vh' }}>
-      {!filter &&
+      {!filter && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
           <Typography>Bulk Delete</Typography>
-          <FilterAltIcon fontSize='small' sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
+          <FilterAltIcon fontSize="small" sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
         </Box>
-      }
-      {filter &&
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
-          <TextField
-            select
-            label="Chooose Your Field"
-            value={one}
-            onChange={(e) => setOne(e.target.value)}
-            variant="outlined"
-            size="small"
-            InputLabelProps={{ shrink: false }}
-            sx={{ width: 200 }}
-          >
-            <MenuItem value="District 1">District 1</MenuItem>
-            <MenuItem value="District 2">District 2</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Service Date"
-            value={two}
-            onChange={(e) => setTwo(e.target.value)}
-            variant="outlined"
-            size="small"
-            InputLabelProps={{ shrink: false }}
-            sx={{ width: 100 }}
-          >
-            <MenuItem value="District 1">District 1</MenuItem>
-            <MenuItem value="District 2">District 2</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Referral Date"
-            value={three}
-            onChange={(e) => setThree(e.target.value)}
-            variant="outlined"
-            size="small"
-            InputLabelProps={{ shrink: false }}
-            sx={{ width: 120 }}
-          >
-            <MenuItem value="District 1">District 1</MenuItem>
-            <MenuItem value="District 2">District 2</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Age"
-            value={four}
-            onChange={(e) => setFour(e.target.value)}
-            variant="outlined"
-            size="small"
-            InputLabelProps={{ shrink: false }}
-            sx={{ width: 150 }}
-          >
-            <MenuItem value="District 1">District 1</MenuItem>
-            <MenuItem value="District 2">District 2</MenuItem>
-          </TextField>
-          <Button color='secondary' variant='contained'>Apply</Button>
-          <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
-            <FilterAltIcon
-              fontSize='medium'
-              sx={{ m: '4px', cursor: 'pointer' }}
-              onClick={() => setFilter(false)} />
+      )}
+      {filter && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px' }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <FilterAltIcon />
+            <Typography variant="h6" fontWeight="bold">
+              Filter
+            </Typography>
           </Stack>
-        </Box >
-      }
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <TextField
+              select
+              label="Service"
+              value={one}
+              onChange={(e) => setOne(e.target.value)}
+              variant="outlined"
+              size="small"
+              sx={{ width: 200 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+
+            <TextField
+              select
+              label="Service Date"
+              value={two}
+              onChange={(e) => setTwo(e.target.value)}
+              variant="outlined"
+              size="small"
+              sx={{ width: 150 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+
+            <TextField
+              select
+              label="Service User Tags"
+              value={three}
+              onChange={(e) => setThree(e.target.value)}
+              variant="outlined"
+              size="small"
+              sx={{ width: 150 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+
+            <TextField
+              select
+              label="Country Of Origin"
+              value={four}
+              onChange={(e) => setFour(e.target.value)}
+              variant="outlined"
+              size="small"
+              sx={{ width: 180 }}
+            >
+              <MenuItem value="District 1">District 1</MenuItem>
+              <MenuItem value="District 2">District 2</MenuItem>
+            </TextField>
+
+            <Button color="secondary" variant="contained">
+              Apply
+            </Button>
+
+            <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
+              <FilterAltIcon fontSize="medium" sx={{ m: '4px', cursor: 'pointer' }} onClick={() => setFilter(false)} />
+            </Stack>
+          </Box>
+        </Box>
+      )}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
-        <Button size='small' variant="contained" startIcon={<DeleteIcon />} sx={{ marginRight: '10px', bgcolor: '#ff918d', border: '1px solid #ff918d', '&:hover': { bgcolor: '#ff918d' } }}>Bulk Delete</Button>
+        <Button
+          size="small"
+          variant="contained"
+          endIcon={<DeleteIcon />}
+          sx={{ marginRight: '10px', bgcolor: '#ff4d49', border: '1px solid #ff918d', '&:hover': { bgcolor: '#ec3330' } }}
+        >
+          Bulk Delete
+        </Button>
       </Box>
       <Box width="100%">
         <Card style={{ height: '600px', borderRadius: '0px' }}>
@@ -218,9 +234,8 @@ const BulkDelete = () => {
           />
         </Card>
       </Box>
-
     </Box>
-  )
-}
+  );
+};
 
-export default BulkDelete
+export default BulkDelete;

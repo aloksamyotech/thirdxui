@@ -63,7 +63,7 @@ const Dashboard = () => {
                 title="My Task"
                 list={[
                   { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
-                  { id: '2', label: 'Tasj call due for Anindya on 12/01/2023 Comment: call himand confirm commented by HeadSalesMarketing' },
+                  { id: '2', label: 'Task call due for Anindya on 12/01/2023 Comment: call Himand confirm commented by HeadSalesMarketing' },
                   { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
                 ]}
               />

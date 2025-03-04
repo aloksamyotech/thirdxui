@@ -3,7 +3,7 @@ import { useState } from 'react';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
-import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, Box, Typography, CardHeader, FormControlLabel } from '@mui/material';
+import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, Box, Tooltip,Typography, CardHeader, FormControlLabel } from '@mui/material';
 // components
 
 import Iconify from '../../../ui-component/iconify';
@@ -29,6 +29,7 @@ export default function AppTasks({ title, subheader, list, ...other }) {
     <Card {...other} sx={{ paddingY: '20px' }}>
       <CardHeader title={title} subheader={subheader}
         action={
+           <Tooltip title="Add Task" arrow>
           <Box sx={{
             color: '#fff',
             bgcolor: '#41c048',
@@ -42,6 +43,7 @@ export default function AppTasks({ title, subheader, list, ...other }) {
           }}>
             <AddIcon />
           </Box>
+          </Tooltip>
         } />
       <Divider />
       <Controller

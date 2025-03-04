@@ -40,7 +40,7 @@ const Archieves = () => {
   const [two, setTwo] = useState('');
   const [three, setThree] = useState('');
   const [four, setFour] = useState('');
-  const [filter, setFilter] = useState(false)
+  const [filter, setFilter] = useState(false);
 
   const CustomHeader = ({ pageSize, setPageSize, page, setPage, totalPages }) => {
     return (
@@ -125,75 +125,84 @@ const Archieves = () => {
   return (
     <Card sx={{ backgroundColor: '#EEF2F6' }}>
       <Grid>
-        {!filter &&
+        {!filter && (
           <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
             <Typography>Archives</Typography>
-            <FilterAltIcon fontSize='small' sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
+            <FilterAltIcon fontSize="small" sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
           </Box>
-        }
-        {filter &&
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
-            <TextField
-              select
-              label="Chooose Your Field"
-              value={one}
-              onChange={(e) => setOne(e.target.value)}
-              variant="outlined"
-              size="small"
-              InputLabelProps={{ shrink: false }}
-              sx={{ width: 200 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-            <TextField
-              select
-              label="Service Date"
-              value={two}
-              onChange={(e) => setTwo(e.target.value)}
-              variant="outlined"
-              size="small"
-              InputLabelProps={{ shrink: false }}
-              sx={{ width: 100 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-            <TextField
-              select
-              label="Referral Date"
-              value={three}
-              onChange={(e) => setThree(e.target.value)}
-              variant="outlined"
-              size="small"
-              InputLabelProps={{ shrink: false }}
-              sx={{ width: 120 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-            <TextField
-              select
-              label="Age"
-              value={four}
-              onChange={(e) => setFour(e.target.value)}
-              variant="outlined"
-              size="small"
-              InputLabelProps={{ shrink: false }}
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-            <Button color='secondary' variant='contained'>Apply</Button>
-            <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
-              <FilterAltIcon
-                fontSize='medium'
-                sx={{ m: '4px', cursor: 'pointer' }}
-                onClick={() => setFilter(false)} />
+        )}
+        {filter && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px' }}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <FilterAltIcon />
+              <Typography variant="h6" fontWeight="bold">
+                Filter
+              </Typography>
             </Stack>
-          </Box >
-        }
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <TextField
+                select
+                label="Service"
+                value={one}
+                onChange={(e) => setOne(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ width: 200 }}
+              >
+                <MenuItem value="District 1">District 1</MenuItem>
+                <MenuItem value="District 2">District 2</MenuItem>
+              </TextField>
+
+              <TextField
+                select
+                label="Service Date"
+                value={two}
+                onChange={(e) => setTwo(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ width: 150 }}
+              >
+                <MenuItem value="District 1">District 1</MenuItem>
+                <MenuItem value="District 2">District 2</MenuItem>
+              </TextField>
+
+              <TextField
+                select
+                label="Service User Tags"
+                value={three}
+                onChange={(e) => setThree(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ width: 150 }}
+              >
+                <MenuItem value="District 1">District 1</MenuItem>
+                <MenuItem value="District 2">District 2</MenuItem>
+              </TextField>
+
+              <TextField
+                select
+                label="Country Of Origin"
+                value={four}
+                onChange={(e) => setFour(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ width: 180 }}
+              >
+                <MenuItem value="District 1">District 1</MenuItem>
+                <MenuItem value="District 2">District 2</MenuItem>
+              </TextField>
+
+              <Button color="secondary" variant="contained">
+                Apply
+              </Button>
+
+              <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
+                <FilterAltIcon fontSize="medium" sx={{ m: '4px', cursor: 'pointer' }} onClick={() => setFilter(false)} />
+              </Stack>
+            </Box>
+          </Box>
+        )}
         <Box width="100%">
           <Card style={{ height: '600px' }}>
             <DataGrid

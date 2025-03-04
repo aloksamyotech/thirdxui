@@ -123,7 +123,7 @@ const Lead = () => {
               <Typography variant="h6">Filter</Typography>
             </Stack>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+              <Stack direction="row" alignItems="center" spacing={2} sx={{ whiteSpace: 'nowrap' }}>
                 <TextField
                   select
                   label="Select District"
@@ -131,7 +131,6 @@ const Lead = () => {
                   onChange={(e) => setDistrict(e.target.value)}
                   variant="outlined"
                   size="small"
-                  InputLabelProps={{ shrink: false }}
                   sx={{ width: 150 }}
                 >
                   <MenuItem value="District 1">District 1</MenuItem>
@@ -145,7 +144,6 @@ const Lead = () => {
                   onChange={(e) => setStatus(e.target.value)}
                   variant="outlined"
                   size="small"
-                  InputLabelProps={{ shrink: false }}
                   sx={{ width: 150 }}
                 >
                   <MenuItem value="Active">Active</MenuItem>
@@ -160,7 +158,6 @@ const Lead = () => {
                     slotProps={{
                       textField: {
                         size: 'small',
-                        InputLabelProps: { shrink: false },
                         sx: {
                           width: '100%',
                           '& .MuiInputBase-input': {
@@ -182,7 +179,6 @@ const Lead = () => {
                     slotProps={{
                       textField: {
                         size: 'small',
-                        InputLabelProps: { shrink: false },
                         sx: {
                           width: '100%',
                           '& .MuiInputBase-input': {

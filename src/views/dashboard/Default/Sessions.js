@@ -9,7 +9,7 @@ const Sessions = () => {
             <Stack direction='row' sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography>Current Sessions</Typography>
                 <Stack direction='row'>
-                    <Input placeholder='type to filter' sx={{ border: 'none' }}></Input>
+                    <Input placeholder='Type to filter' sx={{ border: 'none' }}></Input>
                     <SearchIcon sx={{ mt: '2px' }} />
                 </Stack>
             </Stack>
@@ -40,10 +40,10 @@ const Sessions = () => {
                     </Stack>
                     <Stack sx={{ ml: '10px' }}>
                         <Stack><Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Cover Letter Writing - Group Session</Typography></Stack>
-                        <Stack><Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Market Road AtP - you</Typography></Stack>
+                        <Stack><Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Market Road ATP - you</Typography></Stack>
                         <Stack direction='row' sx={{ mt: '5px' }}>
-                            <Stack><Typography sx={{ color: 'blue', fontSize: '12px' }}>edit session</Typography></Stack>
-                            <Stack sx={{ borderLeft: '1px solid #000', paddingLeft: '5px', marginLeft: '5px' }}><Typography sx={{ color: 'blue', fontSize: '12px' }}>add register</Typography></Stack>
+                            <Stack><Typography sx={{ color: 'blue', fontSize: '12px' }}>Edit Session</Typography></Stack>
+                            <Stack sx={{ borderLeft: '1px solid #000', paddingLeft: '5px', marginLeft: '5px' }}><Typography sx={{ color: 'blue', fontSize: '12px' }}>Add Register</Typography></Stack>
                         </Stack>
                     </Stack>
                 </Stack>
@@ -55,10 +55,10 @@ const Sessions = () => {
                     </Stack>
                     <Stack sx={{ ml: '10px' }}>
                         <Stack><Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Cover Letter Writing - Group Session</Typography></Stack>
-                        <Stack><Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Market Road AtP - you</Typography></Stack>
+                        <Stack><Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Market Road ATP - you</Typography></Stack>
                         <Stack direction='row' sx={{ mt: '5px' }}>
-                            <Stack><Typography sx={{ color: 'blue', fontSize: '12px' }}>edit session</Typography></Stack>
-                            <Stack sx={{ borderLeft: '1px solid #000', paddingLeft: '5px', marginLeft: '5px' }}><Typography sx={{ color: 'blue', fontSize: '12px' }}>add register</Typography></Stack>
+                            <Stack><Typography sx={{ color: 'blue', fontSize: '12px' }}>Edit Session</Typography></Stack>
+                            <Stack sx={{ borderLeft: '1px solid #000', paddingLeft: '5px', marginLeft: '5px' }}><Typography sx={{ color: 'blue', fontSize: '12px' }}>Add Register</Typography></Stack>
                         </Stack>
                     </Stack>
                 </Stack>

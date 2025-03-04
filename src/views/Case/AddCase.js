@@ -41,14 +41,14 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   return (
-    <Grid sx={{ padding: 3, position: 'relative', backgroundColor: '#eef2f6' }}>
+    <Grid sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Typography variant="h4">Add New Case</Typography>
-      <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 10, right: 10, fontSize: 32 }}>
+      <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 1, right: 10, fontSize: 32 }}>
         <CancelIcon sx={{ fontSize: 32, color: 'grey' }} />
       </IconButton>
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Stack direction="row" alignItems="center" spacing={2} mt={3} sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+        <Stack direction="row" alignItems="center" spacing={2} mt={3} sx={{ whiteSpace: 'nowrap' }}>
           <TextField
             select
             label="Select District"
@@ -56,7 +56,6 @@ const AddCaseForm = ({ onCancel }) => {
             onChange={(e) => setDistrict(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 150 }}
           >
             <MenuItem value="District 1">District 1</MenuItem>
@@ -70,7 +69,6 @@ const AddCaseForm = ({ onCancel }) => {
             onChange={(e) => setOwner(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 150 }}
           >
             <MenuItem value="Owner 1">Owner 1</MenuItem>
@@ -84,7 +82,6 @@ const AddCaseForm = ({ onCancel }) => {
             onChange={(e) => setStatus(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 150 }}
           >
             <MenuItem value="Active">Active</MenuItem>
@@ -99,7 +96,6 @@ const AddCaseForm = ({ onCancel }) => {
               slotProps={{
                 textField: {
                   size: 'small',
-                  InputLabelProps: { shrink: false },
                   sx: {
                     width: '100%',
                     '& .MuiInputBase-input': {
@@ -121,7 +117,6 @@ const AddCaseForm = ({ onCancel }) => {
               slotProps={{
                 textField: {
                   size: 'small',
-                  InputLabelProps: { shrink: false },
                   sx: {
                     width: '100%',
                     '& .MuiInputBase-input': {

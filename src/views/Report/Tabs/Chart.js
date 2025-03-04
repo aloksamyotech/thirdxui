@@ -37,7 +37,6 @@ const Chart = () => {
             onChange={(e) => setOne(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 200 }}
           >
             <MenuItem value="District 1">District 1</MenuItem>
@@ -50,7 +49,6 @@ const Chart = () => {
             onChange={(e) => setTwo(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 100 }}
           >
             <MenuItem value="District 1">District 1</MenuItem>
@@ -63,7 +61,6 @@ const Chart = () => {
             onChange={(e) => setThree(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 120 }}
           >
             <MenuItem value="District 1">District 1</MenuItem>
@@ -76,7 +73,6 @@ const Chart = () => {
             onChange={(e) => setFour(e.target.value)}
             variant="outlined"
             size="small"
-            InputLabelProps={{ shrink: false }}
             sx={{ width: 150 }}
           >
             <MenuItem value="District 1">District 1</MenuItem>

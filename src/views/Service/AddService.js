@@ -29,9 +29,9 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   return (
-    <Card sx={{ padding: 3, position: 'relative', backgroundColor: '#eef2f6' }}>
+    <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Typography variant="h4">Add Services</Typography>
-      <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 10, right: 10, fontSize: 32 }}>
+      <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 1, right: 10, fontSize: 32 }}>
         <CancelIcon sx={{ fontSize: 32, color: 'grey' }} />
       </IconButton>
 

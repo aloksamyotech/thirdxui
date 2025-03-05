@@ -12,12 +12,12 @@ import {
   TextField,
   Typography,
   Button,
-  Switch,
   FormControlLabel
 } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import AntSwitch from 'components/AntSwitch.js';
 
 const AddCaseForm = ({ onCancel }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -259,8 +259,13 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid item xs={12} sm={6}>
                           <TextField fullWidth label="Volunteer Roles" name="volunteer_roles" variant="outlined" />
                         </Grid>
+
                         <Grid item xs={12} sm={6}>
-                          <FormControlLabel control={<Switch checked={restrictAccess} onChange={handleToggle} />} label="Restrict Access" />
+                          <FormControlLabel
+                            control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                            label="Restrict Access?"
+                            labelPlacement="start"
+                          />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Typography
@@ -476,16 +481,36 @@ const AddCaseForm = ({ onCancel }) => {
             {tabIndex === 4 && (
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel control={<Switch checked={caseData.telephone} />} label="Telephone" />
+                  <FormControlLabel
+                    control={<AntSwitch checked={caseData.telephone} />}
+                    label="Telephone"
+                    labelPlacement="start"
+                    sx={{ display: 'flex', gap: '10px' }}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel control={<Switch checked={caseData.emailConsent} />} label="Email" />
+                  <FormControlLabel
+                    control={<AntSwitch checked={caseData.emailConsent} />}
+                    label="Email"
+                    labelPlacement="start"
+                    sx={{ display: 'flex', gap: '10px' }}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel control={<Switch checked={caseData.sms} />} label="SMS" />
+                  <FormControlLabel
+                    control={<AntSwitch checked={caseData.sms} />}
+                    label="SMS"
+                    labelPlacement="start"
+                    sx={{ display: 'flex', gap: '10px' }}
+                  />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel control={<Switch checked={caseData.letter} />} label="Letter" />
+                  <FormControlLabel
+                    control={<AntSwitch checked={caseData.letter} />}
+                    label="Letter"
+                    labelPlacement="start"
+                    sx={{ display: 'flex', gap: '10px' }}
+                  />
                 </Grid>
 
                 <Grid item sm={4}></Grid>

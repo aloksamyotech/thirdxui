@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Stack, Button, Typography, Card, Switch, TextField, MenuItem, Grid, FormControlLabel } from '@mui/material';
+import { Stack, Button, Typography, Card, TextField, MenuItem, Grid, FormControlLabel } from '@mui/material';
+import AntSwitch from 'components/AntSwitch.js';
 
 const Emails = () => {
   const [caseData, setCaseData] = useState({
@@ -74,18 +75,24 @@ const Emails = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <FormControlLabel control={<Switch checked={caseData.locked} onChange={handleToggle} name="locked" />} label="Locked" />
+                  <FormControlLabel
+                    control={<AntSwitch checked={caseData.locked} onChange={handleToggle} name="locked" />}
+                    label="Locked"
+                    labelPlacement="start"
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControlLabel
-                    control={<Switch checked={caseData.showInMenu} onChange={handleToggle} name="showInMenu" />}
+                    control={<AntSwitch checked={caseData.showInMenu} onChange={handleToggle} name="showInMenu" />}
                     label="Show in Menu"
+                    labelPlacement="start"
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <FormControlLabel
-                    control={<Switch checked={caseData.includeArchived} onChange={handleToggle} name="includeArchived" />}
+                    control={<AntSwitch checked={caseData.includeArchived} onChange={handleToggle} name="includeArchived" />}
                     label="Include Archived Records"
+                    labelPlacement="start"
                   />
                 </Grid>
               </Grid>

@@ -8,7 +8,9 @@ import {
   IconButton,
   Tooltip,
   Pagination,
-  Accordion,AccordionSummary,AccordionDetails,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Select,
   MenuItem,
   Dialog,
@@ -25,9 +27,7 @@ import AddCaseForm from './AddPeople.js';
 import CloseIcon from '@mui/icons-material/Close';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
-import FilterToggle from 'components/FilterToggle';
 import FilterPanel from 'components/FilterPanel';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
@@ -47,9 +47,7 @@ const Lead = () => {
   const [showForm, setShowForm] = useState(false);
   const [formType, setFormType] = useState('');
   const [dateFilter, setDateFilter] = useState('');
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(1);
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
 
   const CustomHeader = () => {
     return (
@@ -156,127 +154,16 @@ const Lead = () => {
               </IconButton>
             </Tooltip>
           </Stack>
-          {/* 
-          <Dialog
-            open={openDialog}
-            onClose={handleCloseDialog}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
-              sx: { minHeight: 300, maxHeight: 350 }
-            }}
-          >
-            <DialogTitle sx={{ fontSize: '1rem', textAlign: 'center' }}>
-              Choose which type of person you would like to add
-              <IconButton onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-            <DialogContent>
-              <Stack direction="row" spacing={4} justifyContent="center">
-                <Box
-                  onClick={handleSelectPerson}
-                  sx={{
-                    width: 160,
-                    height: 160,
-                    bgcolor: '#e0e0e0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                    cursor: 'pointer',
-                    transition: '0.3s',
-                    '&:hover': { bgcolor: '#d6d6d6' }
-                  }}
-                >
-                  <PersonIcon sx={{ fontSize: 50, color: '#333' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                    Service User
-                  </Typography>
-                </Box>
-
-                <Box
-                  onClick={handleSelectPerson}
-                  sx={{
-                    width: 160,
-                    height: 160,
-                    bgcolor: '#e0e0e0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                    cursor: 'pointer',
-                    transition: '0.3s',
-                    '&:hover': { bgcolor: '#d6d6d6' }
-                  }}
-                >
-                  <VolunteerActivismIcon sx={{ fontSize: 50, color: '#333' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                    Volunteer
-                  </Typography>
-                </Box>
-              </Stack>
-            </DialogContent>
-          </Dialog> */}
 
           <Grid container spacing={3}>
-            {/* <FilterToggle showFilter={showFilter} setShowFilter={setShowFilter} />
-              <FilterPanel
-                showFilter={showFilter}
-                formTypes={formTypes}
-                setFormType={setFormType}
-                dateFilters={dateFilters}
-                setDateFilter={setDateFilter}
-              /> */}
-            <Grid item xs={3}>
-              <Card sx={{ p: 1, backgroundColor: '#f5faff', borderRadius: 2, height: '100%' }}>
-                <Typography variant="h6" gutterBottom>
-                  Filter
-                </Typography>
+            <FilterPanel
+              showFilter={showFilter}
+              formTypes={formTypes}
+              setFormType={setFormType}
+              dateFilters={dateFilters}
+              setDateFilter={setDateFilter}
+            />
 
-                <Box sx={{ maxWidth: 320 }}>
-                  {/* FORM TYPE FILTER */}
-                  <Accordion>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon sx={{ color: '#4ba1f8' }} />}
-                      sx={{ bgcolor: '#f1f8ff', borderRadius: 1 }}
-                    >
-                      <Typography variant="subtitle2" sx={{ color: '#4ba1f8', fontWeight: 'bold' }}>
-                        FORM TYPE
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {formTypes.map((option) => (
-                        <MenuItem key={option.value} onClick={() => setFormType(option.label)} sx={{ cursor: 'pointer' }}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-
-                  {/* FILTER BY DATE */}
-                  <Accordion sx={{ mt: 2 }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon sx={{ color: '#4ba1f8' }} />}
-                      sx={{ bgcolor: '#f1f8ff', borderRadius: 1 }}
-                    >
-                      <Typography variant="subtitle2" sx={{ color: '#4ba1f8', fontWeight: 'bold' }}>
-                        FILTER BY DATE
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {dateFilters.map((option) => (
-                        <MenuItem key={option.value} onClick={() => setDateFilter(option.label)} sx={{ cursor: 'pointer' }}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                </Box>
-              </Card>
-            </Grid>
             <Grid item xs={9}>
               <Card style={{ height: '600px' }}>
                 <DataGrid

@@ -119,7 +119,7 @@ const UserProfile = () => {
 
           <Grid item xs={12} md={8}>
             <Card sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px', height: '450px' }}>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Box display="flex" alignItems="center" gap={2}>
                 <Typography variant="h4" fontWeight="bold">
                   Session List
                 </Typography>

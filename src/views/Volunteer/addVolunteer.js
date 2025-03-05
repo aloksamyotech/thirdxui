@@ -73,7 +73,7 @@ const AddCaseForm = ({ onCancel }) => {
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
-        <Typography variant="h4">Add New Service User</Typography>
+        <Typography variant="h4">Add New Volunteer</Typography>
         <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 1, right: 10 }}>
           <CancelIcon sx={{ fontSize: 32, color: 'grey' }} />
         </IconButton>

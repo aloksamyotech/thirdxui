@@ -42,7 +42,7 @@ const Archieves = () => {
   const [four, setFour] = useState('');
   const [filter, setFilter] = useState(false);
 
-  const CustomHeader = ({ pageSize, setPageSize, page, setPage, totalPages }) => {
+  const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
         <GridToolbarContainer
@@ -69,17 +69,6 @@ const Archieves = () => {
           >
             PEOPLE LIST
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2">Rows per page:</Typography>
-            <Select value={pageSize} onChange={(e) => setPageSize(e.target.value)} size="small" sx={{ height: '30px' }}>
-              {[5, 10, 20, 50].map((size) => (
-                <MenuItem key={size} value={size}>
-                  {size}
-                </MenuItem>
-              ))}
-            </Select>
-            <Pagination count={totalPages} page={page} onChange={(event, value) => setPage(value)} size="small" />
-          </Box>
         </GridToolbarContainer>
       </Box>
     );
@@ -210,23 +199,8 @@ const Archieves = () => {
               columns={columns}
               rowHeight={65}
               getRowId={(row) => row.id}
-              pageSize={pageSize}
-              onPageSizeChange={(newSize) => setPageSize(newSize)}
-              pagination
-              page={page - 1}
-              onPageChange={(newPage) => setPage(newPage + 1)}
-              rowCount={rows.length}
-              paginationMode="client"
               components={{
-                Toolbar: () => (
-                  <CustomHeader
-                    pageSize={pageSize}
-                    setPageSize={setPageSize}
-                    page={page}
-                    setPage={setPage}
-                    totalPages={Math.ceil(rows.length / pageSize)}
-                  />
-                )
+                Toolbar: () => <CustomHeader />
               }}
               sx={{
                 '& .MuiDataGrid-columnHeaders': {
@@ -241,7 +215,6 @@ const Archieves = () => {
                 }
               }}
               disableSelectionOnClick
-              hideFooter
             />
           </Card>
         </Box>

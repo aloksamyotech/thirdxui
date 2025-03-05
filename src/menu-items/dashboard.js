@@ -51,14 +51,14 @@ const dashboard = {
       children: [
         {
           id: 'all-service-users',
-          title: 'All Service Users',
+          title: 'Service Users',
           type: 'item',
           url: '/dashboard/people',
           breadcrumbs: false
         },
         {
           id: 'all-volunteer-users',
-          title: 'All Volunteers',
+          title: 'Volunteers',
           type: 'item',
           url: '/dashboard/volunteer',
           breadcrumbs: false

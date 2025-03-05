@@ -87,7 +87,6 @@ const AddCaseForm = ({ onCancel }) => {
             <MenuItem value="Active">Active</MenuItem>
             <MenuItem value="Inactive">Inactive</MenuItem>
           </TextField>
-
           <Box sx={{ width: 150 }}>
             <DatePicker
               label="From"
@@ -96,6 +95,7 @@ const AddCaseForm = ({ onCancel }) => {
               slotProps={{
                 textField: {
                   size: 'small',
+                  InputLabelProps: { shrink: true },
                   sx: {
                     width: '100%',
                     '& .MuiInputBase-input': {
@@ -117,6 +117,7 @@ const AddCaseForm = ({ onCancel }) => {
               slotProps={{
                 textField: {
                   size: 'small',
+                  InputLabelProps: { shrink: true },
                   sx: {
                     width: '100%',
                     '& .MuiInputBase-input': {
@@ -128,7 +129,7 @@ const AddCaseForm = ({ onCancel }) => {
                 }
               }}
             />
-          </Box>
+            </Box>
           <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
             Apply
           </Button>

@@ -1,5 +1,21 @@
 import { useState } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, MenuItem, IconButton, Tooltip, Chip, InputAdornment } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Grid,
+  Typography,
+  Box,
+  Card,
+  TextField,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  MenuItem,
+  IconButton,
+  Tooltip,
+  Chip,
+  InputAdornment
+} from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,6 +25,23 @@ import TableStyle from '../../ui-component/TableStyle';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import AddService from './AddService.js';
+import FilterPanel from 'components/FilterPanel.js';
+import { use } from 'react';
+
+const formTypes = [
+  { value: 'Self Referral form', label: 'Self Referral form' },
+  { value: 'Community Referral form', label: 'Community Referral form' },
+  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+];
+
+const dateFilters = [
+  { value: 'today', label: 'All Dates' },
+  { value: 'week', label: 'Last 7 days' },
+  { value: 'month', label: 'Last 30 days' },
+  { value: 'year', label: 'Last 2 months' }
+];
 
 const Lead = () => {
   const [district, setDistrict] = useState('');
@@ -17,6 +50,9 @@ const Lead = () => {
   const [toDate, setToDate] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [showFilter , setShowFilter] = useState(true);
   const navigate = useNavigate();
 
   const handleFilterApply = () => {
@@ -217,30 +253,41 @@ const Lead = () => {
               </Stack>
             </LocalizationProvider>
           </Card>
-          <TableStyle>
-            <Box width="100%">
-              <Card style={{ height: '500px' }}>
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  rowHeight={65}
-                  getRowId={(row) => row.id}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10]}
-                  getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                  // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
-                  onRowClick={() => navigate('/dashboard/view-service')}
-                  sx={{
-                    '& .even-row': { backgroundColor: '#ffffff' },
-                    '& .odd-row': { backgroundColor: '#f5f5f5' },
-                    '& .MuiDataGrid-row': {
-                      borderBottom: '1px solid #ccc'
-                    }
-                  }}
-                />
-              </Card>
-            </Box>
-          </TableStyle>
+          <Grid container spacing={3}>
+            <FilterPanel
+              showFilter={showFilter}
+              formTypes={formTypes}
+              setFormType={setFormType}
+              dateFilters={dateFilters}
+              setDateFilter={setDateFilter}
+            />
+            <Grid item xs={9}>
+              <TableStyle>
+                <Box width="100%">
+                  <Card style={{ height: '500px' }}>
+                    <DataGrid
+                      rows={rows}
+                      columns={columns}
+                      rowHeight={65}
+                      getRowId={(row) => row.id}
+                      pageSize={5}
+                      rowsPerPageOptions={[5, 10]}
+                      getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                      // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
+                      onRowClick={() => navigate('/dashboard/view-service')}
+                      sx={{
+                        '& .even-row': { backgroundColor: '#ffffff' },
+                        '& .odd-row': { backgroundColor: '#f5f5f5' },
+                        '& .MuiDataGrid-row': {
+                          borderBottom: '1px solid #ccc'
+                        }
+                      }}
+                    />
+                  </Card>
+                </Box>
+              </TableStyle>
+            </Grid>
+          </Grid>
         </Grid>
       )}
     </Card>

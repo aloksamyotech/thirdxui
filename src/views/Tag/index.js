@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Stack, Grid, Typography, Box, Card, Switch, Tooltip, IconButton } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card,Tooltip, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid } from '@mui/x-data-grid';
 import AddTag from './AddTag.js';
+import AntSwitch from 'components/AntSwitch.js';
 
 const Tag = () => {
   const [showForm, setShowForm] = useState(false);
@@ -11,7 +12,7 @@ const Tag = () => {
     {
       field: 'status',
       headerName: 'STATUS',
-      renderCell: (params) => <Switch defaultChecked={params.value} color="primary" />,
+      renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
       flex: 1
     }
   ];
@@ -23,13 +24,14 @@ const Tag = () => {
     { id: 4, name: 'Current Adopters', status: true },
     { id: 5, name: 'Self Referral', status: true }
   ];
+
   return (
     <Card sx={{ backgroundColor: '#EEF2F6' }}>
       {showForm ? (
         <AddTag onCancel={() => setShowForm(false)} />
       ) : (
         <Grid>
-          <Stack direction="row" alignItems="center"  mb={2} spacing={2} sx={{ width: '100%' }}>
+          <Stack direction="row" alignItems="center" mb={2} spacing={2} sx={{ width: '100%' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
               Add Tag Category
             </Typography>

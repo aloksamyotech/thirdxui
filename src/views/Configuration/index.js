@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Box, Switch, IconButton, Card, Modal, Typography, TextField, Button } from '@mui/material';
+import { Tabs, Tab, Box, Switch, IconButton, Card,styled, Modal, Typography, TextField, Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Edit, Delete, Add } from '@mui/icons-material';
+import AntSwitch from 'components/AntSwitch.js';
 
 const tabLabels = [
   'Contact Types',
@@ -86,7 +87,7 @@ const columns = [
   {
     field: 'status',
     headerName: 'STATUS',
-    renderCell: (params) => <Switch defaultChecked={params.value} color="primary" />,
+    renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
     flex: 1
   },
   {

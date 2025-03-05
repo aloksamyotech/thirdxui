@@ -8,6 +8,7 @@ import {
   IconButton,
   Tooltip,
   Pagination,
+  Accordion,AccordionSummary,AccordionDetails,
   Select,
   MenuItem,
   Dialog,
@@ -24,11 +25,27 @@ import AddCaseForm from './addVolunteer.js';
 import CloseIcon from '@mui/icons-material/Close';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import FilterPanel from 'components/FilterPanel';
 
+const formTypes = [
+  { value: 'Self Referral form', label: 'Self Referral form' },
+  { value: 'Community Referral form', label: 'Community Referral form' },
+  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+];
+
+const dateFilters = [
+  { value: 'today', label: 'All Dates' },
+  { value: 'week', label: 'Last 7 days' },
+  { value: 'month', label: 'Last 30 days' },
+  { value: 'year', label: 'Last 2 months' }
+];
 const Lead = () => {
   const [showForm, setShowForm] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(1);
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+  const [showFilter, setShowFilter] = useState(true);
 
   const CustomHeader = () => {
     return (
@@ -135,100 +152,43 @@ const Lead = () => {
               </IconButton>
             </Tooltip>
           </Stack>
-{/* 
-          <Dialog
-            open={openDialog}
-            onClose={handleCloseDialog}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
-              sx: { minHeight: 300, maxHeight: 350 }
-            }}
-          >
-            <DialogTitle sx={{ fontSize: '1rem', textAlign: 'center' }}>
-              Choose which type of person you would like to add
-              <IconButton onClick={handleCloseDialog} sx={{ position: 'absolute', right: 8, top: 8 }}>
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-            <DialogContent>
-              <Stack direction="row" spacing={4} justifyContent="center">
-                <Box
-                  onClick={handleSelectPerson}
-                  sx={{
-                    width: 160,
-                    height: 160,
-                    bgcolor: '#e0e0e0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                    cursor: 'pointer',
-                    transition: '0.3s',
-                    '&:hover': { bgcolor: '#d6d6d6' }
-                  }}
-                >
-                  <PersonIcon sx={{ fontSize: 50, color: '#333' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                    Service User
-                  </Typography>
-                </Box>
+      
 
-                <Box
-                  onClick={handleSelectPerson}
-                  sx={{
-                    width: 160,
-                    height: 160,
-                    bgcolor: '#e0e0e0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                    cursor: 'pointer',
-                    transition: '0.3s',
-                    '&:hover': { bgcolor: '#d6d6d6' }
+          <Grid container spacing={3}>
+            <FilterPanel
+                showFilter={showFilter}
+                formTypes={formTypes}
+                setFormType={setFormType}
+                dateFilters={dateFilters}
+                setDateFilter={setDateFilter}
+              /> 
+            <Grid item xs={9}>
+              <Card style={{ height: '600px' }}>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  rowHeight={65}
+                  getRowId={(row) => row.id}
+                  components={{
+                    Toolbar: () => <CustomHeader />
                   }}
-                >
-                  <VolunteerActivismIcon sx={{ fontSize: 50, color: '#333' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                    Volunteer
-                  </Typography>
-                </Box>
-              </Stack>
-            </DialogContent>
-          </Dialog> */}
-
-          <Box width="100%">
-            <Card style={{ height: '600px' }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={65}
-                getRowId={(row) => row.id}
-                components={{
-                  Toolbar: () => (
-                    <CustomHeader
-                    />
-                  )
-                }}
-                sx={{
-                  '& .MuiDataGrid-columnHeaders': {
-                    display: 'none'
-                  },
-                  '& .MuiDataGrid-row:nth-of-type(2n)': {
-                    backgroundColor: '#f9f9f9'
-                  },
-                  '& .MuiDataGrid-cell': {
-                    textAlign: 'left',
-                    fontSize: '14px'
-                  }
-                }}
-                disableSelectionOnClick
-              />
-            </Card>
-          </Box>
+                  sx={{
+                    '& .MuiDataGrid-columnHeaders': {
+                      display: 'none'
+                    },
+                    '& .MuiDataGrid-row:nth-of-type(2n)': {
+                      backgroundColor: '#f9f9f9'
+                    },
+                    '& .MuiDataGrid-cell': {
+                      textAlign: 'left',
+                      fontSize: '14px'
+                    }
+                  }}
+                  disableSelectionOnClick
+                />
+              </Card>
+            </Grid>
+          </Grid>
         </Grid>
       )}
     </Card>

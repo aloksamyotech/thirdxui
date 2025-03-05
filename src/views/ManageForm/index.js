@@ -6,23 +6,17 @@ import {
   IconButton,
   Chip,
   Tooltip,
-  MenuItem,
-  Menu,
-  Box,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AddFormModal from './AddForm.js';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PrintIcon from '@mui/icons-material/Print';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FilterPanel from "components/FilterPanel"; 
 
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
@@ -64,6 +58,7 @@ const Lead = () => {
   const [rows, setRows] = useState(initialRows);
   const [formTypeAnchor, setFormTypeAnchor] = useState(null);
   const [dateFilterAnchor, setDateFilterAnchor] = useState(null);
+  const [showFilter, setShowFilter] = useState(true);
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -76,122 +71,90 @@ const Lead = () => {
   return (
     <>
       <Grid>
-      <AddFormModal open={openAdd} onClose={handleCloseAdd} />
-      <Card sx={{ backgroundColor: '#eef2f6' }}>
-        <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4">Add Form</Typography>
-            <Tooltip title="Add Case" arrow>
-              <IconButton
-                onClick={handleOpenAdd}
-                sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
+        <AddFormModal open={openAdd} onClose={handleCloseAdd} />
+        <Card sx={{ backgroundColor: '#eef2f6' }}>
+          <Grid>
+            <Stack direction="row" alignItems="center" mb={2} spacing={2}>
+              <Typography variant="h4">Add Form</Typography>
+              <Tooltip title="Add Case" arrow>
+                <IconButton
+                  onClick={handleOpenAdd}
+                  sx={{
                     backgroundColor: '#41C048',
-                    color: '#ffffff'
-                  }
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Grid>
-
-        <Grid container spacing={3}>
-          <Grid item xs={3}>
-            <Card sx={{ p: 1, backgroundColor: '#f5faff', borderRadius: 2, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Filter
-              </Typography>
-
-              <Box sx={{ maxWidth: 320 }}>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color:'#4ba1f8'}}/>} sx={{ bgcolor: '#f1f8ff', borderRadius: 1 }}>
-                    <Typography variant="subtitle2" sx={{ color: '#4ba1f8', fontWeight: 'bold' }}>
-                      FORM TYPE 
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {formTypes.map((option) => (
-                      <MenuItem key={option.value} onClick={() => setFormType(option.label)} sx={{ cursor: 'pointer' }}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </AccordionDetails>
-                </Accordion>
-
-                <Accordion sx={{ mt: 2 }}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon sx={{color:'#4ba1f8'}}/>} sx={{ bgcolor: '#f1f8ff', borderRadius: 1 }}>
-                    <Typography variant="subtitle2" sx={{ color: '#4ba1f8', fontWeight: 'bold' }}>
-                      FILTER BY DATE 
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {dateFilters.map((option) => (
-                      <MenuItem key={option.value} onClick={() => setDateFilter(option.label)} sx={{ cursor: 'pointer' }}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </AccordionDetails>
-                </Accordion>
-              </Box>
-            </Card>
-          </Grid>
-
-          <Grid item xs={9}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ bgcolor: '#eef2f6', p: 1, borderRadius: 1 }}>
-              <Stack direction="row" spacing={1}>
-                <IconButton title="Export" sx={{ color: 'grey' }}>
-                  <GetAppIcon />
+                    borderRadius: '50%',
+                    width: '35px',
+                    height: '35px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    boxShadow: 3,
+                    color: 'white',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: '#41C048',
+                      color: '#ffffff'
+                    }
+                  }}
+                >
+                  <AddIcon />
                 </IconButton>
-                <IconButton title="Filter" sx={{ color: 'grey' }}>
-                  <FilterListIcon />
-                </IconButton>
-                <IconButton title="Search" sx={{ color: 'grey' }}>
-                  <SearchIcon />
-                </IconButton>
-              </Stack>
-
-              <Stack direction="row" spacing={1}>
-                <IconButton title="Download PDF" sx={{ color: 'grey' }}>
-                  <PictureAsPdfIcon />
-                </IconButton>
-                <IconButton title="Print" sx={{ color: 'grey' }}>
-                  <PrintIcon />
-                </IconButton>
-              </Stack>
+              </Tooltip>
             </Stack>
-            <Card style={{ height: '440px' }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={60}
-                getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                sx={{
-                  '& .even-row': { backgroundColor: '#ffffff' },
-                  '& .odd-row': { backgroundColor: '#f5f5f5' },
-                  '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #ccc'
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor:'#f5f5f5'
-                  },
-                }}
-              />
-            </Card>
           </Grid>
-        </Grid>
-      </Card>
+
+          <Grid container spacing={3}>
+              <FilterPanel
+                showFilter={showFilter}
+                formTypes={formTypes}
+                setFormType={setFormType}
+                dateFilters={dateFilters}
+                setDateFilter={setDateFilter}
+              />
+
+            <Grid item xs={9}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ bgcolor: '#eef2f6', p: 1, borderRadius: 1 }}>
+                <Stack direction="row" spacing={1}>
+                  <IconButton title="Export" sx={{ color: 'grey' }}>
+                    <GetAppIcon />
+                  </IconButton>
+                  <IconButton title="Filter" sx={{ color: 'grey' }}>
+                    <FilterListIcon />
+                  </IconButton>
+                  <IconButton title="Search" sx={{ color: 'grey' }}>
+                    <SearchIcon />
+                  </IconButton>
+                </Stack>
+
+                <Stack direction="row" spacing={1}>
+                  <IconButton title="Download PDF" sx={{ color: 'grey' }}>
+                    <PictureAsPdfIcon />
+                  </IconButton>
+                  <IconButton title="Print" sx={{ color: 'grey' }}>
+                    <PrintIcon />
+                  </IconButton>
+                </Stack>
+              </Stack>
+              <Card style={{ height: '440px' }}>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  rowHeight={60}
+                  getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                  sx={{
+                    '& .even-row': { backgroundColor: '#ffffff' },
+                    '& .odd-row': { backgroundColor: '#f5f5f5' },
+                    '& .MuiDataGrid-row': {
+                      borderBottom: '1px solid #ccc'
+                    },
+                    '& .MuiDataGrid-columnHeader': {
+                      backgroundColor: '#f5f5f5'
+                    }
+                  }}
+                />
+              </Card>
+            </Grid>
+          </Grid>
+        </Card>
       </Grid>
     </>
   );

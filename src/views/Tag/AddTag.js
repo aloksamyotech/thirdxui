@@ -6,7 +6,6 @@ import {
   TextField,
   IconButton,
   FormControlLabel,
-  Switch,
   Card,
   Typography,
   Button,
@@ -23,6 +22,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddIcon from '@mui/icons-material/Add';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { DataGrid } from '@mui/x-data-grid';
+import AntSwitch from "components/AntSwitch.js";
 
 const TagForm = ({ onCancel }) => {
   const [description, setDescription] = useState('');
@@ -71,7 +71,7 @@ const TagForm = ({ onCancel }) => {
             <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <FormControlLabel control={<Switch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />} label="Active?" />
+            <FormControlLabel control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />} label="Active?" labelPlacement='start'/>
           </Grid>
           <Grid item xs={4}></Grid>
           <Grid item xs={12} sm={6}>

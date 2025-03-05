@@ -29,16 +29,8 @@ const Lead = () => {
   const [showForm, setShowForm] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
-  const [openDialog, setOpenDialog] = useState(false);
 
-  const handleOpenDialog = () => setOpenDialog(true);
-  const handleCloseDialog = () => setOpenDialog(false);
-  const handleSelectPerson = () => {
-    setShowForm(true);
-    handleCloseDialog();
-  };
-
-  const CustomHeader = ({ pageSize, setPageSize, page, setPage, totalPages }) => {
+  const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
         <GridToolbarContainer
@@ -65,18 +57,6 @@ const Lead = () => {
           >
             PEOPLE LIST
           </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2">Rows per page:</Typography>
-            <Select value={pageSize} onChange={(e) => setPageSize(e.target.value)} size="small" sx={{ height: '30px' }}>
-              {[5, 10, 20, 50].map((size) => (
-                <MenuItem key={size} value={size}>
-                  {size}
-                </MenuItem>
-              ))}
-            </Select>
-            <Pagination count={totalPages} page={page} onChange={(event, value) => setPage(value)} size="small" />
-          </Box>
         </GridToolbarContainer>
       </Box>
     );
@@ -133,7 +113,7 @@ const Lead = () => {
             </Typography>
             <Tooltip title="Add People" arrow>
               <IconButton
-                onClick={handleOpenDialog}
+                onClick={() => setShowForm(true)}
                 sx={{
                   backgroundColor: '#41C048',
                   borderRadius: '50%',
@@ -155,7 +135,7 @@ const Lead = () => {
               </IconButton>
             </Tooltip>
           </Stack>
-
+{/* 
           <Dialog
             open={openDialog}
             onClose={handleCloseDialog}
@@ -218,7 +198,7 @@ const Lead = () => {
                 </Box>
               </Stack>
             </DialogContent>
-          </Dialog>
+          </Dialog> */}
 
           <Box width="100%">
             <Card style={{ height: '600px' }}>
@@ -227,21 +207,9 @@ const Lead = () => {
                 columns={columns}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                pageSize={pageSize}
-                onPageSizeChange={(newSize) => setPageSize(newSize)}
-                pagination
-                page={page - 1}
-                onPageChange={(newPage) => setPage(newPage + 1)}
-                rowCount={rows.length}
-                paginationMode="client"
                 components={{
                   Toolbar: () => (
                     <CustomHeader
-                      pageSize={pageSize}
-                      setPageSize={setPageSize}
-                      page={page}
-                      setPage={setPage}
-                      totalPages={Math.ceil(rows.length / pageSize)}
                     />
                   )
                 }}
@@ -258,7 +226,6 @@ const Lead = () => {
                   }
                 }}
                 disableSelectionOnClick
-                hideFooter
               />
             </Card>
           </Box>

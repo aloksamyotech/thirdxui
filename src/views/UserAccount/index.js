@@ -99,15 +99,44 @@ const EmployeeDetails = () => {
       <Grid container spacing={2} p={2}>
         <Typography variant="h4">User Account</Typography>
         <Box sx={{ width: '100%', mt: '15px' }}>
-          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
-            <Tab label="Profile" />
-            <Tab label="Change Password" />
-            <Tab label="Settings" />
+          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} textColor="primary" indicatorColor="primary"
+            sx={{
+              display: 'flex',
+              gap: 2,
+              borderBottom: '1px solid #4792d3' 
+            }}>
+            <Tab
+              label="Profile"
+              value={0}
+              sx={(theme) => ({
+                backgroundColor: tabValue === 0 ? '#e3f2fd' : 'transparent', 
+                transition: 'background-color 0.3s ease',
+                marginRight: 2
+              })}
+            />
+            <Tab
+              label="Change Password"
+              value={1}
+              sx={(theme) => ({
+                backgroundColor: tabValue === 1 ? '#e3f2fd': 'transparent', 
+                transition: 'background-color 0.3s ease',
+                marginRight: 2
+              })}
+            />
+            <Tab
+              label="Settings"
+              value={2}
+              sx={(theme) => ({
+                backgroundColor: tabValue === 2 ? '#e3f2fd' : 'transparent', 
+                transition: 'background-color 0.3s ease',
+                marginRight: 2
+              })}
+            />
           </Tabs>
 
           {tabValue === 0 && (
             <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={6} mt={2}>
                 <Box p={2} boxShadow={3} borderRadius={2} bgcolor="background.paper">
                   <Card sx={{ maxWidth: 400, borderRadius: 3, overflow: 'hidden' }}>
                     <Box
@@ -209,7 +238,7 @@ const EmployeeDetails = () => {
                 </Box>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={6} mt={2}>
                 <Box p={1} boxShadow={3} borderRadius={2} bgcolor="background.paper">
                   <Card>
                     <CardContent>
@@ -283,7 +312,7 @@ const EmployeeDetails = () => {
           )}
 
           {tabValue === 1 && (
-            <Card sx={{ width: '100%', margin: 'auto' }}>
+            <Card sx={{ width: '100%', margin: 'auto', mt: 2 }}>
               <CardContent>
                 <Typography variant="h4" gutterBottom>
                   Change Password
@@ -346,7 +375,7 @@ const EmployeeDetails = () => {
           )}
 
           {tabValue === 2 && (
-            <Card>
+            <Card sx={{mt:2}}>
               <CardContent>
                 <Typography variant="h4" sx={{ mb: 1 }}>
                   Email Settings

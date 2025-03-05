@@ -57,6 +57,13 @@ const dashboard = {
           breadcrumbs: false
         },
         {
+          id: 'all-volunteer-users',
+          title: 'All Volunteers',
+          type: 'item',
+          url: '/dashboard/volunteer',
+          breadcrumbs: false
+        },
+        {
           id: 'mailing-list',
           title: 'Mailing List',
           type: 'item',

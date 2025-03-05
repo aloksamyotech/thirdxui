@@ -36,7 +36,7 @@ const AddCaseForm = ({ onCancel }) => {
       </IconButton>
 
       <Card sx={{ padding: 2, marginTop: 2 }}>
-        <Grid container spacing={2}>
+        <Grid container spacing={4}>
           <Grid item xs={12} sm={3}>
             <TextField fullWidth label="Service Name" name="name" value={caseData.name} onChange={handleChange} />
           </Grid>

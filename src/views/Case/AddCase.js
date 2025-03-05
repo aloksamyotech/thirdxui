@@ -139,7 +139,7 @@ const AddCaseForm = ({ onCancel }) => {
       </LocalizationProvider>
 
       <Card sx={{ padding: 2, marginTop: 2 }}>
-        <Grid container spacing={2}>
+        <Grid container spacing={4}>
           <Grid item xs={12} sm={3}>
             <TextField fullWidth label="Service User" name="caseTag" value={caseData.caseTag} onChange={handleChange} />
           </Grid>

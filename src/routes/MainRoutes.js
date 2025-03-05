@@ -55,6 +55,15 @@ const MainRoutes = {
       path: 'dashboard',
       children: [
         {
+          path: 'volunteer',
+          element: <PeopleManagement />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
           path: 'services',
           element: <ServiceManagement />
         }

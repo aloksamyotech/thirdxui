@@ -1,6 +1,6 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Tab } from '@mui/material';
-import React from 'react'
+import React from 'react';
 import Chart from './Chart';
 import ServiceList from './ServiceList';
 import { useState } from 'react';
@@ -16,15 +16,35 @@ const Cases = () => {
   return (
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <TabContext value={value}>
-          <TabList onChange={handleChange} textColor="secondary" indicatorColor="secondary">
-            <Tab label="Chart View" value="2" />
-            <Tab label="List View" value="1" />
-          </TabList>
-        <TabPanel value="1" sx={{ p: 0 }}><CaseList /></TabPanel>
-        <TabPanel value="2" ><Chart /></TabPanel>
+        <TabList onChange={handleChange} textColor="secondary" indicatorColor="secondary">
+          <Tab
+            label="Chart View"
+            value="2"
+            sx={(theme) => ({
+              backgroundColor: value === '2' ? theme.palette.secondary.light : 'transparent',
+              transition: 'background-color 0.3s ease',
+              marginRight: 2
+            })}
+          />
+          <Tab
+            label="List View"
+            value="1"
+            sx={(theme) => ({
+              backgroundColor: value === '1' ? theme.palette.secondary.light : 'transparent',
+              transition: 'background-color 0.3s ease',
+              marginRight: 2
+            })}
+          />
+        </TabList>
+        <TabPanel value="1" sx={{ p: 0 }}>
+          <CaseList />
+        </TabPanel>
+        <TabPanel value="2">
+          <Chart />
+        </TabPanel>
       </TabContext>
     </Box>
   );
-}
+};
 
-export default Cases
+export default Cases;

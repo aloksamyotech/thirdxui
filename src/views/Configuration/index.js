@@ -129,7 +129,7 @@ const TabbedDataGrid = () => {
           onChange={(e, newValue) => setSelectedTab(newValue)}
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ '& .MuiTab-root': { fontSize: '0.75rem', display: 'flex', alignItems: 'center' } }}
+          sx={{ '& .MuiTab-root': { fontSize: '0.85rem', display: 'flex', alignItems: 'center'  },borderBottom: '1px solid #1e87e4' }}
         >
           {tabLabels.map((label, index) => (
             <Tab
@@ -146,14 +146,20 @@ const TabbedDataGrid = () => {
                         width: 15,
                         height: 15,
                         borderRadius: '50%',
-                        '&:hover': { bgcolor: '#41c048', color:'white' } 
+                        '&:hover': { bgcolor: '#41c048', color: 'white' }
                       }}
                     >
-                      <Add sx={{ fontSize: '16px' }}  />
+                      <Add sx={{ fontSize: '16px' }} />
                     </IconButton>
                   )}
                 </Box>
               }
+              sx={{
+                backgroundColor: selectedTab === index ? '#e3f2fd' : 'transparent',
+                transition: 'background-color 0.3s ease',
+                marginRight: 2,
+                borderRadius: '8px'
+              }}
             />
           ))}
         </Tabs>

@@ -12,7 +12,7 @@ AppTrafficBySite.propTypes = {
 
 export default function AppTrafficBySite({ title, subheader, list, ...other }) {
   return (
-    <Card {...other} sx={{ paddingY: '20px' }}>
+    <Card {...other}>
       {/* Title & Static "Type to filter" Text with Search Icon */}
       <CardHeader
         title={title}

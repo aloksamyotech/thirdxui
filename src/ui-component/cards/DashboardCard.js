@@ -11,7 +11,8 @@ const DashboardCard = ({ title, num1, num2, color, color2 }) => {
             backgroundImage: color,
             color: '#fff',
             height: '130px',
-            width: '220px',
+            // width: '220px',
+            width: 'auto',
             borderRadius: '20px',
             display: 'flex',
             alignItems: 'center'

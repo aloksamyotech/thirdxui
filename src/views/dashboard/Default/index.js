@@ -21,10 +21,14 @@ import footballImg from 'assets/images/football.jpg';
 import volleyballImg from 'assets/images/volleyball.jpg';
 import groupWorkImg from 'assets/images/groupWork.jpg';
 import artsImg from 'assets/images/arts.jpg';
+import cricket from 'assets/images/cricket.webp'
+import pickleball from 'assets/images/pickleball.jpg'
 import DashboardCard from 'ui-component/cards/DashboardCard';
 import NewDashboardCard from 'ui-component/cards/NewDashboardCard';
 import Sessions from './Sessions';
 import Map from '../Map';
+import Shortcut from './Shortcut';
+
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
@@ -37,7 +41,7 @@ const Dashboard = () => {
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
-        <Grid container >
+        <Grid container spacing={4}>
           <Grid item xs={3}>
             <DashboardCard title='Actice Service User' num1='234' num2='119' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
           </Grid>
@@ -53,11 +57,39 @@ const Dashboard = () => {
         </Grid>
       </Grid>
       <Grid item xs={12}>
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <Shortcut icon={1} title={'Add Person'} path={'/dashboard/people'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={2} title={'Add Session'} path={'/dashboard/services'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={3} title={'Add Session Attendies'} path={'/dashboard/people'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={4} title={'View New Refferal'} path={'/dashboard/referral'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={5} title={'Add New Service'} path={'/dashboard/services'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={6} title={'Create New Case'} path={'/dashboard/case'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={7} title={'Create New Form'} path={'/dashboard/manage-form'} />
+          </Grid>
+          <Grid item xs={3}>
+            <Shortcut icon={8} title={'Add Media'} path={'/dashboard/bulkupload'} />
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={7}>
             <TotalGrowthBarChart isLoading={isLoading} />
           </Grid>
-          <Grid item container xs={5}>
+          <Grid item container xs={5} spacing={3}>
             <Grid item xs={12}>
               <AppTasks
                 title="My Task"
@@ -75,7 +107,9 @@ const Dashboard = () => {
                   { name: 'Football', image: footballImg },
                   { name: 'Volleyball', image: volleyballImg },
                   { name: 'Group Work', image: groupWorkImg },
-                  { name: 'Arts & Craft', image: artsImg }
+                  { name: 'Arts & Craft', image: artsImg },
+                  { name: 'Cricket', image: cricket },
+                  { name: 'PickleBall', image: pickleball }
                 ]}
               />
             </Grid>

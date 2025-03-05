@@ -239,7 +239,7 @@ const Appearance = () => {
                 </Box>
               </Grid >
               <Grid item xs={6}>
-                <Typography>Preview</Typography>
+                <Typography sx={{ color: '#000', fontSize: '12px', fontWeight: '500', mb: '5px' }}>Preview</Typography>
                 <Card sx={{ minHeight: '100vh' }}>
                   <Card sx={{ boxShadow: '1px 1px 5px #e8e8e8', m: '20px' }}>
                     <Typography sx={{ my: '30px', ml: '15px' }}>Your Details</Typography>

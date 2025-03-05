@@ -18,19 +18,17 @@ const Report = () => {
         <TabContext value={value}>
           <TabList
             onChange={handleChange}
-            textColor="secondary"
-            indicatorColor="secondary"
             sx={{
               display: 'flex',
               gap: 2,
-              borderBottom: '1px solid #673ab7' 
+              borderBottom: '1px solid #1e87e4' 
             }}
           >
             <Tab
               label="Service User Report"
               value="1"
               sx={(theme) => ({
-                backgroundColor: value === '1' ? theme.palette.secondary.light : 'transparent',
+                backgroundColor: value === '1' ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2
               })}
@@ -40,7 +38,7 @@ const Report = () => {
               label="Cases Report"
               value="2"
               sx={(theme) => ({
-                backgroundColor: value === '2' ? theme.palette.secondary.light : 'transparent',
+                backgroundColor: value === '2' ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2
               })}
@@ -50,7 +48,7 @@ const Report = () => {
               label="Sessions Report"
               value="3"
               sx={(theme) => ({
-                backgroundColor: value === '3' ? theme.palette.secondary.light : 'transparent',
+                backgroundColor: value === '3' ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2
               })}
@@ -60,7 +58,7 @@ const Report = () => {
               label="Survey Report"
               value="4"
               sx={(theme) => ({
-                backgroundColor: value === '4' ? theme.palette.secondary.light : 'transparent',
+                backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease'
               })}
             />

@@ -4,6 +4,7 @@ import Loadable from 'ui-component/Loadable';
 
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
+const Volunteer = Loadable(lazy(() => import('views/Volunteer')));
 const ServiceManagement = Loadable(lazy(() => import('views/Service')));
 const ManageForm = Loadable(lazy(() => import('views/ManageForm')));
 const History = Loadable(lazy(() => import('views/History')));
@@ -56,7 +57,7 @@ const MainRoutes = {
       children: [
         {
           path: 'volunteer',
-          element: <PeopleManagement />
+          element: <Volunteer />
         }
       ]
     },

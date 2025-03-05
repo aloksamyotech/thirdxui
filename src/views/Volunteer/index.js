@@ -20,7 +20,7 @@ import { DataGrid, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
-import AddCaseForm from './AddPeople.js';
+import AddCaseForm from './addVolunteer.js';
 import CloseIcon from '@mui/icons-material/Close';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
@@ -55,7 +55,7 @@ const Lead = () => {
               lineHeight: '36px'
             }}
           >
-            PEOPLE LIST
+            VOLUNTEER LIST
           </Typography>
         </GridToolbarContainer>
       </Box>
@@ -109,9 +109,9 @@ const Lead = () => {
         <Grid>
           <Stack direction="row" alignItems="center" mb={2} spacing={2}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-              Add Service User
+              Add Volunteer
             </Typography>
-            <Tooltip title="Add Service User" arrow>
+            <Tooltip title="Add Volunteer" arrow>
               <IconButton
                 onClick={() => setShowForm(true)}
                 sx={{

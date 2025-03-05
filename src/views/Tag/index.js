@@ -29,7 +29,7 @@ const Tag = () => {
         <AddTag onCancel={() => setShowForm(false)} />
       ) : (
         <Grid>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2} spacing={2} sx={{ width: '100%' }}>
+          <Stack direction="row" alignItems="center"  mb={2} spacing={2} sx={{ width: '100%' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
               Add Tag Category
             </Typography>

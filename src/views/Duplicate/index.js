@@ -176,9 +176,6 @@ const Duplicate = () => {
               backgroundColor: '#eeeeee'
             }
           }}
-          pagination={false}
-          hideFooterPagination
-          hideFooter
         />
         <Stack direction="row" sx={{ display: 'flex', justifyContent: 'flex-end', m: '10px' }}>
           <Button

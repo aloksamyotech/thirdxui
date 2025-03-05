@@ -15,7 +15,7 @@ const Map = () => {
                 </Stack>
             </Stack>
             <Stack sx={{ mt: '5px' }}>
-                <img src={map} alt='' height='180px' style={{ objectFit: 'contain' }} />
+                <img src={map} alt='' height='180px' width='100%' />
             </Stack>
         </Box>
     )

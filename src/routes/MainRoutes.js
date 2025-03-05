@@ -4,7 +4,7 @@ import Loadable from 'ui-component/Loadable';
 
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
-const ContactManagement = Loadable(lazy(() => import('views/Service')));
+const ServiceManagement = Loadable(lazy(() => import('views/Service')));
 const ManageForm = Loadable(lazy(() => import('views/ManageForm')));
 const History = Loadable(lazy(() => import('views/History')));
 const Case = Loadable(lazy(() => import('views/Case')));
@@ -23,6 +23,7 @@ const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
 const Tag = Loadable(lazy(() => import('views/Tag')));
 const UserAccount = Loadable(lazy(() => import('views/UserAccount')));
 const Appearance = Loadable(lazy(() => import('views/Appearance')));
+const ViewService = Loadable(lazy(() => import('views/ViewService')));
 
 const MainRoutes = {
   path: '/',
@@ -55,7 +56,7 @@ const MainRoutes = {
       children: [
         {
           path: 'services',
-          element: <ContactManagement />
+          element: <ServiceManagement />
         }
       ]
     },
@@ -218,6 +219,15 @@ const MainRoutes = {
         {
           path: 'bulkdelete',
           element: <BulkDelete />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'view-service',
+          element: <ViewService />
         }
       ]
     }

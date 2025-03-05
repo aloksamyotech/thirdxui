@@ -7,6 +7,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TableStyle from '../../ui-component/TableStyle';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 import AddService from './AddService.js';
 
 const Lead = () => {
@@ -16,6 +17,7 @@ const Lead = () => {
   const [toDate, setToDate] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const handleFilterApply = () => {
     console.log('Filters Applied:', { district, status, fromDate, toDate });
@@ -152,12 +154,13 @@ const Lead = () => {
 
                 <Box sx={{ width: 150 }}>
                   <DatePicker
-                    label="Start Date"
+                    label="From"
                     value={fromDate}
                     onChange={(newValue) => setFromDate(newValue)}
                     slotProps={{
                       textField: {
                         size: 'small',
+                        InputLabelProps: { shrink: true },
                         sx: {
                           width: '100%',
                           '& .MuiInputBase-input': {
@@ -173,12 +176,13 @@ const Lead = () => {
 
                 <Box sx={{ width: 150 }}>
                   <DatePicker
-                    label="End Date"
+                    label="To"
                     value={toDate}
                     onChange={(newValue) => setToDate(newValue)}
                     slotProps={{
                       textField: {
                         size: 'small',
+                        InputLabelProps: { shrink: true },
                         sx: {
                           width: '100%',
                           '& .MuiInputBase-input': {
@@ -191,7 +195,6 @@ const Lead = () => {
                     }}
                   />
                 </Box>
-
                 <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
                   Apply
                 </Button>
@@ -225,6 +228,8 @@ const Lead = () => {
                   pageSize={5}
                   rowsPerPageOptions={[5, 10]}
                   getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                  // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
+                  onRowClick={() => navigate('/dashboard/view-service')}
                   sx={{
                     '& .even-row': { backgroundColor: '#ffffff' },
                     '& .odd-row': { backgroundColor: '#f5f5f5' },

@@ -110,7 +110,7 @@ const dashboard = {
         },
         {
           id: 'appearance',
-          title: 'Appearance',
+          title: 'Submission',
           type: 'item',
           url: '/dashboard/appearance',
           breadcrumbs: false

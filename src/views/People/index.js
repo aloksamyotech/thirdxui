@@ -8,6 +8,7 @@ import {
   IconButton,
   Tooltip,
   Pagination,
+  Accordion,AccordionSummary,AccordionDetails,
   Select,
   MenuItem,
   Dialog,
@@ -24,11 +25,31 @@ import AddCaseForm from './AddPeople.js';
 import CloseIcon from '@mui/icons-material/Close';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import FilterToggle from 'components/FilterToggle';
+import FilterPanel from 'components/FilterPanel';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+const formTypes = [
+  { value: 'Self Referral form', label: 'Self Referral form' },
+  { value: 'Community Referral form', label: 'Community Referral form' },
+  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+];
+
+const dateFilters = [
+  { value: 'today', label: 'All Dates' },
+  { value: 'week', label: 'Last 7 days' },
+  { value: 'month', label: 'Last 30 days' },
+  { value: 'year', label: 'Last 2 months' }
+];
 const Lead = () => {
   const [showForm, setShowForm] = useState(false);
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(false);
 
   const CustomHeader = () => {
     return (
@@ -135,7 +156,7 @@ const Lead = () => {
               </IconButton>
             </Tooltip>
           </Stack>
-{/* 
+          {/* 
           <Dialog
             open={openDialog}
             onClose={handleCloseDialog}
@@ -200,35 +221,89 @@ const Lead = () => {
             </DialogContent>
           </Dialog> */}
 
-          <Box width="100%">
-            <Card style={{ height: '600px' }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={65}
-                getRowId={(row) => row.id}
-                components={{
-                  Toolbar: () => (
-                    <CustomHeader
-                    />
-                  )
-                }}
-                sx={{
-                  '& .MuiDataGrid-columnHeaders': {
-                    display: 'none'
-                  },
-                  '& .MuiDataGrid-row:nth-of-type(2n)': {
-                    backgroundColor: '#f9f9f9'
-                  },
-                  '& .MuiDataGrid-cell': {
-                    textAlign: 'left',
-                    fontSize: '14px'
-                  }
-                }}
-                disableSelectionOnClick
-              />
-            </Card>
-          </Box>
+          <Grid container spacing={3}>
+            {/* <FilterToggle showFilter={showFilter} setShowFilter={setShowFilter} />
+              <FilterPanel
+                showFilter={showFilter}
+                formTypes={formTypes}
+                setFormType={setFormType}
+                dateFilters={dateFilters}
+                setDateFilter={setDateFilter}
+              /> */}
+            <Grid item xs={3}>
+              <Card sx={{ p: 1, backgroundColor: '#f5faff', borderRadius: 2, height: '100%' }}>
+                <Typography variant="h6" gutterBottom>
+                  Filter
+                </Typography>
+
+                <Box sx={{ maxWidth: 320 }}>
+                  {/* FORM TYPE FILTER */}
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon sx={{ color: '#4ba1f8' }} />}
+                      sx={{ bgcolor: '#f1f8ff', borderRadius: 1 }}
+                    >
+                      <Typography variant="subtitle2" sx={{ color: '#4ba1f8', fontWeight: 'bold' }}>
+                        FORM TYPE
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {formTypes.map((option) => (
+                        <MenuItem key={option.value} onClick={() => setFormType(option.label)} sx={{ cursor: 'pointer' }}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </AccordionDetails>
+                  </Accordion>
+
+                  {/* FILTER BY DATE */}
+                  <Accordion sx={{ mt: 2 }}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon sx={{ color: '#4ba1f8' }} />}
+                      sx={{ bgcolor: '#f1f8ff', borderRadius: 1 }}
+                    >
+                      <Typography variant="subtitle2" sx={{ color: '#4ba1f8', fontWeight: 'bold' }}>
+                        FILTER BY DATE
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {dateFilters.map((option) => (
+                        <MenuItem key={option.value} onClick={() => setDateFilter(option.label)} sx={{ cursor: 'pointer' }}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </AccordionDetails>
+                  </Accordion>
+                </Box>
+              </Card>
+            </Grid>
+            <Grid item xs={9}>
+              <Card style={{ height: '600px' }}>
+                <DataGrid
+                  rows={rows}
+                  columns={columns}
+                  rowHeight={65}
+                  getRowId={(row) => row.id}
+                  components={{
+                    Toolbar: () => <CustomHeader />
+                  }}
+                  sx={{
+                    '& .MuiDataGrid-columnHeaders': {
+                      display: 'none'
+                    },
+                    '& .MuiDataGrid-row:nth-of-type(2n)': {
+                      backgroundColor: '#f9f9f9'
+                    },
+                    '& .MuiDataGrid-cell': {
+                      textAlign: 'left',
+                      fontSize: '14px'
+                    }
+                  }}
+                  disableSelectionOnClick
+                />
+              </Card>
+            </Grid>
+          </Grid>
         </Grid>
       )}
     </Card>

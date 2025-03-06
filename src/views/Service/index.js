@@ -155,7 +155,7 @@ const Lead = () => {
               </IconButton>
             </Tooltip>
           </Stack>
-          <Card sx={{ marginBottom: 3, backgroundColor: '#eef2f6' }}>
+          {/* <Card sx={{ marginBottom: 3, backgroundColor: '#eef2f6' }}>
             <Stack direction="row" alignItems="center" spacing={2} mb={1}>
               <FilterAltOutlinedIcon color="grey" />
               <Typography variant="h6">Filter</Typography>
@@ -252,7 +252,7 @@ const Lead = () => {
                 />
               </Stack>
             </LocalizationProvider>
-          </Card>
+          </Card> */}
           <Grid container spacing={3}>
             <FilterPanel
               showFilter={showFilter}

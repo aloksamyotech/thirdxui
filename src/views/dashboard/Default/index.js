@@ -89,7 +89,7 @@ const Dashboard = () => {
           <Grid item xs={7}>
             <TotalGrowthBarChart isLoading={isLoading} />
           </Grid>
-          <Grid item container xs={5} spacing={3}>
+          <Grid item container xs={5} sx={{ display: 'flex', alignContent: 'space-between' }}>
             <Grid item xs={12}>
               <AppTasks
                 title="My Task"

@@ -243,6 +243,7 @@ const UserProfile = () => {
                     <Grid item xs={12} key={index}>
                       <Card
                         sx={{
+                          m:1,
                           p: 2,
                           borderRadius: 2,
                           boxShadow: 4

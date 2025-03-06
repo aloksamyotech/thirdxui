@@ -377,45 +377,63 @@ const AddCaseForm = ({ onCancel }) => {
             )}
             {tabIndex === 3 && (
               <Grid container spacing={4}>
-                <Grid item xs={12} sm={2}>
+                <Grid item xs={4}>
                   <Typography variant="h6" gutterBottom>
                     Date Information
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           label="Referred Date"
                           value={caseData.referredDate}
                           onChange={(newValue) => setCaseData({ ...caseData, referredDate: newValue })}
-                          renderInput={(params) => <TextField {...params} fullWidth />}
                         />
-                      </LocalizationProvider>
+                      </LocalizationProvider> */}
+                      <TextField
+                        type="date"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        label="Referred Date"
+                      />
+
                     </Grid>
                     <Grid item xs={12}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           label="From Date"
                           value={caseData.fromDate}
                           onChange={(newValue) => setCaseData({ ...caseData, fromDate: newValue })}
                           renderInput={(params) => <TextField {...params} fullWidth />}
                         />
-                      </LocalizationProvider>
+                      </LocalizationProvider> */}
+                      <TextField
+                        type="date"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        label="From Date"
+                      />
                     </Grid>
                     <Grid item xs={12}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           label="To Date"
                           value={caseData.toDate}
                           onChange={(newValue) => setCaseData({ ...caseData, toDate: newValue })}
                           renderInput={(params) => <TextField {...params} fullWidth />}
                         />
-                      </LocalizationProvider>
+                      </LocalizationProvider> */}
+                      <TextField
+                        type="date"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        label="To Date"
+                      />
                     </Grid>
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={4}>
                   <Typography variant="h6" gutterBottom>
                     Referral Information
                   </Typography>
@@ -450,7 +468,7 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={4}>
                   <Typography variant="h6" gutterBottom>
                     Contact Information
                   </Typography>
@@ -567,7 +585,7 @@ const AddCaseForm = ({ onCancel }) => {
           </Grid>
         </Grid>
       </Card>
-    </Grid>
+    </Grid >
   );
 };
 

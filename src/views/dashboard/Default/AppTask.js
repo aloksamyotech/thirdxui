@@ -3,7 +3,7 @@ import { useState } from 'react';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
-import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, Box, Tooltip,Typography, CardHeader, FormControlLabel } from '@mui/material';
+import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, Box, Tooltip, Typography, CardHeader, FormControlLabel } from '@mui/material';
 // components
 
 import Iconify from '../../../ui-component/iconify';
@@ -26,23 +26,23 @@ export default function AppTasks({ title, subheader, list, ...other }) {
   });
 
   return (
-    <Card {...other} sx={{ paddingY: '20px' }}>
+    <Card {...other}>
       <CardHeader title={title} subheader={subheader}
         action={
-           <Tooltip title="Add Task" arrow>
-          <Box sx={{
-            color: '#fff',
-            bgcolor: '#41c048',
-            borderRadius: '100%',
-            width: '35px',
-            height: '35px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            boxShadow: 3,
-          }}>
-            <AddIcon />
-          </Box>
+          <Tooltip title="Add Task" arrow>
+            <Box sx={{
+              color: '#fff',
+              bgcolor: '#41c048',
+              borderRadius: '100%',
+              width: '35px',
+              height: '35px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              boxShadow: 3,
+            }}>
+              <AddIcon />
+            </Box>
           </Tooltip>
         } />
       <Divider />
@@ -127,11 +127,14 @@ function TaskItem({ task, checked, onChange }) {
     >
       <FormControlLabel control={<Checkbox checked={checked} onChange={onChange} />} label={task.label} sx={{ flexGrow: 1, m: 0 }} />
 
-      <IconButton size="large" color="inherit" sx={{ opacity: 0.48 }} onClick={handleOpenMenu}>
-        <Iconify icon={'eva:more-vertical-fill'} />
+      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
+        <Iconify icon={'eva:edit-fill'} />
+      </IconButton>
+      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
+        <Iconify icon={'eva:trash-2-outline'} />
       </IconButton>
 
-      <Popover
+      {/* <Popover
         open={Boolean(open)}
         anchorEl={open}
         onClose={handleCloseMenu}
@@ -169,7 +172,7 @@ function TaskItem({ task, checked, onChange }) {
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
         </MenuItem>
-      </Popover>
+      </Popover> */}
     </Stack>
   );
 }

@@ -7,16 +7,8 @@ import {
   Card,
   IconButton,
   Tooltip,
-  Pagination,
-  Accordion,AccordionSummary,AccordionDetails,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
@@ -42,6 +34,7 @@ const dateFilters = [
   { value: 'year', label: 'Last 2 months' }
 ];
 const Lead = () => {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [formType, setFormType] = useState('');
   const [dateFilter, setDateFilter] = useState('');
@@ -169,6 +162,7 @@ const Lead = () => {
                   columns={columns}
                   rowHeight={65}
                   getRowId={(row) => row.id}
+                  onRowClick={() => navigate('/dashboard/view-people')}
                   components={{
                     Toolbar: () => <CustomHeader />
                   }}

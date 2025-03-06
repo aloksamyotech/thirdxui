@@ -44,34 +44,34 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: 'people',
+      id: '01',
       title: 'People',
       type: 'collapse',
       icon: icons.IconUser,
       children: [
         {
-          id: 'all-service-users',
+          id: '02',
           title: 'Service Users',
           type: 'item',
           url: '/dashboard/people',
           breadcrumbs: false
         },
         {
-          id: 'all-volunteer-users',
+          id: '03',
           title: 'Volunteers',
           type: 'item',
           url: '/dashboard/volunteer',
           breadcrumbs: false
         },
         {
-          id: 'mailing-list',
+          id: '04',
           title: 'Mailing List',
           type: 'item',
           url: '/dashboard/mail',
           breadcrumbs: false
         },
         {
-          id: 'new-referral',
+          id: '05',
           title: 'New Referral',
           type: 'item',
           url: '/dashboard/referral',
@@ -80,7 +80,7 @@ const dashboard = {
       ]
     },
     {
-      id: '02',
+      id: '06',
       title: 'Services',
       type: 'item',
       url: '/dashboard/services',
@@ -88,7 +88,7 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: '03',
+      id: '07',
       title: 'Cases',
       type: 'item',
       url: '/dashboard/case',
@@ -96,27 +96,27 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: 'forms',
+      id: '08',
       title: 'Forms',
       type: 'collapse',
       icon: icons.IconClipboardData,
       children: [
         {
-          id: 'manage-form',
+          id: '09',
           title: 'Manage Form',
           type: 'item',
           url: '/dashboard/manage-form',
           breadcrumbs: false
         },
         {
-          id: 'appearance',
+          id: '10',
           title: 'Submission',
           type: 'item',
           url: '/dashboard/appearance',
           breadcrumbs: false
         },
         {
-          id: 'history',
+          id: '11',
           title: 'History',
           type: 'item',
           url: '/dashboard/history',
@@ -125,7 +125,7 @@ const dashboard = {
       ]
     },
     {
-      id: '05',
+      id: '12',
       title: 'Report',
       type: 'item',
       url: '/dashboard/report',
@@ -133,34 +133,34 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: 'configuration',
+      id: '13',
       title: 'Configuration',
       type: 'collapse',
       icon: icons.IconSettings,
       children: [
         {
-          id: 'configuration',
+          id: '14',
           title: 'Configuration',
           type: 'item',
           url: '/dashboard/configuration',
           breadcrumbs: false
         },
         {
-          id: 'tags',
+          id: '15',
           title: 'Tags',
           type: 'item',
           url: '/dashboard/tags',
           breadcrumbs: false
         },
         {
-          id: 'users',
+          id: '16',
           title: 'Users',
           type: 'item',
           url: '/dashboard/users',
           breadcrumbs: false
         },
         {
-          id: 'account',
+          id: '17',
           title: 'Account',
           type: 'item',
           url: '/dashboard/account',
@@ -169,34 +169,34 @@ const dashboard = {
       ]
     },
     {
-      id: 'data',
+      id: '18',
       title: 'Data Management',
       type: 'collapse',
       icon: icons.IconRefresh,
       children: [
         {
-          id: 'bulkupload',
+          id: '19',
           title: 'Bulk Upload',
           type: 'item',
           url: '/dashboard/bulkupload',
           breadcrumbs: false
         },
         {
-          id: 'duplicate',
+          id: '20',
           title: 'Duplicate',
           type: 'item',
           url: '/dashboard/duplicate',
           breadcrumbs: false
         },
         {
-          id: 'bulkdelete',
+          id: '21',
           title: 'Bulk Delete',
           type: 'item',
           url: '/dashboard/bulkdelete',
           breadcrumbs: false
         },
         {
-          id: 'archives',
+          id: '22',
           title: 'Archives',
           type: 'item',
           url: '/dashboard/archives',

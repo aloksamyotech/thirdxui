@@ -159,7 +159,6 @@ const TabbedDataGrid = () => {
                 backgroundColor: selectedTab === index ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2,
-                borderRadius: '8px'
               }}
             />
           ))}

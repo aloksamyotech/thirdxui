@@ -25,6 +25,7 @@ const Tag = Loadable(lazy(() => import('views/Tag')));
 const UserAccount = Loadable(lazy(() => import('views/UserAccount')));
 const Appearance = Loadable(lazy(() => import('views/Appearance')));
 const ViewService = Loadable(lazy(() => import('views/ViewService')));
+const ViewServiceUser = Loadable(lazy(() => import('views/ViewServiceUser')));
 
 const MainRoutes = {
   path: '/',
@@ -49,6 +50,15 @@ const MainRoutes = {
         {
           path: 'people',
           element: <PeopleManagement />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'view-people',
+          element: <ViewServiceUser />
         }
       ]
     },

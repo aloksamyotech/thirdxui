@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, Menu, MenuItem, IconButton,InputAdornment, Tooltip, Chip, Toolbar } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, Menu, MenuItem, IconButton, InputAdornment, Tooltip, Chip, Toolbar } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
@@ -11,6 +11,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
 import AddCaseForm from './AddCase.js';
 import { Search, Download, PictureAsPdf, Print, ExpandMore, Archive, Edit, MergeType, Delete } from '@mui/icons-material';
+import FilterPanel from 'components/FilterPanel';
 
 const Lead = () => {
   const [district, setDistrict] = useState('');
@@ -21,6 +22,9 @@ const Lead = () => {
   const [showForm, setShowForm] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
@@ -80,6 +84,20 @@ const Lead = () => {
       dateOpened: '2024-01-25',
       dateClosed: '2024-02-10'
     }
+  ];
+  const formTypes = [
+    { value: 'Self Referral form', label: 'Self Referral form' },
+    { value: 'Community Referral form', label: 'Community Referral form' },
+    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+  ];
+
+  const dateFilters = [
+    { value: 'today', label: 'All Dates' },
+    { value: 'week', label: 'Last 7 days' },
+    { value: 'month', label: 'Last 30 days' },
+    { value: 'year', label: 'Last 2 months' }
   ];
 
   return (
@@ -210,8 +228,7 @@ const Lead = () => {
               </Stack>
             </LocalizationProvider>
           </Card>
-
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
+          {/* <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={1}>
               <TextField
                 variant="outlined"
@@ -261,27 +278,37 @@ const Lead = () => {
                 <Print />
               </IconButton>
             </Stack>
-          </Stack>
-          <TableStyle>
-            <Box width="100%">
-              <Card style={{ height: '600px' }}>
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  rowHeight={60}
-                  checkboxSelection
-                  getRowId={(row) => row.id}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10]}
-                  sx={{
-                    '& .MuiDataGrid-row': {
-                      borderBottom: '1px solid #ccc'
-                    }
-                  }}
-                />
-              </Card>
-            </Box>
-          </TableStyle>
+          </Stack> */}
+          <Grid container spacing={4}>
+            <FilterPanel
+              showFilter={showFilter}
+              formTypes={formTypes}
+              setFormType={setFormType}
+              dateFilters={dateFilters}
+              setDateFilter={setDateFilter} />
+            <Grid item xs={9}>
+              <TableStyle>
+                <Box width="100%">
+                  <Card style={{ height: '600px' }}>
+                    <DataGrid
+                      rows={rows}
+                      columns={columns}
+                      rowHeight={60}
+                      checkboxSelection
+                      getRowId={(row) => row.id}
+                      pageSize={5}
+                      rowsPerPageOptions={[5, 10]}
+                      sx={{
+                        '& .MuiDataGrid-row': {
+                          borderBottom: '1px solid #ccc'
+                        }
+                      }}
+                    />
+                  </Card>
+                </Box>
+              </TableStyle>
+            </Grid>
+          </Grid>
         </Grid>
       )}
     </Card>

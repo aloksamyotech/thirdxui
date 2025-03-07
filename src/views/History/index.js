@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Stack, Typography, Box, Card, Chip, Tabs, Tab } from '@mui/material';
+import { Stack, Typography, Box, Card, Chip, Tabs, Tab, Container, Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import FilterPanel from 'components/FilterPanel';
 
 const columns = [
   {
@@ -76,58 +77,84 @@ const allRows = [
 
 export default function TabbedDataGrid() {
   const [tabValue, setTabValue] = useState(0);
+  const [showFilter, setShowFilter] = useState(true);
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
   const filteredRows = allRows.filter((row) => (tabValue === 0 ? row.status === 'Accepted' : row.status === 'Rejected'));
+  const formTypes = [
+    { value: 'Self Referral form', label: 'Self Referral form' },
+    { value: 'Community Referral form', label: 'Community Referral form' },
+    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+  ];
 
+  const dateFilters = [
+    { value: 'today', label: 'All Dates' },
+    { value: 'week', label: 'Last 7 days' },
+    { value: 'month', label: 'Last 30 days' },
+    { value: 'year', label: 'Last 2 months' }
+  ];
   return (
-    <Box sx={{ width: '100%' }}>
-      <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}
-       sx={{
-        display: 'flex',
-        gap: 2,
-        borderBottom: '1px solid #4792d3' 
-      }}>
-        <Tab
-          label="Accepted"
-          value={0}
-          sx={(theme) => ({
-            backgroundColor: tabValue === 0 ? '#e3f2fd' : 'transparent',
-            transition: 'background-color 0.3s ease',
-            marginRight: 2
-          })}
-        />
-        <Tab
-          label="Rejected"
-          value={1}
-          sx={(theme) => ({
-            backgroundColor: tabValue === 1 ? '#e3f2fd' : 'transparent',
-            transition: 'background-color 0.3s ease',
-            marginRight: 2
-          })}
-        />
-      </Tabs>
+    <Grid container spacing={2}>
+      <FilterPanel
+        showFilter={showFilter}
+        formTypes={formTypes}
+        setFormType={setFormType}
+        dateFilters={dateFilters}
+        setDateFilter={setDateFilter} />
+      <Grid item xs={9}>
+        <Box sx={{ width: '100%' }}>
+          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}
+            sx={{
+              display: 'flex',
+              gap: 2,
+              borderBottom: '1px solid #4792d3'
+            }}>
+            <Tab
+              label="Accepted"
+              value={0}
+              sx={(theme) => ({
+                backgroundColor: tabValue === 0 ? '#e3f2fd' : 'transparent',
+                transition: 'background-color 0.3s ease',
+                marginRight: 2
+              })}
+            />
+            <Tab
+              label="Rejected"
+              value={1}
+              sx={(theme) => ({
+                backgroundColor: tabValue === 1 ? '#e3f2fd' : 'transparent',
+                transition: 'background-color 0.3s ease',
+                marginRight: 2
+              })}
+            />
+          </Tabs>
 
-      <Card sx={{ mt: 2, height: '464px' }}>
-        <DataGrid
-          rows={filteredRows}
-          columns={columns}
-          rowHeight={65}
-          getRowId={(row) => row.id}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10]}
-          getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-          sx={{
-            '& .even-row': { backgroundColor: '#ffffff' },
-            '& .odd-row': { backgroundColor: '#f5f5f5' },
-            '& .MuiDataGrid-row': {
-              borderBottom: '1px solid #ccc'
-            },
-            '& .MuiDataGrid-columnHeader': {
-              backgroundColor: '#f5f5f5'
-            }
-          }}
-        />
-      </Card>
-    </Box>
+          <Card sx={{ mt: 2, height: '464px' }}>
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              rowHeight={65}
+              getRowId={(row) => row.id}
+              pageSize={5}
+              rowsPerPageOptions={[5, 10]}
+              getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+              sx={{
+                '& .even-row': { backgroundColor: '#ffffff' },
+                '& .odd-row': { backgroundColor: '#f5f5f5' },
+                '& .MuiDataGrid-row': {
+                  borderBottom: '1px solid #ccc'
+                },
+                '& .MuiDataGrid-columnHeader': {
+                  backgroundColor: '#f5f5f5'
+                }
+              }}
+            />
+          </Card>
+        </Box>
+      </Grid>
+    </Grid>
   );
 }

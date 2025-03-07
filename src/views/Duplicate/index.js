@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FilterPanel from 'components/FilterPanel';
 
 const Duplicate = () => {
   const [one, setOne] = useState('');
@@ -13,6 +14,9 @@ const Duplicate = () => {
   const [three, setThree] = useState('');
   const [four, setFour] = useState('');
   const [filter, setFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
   const rows = [
     {
@@ -85,118 +89,141 @@ const Duplicate = () => {
       renderCell: (params) => <Typography>{params?.value}</Typography>
     }
   ];
+  const formTypes = [
+    { value: 'Self Referral form', label: 'Self Referral form' },
+    { value: 'Community Referral form', label: 'Community Referral form' },
+    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+  ];
 
+  const dateFilters = [
+    { value: 'today', label: 'All Dates' },
+    { value: 'week', label: 'Last 7 days' },
+    { value: 'month', label: 'Last 30 days' },
+    { value: 'year', label: 'Last 2 months' }
+  ];
   return (
-    <Box sx={{ width: '100%', typography: 'body1', bgcolor: '#fff', borderRadius: '10px', minHeight: '100vh' }}>
-      {!filter && (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
-          <Typography>Duplicates</Typography>
-          <FilterAltIcon fontSize="small" sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
-        </Box>
-      )}
-      {filter && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px' }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <FilterAltIcon/>
-            <Typography variant="h6" fontWeight="bold">
-              Filter
-            </Typography>
-          </Stack>
+    <Grid container spacing={2}>
+      <FilterPanel
+        showFilter={showFilter}
+        formTypes={formTypes}
+        setFormType={setFormType}
+        dateFilters={dateFilters}
+        setDateFilter={setDateFilter} />
+      <Grid item xs={9}>
+        <Box sx={{ width: '100%', typography: 'body1', bgcolor: '#fff', borderRadius: '10px', minHeight: '100vh' }}>
+          {!filter && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
+              <Typography>Duplicates</Typography>
+              <FilterAltIcon fontSize="small" sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
+            </Box>
+          )}
+          {filter && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px' }}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <FilterAltIcon />
+                <Typography variant="h6" fontWeight="bold">
+                  Filter
+                </Typography>
+              </Stack>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <TextField
-              select
-              label="Service"
-              value={one}
-              onChange={(e) => setOne(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 200 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <TextField
+                  select
+                  label="Service"
+                  value={one}
+                  onChange={(e) => setOne(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 200 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
 
-            <TextField
-              select
-              label="Service Date"
-              value={two}
-              onChange={(e) => setTwo(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
+                <TextField
+                  select
+                  label="Service Date"
+                  value={two}
+                  onChange={(e) => setTwo(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 150 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
 
-            <TextField
-              select
-              label="Service User Tags"
-              value={three}
-              onChange={(e) => setThree(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
+                <TextField
+                  select
+                  label="Service User Tags"
+                  value={three}
+                  onChange={(e) => setThree(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 150 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
 
-            <TextField
-              select
-              label="Country Of Origin"
-              value={four}
-              onChange={(e) => setFour(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 180 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
+                <TextField
+                  select
+                  label="Country Of Origin"
+                  value={four}
+                  onChange={(e) => setFour(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 180 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
 
-            <Button color="secondary" variant="contained">
-              Apply
-            </Button>
+                <Button color="secondary" variant="contained">
+                  Apply
+                </Button>
 
-            <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
-              <FilterAltIcon fontSize="medium" sx={{ m: '4px', cursor: 'pointer' }} onClick={() => setFilter(false)} />
+                <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
+                  <FilterAltIcon fontSize="medium" sx={{ m: '4px', cursor: 'pointer' }} onClick={() => setFilter(false)} />
+                </Stack>
+              </Box>
+            </Box>
+          )}
+          <Box height="200px" width="100%">
+            <DataGrid
+              rows={rows ? rows : []}
+              columns={columns}
+              getRowId={(rows) => rows?.id}
+              sx={{
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: '#eeeeee'
+                }
+              }}
+            />
+            <Stack direction="row" sx={{ display: 'flex', justifyContent: 'flex-end', m: '10px' }}>
+              <Button
+                size="small"
+                variant="outlined"
+                endIcon={<CallMergeIcon />}
+                sx={{ marginRight: '10px', color: '#fdc250', border: '1px solid #fdc250' }}
+              >
+                Merge
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                endIcon={<DeleteIcon />}
+                sx={{ marginRight: '10px', color: '#ff918d', border: '1px solid #ff918d' }}
+              >
+                Delete
+              </Button>
             </Stack>
           </Box>
         </Box>
-      )}
-      <Box height="200px" width="100%">
-        <DataGrid
-          rows={rows ? rows : []}
-          columns={columns}
-          getRowId={(rows) => rows?.id}
-          sx={{
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: '#eeeeee'
-            }
-          }}
-        />
-        <Stack direction="row" sx={{ display: 'flex', justifyContent: 'flex-end', m: '10px' }}>
-          <Button
-            size="small"
-            variant="outlined"
-            endIcon={<CallMergeIcon />}
-            sx={{ marginRight: '10px', color: '#fdc250', border: '1px solid #fdc250' }}
-          >
-            Merge
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            endIcon={<DeleteIcon />}
-            sx={{ marginRight: '10px', color: '#ff918d', border: '1px solid #ff918d' }}
-          >
-            Delete
-          </Button>
-        </Stack>
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };
 

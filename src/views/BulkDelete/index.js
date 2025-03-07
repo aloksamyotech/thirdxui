@@ -9,6 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import InfoIcon from '@mui/icons-material/Info';
+import FilterPanel from 'components/FilterPanel';
 
 const BulkDelete = () => {
   const [one, setOne] = useState('');
@@ -18,7 +19,24 @@ const BulkDelete = () => {
   const [filter, setFilter] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(true);
+  const [formType, setFormType] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
+  const formTypes = [
+    { value: 'Self Referral form', label: 'Self Referral form' },
+    { value: 'Community Referral form', label: 'Community Referral form' },
+    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
+    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
+    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+  ];
+
+  const dateFilters = [
+    { value: 'today', label: 'All Dates' },
+    { value: 'week', label: 'Last 7 days' },
+    { value: 'month', label: 'Last 30 days' },
+    { value: 'year', label: 'Last 2 months' }
+  ];
   const CustomHeader = ({ pageSize, setPageSize, page, setPage, totalPages }) => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -104,137 +122,147 @@ const BulkDelete = () => {
   ];
 
   return (
-    <Box sx={{ width: '100%', typography: 'body1', bgcolor: '#fff', borderRadius: '10px', minHeight: '100vh' }}>
-      {!filter && (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
-          <Typography>Bulk Delete</Typography>
-          <FilterAltIcon fontSize="small" sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
-        </Box>
-      )}
-      {filter && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px' }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <FilterAltIcon />
-            <Typography variant="h6" fontWeight="bold">
-              Filter
-            </Typography>
-          </Stack>
+    <Grid container spacing={2}>
+      <FilterPanel
+        showFilter={showFilter}
+        formTypes={formTypes}
+        setFormType={setFormType}
+        dateFilters={dateFilters}
+        setDateFilter={setDateFilter} />
+      <Grid item xs={9}>
+        <Box sx={{ width: '100%', typography: 'body1', bgcolor: '#fff', borderRadius: '10px', minHeight: '100vh' }}>
+          {!filter && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
+              <Typography>Bulk Delete</Typography>
+              <FilterAltIcon fontSize="small" sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
+            </Box>
+          )}
+          {filter && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px' }}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <FilterAltIcon />
+                <Typography variant="h6" fontWeight="bold">
+                  Filter
+                </Typography>
+              </Stack>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <TextField
-              select
-              label="Service"
-              value={one}
-              onChange={(e) => setOne(e.target.value)}
-              variant="outlined"
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <TextField
+                  select
+                  label="Service"
+                  value={one}
+                  onChange={(e) => setOne(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 200 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  label="Service Date"
+                  value={two}
+                  onChange={(e) => setTwo(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 150 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  label="Service User Tags"
+                  value={three}
+                  onChange={(e) => setThree(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 150 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  label="Country Of Origin"
+                  value={four}
+                  onChange={(e) => setFour(e.target.value)}
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: 180 }}
+                >
+                  <MenuItem value="District 1">District 1</MenuItem>
+                  <MenuItem value="District 2">District 2</MenuItem>
+                </TextField>
+
+                <Button color="secondary" variant="contained">
+                  Apply
+                </Button>
+
+                <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
+                  <FilterAltIcon fontSize="medium" sx={{ m: '4px', cursor: 'pointer' }} onClick={() => setFilter(false)} />
+                </Stack>
+              </Box>
+            </Box>
+          )}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
+            <Button
               size="small"
-              sx={{ width: 200 }}
+              variant="contained"
+              endIcon={<DeleteIcon />}
+              sx={{ marginRight: '10px', bgcolor: '#ff4d49', border: '1px solid #ff918d', '&:hover': { bgcolor: '#ec3330' } }}
             >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-
-            <TextField
-              select
-              label="Service Date"
-              value={two}
-              onChange={(e) => setTwo(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-
-            <TextField
-              select
-              label="Service User Tags"
-              value={three}
-              onChange={(e) => setThree(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-
-            <TextField
-              select
-              label="Country Of Origin"
-              value={four}
-              onChange={(e) => setFour(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ width: 180 }}
-            >
-              <MenuItem value="District 1">District 1</MenuItem>
-              <MenuItem value="District 2">District 2</MenuItem>
-            </TextField>
-
-            <Button color="secondary" variant="contained">
-              Apply
+              Bulk Delete
             </Button>
-
-            <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
-              <FilterAltIcon fontSize="medium" sx={{ m: '4px', cursor: 'pointer' }} onClick={() => setFilter(false)} />
-            </Stack>
+          </Box>
+          <Box width="100%">
+            <Card style={{ height: '600px', borderRadius: '0px' }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                rowHeight={65}
+                getRowId={(row) => row.id}
+                pageSize={pageSize}
+                onPageSizeChange={(newSize) => setPageSize(newSize)}
+                pagination
+                page={page - 1}
+                onPageChange={(newPage) => setPage(newPage + 1)}
+                rowCount={rows.length}
+                paginationMode="client"
+                components={{
+                  Toolbar: () => (
+                    <CustomHeader
+                      pageSize={pageSize}
+                      setPageSize={setPageSize}
+                      page={page}
+                      setPage={setPage}
+                      totalPages={Math.ceil(rows.length / pageSize)}
+                    />
+                  )
+                }}
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    display: 'none'
+                  },
+                  '& .MuiDataGrid-row:nth-of-type(2n)': {
+                    backgroundColor: '#f9f9f9'
+                  },
+                  '& .MuiDataGrid-cell': {
+                    textAlign: 'left',
+                    fontSize: '14px'
+                  }
+                }}
+                disableSelectionOnClick
+              />
+            </Card>
           </Box>
         </Box>
-      )}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', margin: '20px' }}>
-        <Button
-          size="small"
-          variant="contained"
-          endIcon={<DeleteIcon />}
-          sx={{ marginRight: '10px', bgcolor: '#ff4d49', border: '1px solid #ff918d', '&:hover': { bgcolor: '#ec3330' } }}
-        >
-          Bulk Delete
-        </Button>
-      </Box>
-      <Box width="100%">
-        <Card style={{ height: '600px', borderRadius: '0px' }}>
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            rowHeight={65}
-            getRowId={(row) => row.id}
-            pageSize={pageSize}
-            onPageSizeChange={(newSize) => setPageSize(newSize)}
-            pagination
-            page={page - 1}
-            onPageChange={(newPage) => setPage(newPage + 1)}
-            rowCount={rows.length}
-            paginationMode="client"
-            components={{
-              Toolbar: () => (
-                <CustomHeader
-                  pageSize={pageSize}
-                  setPageSize={setPageSize}
-                  page={page}
-                  setPage={setPage}
-                  totalPages={Math.ceil(rows.length / pageSize)}
-                />
-              )
-            }}
-            sx={{
-              '& .MuiDataGrid-columnHeaders': {
-                display: 'none'
-              },
-              '& .MuiDataGrid-row:nth-of-type(2n)': {
-                backgroundColor: '#f9f9f9'
-              },
-              '& .MuiDataGrid-cell': {
-                textAlign: 'left',
-                fontSize: '14px'
-              }
-            }}
-            disableSelectionOnClick
-          />
-        </Card>
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };
 

@@ -26,19 +26,19 @@ export default function AppTasks({ title, subheader, list, ...other }) {
   });
 
   return (
-    <Card {...other}>
+    <Card {...other} sx={{height:'350px'}}>
       <CardHeader title={title} subheader={subheader}
         action={
-          <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '10px'}}>
-          <Stack direction="row" spacing={1}>
-            <Select value="This Week" size="small">
-              <MenuItem value="This Week">This Week</MenuItem>
-              <MenuItem value="This Month">This Month</MenuItem>
-              <MenuItem value="This Year">This Year</MenuItem>
-            </Select>
-            <TextField variant="outlined" placeholder="search" size="small" />
+          <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '0px' }}>
+            <Stack direction="row" spacing={1}>
+              <Select value="This Week" size="small">
+                <MenuItem value="This Week">This Week</MenuItem>
+                <MenuItem value="This Month">This Month</MenuItem>
+                <MenuItem value="This Year">This Year</MenuItem>
+              </Select>
+              <TextField variant="outlined" placeholder="search" size="small" />
+            </Stack>
           </Stack>
-        </Stack>
         } />
       <Divider />
       <Controller
@@ -51,12 +51,15 @@ export default function AppTasks({ title, subheader, list, ...other }) {
           return (
             <>
               {list.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  // checked={field.value.includes(task.id)}
-                  onChange={() => field.onChange(onSelected(task.id))}
-                />
+                <>
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    // checked={field.value.includes(task.id)}
+                    onChange={() => field.onChange(onSelected(task.id))}
+                  />
+                  <Divider />
+                </>
               ))}
             </>
           );

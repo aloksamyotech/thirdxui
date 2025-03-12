@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // material-ui
-import { Grid, Avatar } from '@mui/material';
+import { Grid, Avatar, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
@@ -27,7 +27,10 @@ import DashboardCard from 'ui-component/cards/DashboardCard';
 import NewDashboardCard from 'ui-component/cards/NewDashboardCard';
 import Sessions from './Sessions';
 import Map from '../Map';
-import Shortcut from './Shortcut';
+import Shortcut2 from './Shortcut2';
+import EmptyCard from './EmptyCard';
+import Media from './Media';
+// import Map from 'components/Map';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
@@ -46,84 +49,72 @@ const Dashboard = () => {
             <DashboardCard title='Actice Service User' num1='234' num2='119' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
           </Grid>
           <Grid item xs={3}>
-            <DashboardCard title='Accepted referal this year' num1='71' num2='119' color='linear-gradient(135deg, rgb(135, 206, 250) 0%, rgb(70, 130, 180) 100%)' color2='#4682b4' />
-          </Grid>
-          <Grid item xs={3}>
             <DashboardCard title='Open Cases' num1='145' num2='62' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
           </Grid>
           <Grid item xs={3}>
-            <DashboardCard title='Sessions Delievered' num1='34' num2='19' color='linear-gradient(135deg, rgb(135, 206, 250) 0%, rgb(70, 130, 180) 100%)' color2='#4682b4' />
+            <DashboardCard title='Sessions Deliver' num1='34' num2='19' color='linear-gradient(135deg, rgb(135, 206, 250) 0%, rgb(70, 130, 180) 100%)' color2='#4682b4' />
+          </Grid>
+          <Grid item xs={3}>
+            <DashboardCard title='Total Donation' num1='145M' num2='62' color='linear-gradient(135deg, rgb(135, 206, 250) 0%, rgb(70, 130, 180) 100%)' color2='#4682b4' />
           </Grid>
         </Grid>
       </Grid>
       <Grid item xs={12}>
-        <Grid container spacing={2}>
+        <Grid container spacing={8} sx={{ px: '20px' }}>
           <Grid item xs={3}>
-            <Shortcut icon={1} title={'Add Person'} path={'/dashboard/people'} />
+            <Shortcut2 icon={1} title={'Add Person'} path={'/dashboard/people'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut icon={2} title={'Add Session'} path={'/dashboard/services'} />
+            <Shortcut2 icon={2} title={'Add New Case'} path={'/dashboard/services'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut icon={3} title={'Add Session Attendies'} path={'/dashboard/people'} />
+            <Shortcut2 icon={3} title={'Add Session Attendies'} path={'/dashboard/people'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut icon={4} title={'View New Refferal'} path={'/dashboard/referral'} />
-          </Grid>
-          <Grid item xs={3}>
-            <Shortcut icon={5} title={'Add New Service'} path={'/dashboard/services'} />
-          </Grid>
-          <Grid item xs={3}>
-            <Shortcut icon={6} title={'Create New Case'} path={'/dashboard/case'} />
-          </Grid>
-          <Grid item xs={3}>
-            <Shortcut icon={7} title={'Create New Form'} path={'/dashboard/manage-form'} />
-          </Grid>
-          <Grid item xs={3}>
-            <Shortcut icon={8} title={'Add Media'} path={'/dashboard/bulkupload'} />
+            <Shortcut2 icon={4} title={'Add Donor'} path={'/dashboard/referral'} />
           </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          <Grid item xs={7}>
-            <TotalGrowthBarChart isLoading={isLoading} />
-          </Grid>
-          <Grid item container xs={5} sx={{ display: 'flex', alignContent: 'space-between' }}>
-            <Grid item xs={12}>
-              <AppTasks
-                title="My Task"
-                list={[
-                  { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
-                  { id: '2', label: 'Task call due for Anindya on 12/01/2023 Comment: call Himand confirm commented by HeadSalesMarketing' },
-                  { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} >
-              <AppTrafficBySite
-                title="Recent Media"
-                list={[
-                  { name: 'Football', image: footballImg },
-                  { name: 'Volleyball', image: volleyballImg },
-                  { name: 'Group Work', image: groupWorkImg },
-                  { name: 'Arts & Craft', image: artsImg },
-                  { name: 'Cricket', image: cricket },
-                  { name: 'PickleBall', image: pickleball }
-                ]}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
+      <Grid item container xs={12} sx={{ justifyContent: 'center' }}>
+        <Divider sx={{ width: '70%', borderWidth: '1px' }} />
       </Grid>
-      <Grid item xs={12}>
-        <Grid container spacing={1}>
-          <Grid item xs={6}>
-            <Sessions />
-          </Grid>
-          <Grid item xs={6}>
-            <Map />
-          </Grid>
+      <Grid item container xs={12} spacing={2}>
+        <Grid item xs={6}>
+          <Sessions />
+        </Grid>
+        <Grid item xs={6}>
+          <TotalGrowthBarChart isLoading={isLoading} />
+        </Grid>
+        <Grid item xs={6}>
+          <AppTasks
+            title="My Task"
+            list={[
+              { id: '1', label: 'Task call due for A.Alka Saxena 9876567378 on 12/01/2024' },
+              { id: '2', label: 'Task call due for Anindya on 12/01/2023 Comment: call Himand confirm commented by HeadSalesMarketing' },
+              { id: '3', label: 'Task call due for Dheeraj Kumar on 12/01/2024' },
+              { id: '4', label: 'Task call due for Dheeraj Kumar on 12/01/2024' }
+            ]}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          {/* <AppTrafficBySite
+            title="Recent Media"
+            list={[
+              { name: 'Football', image: footballImg },
+              { name: 'Volleyball', image: volleyballImg },
+              { name: 'Group Work', image: groupWorkImg },
+              { name: 'Arts & Craft', image: artsImg },
+              { name: 'Cricket', image: cricket },
+              { name: 'PickleBall', image: pickleball }
+            ]}
+          /> */}
+          <Media />
+        </Grid>
+        <Grid item xs={6}>
+          <Map />
+        </Grid>
+        <Grid item xs={6}>
+          <EmptyCard />
         </Grid>
       </Grid>
       {/* <Grid item xs={12}>

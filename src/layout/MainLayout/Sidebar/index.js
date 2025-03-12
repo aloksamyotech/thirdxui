@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, Chip, Drawer, Stack, useMediaQuery } from '@mui/material';
-
+import { Box, Chip, Drawer, Stack, Button, useMediaQuery } from '@mui/material';
+import CallMadeIcon from '@mui/icons-material/CallMade';
 // third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { BrowserView, MobileView } from 'react-device-detect';
@@ -39,6 +39,27 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
         >
           <MenuList />
           <UpgradePlanCard />
+          <Button
+            variant="contained"
+            fullWidth
+            endIcon={<CallMadeIcon />}
+            sx={{
+              mt: 1,
+              mb: 4,
+              backgroundColor: '#053146', 
+              color: 'white', 
+              border: '1px solid white', 
+              '&:hover': {
+                backgroundColor: '#021d2a', 
+                border: '1px solid white' 
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'white' 
+              }
+            }}
+          >
+            Take the Tour
+          </Button>
         </PerfectScrollbar>
       </BrowserView>
       <MobileView>
@@ -66,7 +87,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
         sx={{
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            background: theme.palette.background.default,
+            background: '#053146 !important',
             color: theme.palette.text.primary,
             borderRight: 'none',
             [theme.breakpoints.up('md')]: {

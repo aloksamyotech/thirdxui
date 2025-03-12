@@ -3,7 +3,7 @@ import { useState } from 'react';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
-import { Card, Stack, Divider, Popover, Checkbox, MenuItem, IconButton, Box, Tooltip, Typography, CardHeader, FormControlLabel } from '@mui/material';
+import { Card, Stack, Divider, TextField, Checkbox, MenuItem, IconButton, Select, Typography, CardHeader, FormControlLabel } from '@mui/material';
 // components
 
 import Iconify from '../../../ui-component/iconify';
@@ -29,21 +29,16 @@ export default function AppTasks({ title, subheader, list, ...other }) {
     <Card {...other}>
       <CardHeader title={title} subheader={subheader}
         action={
-          <Tooltip title="Add Task" arrow>
-            <Box sx={{
-              color: '#fff',
-              bgcolor: '#41c048',
-              borderRadius: '100%',
-              width: '35px',
-              height: '35px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              boxShadow: 3,
-            }}>
-              <AddIcon />
-            </Box>
-          </Tooltip>
+          <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '10px'}}>
+          <Stack direction="row" spacing={1}>
+            <Select value="This Week" size="small">
+              <MenuItem value="This Week">This Week</MenuItem>
+              <MenuItem value="This Month">This Month</MenuItem>
+              <MenuItem value="This Year">This Year</MenuItem>
+            </Select>
+            <TextField variant="outlined" placeholder="search" size="small" />
+          </Stack>
+        </Stack>
         } />
       <Divider />
       <Controller
@@ -130,7 +125,7 @@ function TaskItem({ task, checked, onChange }) {
       <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
         <Iconify icon={'eva:edit-fill'} />
       </IconButton>
-      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
+      <IconButton size="large" color="error" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
         <Iconify icon={'eva:trash-2-outline'} />
       </IconButton>
 

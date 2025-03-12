@@ -17,7 +17,7 @@ const LogoSection = () => {
   const dispatch = useDispatch();
   return (
     <ButtonBase disableRipple>
-      <img src={logo} alt='Logo' style={{ height: '50px', objectFit: 'cover' }} />
+      <img src={logo} alt='Logo' style={{ height: '45px', objectFit: 'cover' }} />
     </ButtonBase>
   );
 };

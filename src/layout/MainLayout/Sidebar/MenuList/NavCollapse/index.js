@@ -92,22 +92,75 @@ const NavCollapse = ({ menu, level }) => {
 
   return (
     <>
-      <ListItemButton
+      {/* <ListItemButton
+        // sx={{
+        //   borderRadius: `${customization.borderRadius}px`,
+        //   mb: 0.5,
+        //   alignItems: 'flex-start',
+        //   backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
+        //   py: level > 1 ? 1 : 1.25,
+        //   pl: `${level * 24}px`
+        // }}
+        // selected={selected === menu.id}
+        // onClick={handleClick}
+
         sx={{
           borderRadius: `${customization.borderRadius}px`,
           mb: 0.5,
           alignItems: 'flex-start',
           backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
           py: level > 1 ? 1 : 1.25,
-          pl: `${level * 24}px`
+          pl: `${level * 24}px`,
+          '&:hover': {
+            backgroundColor: '#ffff'
+          },
+          '&.Mui-selected': {
+            backgroundColor: '#ffff !important',
+            color: '#053146'
+          }
         }}
         selected={selected === menu.id}
         onClick={handleClick}
       >
-        <ListItemIcon sx={{ my: 'auto', minWidth: !menu.icon ? 18 : 36 }}>{menuIcon}</ListItemIcon>
+        <ListItemIcon
+          // sx={{ my: 'auto', minWidth: !menu.icon ? 18 : 36 }}
+          sx={{
+            my: 'auto',
+            minWidth: !menu.icon ? 18 : 36,
+            color: '#ffff', // Ensure icon is green
+            '&.MuiListItemIcon-root': {
+              color: '#ffff !important' // Overrides default MUI styles
+            },
+            '&.Mui-selected &': {
+              color: '#ffff !important' // Fixes selected state
+            },
+            '&.Mui-selected:hover &': {
+              color: '#053146 !important'
+            }
+          }}
+        >
+          {menuIcon}
+        </ListItemIcon>
         <ListItemText
           primary={
-            <Typography variant={selected === menu.id ? 'h5' : 'body1'} color="inherit" sx={{ my: 'auto' }}>
+            <Typography
+              variant={selected === menu.id ? 'h5' : 'body1'}
+              //  sx={{ my: 'auto' }}
+              sx={{
+                my: 'auto',
+                // minWidth: !item?.icon ? 18 : 36,
+                color: '#ffff', // Ensure icon is green
+                '&.MuiListItemIcon-root': {
+                  color: '#ffff !important' // Overrides default MUI styles
+                },
+                '&.Mui-selected &': {
+                  color: '#ffff !important' // Fixes selected state
+                },
+                '&.Mui-selected:hover &': {
+                  color: '#053146 !important'
+                }
+              }}
+            >
               {menu.title}
             </Typography>
           }
@@ -120,11 +173,92 @@ const NavCollapse = ({ menu, level }) => {
           }
         />
         {open ? (
-          <IconChevronUp stroke={1.5} size="1rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+          <IconChevronUp stroke={1.5} size="1rem" style={{ marginTop: 'auto', marginBottom: 'auto', color: '#ffff' }} />
         ) : (
-          <IconChevronDown stroke={1.5} size="1rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
+          <IconChevronDown stroke={1.5} size="1rem" style={{ marginTop: 'auto', marginBottom: 'auto', color: '#ffff' }} />
+        )}
+      </ListItemButton> */}
+
+      <ListItemButton
+        sx={{
+          borderRadius: `${customization.borderRadius}px`,
+          mb: 0.5,
+          alignItems: 'flex-start',
+          backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
+          py: level > 1 ? 1 : 1.25,
+          pl: `${level * 24}px`,
+          '&:hover': {
+            backgroundColor: '#ffffff !important', // White background on hover
+            color: '#053146 !important', // Dark blue text on hover
+            '& .MuiListItemIcon-root': {
+              color: '#053146 !important' // Dark blue icon on hover
+            },
+            '& .MuiTypography-root': {
+              color: '#053146 !important' // Dark blue text on hover
+            }
+          },
+          '&.Mui-selected': {
+            backgroundColor: '#ffffff !important',
+            color: '#053146 !important',
+            '& .MuiListItemIcon-root': {
+              color: '#053146 !important'
+            },
+            '& .MuiTypography-root': {
+              color: '#053146 !important'
+            }
+          }
+        }}
+        selected={selected === menu.id}
+        onClick={handleClick}
+      >
+        <ListItemIcon
+          sx={{
+            my: 'auto',
+            minWidth: !menu.icon ? 18 : 36,
+            color: selected === menu.id ? '#053146' : '#ffff', // Default white, selected dark blue
+            '&.MuiListItemIcon-root': {
+              color: selected === menu.id ? '#053146 !important' : '#ffff' // Fix MUI override issues
+            }
+          }}
+        >
+          {menuIcon}
+        </ListItemIcon>
+        <ListItemText
+          primary={
+            <Typography
+              variant={selected === menu.id ? 'h5' : 'body1'}
+              sx={{
+                my: 'auto',
+                color: selected === menu.id ? '#053146' : '#ffff', // Default white, selected dark blue
+                transition: 'color 0.3s ease-in-out'
+              }}
+            >
+              {menu.title}
+            </Typography>
+          }
+          secondary={
+            menu.caption && (
+              <Typography variant="caption" sx={{ ...theme.typography.subMenuCaption }} display="block" gutterBottom>
+                {menu.caption}
+              </Typography>
+            )
+          }
+        />
+        {open ? (
+          <IconChevronUp
+            stroke={1.5}
+            size="1rem"
+            style={{ marginTop: 'auto', marginBottom: 'auto', color: selected === menu.id ? '#053146' : '#ffff' }}
+          />
+        ) : (
+          <IconChevronDown
+            stroke={1.5}
+            size="1rem"
+            style={{ marginTop: 'auto', marginBottom: 'auto', color: selected === menu.id ? '#053146' : '#ffff' }}
+          />
         )}
       </ListItemButton>
+
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List
           component="div"

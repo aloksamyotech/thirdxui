@@ -90,9 +90,9 @@ const ProfileSection = () => {
   return (
     <>
       <Stack direction="row" spacing={3} alignItems="center">
-      <Box>
+      {/* <Box>
         <TranslateIcon />
-      </Box>
+      </Box> */}
       <Chip
         sx={{
           height: '48px',

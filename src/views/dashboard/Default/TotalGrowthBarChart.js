@@ -18,6 +18,7 @@ import { gridSpacing } from 'store/constant';
 // chart data
 import chartData from './chart-data/total-growth-bar-chart';
 import { BarChart } from '@mui/x-charts';
+import { height } from '@mui/system';
 
 const status = [
   {
@@ -98,7 +99,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
       {isLoading ? (
         <SkeletonTotalGrowthBarChart />
       ) : (
-        <MainCard>
+        <MainCard sx={{ height: '430px' }}>
           <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
               <Grid container alignItems="center" justifyContent="space-between">

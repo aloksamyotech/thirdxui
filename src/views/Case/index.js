@@ -1,52 +1,100 @@
 import React, { useState } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, Menu, MenuItem, IconButton, InputAdornment, Tooltip, Chip, Toolbar } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
+import {
+  Stack,
+  Grid,
+  Typography,
+  Box,
+  Card,
+  TextField,
+  IconButton,
+  Tooltip,
+  Chip,
+} from '@mui/material';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TableStyle from '../../ui-component/TableStyle';
 import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
-import AddCaseForm from './AddCase.js';
-import { Search, Download, PictureAsPdf, Print, ExpandMore, Archive, Edit, MergeType, Delete } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
+import { useNavigate } from 'react-router-dom';
 
 const Lead = () => {
-  const [district, setDistrict] = useState('');
-  const [owner, setOwner] = useState('');
-  const [status, setStatus] = useState('');
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [showSearch, setShowSearch] = useState(false);
+  const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [serviceType, setServiceType] = useState('');
+  const [status, setStatus] = useState('');
+  const [owner, setOwner] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const serviceTypeFilter = [
+    { value: 'Education', label: 'Education' },
+    { value: 'Health', label: 'Health' },
+    { value: 'Mentoring', label: 'Mentoring' },
+    { value: 'Group Work', label: 'Group Work' },
+    { value: 'Sports', label: 'Sports' },
+    { value: 'Social Work', label: 'Social Work' }
+  ];
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const statusFilter = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
+  ];
 
-  const handleFilterApply = () => {
-    console.log('Filters Applied:', { district, owner, status, fromDate, toDate });
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
+
+  const ownerFilters = [
+    { value: 'owner1', label: 'Owner 1' },
+    { value: 'owner2', label: 'Owner 2' }
+  ];
+
+  const CustomHeader = () => {
+    return (
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            CASE LIST
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
   };
 
   const columns = [
-    { field: 'caseId', headerName: 'CASE ID', width: 100 },
-    { field: 'serviceUser', headerName: 'SERVICE USER', width: 150 },
-    { field: 'owner', headerName: 'OWNER', width: 120 },
+    { field: 'caseId', headerName: 'Case Id', width: 100 },
+    { field: 'serviceUser', headerName: 'Service User', width: 150 },
+    { field: 'owner', headerName: 'Owner', width: 120 },
     {
       field: 'status',
-      headerName: 'STATUS',
+      headerName: 'Status',
       width: 120,
       renderCell: (params) => (
         <Chip
@@ -58,9 +106,9 @@ const Lead = () => {
         />
       )
     },
-    { field: 'service', headerName: 'SERVICE', width: 120 },
-    { field: 'dateOpened', headerName: 'DATE OPENED', width: 150 },
-    { field: 'dateClosed', headerName: 'DATE CLOSED', width: 150 }
+    { field: 'service', headerName: 'Service', width: 120 },
+    { field: 'dateOpened', headerName: 'Date Opened', width: 150 },
+    { field: 'dateClosed', headerName: 'Date Closed', width: 150 }
   ];
 
   const rows = [
@@ -85,232 +133,86 @@ const Lead = () => {
       dateClosed: '2024-02-10'
     }
   ];
-  const formTypes = [
-    { value: 'Self Referral form', label: 'Self Referral form' },
-    { value: 'Community Referral form', label: 'Community Referral form' },
-    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-  ];
-
-  const dateFilters = [
-    { value: 'today', label: 'All Dates' },
-    { value: 'week', label: 'Last 7 days' },
-    { value: 'month', label: 'Last 30 days' },
-    { value: 'year', label: 'Last 2 months' }
-  ];
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
-      {showForm ? (
-        <AddCaseForm onCancel={() => setShowForm(false)} />
-      ) : (
-        <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4">Add Cases</Typography>
-            <Tooltip title="Add Case" arrow>
-              <IconButton
-                onClick={() => setShowForm(true)}
-                sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#41C048',
-                    color: '#ffffff'
-                  }
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          <Card sx={{ marginBottom: 3, backgroundColor: '#eef2f6' }}>
-            <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-              <FilterAltOutlinedIcon color="grey" />
-              <Typography variant="h6">Filter</Typography>
-            </Stack>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ whiteSpace: 'nowrap' }}>
-                <TextField
-                  select
-                  label="Select District"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="District 1">District 1</MenuItem>
-                  <MenuItem value="District 2">District 2</MenuItem>
-                </TextField>
+      <Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-case')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: 'auto',
+                height: '35px',
+                px: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add New Case <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-                <TextField
-                  select
-                  label="Select Owner"
-                  value={owner}
-                  onChange={(e) => setOwner(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="Owner 1">Owner 1</MenuItem>
-                  <MenuItem value="Owner 2">Owner 2</MenuItem>
-                </TextField>
-
-                <TextField
-                  select
-                  label="Select Status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
-                </TextField>
-
-                <Box sx={{ width: 150 }}>
-                  <DatePicker
-                    label="From"
-                    value={fromDate}
-                    onChange={(newValue) => setFromDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        sx: {
-                          width: '100%',
-                          '& .MuiInputBase-input': {
-                            fontSize: '12px',
-                            padding: '6px 8px',
-                            textAlign: 'center'
-                          }
-                        }
+          <TextField
+            size="small"
+            placeholder="Search..."
+            InputProps={{
+              endAdornment: <SearchIcon />
+            }}
+            sx={{ width: '350px' }}
+          />
+        </Stack>
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            serviceTypes={serviceTypeFilter}
+            setServiceTypeFilter={setServiceType}
+            statuses={statusFilter}
+            setStatusFilter={setStatus}
+            dateAddedFilters={dateAddedFilters}
+            setDateAddedFilter={setDateOpenedFilter}
+            owners={ownerFilters}
+            setOwnerFilter={setOwner}
+            selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
+          />
+          <Grid item xs={9}>
+            <TableStyle>
+              <Box width="100%">
+                <Card style={{ height: 'auto' }}>
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    rowHeight={60}
+                    checkboxSelection
+                    components={{
+                      Toolbar: () => <CustomHeader />
+                    }}
+                    onRowClick={() => navigate('/view-case')}
+                    getRowId={(row) => row.id}
+                    pageSize={5}
+                    rowsPerPageOptions={[5, 10]}
+                    sx={{
+                      '& .MuiDataGrid-row': {
+                        borderBottom: '1px solid #ccc'
                       }
                     }}
                   />
-                </Box>
-
-                <Box sx={{ width: 150 }}>
-                  <DatePicker
-                    label="To"
-                    value={toDate}
-                    onChange={(newValue) => setToDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        sx: {
-                          width: '100%',
-                          '& .MuiInputBase-input': {
-                            fontSize: '12px',
-                            padding: '6px 8px',
-                            textAlign: 'center'
-                          }
-                        }
-                      }
-                    }}
-                  />
-                </Box>
-
-                <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
-                  Apply
-                </Button>
-
-                <FilterAltOffOutlinedIcon color="grey" />
-              </Stack>
-            </LocalizationProvider>
-          </Card>
-          {/* <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" spacing={1}>
-              <TextField
-                variant="outlined"
-                size="small"
-                placeholder="Quick Action"
-                onClick={handleClick}
-                InputProps={{
-                  readOnly: true,
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleClick}>
-                        <ExpandMore />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-                sx={{ maxWidth: 180 }}
-              />
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                <MenuItem onClick={handleClose}>
-                  <Archive fontSize="small" sx={{ mr: 1 }} /> Archive
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <MergeType fontSize="small" sx={{ mr: 1 }} /> Merge
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
-                </MenuItem>
-              </Menu>
-            </Stack>
-
-            <Stack direction="row">
-              <IconButton onClick={toggleSearch}>
-                <Search />
-              </IconButton>
-              {showSearch && <TextField variant="outlined" size="small" placeholder="Search..." autoFocus />}
-              <IconButton>
-                <Download />
-              </IconButton>
-              <IconButton>
-                <PictureAsPdf />
-              </IconButton>
-              <IconButton>
-                <Print />
-              </IconButton>
-            </Stack>
-          </Stack> */}
-          <Grid container spacing={4}>
-            <FilterPanel
-              showFilter={showFilter}
-              formTypes={formTypes}
-              setFormType={setFormType}
-              dateFilters={dateFilters}
-              setDateFilter={setDateFilter} />
-            <Grid item xs={9}>
-              <TableStyle>
-                <Box width="100%">
-                  <Card style={{ height: '600px' }}>
-                    <DataGrid
-                      rows={rows}
-                      columns={columns}
-                      rowHeight={60}
-                      checkboxSelection
-                      getRowId={(row) => row.id}
-                      pageSize={5}
-                      rowsPerPageOptions={[5, 10]}
-                      sx={{
-                        '& .MuiDataGrid-row': {
-                          borderBottom: '1px solid #ccc'
-                        }
-                      }}
-                    />
-                  </Card>
-                </Box>
-              </TableStyle>
-            </Grid>
+                </Card>
+              </Box>
+            </TableStyle>
           </Grid>
         </Grid>
-      )}
+      </Grid>
     </Card>
   );
 };

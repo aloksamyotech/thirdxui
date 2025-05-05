@@ -24,6 +24,7 @@ import {
   Paper,
   IconButton
 } from '@mui/material';
+import AntSwitch from 'components/AntSwitch.js';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -41,7 +42,6 @@ import Background from 'assets/images/background.jpg';
 
 const EmployeeDetails = () => {
   const [tabValue, setTabValue] = useState(0);
-
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [oldPassword, setOldPassword] = useState('');
@@ -99,17 +99,22 @@ const EmployeeDetails = () => {
       <Grid container spacing={2} p={2}>
         <Typography variant="h4">User Account</Typography>
         <Box sx={{ width: '100%', mt: '15px' }}>
-          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} textColor="primary" indicatorColor="primary"
+          <Tabs
+            value={tabValue}
+            onChange={(e, newValue) => setTabValue(newValue)}
+            textColor="primary"
+            indicatorColor="primary"
             sx={{
               display: 'flex',
               gap: 2,
-              borderBottom: '1px solid #4792d3' 
-            }}>
+              borderBottom: '1px solid #4792d3'
+            }}
+          >
             <Tab
               label="Profile"
               value={0}
               sx={(theme) => ({
-                backgroundColor: tabValue === 0 ? '#e3f2fd' : 'transparent', 
+                backgroundColor: tabValue === 0 ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2
               })}
@@ -118,7 +123,7 @@ const EmployeeDetails = () => {
               label="Change Password"
               value={1}
               sx={(theme) => ({
-                backgroundColor: tabValue === 1 ? '#e3f2fd': 'transparent', 
+                backgroundColor: tabValue === 1 ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2
               })}
@@ -127,7 +132,7 @@ const EmployeeDetails = () => {
               label="Settings"
               value={2}
               sx={(theme) => ({
-                backgroundColor: tabValue === 2 ? '#e3f2fd' : 'transparent', 
+                backgroundColor: tabValue === 2 ? '#e3f2fd' : 'transparent',
                 transition: 'background-color 0.3s ease',
                 marginRight: 2
               })}
@@ -359,15 +364,15 @@ const EmployeeDetails = () => {
                 </Box>
 
                 <Grid container spacing={2}>
-                  <Grid item>
-                    <Button variant="contained" color="secondary" onClick={handleChangePassword}>
-                      CHANGE PASSWORD
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button variant="outlined" color="error" onClick={handleClear}>
-                      CLEAR
-                    </Button>
+                  <Grid item xs={12}>
+                    <Stack direction="row" spacing={2} justifyContent="flex-end">
+                      <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={handleChangePassword}>
+                        CHANGE PASSWORD
+                      </Button>
+                      <Button variant="outlined" color="error" onClick={handleClear}>
+                        CLEAR
+                      </Button>
+                    </Stack>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -375,7 +380,7 @@ const EmployeeDetails = () => {
           )}
 
           {tabValue === 2 && (
-            <Card sx={{mt:2}}>
+            <Card sx={{ mt: 2 }}>
               <CardContent>
                 <Typography variant="h4" sx={{ mb: 1 }}>
                   Email Settings
@@ -397,14 +402,14 @@ const EmployeeDetails = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={emailNotification} onChange={() => setEmailNotification(!emailNotification)} />
+                          <AntSwitch checked={emailNotification} onChange={() => setEmailNotification(!emailNotification)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>Email Notification</TableCell>
                       </TableRow>
 
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={copyToPersonalEmail} onChange={() => setCopyToPersonalEmail(!copyToPersonalEmail)} />
+                          <AntSwitch checked={copyToPersonalEmail} onChange={() => setCopyToPersonalEmail(!copyToPersonalEmail)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>Send Copy to Personal Email</TableCell>
                       </TableRow>
@@ -424,25 +429,25 @@ const EmployeeDetails = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={newNotification} onChange={() => setNewNotification(!newNotification)} />
+                          <AntSwitch checked={newNotification} onChange={() => setNewNotification(!newNotification)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>Have new Notification</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={directMessage} onChange={() => setDirectMessage(!directMessage)} />
+                          <AntSwitch checked={directMessage} onChange={() => setDirectMessage(!directMessage)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>You&apos;ve sent a direct message</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={connection} onChange={() => setConnection(!connection)} />
+                          <AntSwitch checked={connection} onChange={() => setConnection(!connection)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>Someone adds you as a connection</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={directMessage} onChange={() => setDirectMessage(!directMessage)} />
+                          <AntSwitch checked={directMessage} onChange={() => setDirectMessage(!directMessage)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>You&apos;ve sent a direct message</TableCell>
                       </TableRow>
@@ -462,25 +467,25 @@ const EmployeeDetails = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={products} onChange={() => setProducts(!products)} />
+                          <AntSwitch checked={products} onChange={() => setProducts(!products)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>News about PCT-themed products and feature products</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={tips} onChange={() => setTips(!tips)} />
+                          <AntSwitch checked={tips} onChange={() => setTips(!tips)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>Tips on getting more out of PCT-themes</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={other} onChange={() => setOthers(!other)} />
+                          <AntSwitch checked={other} onChange={() => setOthers(!other)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>News about products and other services</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell sx={{ width: '10%', minWidth: 50, padding: '4px' }}>
-                          <Switch checked={business} onChange={() => setBusiness(!business)} />
+                          <AntSwitch checked={business} onChange={() => setBusiness(!business)} />
                         </TableCell>
                         <TableCell sx={{ width: '90%', padding: '4px' }}>Tips and Documents business products</TableCell>
                       </TableRow>
@@ -503,7 +508,7 @@ const EmployeeDetails = () => {
 
                 <Grid container spacing={2} sx={{ justifyContent: 'flex-end' }}>
                   <Grid item>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="contained" sx={{backgroundColor:'#053146'}}>
                       SAVE CHANGES
                     </Button>
                   </Grid>

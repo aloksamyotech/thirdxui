@@ -5,27 +5,38 @@ import Loadable from 'ui-component/Loadable';
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
 const Volunteer = Loadable(lazy(() => import('views/Volunteer')));
-const ServiceManagement = Loadable(lazy(() => import('views/Service')));
-const ManageForm = Loadable(lazy(() => import('views/ManageForm')));
-const History = Loadable(lazy(() => import('views/History')));
-const Case = Loadable(lazy(() => import('views/Case')));
-const Metting = Loadable(lazy(() => import('views/Metting')));
-const Mail = Loadable(lazy(() => import('views/Mail')));
 const NewReferral = Loadable(lazy(() => import('views/NewReferral')));
-const Configuration = Loadable(lazy(() => import('views/Configuration')));
-const Document = Loadable(lazy(() => import('views/Documents')));
-const Calender = Loadable(lazy(() => import('views/Calender')));
+const ServiceManagement = Loadable(lazy(() => import('views/Service')));
+const Case = Loadable(lazy(() => import('views/Case')));
+const Mail = Loadable(lazy(() => import('views/Mail')));
+const Donor = Loadable(lazy(() => import('views/Donor')));
+const Financial = Loadable(lazy(() => import('views/Financial')));
+const MailingList = Loadable(lazy(() => import('views/MailingList')));
+const ManageForm = Loadable(lazy(() => import('views/ManageForm')));
+const Submission = Loadable(lazy(() => import('views/Submission')));
+const History = Loadable(lazy(() => import('views/History')));
 const Report = Loadable(lazy(() => import('views/Report')));
-const User = Loadable(lazy(() => import('views/User')));
 const BulkUpload = Loadable(lazy(() => import('views/BulkUpload')));
+const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
 const BulkDelete = Loadable(lazy(() => import('views/BulkDelete')));
 const Archives = Loadable(lazy(() => import('views/Archives')));
-const Duplicate = Loadable(lazy(() => import('views/Duplicate')));
+const Configuration = Loadable(lazy(() => import('views/Configuration')));
 const Tag = Loadable(lazy(() => import('views/Tag')));
 const UserAccount = Loadable(lazy(() => import('views/UserAccount')));
-const Appearance = Loadable(lazy(() => import('views/Appearance')));
+const User = Loadable(lazy(() => import('views/User')));
 const ViewService = Loadable(lazy(() => import('views/ViewService')));
 const ViewServiceUser = Loadable(lazy(() => import('views/ViewServiceUser')));
+const AddServiceUser = Loadable(lazy(() => import('views/AddServiceUser')));
+const AddVolunteer = Loadable(lazy(() => import('views/AddVolunteer')));
+const AddService = Loadable(lazy(() => import('views/AddService')));
+const AddCase = Loadable(lazy(() => import('views/AddCase')));
+const AddMail = Loadable(lazy(() => import('views/AddMail')));
+const AddDonor = Loadable(lazy(() => import('views/AddDonor')));
+const AddDonorCompany = Loadable(lazy(() => import('views/AddDonorCompany')));
+const AddTransaction = Loadable(lazy(() => import('views/AddTransaction')));
+const AddTag = Loadable(lazy(() => import('views/AddTag')));
+const AddSession = Loadable(lazy(() => import('views/AddSession')));
+const ViewCase = Loadable(lazy(() => import('views/ViewCase')));
 
 const MainRoutes = {
   path: '/',
@@ -45,212 +56,142 @@ const MainRoutes = {
       ]
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'people',
-          element: <PeopleManagement />
-        }
-      ]
+      path: 'people',
+      element: <PeopleManagement />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'view-people',
-          element: <ViewServiceUser />
-        }
-      ]
+      path: 'view-people',
+      element: <ViewServiceUser />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'volunteer',
-          element: <Volunteer />
-        }
-      ]
+      path: 'add-serviceuser',
+      element: <AddServiceUser />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'services',
-          element: <ServiceManagement />
-        }
-      ]
+      path: 'add-volunteer',
+      element: <AddVolunteer />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'case',
-          element: <Case />
-        }
-      ]
+      path: 'volunteer',
+      element: <Volunteer />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'manage-form',
-          element: <ManageForm />
-        }
-      ]
+      path: 'referral',
+      element: <NewReferral />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'appearance',
-          element: <Appearance />
-        }
-      ]
+      path: 'services',
+      element: <ServiceManagement />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'history',
-          element: <History />
-        }
-      ]
+      path: 'add-service',
+      element: <AddService />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'referral',
-          element: <NewReferral />
-        }
-      ]
+      path: 'case',
+      element: <Case />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'mail',
-          element: <Mail />
-        }
-      ]
+      path: 'add-case',
+      element: <AddCase />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'meeting',
-          element: <Metting />
-        }
-      ]
+      path: 'mail',
+      element: <Mail />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'calender',
-          element: <Calender />
-        }
-      ]
+      path: 'add-mail',
+      element: <AddMail />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'document',
-          element: <Document />
-        }
-      ]
+      path: 'donor',
+      element: <Donor />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'configuration',
-          element: <Configuration />
-        }
-      ]
+      path: 'add-donor',
+      element: <AddDonor />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'tags',
-          element: <Tag />
-        }
-      ]
+      path: 'add-donorCompany',
+      element: <AddDonorCompany />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'users',
-          element: <User />
-        }
-      ]
+      path: 'financial',
+      element: <Financial />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'account',
-          element: <UserAccount />
-        }
-      ]
+      path: 'add-transaction',
+      element: <AddTransaction />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'report',
-          element: <Report />
-        }
-      ]
+      path: 'mailing-list',
+      element: <MailingList />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'bulkupload',
-          element: <BulkUpload />
-        }
-      ]
+      path: 'manage-form',
+      element: <ManageForm />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'duplicate',
-          element: <Duplicate />
-        }
-      ]
+      path: 'submission',
+      element: <Submission />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'archives',
-          element: <Archives />
-        }
-      ]
+      path: 'history',
+      element: <History />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'bulkdelete',
-          element: <BulkDelete />
-        }
-      ]
+      path: 'report',
+      element: <Report />
     },
     {
-      path: 'dashboard',
-      children: [
-        {
-          path: 'view-service',
-          element: <ViewService />
-        }
-      ]
-    }
+      path: 'bulkupload',
+      element: <BulkUpload />
+    },
+    {
+      path: 'duplicate',
+      element: <Duplicate />
+    },
+    {
+      path: 'bulkdelete',
+      element: <BulkDelete />
+    },
+    {
+      path: 'archives',
+      element: <Archives />
+    },
+
+    {
+      path: 'configuration',
+      element: <Configuration />
+    },
+    {
+      path: 'tags',
+      element: <Tag />
+    },
+    {
+      path: 'add-tag',
+      element: <AddTag />
+    },
+    {
+      path: 'users',
+      element: <User />
+    },
+    {
+      path: 'account',
+      element: <UserAccount />
+    },
+    {
+      path: 'view-service',
+      element: <ViewService />
+    },
+    {
+      path: 'add-session',
+      element: <AddSession />
+    },
+    {
+      path: 'view-case',
+      element: <ViewCase />
+    },
   ]
 };
 

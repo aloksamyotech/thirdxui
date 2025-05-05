@@ -1,16 +1,56 @@
 import { useState } from 'react';
-import { Stack, Grid, Typography, Box, Card, Tooltip, IconButton } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, Tooltip, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { DataGrid } from '@mui/x-data-grid';
-import AddTag from './AddTag.js';
 import AntSwitch from 'components/AntSwitch.js';
 import FilterPanel from 'components/FilterPanel.js';
+import TableStyle from '../../ui-component/TableStyle';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import SearchIcon from '@mui/icons-material/Search';
+
+import { useNavigate } from 'react-router-dom';
 
 const Tag = () => {
-  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [status, setStatus] = useState('');
+
+  const statusFilter = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
+  ];
+
+  const CustomHeader = () => {
+    return (
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            TAG LIST
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
+  };
 
   const columns = [
     { field: 'name', headerName: 'CONFIGURATION', flex: 1 },
@@ -45,78 +85,83 @@ const Tag = () => {
   ];
 
   return (
-    <Grid container spacing={2}>
-      <FilterPanel
-        showFilter={showFilter}
-        formTypes={formTypes}
-        setFormType={setFormType}
-        dateFilters={dateFilters}
-        setDateFilter={setDateFilter} />
+    <Card sx={{ backgroundColor: '#eef2f6' }}>
+      <Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-tag')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: 'auto',
+                height: '35px',
+                px: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add New Tag
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-      <Grid item xs={9}>
-        <Card sx={{ backgroundColor: '#EEF2F6' }}>
-          {showForm ? (
-            <AddTag onCancel={() => setShowForm(false)} />
-          ) : (
-            <Grid>
-              <Stack direction="row" alignItems="center" mb={2} spacing={2} sx={{ width: '100%' }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-                  Add Tag Category
-                </Typography>
-                <Tooltip title="Add Tag Category" arrow>
-                  <IconButton
-                    onClick={() => setShowForm(true)}
-                    sx={{
-                      backgroundColor: '#41C048',
-                      borderRadius: '50%',
-                      width: '35px',
-                      height: '35px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      boxShadow: 3,
-                      color: 'white',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: '#41C048',
-                        color: '#ffffff'
-                      }
-                    }}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
+          <TextField
+            size="small"
+            placeholder="Search..."
+            InputProps={{
+              endAdornment: <SearchIcon />
+            }}
+            sx={{ width: '350px' }}
+          />
+        </Stack>
 
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            statuses={statusFilter}
+            setStatusFilter={setStatus}
+            selectedFilters={['configurationNameFilter', 'statusFilter']}
+          />
+          <Grid item xs={9}>
+            <TableStyle>
               <Box width="100%">
-                <Card style={{ height: '465px' }}>
+                <Card style={{ height: 'auto' }}>
                   <DataGrid
                     rows={rows}
                     columns={columns}
                     rowHeight={65}
                     getRowId={(row) => row.id}
                     pageSize={5}
+                    rowsPerPageOptions={[5, 10]}
+                    components={{
+                      Toolbar: () => <CustomHeader />
+                    }}
+                    getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                    // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
+                    onRowClick={() => navigate('/dashboard/view-service')}
                     sx={{
-                      '& .MuiDataGrid-columnHeader': {
-                        backgroundColor: '#f5f5f5'
-                      },
-                      '& .MuiDataGrid-row:nth-of-type(2n)': {
-                        backgroundColor: '#F9F9F9'
-                      },
-                      '& .MuiDataGrid-cell': {
-                        textAlign: 'left',
-                        fontSize: '14px'
+                      '& .MuiDataGrid-row': {
+                        borderBottom: '1px solid #ccc'
                       }
                     }}
-                    disableSelectionOnClick
                   />
                 </Card>
               </Box>
-            </Grid>
-          )}
-        </Card>
+            </TableStyle>
+          </Grid>
+        </Grid>
       </Grid>
-    </Grid>
+    </Card>
   );
 };
+
 export default Tag;

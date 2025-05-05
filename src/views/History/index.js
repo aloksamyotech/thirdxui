@@ -1,24 +1,36 @@
 import { useState } from 'react';
-import { Stack, Typography, Box, Card, Chip, Tabs, Tab, Container, Grid } from '@mui/material';
+import { Stack, Typography, Box, Card, TextField, Chip, Tabs, Tab, Container, Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
+
+const statusFilter = [
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' }
+];
+
+const dateAddedFilters = [
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'Last 7 Days' },
+  { value: 'month', label: 'Last 30 Days' },
+  { value: 'year', label: 'Last 1 Year' }
+];
+
+const nameFilter = [
+  { value: 'name1', label: 'Name 1' },
+  { value: 'name2', label: 'Name 2' }
+];
 
 const columns = [
   {
     field: 'title',
-    headerName: 'NAME',
-    flex: 2,
-    renderCell: (params) => (
-      <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-        {params.value}
-      </Typography>
-    )
+    headerName: 'Name',
+    flex: 1.5,
+    renderCell: (params) => <Typography variant="body1">{params.value}</Typography>
   },
   {
     field: 'date',
-    headerName: 'DATE',
+    headerName: 'Date',
     flex: 1,
     renderCell: (params) => (
       <Typography variant="body2" color="textSecondary">
@@ -26,16 +38,15 @@ const columns = [
       </Typography>
     )
   },
-  { field: 'view', headerName: 'VIEW', flex: 1, renderCell: () => '00' },
   {
     field: 'age',
-    headerName: 'AGE',
+    headerName: 'Age',
     flex: 1,
     renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
   },
   {
     field: 'status',
-    headerName: 'STATUS',
+    headerName: 'Status',
     flex: 1,
     renderCell: (params) => (
       <Chip
@@ -46,19 +57,6 @@ const columns = [
         }}
       />
     )
-  },
-  {
-    field: 'iconStatus',
-    headerName: '',
-    flex: 0.5,
-    sortable: false,
-    filterable: false,
-    renderCell: (params) =>
-      params.row.status === 'Accepted' ? (
-        <CheckCircleIcon sx={{ color: 'green', fontSize: 20 }} />
-      ) : (
-        <CancelIcon sx={{ color: 'red', fontSize: 20 }} />
-      )
   }
 ];
 
@@ -78,83 +76,94 @@ const allRows = [
 export default function TabbedDataGrid() {
   const [tabValue, setTabValue] = useState(0);
   const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [status, setStatus] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [name, setNameFilter] = useState('');
 
   const filteredRows = allRows.filter((row) => (tabValue === 0 ? row.status === 'Accepted' : row.status === 'Rejected'));
-  const formTypes = [
-    { value: 'Self Referral form', label: 'Self Referral form' },
-    { value: 'Community Referral form', label: 'Community Referral form' },
-    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-  ];
 
-  const dateFilters = [
-    { value: 'today', label: 'All Dates' },
-    { value: 'week', label: 'Last 7 days' },
-    { value: 'month', label: 'Last 30 days' },
-    { value: 'year', label: 'Last 2 months' }
-  ];
-  return (
-    <Grid container spacing={2}>
-      <FilterPanel
-        showFilter={showFilter}
-        formTypes={formTypes}
-        setFormType={setFormType}
-        dateFilters={dateFilters}
-        setDateFilter={setDateFilter} />
-      <Grid item xs={9}>
-        <Box sx={{ width: '100%' }}>
-          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}
-            sx={{
-              display: 'flex',
-              gap: 2,
-              borderBottom: '1px solid #4792d3'
-            }}>
+  const CustomHeader = ({ tabValue, setTabValue }) => {
+    return (
+      <Box sx={{ height: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ borderBottom: '1px solid #4792d3' }}>
+          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ gap: 2 }}>
             <Tab
               label="Accepted"
               value={0}
-              sx={(theme) => ({
-                backgroundColor: tabValue === 0 ? '#e3f2fd' : 'transparent',
-                transition: 'background-color 0.3s ease',
-                marginRight: 2
-              })}
+              sx={{
+                marginRight: 2,
+                borderRadius: 1,
+                textTransform: 'none'
+              }}
             />
             <Tab
               label="Rejected"
               value={1}
-              sx={(theme) => ({
-                backgroundColor: tabValue === 1 ? '#e3f2fd' : 'transparent',
-                transition: 'background-color 0.3s ease',
-                marginRight: 2
-              })}
-            />
-          </Tabs>
-
-          <Card sx={{ mt: 2, height: '464px' }}>
-            <DataGrid
-              rows={filteredRows}
-              columns={columns}
-              rowHeight={65}
-              getRowId={(row) => row.id}
-              pageSize={5}
-              rowsPerPageOptions={[5, 10]}
-              getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
               sx={{
-                '& .even-row': { backgroundColor: '#ffffff' },
-                '& .odd-row': { backgroundColor: '#f5f5f5' },
-                '& .MuiDataGrid-row': {
-                  borderBottom: '1px solid #ccc'
-                },
-                '& .MuiDataGrid-columnHeader': {
-                  backgroundColor: '#f5f5f5'
-                }
+                marginRight: 2,
+                borderRadius: 1,
+                textTransform: 'none'
               }}
             />
-          </Card>
+          </Tabs>
         </Box>
+      </Box>
+    );
+  };
+
+  return (
+    <>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Typography variant="h4">History</Typography>
+
+        <TextField
+          size="small"
+          placeholder="Search..."
+          InputProps={{
+            endAdornment: <SearchIcon />
+          }}
+          sx={{ width: '350px' }}
+        />
+      </Stack>
+      <Grid container spacing={2}>
+        <FilterPanel
+          showFilter={showFilter}
+          statuses={statusFilter}
+          setStatusFilter={setStatus}
+          dateAddedFilters={dateAddedFilters}
+          setDateAddedFilter={setDateOpenedFilter}
+          names={nameFilter}
+          setNameFilter={setNameFilter}
+          selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter']}
+        />
+        <Grid item xs={9}>
+          <Box sx={{ width: '100%' }}>
+            <Card sx={{ height: 'auto' }}>
+              <DataGrid
+                rows={filteredRows}
+                columns={columns}
+                rowHeight={65}
+                getRowId={(row) => row.id}
+                pageSize={5}
+                checkboxSelection
+                components={{
+                  Toolbar: () => <CustomHeader tabValue={tabValue} setTabValue={setTabValue} />
+                }}
+                rowsPerPageOptions={[5, 10]}
+                getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                sx={{
+                  '& .MuiDataGrid-row': {
+                    borderBottom: '1px solid #ccc'
+                  },
+                  '& .MuiDataGrid-columnHeader': {
+                    backgroundColor: '#f5f5f5'
+                  }
+                }}
+              />
+            </Card>
+          </Box>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 }

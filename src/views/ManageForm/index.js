@@ -1,22 +1,11 @@
-import {
-  Stack,
-  Grid,
-  Typography,
-  Card,
-  IconButton,
-  Chip,
-  Tooltip,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import AddFormModal from './AddForm.js';
-import { DataGrid } from '@mui/x-data-grid';
-import React, { useState } from 'react';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import PrintIcon from '@mui/icons-material/Print';
-import FilterPanel from "components/FilterPanel"; 
+import AddIcon from '@mui/icons-material/Add';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import AddFormModal from './AddForm.js';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import React, { useState } from 'react';
+import FilterPanel from 'components/FilterPanel';
 
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
@@ -26,21 +15,83 @@ const formTypes = [
   { value: 'Workshop sign up form', label: 'Workshop sign up form' }
 ];
 
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
+const campaignFilter = [
+  { value: 'campaign1', label: 'Campaign 1' },
+  { value: 'campaign2', label: 'Campaign 2' }
 ];
 
+const CustomHeader = () => {
+  return (
+    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+      <GridToolbarContainer
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #ddd',
+          width: '100%',
+          height: '100%',
+          padding: '0 12px'
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: 'bold',
+            color: '#333',
+            fontSize: '14px',
+            lineHeight: '36px'
+          }}
+        >
+          FORM LIST
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <GridToolbarExport />
+        </Box>
+      </GridToolbarContainer>
+    </Box>
+  );
+};
+
 const columns = [
-  { field: 'description', headerName: 'DESCRIPTION', flex: 1 },
-  { field: 'campaign', headerName: 'FORM CAMPAIGN', flex: 1 },
+  {
+    field: 'description',
+    headerName: 'Form Type',
+    flex: 0.8,
+    renderCell: (params) => (
+      <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
+        {params.value}
+      </Typography>
+    )
+  },
+  {
+    field: 'campaign',
+    headerName: 'Form Campaign',
+    flex: 1,
+    renderCell: (params) => (
+      <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+        {params.value}
+      </Typography>
+    )
+  },
   {
     field: 'title',
-    headerName: 'FORM DISPLAY TITLE',
-    flex: 1,
-    renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb', fontWeight: 'bold' }} />
+    headerName: 'Form Display Title',
+    flex: 0.8,
+    renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
+  },
+  {
+    field: 'edit',
+    headerName: 'Edit',
+    flex: 0.3,
+    align: 'center',
+    headerAlign: 'center',
+    sortable: false,
+    renderCell: (params) => (
+      <IconButton onClick={() => handleEdit(params.row)} sx={{ p: 0.5 }}>
+        <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" />
+      </IconButton>
+    )
   }
 ];
 
@@ -51,13 +102,12 @@ const initialRows = [
   { id: 4, description: 'Volunteer sign up form', campaign: 'Form Campaign' },
   { id: 5, description: 'Workshop sign up form', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
 ];
+
 const Lead = () => {
   const [openAdd, setOpenAdd] = useState(false);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [campaign, setCampaignFilter] = useState('');
   const [rows, setRows] = useState(initialRows);
-  const [formTypeAnchor, setFormTypeAnchor] = useState(null);
-  const [dateFilterAnchor, setDateFilterAnchor] = useState(null);
+  const [formType, setFormType] = useState('');
   const [showFilter, setShowFilter] = useState(true);
 
   const handleOpenAdd = () => {
@@ -74,75 +124,71 @@ const Lead = () => {
         <AddFormModal open={openAdd} onClose={handleCloseAdd} />
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
-            <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-              <Typography variant="h4">Add Form</Typography>
-              <Tooltip title="Add Case" arrow>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+              <Tooltip title="Add" arrow>
                 <IconButton
-                  onClick={handleOpenAdd}
+                  onClick={() => handleOpenAdd()}
                   sx={{
-                    backgroundColor: '#41C048',
-                    borderRadius: '50%',
-                    width: '35px',
+                    backgroundColor: '#009fc7',
+                    borderRadius: '4px',
+                    width: 'auto',
                     height: '35px',
+                    px: 2,
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    boxShadow: 3,
                     color: 'white',
-                    cursor: 'pointer',
+                    gap: 1,
+                    fontSize: '14px',
                     '&:hover': {
-                      backgroundColor: '#41C048',
+                      backgroundColor: '#1565c0',
                       color: '#ffffff'
                     }
                   }}
                 >
-                  <AddIcon />
+                  Add New Form
+                  <AddIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
+
+              <TextField
+                size="small"
+                placeholder="Search..."
+                InputProps={{
+                  endAdornment: <SearchIcon />
+                }}
+                sx={{ width: '350px' }}
+              />
             </Stack>
           </Grid>
 
           <Grid container spacing={3}>
-              <FilterPanel
-                showFilter={showFilter}
-                formTypes={formTypes}
-                setFormType={setFormType}
-                dateFilters={dateFilters}
-                setDateFilter={setDateFilter}
-              />
+            <FilterPanel
+              showFilter={showFilter}
+              formTypes={formTypes}
+              setFormType={setFormType}
+              campaigns={campaignFilter}
+              setCampaignFilter={setCampaignFilter}
+              selectedFilters={['formType', 'campaignFilter']}
+            />
 
             <Grid item xs={9}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ bgcolor: '#eef2f6', p: 1, borderRadius: 1 }}>
-                <Stack direction="row" spacing={1}>
-                  <IconButton title="Export" sx={{ color: 'grey' }}>
-                    <GetAppIcon />
-                  </IconButton>
-                  <IconButton title="Filter" sx={{ color: 'grey' }}>
-                    <FilterListIcon />
-                  </IconButton>
-                  <IconButton title="Search" sx={{ color: 'grey' }}>
-                    <SearchIcon />
-                  </IconButton>
-                </Stack>
-
-                <Stack direction="row" spacing={1}>
-                  <IconButton title="Download PDF" sx={{ color: 'grey' }}>
-                    <PictureAsPdfIcon />
-                  </IconButton>
-                  <IconButton title="Print" sx={{ color: 'grey' }}>
-                    <PrintIcon />
-                  </IconButton>
-                </Stack>
-              </Stack>
-              <Card style={{ height: '440px' }}>
+              <Card style={{ height: 'auto' }}>
                 <DataGrid
                   rows={rows}
                   columns={columns}
-                  rowHeight={60}
+                  components={{
+                    Toolbar: () => <CustomHeader />
+                  }}
                   getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                  autoHeight
+                  getRowHeight={() => 'auto'}
                   sx={{
-                    '& .even-row': { backgroundColor: '#ffffff' },
-                    '& .odd-row': { backgroundColor: '#f5f5f5' },
+                    '& .MuiDataGrid-cell': {
+                      whiteSpace: 'normal',
+                      lineHeight: '1.4rem',
+                      py: 1
+                    },
                     '& .MuiDataGrid-row': {
                       borderBottom: '1px solid #ccc'
                     },

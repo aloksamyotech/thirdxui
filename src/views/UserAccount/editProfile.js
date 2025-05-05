@@ -40,7 +40,7 @@ const EditProfileModal = ({ open, onClose, userData }) => {
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar src={ProfileLogo} sx={{ width: 50, height: 50 }} />
           <Stack direction="row" spacing={1}>
-            <Button variant="contained" component="label" color="secondary">
+            <Button variant="contained" component="label" sx={{backgroundColor:'#053146'}}>
               UPLOAD A NEW PHOTO
               <input hidden accept="image/*" type="file" />
             </Button>
@@ -147,11 +147,11 @@ const EditProfileModal = ({ open, onClose, userData }) => {
         </Grid>
 
         <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
-          <Button variant="contained" color="secondary" onClick={onClose}>
-            SAVE CHNAGES
+          <Button variant="contained" sx={{backgroundColor:'#053146'}} onClick={onClose}>
+            Save Changes
           </Button>
           <Button onClick={onClose} variant="outlined" color="error">
-            CANCEL
+            Cancel
           </Button>
         </Box>
       </Box>

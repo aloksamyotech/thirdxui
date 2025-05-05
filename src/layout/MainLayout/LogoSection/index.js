@@ -7,7 +7,7 @@ import { ButtonBase } from '@mui/material';
 // project imports
 import config from 'config';
 import Logo from 'ui-component/Logo';
-import logo from '../../../assets/images/ThirdexLogo.png'
+import logo from '../../../assets/images/ThirdexLogo.png';
 import { MENU_OPEN } from 'store/actions';
 
 // ==============================|| MAIN LOGO ||============================== //
@@ -17,7 +17,7 @@ const LogoSection = () => {
   const dispatch = useDispatch();
   return (
     <ButtonBase disableRipple>
-      <img src={logo} alt='Logo' style={{ height: '45px', objectFit: 'cover' }} />
+      <img src={logo} alt="Logo" style={{ height: '45px', width: 'auto', maxWidth: '120px', display: 'block', objectFit: 'contain' }} />
     </ButtonBase>
   );
 };

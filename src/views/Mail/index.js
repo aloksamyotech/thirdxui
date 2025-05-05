@@ -1,145 +1,175 @@
 import { useState } from 'react';
-import { Stack, Button, Typography, Card, TextField, MenuItem, Grid, FormControlLabel } from '@mui/material';
-import AntSwitch from 'components/AntSwitch.js';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import PersonIcon from '@mui/icons-material/Person';
+import InfoIcon from '@mui/icons-material/Info';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import FilterPanel from 'components/FilterPanel';
 
-const Emails = () => {
-  const [caseData, setCaseData] = useState({
-    gender: '',
-    dob: null,
-    address: '',
-    town: '',
-    country: '',
-    pinCode: '',
-    service: '',
-    session: '',
-    age: '',
-    countryOfOrigin: '',
-    district: '',
-    keyIndicators: '',
-    referralType: '',
-    ethnicity: '',
-    chooseChannelSettings: '',
-    listName: '',
-    tags: '',
-    locked: true,
-    includeArchived: true
-  });
+const Lead = () => {
+  const navigate = useNavigate();
+  const [listName, setListName] = useState('');
+  const [tag, setTag] = useState('');
+  const [showFilter, setShowFilter] = useState(true);
 
-  const handleChange = (event) => {
-    setCaseData({ ...caseData, [event.target.name]: event.target.value });
+  const listNames = [
+    { value: 'list-a', label: 'List A' },
+    { value: 'list-b', label: 'List B' }
+  ];
+
+  const tags = [
+    { value: 'urgent', label: 'Urgent' },
+    { value: 'follow-up', label: 'Follow-up' }
+  ];
+
+  const CustomHeader = () => {
+    return (
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#f5f5f5',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            MAILING LIST
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
   };
 
-  const handleSubmit = () => {
-    console.log('Submitted Data:', caseData);
-  };
+  const columns = [
+    {
+      field: 'person',
+      headerName: 'Details',
+      flex: 1,
+      renderCell: (params) => (
+        <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
+          <Stack direction="row" alignItems="center" spacing={2}>
+            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
 
-  const handleToggle = (event) => {
-    setCaseData({ ...caseData, [event.target.name]: event.target.checked });
-  };
+            <Box>
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                {params.row.name} #{params.row.id}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                {params.row.address}
+              </Typography>
+            </Box>
+          </Stack>
+
+          <Tooltip title="Info" arrow>
+            <IconButton>
+              <InfoIcon color="action" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      )
+    }
+  ];
+
+  const rows = [
+    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
+    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
+    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' }
+  ];
 
   return (
-    <>
+    <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Card sx={{ p: 3 }}>
-          <Stack direction="row" alignItems="center" mb={5} justifyContent="space-between">
-            <Typography variant="h4">Create a List of Service Users</Typography>
-          </Stack>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="h6" gutterBottom>
-                Personal Info
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="List Name" name="listName" value={caseData.listName} onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Tags" name="tags" value={caseData.tags} onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Age" name="age" value={caseData.age} onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Gender" name="gender" value={caseData.gender} onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField fullWidth label="Ethnicity" name="ethnicity" value={caseData.ethnicity} onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Country of Origin"
-                    name="countryOfOrigin"
-                    value={caseData.countryOfOrigin}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.locked} onChange={handleToggle} name="locked" />}
-                    label="Locked"
-                    labelPlacement="start"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.showInMenu} onChange={handleToggle} name="showInMenu" />}
-                    label="Show in Menu"
-                    labelPlacement="start"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.includeArchived} onChange={handleToggle} name="includeArchived" />}
-                    label="Include Archived Records"
-                    labelPlacement="start"
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-mail')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: 'auto',
+                height: '35px',
+                px: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add Mailing List <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-            <Grid item xs={12} sm={6}>
-              <Typography variant="h6" gutterBottom>
-                Others
-              </Typography>
-              <Grid container spacing={3}>
-                {[
-                  { label: 'Service', name: 'service' },
-                  { label: 'Session', name: 'session' },
-                  { label: 'District', name: 'district' },
-                  { label: 'Key Indicators', name: 'keyIndicators' },
-                  { label: 'Referral Type', name: 'referralType' },
-                  { label: 'Choose Channel Settings', name: 'chooseChannelSettings' },
-                  { label: 'Choose Purpose Settings', name: 'choosePurposeSettings' }
-                ].map((field) => (
-                  <Grid item xs={12} sm={6} key={field.name}>
-                    <TextField select fullWidth label={field.label} name={field.name} value={caseData[field.name]} onChange={handleChange}>
-                      <MenuItem value="Option 1">Option 1</MenuItem>
-                      <MenuItem value="Option 2">Option 2</MenuItem>
-                      <MenuItem value="Option 3">Option 3</MenuItem>
-                    </TextField>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grid>
+          <TextField
+            size="small"
+            placeholder="Search..."
+            InputProps={{
+              endAdornment: <SearchIcon />
+            }}
+            sx={{ width: '350px' }}
+          />
+        </Stack>
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            listNames={listNames}
+            setListNameFilter={setListName}
+            tags={tags}
+            setTagFilter={setTag}
+            selectedFilters={['listNameFilter', 'tagFilter']}
+          />
 
-          <Grid container spacing={2} sx={{ justifyContent: 'flex-end' }}>
-            <Grid item>
-              <Button variant="contained" color="secondary" onClick={handleSubmit}>
-                Save
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" color="error">
-                Cancel
-              </Button>
-            </Grid>
+          <Grid item xs={9}>
+            <Card style={{ height: 'auto' }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                rowHeight={65}
+                getRowId={(row) => row.id}
+                components={{
+                  Toolbar: () => <CustomHeader />
+                }}
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    display: 'none'
+                  },
+                  '& .MuiDataGrid-cell': {
+                    textAlign: 'left',
+                    fontSize: '14px'
+                  }
+                }}
+                disableSelectionOnClick
+              />
+            </Card>
           </Grid>
-        </Card>
+        </Grid>
       </Grid>
-    </>
+    </Card>
   );
 };
 
-export default Emails;
+export default Lead;

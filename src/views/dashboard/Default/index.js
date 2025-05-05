@@ -62,16 +62,16 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={8} sx={{ px: '20px' }}>
           <Grid item xs={3}>
-            <Shortcut2 icon={1} title={'Add Person'} path={'/dashboard/people'} />
+            <Shortcut2 icon={1} title={'Add Person'} path={'/add-serviceuser'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut2 icon={2} title={'Add New Case'} path={'/dashboard/services'} />
+            <Shortcut2 icon={2} title={'Add New Case'} path={'/add-case'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut2 icon={3} title={'Add Session Attendies'} path={'/dashboard/people'} />
+            <Shortcut2 icon={3} title={'Add Session Attendies'} path={'/'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut2 icon={4} title={'Add Donor'} path={'/dashboard/referral'} />
+            <Shortcut2 icon={4} title={'Add Donor'} path={'/add-donor'} />
           </Grid>
         </Grid>
       </Grid>

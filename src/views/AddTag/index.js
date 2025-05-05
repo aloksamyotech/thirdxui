@@ -12,19 +12,19 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  FormLabel,
-  InputAdornment
+  DialogActions
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import SearchIcon from '@mui/icons-material/Search';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AntSwitch from 'components/AntSwitch.js';
 import AddIcon from '@mui/icons-material/Add';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { DataGrid } from '@mui/x-data-grid';
-import AntSwitch from "components/AntSwitch.js";
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import { useNavigate } from 'react-router-dom';
 
-const TagForm = ({ onCancel }) => {
+const TagForm = () => {
+  const navigate = useNavigate();
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
   const [toggle, setToggle] = useState(true);
@@ -42,41 +42,92 @@ const TagForm = ({ onCancel }) => {
   };
 
   const columns = [
-    { field: 'name', headerName: 'DESCRIPTION', flex: 1 },
+    { field: 'name', headerName: 'Configuration', flex: 1 },
     {
-      field: 'active',
-      headerName: 'ACTIVE',
+      field: 'status',
+      headerName: 'Status',
+      renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
       flex: 1
     }
   ];
 
   const rows = [
-    { id: 1, name: 'Adoption Enquirer', active: 'YES' },
-    { id: 2, name: 'Adoption Gift Recipients', active: 'YES' },
-    { id: 3, name: 'Past Adopters', active: 'YES' },
-    { id: 4, name: 'Current Adopters', active: 'YES' }
+    { id: 1, name: 'Adoption Enquirer', status: true },
+    { id: 2, name: 'Adoption Gift Recipients', status: true },
+    { id: 3, name: 'Past Adopters', status: true },
+    { id: 4, name: 'Current Adopters', status: true }
   ];
+
+  const CustomHeader = () => {
+    return (
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#f5f5f5',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              ml: 2,
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            TAG LIST
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TextField
+              size="small"
+              placeholder="Search..."
+              InputProps={{
+                endAdornment: <SearchIcon />
+              }}
+              sx={{ width: '250px' }}
+            />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
+  };
 
   return (
     <Grid>
-      <Card sx={{ position: 'relative', p: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
           Add Tag Category
         </Typography>
-        <IconButton onClick={onCancel} sx={{ position: 'absolute', top: 1, right: 10 }}>
-          <CancelIcon sx={{ fontSize: 32, color: 'grey' }} />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/tags')}>
+          <ArrowBackIcon sx={{ color: 'grey' }} />
+          <Typography variant="h6" sx={{ mr: 1 }}>
+            Back
+          </Typography>
+        </Box>
+      </Box>
+
+      <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
         <Grid container spacing={2} alignItems="center" mt={1}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <FormControlLabel control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />} label="Active?" labelPlacement='start'/>
+            <FormControlLabel
+              control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />}
+              label="Active?"
+              labelPlacement="start"
+            />
           </Grid>
-          <Grid item xs={4}></Grid>
           <Grid item xs={12} sm={6}>
-            <FormLabel>Tags can be applied to</FormLabel>
-            <TextField fullWidth value={tags} onChange={(e) => setTags(e.target.value)} size="small" />
+            <TextField fullWidth label="Tags can be applied to" value={tags} onChange={(e) => setTags(e.target.value)} size="small" />
           </Grid>
         </Grid>
 
@@ -111,37 +162,16 @@ const TagForm = ({ onCancel }) => {
           </Stack>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Search Description..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ width: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              )
-            }}
-          />
-        </Grid>
-
         <Box width="100%" sx={{ mt: 2 }}>
           <Card>
             <DataGrid
               rows={rows}
               columns={columns}
               getRowId={(row) => row.id}
+              components={{ Toolbar: CustomHeader }}
+              pagination={false}
+              hideFooter
               sx={{
-                '& .MuiDataGrid-columnHeader': {
-                  backgroundColor: '#f5f5f5'
-                },
-                '& .MuiDataGrid-row:nth-of-type(2n)': {
-                  backgroundColor: '#F9F9F9'
-                },
                 '& .MuiDataGrid-cell': {
                   textAlign: 'left',
                   fontSize: '14px'
@@ -150,6 +180,19 @@ const TagForm = ({ onCancel }) => {
               disableSelectionOnClick
             />
           </Card>
+
+          <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+            <Grid item>
+              <Button variant="contained" sx={{ background: '#053146' }}>
+                Save Changes
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button variant="outlined" color="error">
+                Cancel
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
 
         <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
@@ -160,36 +203,59 @@ const TagForm = ({ onCancel }) => {
           <DialogContent>
             <Grid container spacing={2} mt={0.5}>
               <Grid item xs={12}>
-                <TextField fullWidth label="Name" name="name" value={tagData.name} onChange={handleTagChange} />
+                <TextField fullWidth label="Description" size="small" name="name" value={tagData.name} onChange={handleTagChange} />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label="Start Date"
                     value={tagData.startDate}
                     onChange={(date) => setTagData({ ...tagData, startDate: date })}
                     renderInput={(params) => <TextField {...params} fullWidth />}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        size: 'small'
+                      }
+                    }}
                   />
                 </LocalizationProvider>
               </Grid>
-              <Grid item xs={6}>
+
+              <Grid item xs={12} sm={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label="End Date"
                     value={tagData.endDate}
                     onChange={(date) => setTagData({ ...tagData, endDate: date })}
                     renderInput={(params) => <TextField {...params} fullWidth />}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        size: 'small'
+                      }
+                    }}
                   />
                 </LocalizationProvider>
               </Grid>
+
               <Grid item xs={12}>
-                <TextField fullWidth label="Note" name="note" multiline rows={3} value={tagData.note} onChange={handleTagChange} />
+                <TextField
+                  fullWidth
+                  label="Note"
+                  size="small"
+                  name="note"
+                  multiline
+                  rows={3}
+                  value={tagData.note}
+                  onChange={handleTagChange}
+                />
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" color="secondary">
-              Submit
+            <Button variant="contained" sx={{ background: '#053146' }}>
+              Save Changes
             </Button>
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
               Cancel

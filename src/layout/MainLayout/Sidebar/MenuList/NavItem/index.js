@@ -2,15 +2,9 @@ import PropTypes from 'prop-types';
 import { forwardRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, useMediaQuery } from '@mui/material';
-
-// project imports
 import { MENU_OPEN, SET_MENU } from 'store/actions';
-
-// assets
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 // ==============================|| SIDEBAR MENU LIST ITEMS ||============================== //
@@ -52,7 +46,6 @@ const NavItem = ({ item, level }) => {
     if (matchesSM) dispatch({ type: SET_MENU, opened: false });
   };
 
-  // active menu item on page load
   useEffect(() => {
     const currentIndex = document.location.pathname
       .toString()
@@ -61,100 +54,25 @@ const NavItem = ({ item, level }) => {
     if (currentIndex > -1) {
       dispatch({ type: MENU_OPEN, id: item.id });
     }
-    // eslint-disable-next-line
   }, [pathname]);
 
   return (
-    // <ListItemButton
-    //   {...listItemProps}
-    //   disabled={item.disabled}
-    //   sx={{
-    //     borderRadius: `${customization.borderRadius}px`,
-    //     mb: 0.5,
-    //     alignItems: 'flex-start',
-    //     backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
-    //     py: level > 1 ? 1 : 1.25,
-    //     pl: `${level * 24}px`,
-    //     '&:hover': {
-    //       backgroundColor: '#ffff'
-    //     },
-    //     '&.Mui-selected': {
-    //       backgroundColor: '#ffff !important',
-    //       color: '#053146'
-    //     }
-    //   }}
-    //   selected={customization.isOpen.findIndex((id) => id === item.id) > -1}
-    //   onClick={() => itemHandler(item.id)}
-    // >
-    //   <ListItemIcon sx={{ my: 'auto', minWidth: !item?.icon ? 18 : 36,
-    //       color: '#ffff', // Ensure icon is green
-    //       '&.MuiListItemIcon-root': {
-    //         color: '#ffff !important' // Overrides default MUI styles
-    //       },
-    //       '&.Mui-selected &': {
-    //         color: '#ffff !important' // Fixes selected state
-    //       },
-    //       '&.Mui-selected:hover &': {
-    //         color: '#053146 !important'
-    //       }
-    //    }}>{itemIcon}</ListItemIcon>
-    //   <ListItemText
-    //     primary={
-    //       <Typography variant={customization.isOpen.findIndex((id) => id === item.id) > -1 ? 'h5' : 'body1'}
-    //       sx={{
-    //         my: 'auto',
-    //         minWidth: !item?.icon ? 18 : 36,
-    //         color: '#ffff', // Ensure icon is green
-    //         '&.MuiListItemIcon-root': {
-    //           color: '#ffff !important' // Overrides default MUI styles
-    //         },
-    //         '&.Mui-selected &': {
-    //           color: '#ffff !important' // Fixes selected state
-    //         },
-    //         '&.Mui-selected:hover &': {
-    //           color: '#053146 !important'
-    //         }
-    //       }}>
-    //         {item.title}
-    //       </Typography>
-    //     }
-    //     secondary={
-    //       item.caption && (
-    //         <Typography variant="caption" sx={{ ...theme.typography.subMenuCaption }} display="block" gutterBottom>
-    //           {item.caption}
-    //         </Typography>
-    //       )
-    //     }
-    //   />
-    //   {item.chip && (
-    //     <Chip
-    //       color={item.chip.color}
-    //       variant={item.chip.variant}
-    //       size={item.chip.size}
-    //       label={item.chip.label}
-    //       avatar={item.chip.avatar && <Avatar>{item.chip.avatar}</Avatar>}
-    //     />
-    //   )}
-    // </ListItemButton>
-
     <ListItemButton
       {...listItemProps}
       disabled={item.disabled}
       sx={{
-        borderRadius: `${customization.borderRadius}px`,
-        mb: 0.5,
+        borderRadius: '6px',
+        mb: 1,
         alignItems: 'flex-start',
         backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
-        py: level > 1 ? 1 : 1.25,
-        pl: `${level * 24}px`,
         '&:hover': {
-          backgroundColor: '#ffffff !important', // White background on hover
-          color: '#053146 !important', // Dark blue text on hover
+          backgroundColor: '#ffffff !important',
+          color: '#053146 !important',
           '& .MuiListItemIcon-root': {
-            color: '#053146 !important' // Dark blue icon on hover
+            color: '#053146 !important'
           },
           '& .MuiTypography-root': {
-            color: '#053146 !important' // Ensures text color changes on hover
+            color: '#053146 !important'
           }
         },
         '&.Mui-selected': {

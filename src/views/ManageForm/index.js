@@ -162,7 +162,7 @@ const Lead = () => {
             </Stack>
           </Grid>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <FilterPanel
               showFilter={showFilter}
               formTypes={formTypes}

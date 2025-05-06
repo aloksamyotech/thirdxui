@@ -9,9 +9,28 @@ import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
 import { useNavigate } from 'react-router-dom';
 import CaseNoteDialog from 'components/AddCaseNote';
+import UserProfileDialog from './userProfile.js';
+
+const sampleUser = {
+  name: 'Aidan Ayonaudu',
+  email: 'aidan.@example.com',
+  phone: '(123) 456-7890',
+  address: '5033 Transit Road, Clarence NY 14031',
+  country: 'USA',
+  userId: '01231',
+  gender: 'Male',
+  ethnicity: 'American',
+  dob: 'USA',
+  age: '49',
+  altUserId: '12365479+',
+  service: 'Communication',
+  referredDate: '02/02/2020',
+  image: 'https://via.placeholder.com/64'
+};
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
@@ -44,7 +63,13 @@ const CaseDetailsPage = () => {
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
-            <Button variant="contained" size="small" onClick={() => setOpenDialog(true)} sx={{ backgroundColor: '#009fc7' }} endIcon={<Add />}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setOpenDialog(true)}
+              sx={{ backgroundColor: '#009fc7' }}
+              endIcon={<Add />}
+            >
               Add New Case Note
             </Button>
           </Box>
@@ -52,7 +77,6 @@ const CaseDetailsPage = () => {
       </Box>
     );
   };
-
 
   const handleSave = (data) => {
     console.log('Case note submitted:', data);
@@ -213,7 +237,20 @@ const CaseDetailsPage = () => {
                   <Typography variant="subtitle1" sx={{ color: 'white' }}>
                     Service User Summary
                   </Typography>
-                  <Chip label="View" size="small" sx={{ backgroundColor: 'white', color: '#042E4C', fontWeight: 400 }} />
+                  <Chip
+                    label="View"
+                    size="small"
+                    onClick={() => setOpen(true)}
+                    sx={{
+                      backgroundColor: 'white',
+                      color: '#042E4C',
+                      fontWeight: 400,
+                      '&:hover': {
+                        backgroundColor: 'white',
+                        color: '#042E4C'
+                      }
+                    }}
+                  />
                 </Box>
                 <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Name: Aidan Ayonaudu</Typography>
                 <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>User ID: 01231</Typography>
@@ -271,6 +308,7 @@ const CaseDetailsPage = () => {
       </Box>
 
       <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" />
+      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={sampleUser} />
     </>
   );
 };

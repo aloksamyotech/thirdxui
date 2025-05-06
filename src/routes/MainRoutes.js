@@ -37,6 +37,9 @@ const AddTransaction = Loadable(lazy(() => import('views/AddTransaction')));
 const AddTag = Loadable(lazy(() => import('views/AddTag')));
 const AddSession = Loadable(lazy(() => import('views/AddSession')));
 const ViewCase = Loadable(lazy(() => import('views/ViewCase')));
+const ViewSession = Loadable(lazy(() => import('views/ViewSession')));
+const Attendees = Loadable(lazy(() => import('views/Attendees')));
+const ViewDonor = Loadable(lazy(() => import('views/ViewDonor')));
 
 const MainRoutes = {
   path: '/',
@@ -159,7 +162,6 @@ const MainRoutes = {
       path: 'archives',
       element: <Archives />
     },
-
     {
       path: 'configuration',
       element: <Configuration />
@@ -191,6 +193,18 @@ const MainRoutes = {
     {
       path: 'view-case',
       element: <ViewCase />
+    },
+    {
+      path: 'view-session',
+      element: <ViewSession />
+    },
+    {
+      path: 'attendees',
+      element: <Attendees />
+    },
+    {
+      path: 'view-donor',
+      element: <ViewDonor />
     },
   ]
 };

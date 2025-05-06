@@ -28,6 +28,7 @@ const Chart = () => {
 
           <Box
             sx={{
+              backgroundColor: '#fff',
               boxShadow: '1px 1px 5px #d4d4d4',
               borderRadius: '10px',
               padding: '10px',
@@ -52,6 +53,7 @@ const Chart = () => {
           <Typography sx={{ fontSize: '16px', fontWeight: 500 }}>Income</Typography>
           <Box
             sx={{
+              backgroundColor: '#fff',
               boxShadow: '1px 1px 5px #d4d4d4',
               borderRadius: '10px',
               mt: 2

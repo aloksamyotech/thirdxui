@@ -106,8 +106,8 @@ const UserProfile = () => {
                   </Box>
 
                   <Stack direction="row" alignItems="center" spacing={1}>
-                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#41C048' }} />
-                    <Typography variant="body2" color="success.main" fontWeight="bold">
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green' }} />
+                    <Typography variant="body2" color="green" fontWeight="bold">
                       ACTIVE
                     </Typography>
                   </Stack>
@@ -137,6 +137,7 @@ const UserProfile = () => {
               {sessionData.map((session, index) => (
                 <Box
                   key={index}
+                  onClick={() => navigate('/view-session')}
                   sx={{
                     display: 'flex',
                     alignItems: 'flex-start',

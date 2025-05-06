@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import TableStyle from '../../ui-component/TableStyle';
 import FilterPanel from 'components/FilterPanel';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import ViewReferral from './view';
 
 const referralData = [
   { id: 1, name: 'John Doe', formTitle: 'Medical Form', dateReceived: '08/01/2024', referredBy: 'Dr. Smith', type: 'person' },
@@ -99,6 +100,25 @@ const ReferralTable = () => {
   const [formType, setFormType] = useState('');
   const [formName, setFormName] = useState('');
   const [dateAddedFilter, setDateAddedFilter] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleAccept = () => {
+    console.log('Accepted!');
+    setDialogOpen(false);
+  };
+
+  const handleDecline = () => {
+    console.log('Declined!');
+    setDialogOpen(false);
+  };
 
   return (
     <>
@@ -123,7 +143,7 @@ const ReferralTable = () => {
           setFormNameFilter={setFormName}
           dateAddedFilters={dateAddedFilters}
           setDateAddedFilter={setDateAddedFilter}
-          selectedFilters={['dateAddedFilter', 'formType','formNameFilter']}
+          selectedFilters={['dateAddedFilter', 'formType', 'formNameFilter']}
         />
         <Grid item xs={9}>
           <TableStyle>
@@ -132,6 +152,7 @@ const ReferralTable = () => {
                 <DataGrid
                   rows={referralData}
                   columns={columns}
+                  onRowClick={handleOpenDialog} 
                   getRowId={(row) => row.id}
                   components={{
                     Toolbar: () => <CustomHeader />
@@ -147,6 +168,8 @@ const ReferralTable = () => {
           </TableStyle>
         </Grid>
       </Grid>
+
+      <ViewReferral open={dialogOpen} onClose={handleCloseDialog} onAccept={handleAccept} onDecline={handleDecline} />
     </>
   );
 };

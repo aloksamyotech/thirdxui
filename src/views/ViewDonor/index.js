@@ -121,6 +121,13 @@ const UserProfileCard = () => {
                     <Typography variant="h5" fontWeight="bold">
                       John Doe
                     </Typography>
+
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green' }} />
+                      <Typography variant="body2" color="green">
+                        ACTIVE DONOR
+                      </Typography>
+                    </Stack>
                     <Typography variant="body2" color="textSecondary">
                       johndoe@example.com
                     </Typography>
@@ -132,7 +139,7 @@ const UserProfileCard = () => {
 
                 <Box textAlign="right" sx={{ pr: 2 }}>
                   <Button variant="contained" onClick={handleClick} sx={{ mb: 1, backgroundColor: '#00AEEF' }}>
-                    Manage
+                    Edit
                   </Button>
                   <Typography variant="body2" color="textSecondary">
                     Address
@@ -191,27 +198,22 @@ const UserProfileCard = () => {
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>User ID:</strong> <Typography component="span">123456</Typography>
+                              <strong>Phone:</strong> <Typography component="span">123456</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Ethnicity:</strong> <Typography component="span">Mixed - Black and White Caribbean</Typography>
+                              <strong>DOB:</strong> <Typography component="span">1990-05-15</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Language:</strong> <Typography component="span">English</Typography>
+                              <strong>Age:</strong> <Typography component="span">34</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Contact:</strong> <Typography component="span">+123456</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">200 Dutch Meadows, USA</Typography>
+                              <strong>Donor Id:</strong> <Typography component="span">123</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -219,12 +221,12 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Gender:</strong> <Typography component="span">Male</Typography>
+                              <strong>Total Donations:</strong> <Typography component="span">$5000</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>DOB:</strong> <Typography component="span">1990-05-15</Typography>
+                              <strong>No:</strong> <Typography component="span">1990-05-15</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
@@ -251,102 +253,8 @@ const UserProfileCard = () => {
                 <Grid item xs={12} md={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
                     <CardContent>
-                      <Typography variant="h5" fontWeight="bold" gutterBottom>
-                        Risk Assessment
-                      </Typography>
-
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <Typography variant="body1" color="textSecondary">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula purus id est efficitur volutpat.
-                          </Typography>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <Typography variant="h6" fontWeight="bold" sx={{ color: '#009fc7' }}>
-                            Key Indicators Concern
-                          </Typography>
-
-                          <ul>
-                            <li>
-                              <Typography variant="body2">Data breaches detected</Typography>
-                            </li>
-                            <li>
-                              <Typography variant="body2">Unauthorized access attempts</Typography>
-                            </li>
-                            <li>
-                              <Typography variant="body2">Compliance violations reported</Typography>
-                            </li>
-                            <li>
-                              <Typography variant="body2">Subtractive mixture</Typography>
-                            </li>
-                            <li>
-                              <Typography variant="body2">Learning disability</Typography>
-                            </li>
-                          </ul>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
-                    <CardContent>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        Next of Kin Details
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Full Name:</strong> <Typography component="span">John Doe</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Gender:</strong> <Typography component="span">Male</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Relationship to Service User:</strong> <Typography component="span">Father</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">London</Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Home no:</strong> <Typography component="span">+138733</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Mobile no:</strong> <Typography component="span">9776526</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Email:</strong> <Typography component="span">example@gmail.com</Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
-                    <CardContent>
                       <Typography variant="subtitle1" fontWeight="bold" color="#042E4C" gutterBottom>
-                        Contact Preferences
+                        GDPR
                       </Typography>
 
                       <Grid container spacing={2}>

@@ -54,6 +54,7 @@ const FilterPanel = ({
   sessionNames,
   setSessionNameFilter,
   configurationNames,
+  configurationNameFilter,
   setConfigurationNameFilter,
   timeOptions,
   setTimeFilter,
@@ -211,6 +212,7 @@ const FilterPanel = ({
       data: configurationNames,
       label: 'By Configuration Name',
       onChange: setConfigurationNameFilter,
+      value: configurationNameFilter,
       type: 'select'
     },
     timeFilter: {

@@ -24,6 +24,7 @@
     "@react-google-maps/api": "^2.20.6",
     "@tabler/icons": "^1.72.0",
     "apexcharts": "^3.35.3",
+    "axios": "^1.9.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.10",
     "formik": "^2.4.5",

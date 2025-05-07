@@ -4,8 +4,9 @@ import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import AntSwitch from 'components/AntSwitch';
-import { postApi, getApi } from 'common/apiClient';
+import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
 const defaultTabTypes = [
   'Contact Types',
@@ -73,10 +74,9 @@ const TabbedDataGrid = () => {
           status: item.isActive
         });
       });
-
       setTabData(grouped);
     } catch (error) {
-      console.error('Error fetching configurations:', error);
+      toast.error('Error fetching configurations:', error);
     }
   };
 
@@ -93,11 +93,11 @@ const TabbedDataGrid = () => {
 
     try {
       const res = await postApi(urls.configuration.create, payload);
-      console.log('Configuration added:', res.data);
+      toast.success('Data added successfully!');
       fetchConfigurations();
       handleCloseModal();
     } catch (err) {
-      console.error('Error adding configuration:', err);
+      toast.error('Error adding configuration:', err);
     }
   };
 
@@ -125,7 +125,7 @@ const TabbedDataGrid = () => {
 
       setTabData(grouped);
     } catch (error) {
-      console.error('Error fetching filtered configurations:', error);
+      toast.error('Error fetching filtered configurations:', error);
     }
   };
 
@@ -134,6 +134,35 @@ const TabbedDataGrid = () => {
       fetchFilteredConfigurations(selectedSection);
     }
   }, [selectedSection]);
+
+  const handleStatusUpdate = async (itemId, newStatus) => {
+    try {
+      const payload = {
+        isActive: newStatus
+      };
+  
+      const url = `${urls.configuration.updateStatus.replace(':configId', itemId)}`;
+      
+      const res = await updateApi(url, payload);
+      if (res?.data) {
+        setTabData(prevData => {
+          const newData = { ...prevData };
+          Object.keys(newData).forEach(type => {
+            newData[type] = newData[type].map(item => 
+              item.id === itemId ? { ...item, status: newStatus } : item
+            );
+          });
+          return newData;
+        });
+  
+        const statusMessage = newStatus ? 'Active' : 'Inactive';
+        toast.success(`Status updated to ${statusMessage}`);
+      }
+    } catch (error) {
+      toast.error('Error updating status');
+    }
+  };
+  
 
   return (
     <>
@@ -229,7 +258,10 @@ const TabbedDataGrid = () => {
                           }}
                         >
                           <Typography sx={{ flex: 1 }}>{item.name}</Typography>
-                          <AntSwitch checked={item.status} />
+                          <AntSwitch 
+                            checked={item.status} 
+                            onChange={(e) => handleStatusUpdate(item.id, e.target.checked)}
+                          />
                         </Box>
                       ))
                     ) : (

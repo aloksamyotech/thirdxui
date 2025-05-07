@@ -6,5 +6,11 @@ export const urls = Object.freeze({
     create: `${baseUrl}/config/addconfiguration`,
     fetch: `${baseUrl}/config/getallconfiguration`,
     filterType: `${baseUrl}/config/filterbyconfigurationtype`,
+    updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`,
   },
+  serviceuser: {
+    create: `${baseUrl}/user/adduser`,
+    fetch: `${baseUrl}/config/getalluser`,
+    getById: `${baseUrl}/config/getUserById/:userId`,
+  }
 });

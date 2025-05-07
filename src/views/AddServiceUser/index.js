@@ -602,6 +602,21 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="language"
                                 control={control}
+                                rules={{
+                                  required: 'Last name is required',
+                                  minLength: {
+                                    value: 2,
+                                    message: 'Last name must be at least 2 characters'
+                                  },
+                                  maxLength: {
+                                    value: 20,
+                                    message: 'Last name cannot exceed 50 characters'
+                                  },
+                                  pattern: {
+                                    value: onlyLetters,
+                                    message: 'Last name can only contain letters'
+                                  }
+                                }}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
@@ -609,6 +624,14 @@ const AddCaseForm = ({ onCancel }) => {
                                     size="small"
                                     error={!!errors.language}
                                     helperText={errors.language?.message}
+                                    inputProps={{
+                                      pattern: onlyLetters.source,
+                                      onKeyPress: (e) => {
+                                        if (!onlyLetters.test(e.key)) {
+                                          e.preventDefault();
+                                        }
+                                      }
+                                    }}
                                     {...field}
                                   />
                                 )}
@@ -654,78 +677,222 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="riskNotes"
                                   rules={{
+                                    required: 'Last name is required',
+                                    minLength: {
+                                      value: 2,
+                                      message: 'Last name must be at least 2 characters'
+                                    },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Preferred known as cannot exceed 30 characters'
+                                      message: 'Last name cannot exceed 50 characters'
+                                    },
+                                    pattern: {
+                                      value: onlyLetters,
+                                      message: 'Last name can only contain letters'
                                     }
                                   }}
                                   control={control}
-                                  render={({ field }) => <TextField fullWidth size="small" label="Beneficiary Information" {...field} />}
+                                  render={({ field }) => (
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      label="Beneficiary Information"
+                                      inputProps={{
+                                        pattern: onlyLetters.source,
+                                        onKeyPress: (e) => {
+                                          if (!onlyLetters.test(e.key)) {
+                                            e.preventDefault();
+                                          }
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  )}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <Controller
                                   name="keyIndicators"
                                   rules={{
+                                    required: 'Last name is required',
+                                    minLength: {
+                                      value: 2,
+                                      message: 'Last name must be at least 2 characters'
+                                    },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Preferred known as cannot exceed 30 characters'
+                                      message: 'Last name cannot exceed 50 characters'
+                                    },
+                                    pattern: {
+                                      value: onlyLetters,
+                                      message: 'Last name can only contain letters'
                                     }
                                   }}
                                   control={control}
-                                  render={({ field }) => <TextField fullWidth size="small" label="Campaigns Supported" {...field} />}
+                                  render={({ field }) => (
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      label="Campaigns Supported"
+                                      inputProps={{
+                                        pattern: onlyLetters.source,
+                                        onKeyPress: (e) => {
+                                          if (!onlyLetters.test(e.key)) {
+                                            e.preventDefault();
+                                          }
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  )}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <Controller
                                   name="engagement"
                                   rules={{
+                                    required: 'Last name is required',
+                                    minLength: {
+                                      value: 2,
+                                      message: 'Last name must be at least 2 characters'
+                                    },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Preferred known as cannot exceed 30 characters'
+                                      message: 'Last name cannot exceed 50 characters'
+                                    },
+                                    pattern: {
+                                      value: onlyLetters,
+                                      message: 'Last name can only contain letters'
                                     }
                                   }}
                                   control={control}
-                                  render={({ field }) => <TextField fullWidth size="small" label="Engagement" {...field} />}
+                                  render={({ field }) => (
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      label="Engagement"
+                                      inputProps={{
+                                        pattern: onlyLetters.source,
+                                        onKeyPress: (e) => {
+                                          if (!onlyLetters.test(e.key)) {
+                                            e.preventDefault();
+                                          }
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  )}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <Controller
                                   name="eventsAttended"
                                   rules={{
+                                    required: 'Last name is required',
+                                    minLength: {
+                                      value: 2,
+                                      message: 'Last name must be at least 2 characters'
+                                    },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Preferred known as cannot exceed 30 characters'
+                                      message: 'Last name cannot exceed 50 characters'
+                                    },
+                                    pattern: {
+                                      value: onlyLetters,
+                                      message: 'Last name can only contain letters'
                                     }
                                   }}
                                   control={control}
-                                  render={({ field }) => <TextField fullWidth size="small" label="Events Attended" {...field} />}
+                                  render={({ field }) => (
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      label="Events Attended"
+                                      inputProps={{
+                                        pattern: onlyLetters.source,
+                                        onKeyPress: (e) => {
+                                          if (!onlyLetters.test(e.key)) {
+                                            e.preventDefault();
+                                          }
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  )}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <Controller
                                   name="fundingInterests"
                                   rules={{
+                                    required: 'Last name is required',
+                                    minLength: {
+                                      value: 2,
+                                      message: 'Last name must be at least 2 characters'
+                                    },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Preferred known as cannot exceed 30 characters'
+                                      message: 'Last name cannot exceed 50 characters'
+                                    },
+                                    pattern: {
+                                      value: onlyLetters,
+                                      message: 'Last name can only contain letters'
                                     }
                                   }}
                                   control={control}
-                                  render={({ field }) => <TextField fullWidth size="small" label="Funding Interests" {...field} />}
+                                  render={({ field }) => (
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      label="Funding Interests"
+                                      inputProps={{
+                                        pattern: onlyLetters.source,
+                                        onKeyPress: (e) => {
+                                          if (!onlyLetters.test(e.key)) {
+                                            e.preventDefault();
+                                          }
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  )}
                                 />
                               </Grid>
                               <Grid item xs={12}>
                                 <Controller
                                   name="fundraisingActivities"
                                   rules={{
+                                    required: 'Last name is required',
+                                    minLength: {
+                                      value: 2,
+                                      message: 'Last name must be at least 2 characters'
+                                    },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Preferred known as cannot exceed 30 characters'
+                                      message: 'Last name cannot exceed 50 characters'
+                                    },
+                                    pattern: {
+                                      value: onlyLetters,
+                                      message: 'Last name can only contain letters'
                                     }
                                   }}
                                   control={control}
-                                  render={({ field }) => <TextField fullWidth size="small" label="Fundraising Activities" {...field} />}
+                                  render={({ field }) => (
+                                    <TextField
+                                      fullWidth
+                                      size="small"
+                                      label="Fundraising Activities"
+                                      inputProps={{
+                                        pattern: onlyLetters.source,
+                                        onKeyPress: (e) => {
+                                          if (!onlyLetters.test(e.key)) {
+                                            e.preventDefault();
+                                          }
+                                        }
+                                      }}
+                                      {...field}
+                                    />
+                                  )}
                                 />
                               </Grid>
                             </Grid>
@@ -757,10 +924,44 @@ const AddCaseForm = ({ onCancel }) => {
                             <Controller
                               name="riskNotes"
                               control={control}
+                              rules={{
+                                required: 'Notes are required',
+                                minLength: {
+                                  value: 10,
+                                  message: 'Notes must be at least 10 characters long'
+                                },
+                                maxLength: {
+                                  value: 500,
+                                  message: 'Last name cannot exceed 500 characters'
+                                },
+                                pattern: {
+                                  value: onlyLetters,
+                                  message: 'Last name can only contain letters'
+                                }
+                              }}
                               render={({ field }) => (
-                                <TextField label="Notes" multiline minRows={11} fullWidth variant="outlined" sx={{ mb: 2 }} {...field} />
+                                <TextField
+                                  label="Notes"
+                                  multiline
+                                  minRows={11}
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ mb: 2 }}
+                                  error={!!errors.riskNotes}
+                                  helperText={errors.riskNotes?.message}
+                                  inputProps={{
+                                    pattern: onlyLetters.source,
+                                    onKeyPress: (e) => {
+                                      if (!onlyLetters.test(e.key)) {
+                                        e.preventDefault();
+                                      }
+                                    }
+                                  }}
+                                  {...field}
+                                />
                               )}
                             />
+
                             <FormControlLabel
                               control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
                               label="Restrict Access?"

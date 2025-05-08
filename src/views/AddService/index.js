@@ -33,7 +33,7 @@ const AddCaseForm = ({ onCancel }) => {
     setValue,
     formState: { errors }
   } = useForm({
-    mode: 'onChange', // validate while typing
+    mode: 'onChange', 
     defaultValues: {
       homePhone: '',
       phone: '',
@@ -50,7 +50,6 @@ const AddCaseForm = ({ onCancel }) => {
   });
 
   const onSubmit = (data) => {
-    console.log('Submitted Data:', data);
     onCancel();
   };
 

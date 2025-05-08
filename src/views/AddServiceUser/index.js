@@ -111,9 +111,6 @@ const AddCaseForm = ({ onCancel }) => {
   };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      console.log('Selected file:', file);
-    }
   };
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
@@ -185,7 +182,6 @@ const AddCaseForm = ({ onCancel }) => {
 
     try {
       const response = await postApi(urls.serviceuser.create, caseData);
-      console.log('Response:', response);
     } catch (error) {
       console.error('Error creating user:', error);
     }
@@ -214,7 +210,7 @@ const AddCaseForm = ({ onCancel }) => {
           </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
-          <form onSubmit={handleSubmit(onSubmit, (err) => console.log('Validation Errors:', err))}>
+          <form onSubmit={handleSubmit(onSubmit, (err) => console.error('Validation Errors:', err))}>
             <Tabs
               value={tabIndex}
               onChange={(e, newValue) => setTabIndex(newValue)}
@@ -1151,7 +1147,7 @@ const AddCaseForm = ({ onCancel }) => {
                               name="lastname"
                               control={control}
                               rules={{
-                                // required: 'Last name is required',
+                                required: 'Last name is required',
                                 minLength: {
                                   value: 2,
                                   message: 'Last name must be at least 2 characters'

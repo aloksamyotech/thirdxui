@@ -111,9 +111,6 @@ const AddCaseForm = ({ onCancel }) => {
   };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      console.log('Selected file:', file);
-    }
   };
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
@@ -214,7 +211,7 @@ const AddCaseForm = ({ onCancel }) => {
           </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
-          <form onSubmit={handleSubmit(onSubmit, (err) => console.log('Validation Errors:', err))}>
+          <form onSubmit={handleSubmit(onSubmit, (err) => console.error('Validation Errors:', err))}>
             <Tabs
               value={tabIndex}
               onChange={(e, newValue) => setTabIndex(newValue)}

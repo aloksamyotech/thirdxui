@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
   MenuItem,
@@ -24,44 +25,58 @@ import Link from '@mui/material/Link';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
+import dayjs from 'dayjs';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
-  const [caseData, setCaseData] = useState({
-    title: '',
-    firstname: '',
-    lastname: '',
-    phone: '',
-    email: '',
-    gender: '',
-    dob: null,
-    address: '',
-    town: '',
-    country: '',
-    pinCode: '',
-    riskNotes: '',
-    keyIndicators: '',
-    service: '',
-    fromDate: null,
-    toDate: null,
-    referDate: null,
-    referrerName: '',
-    referrerJob: '',
-    referrerAddress: '',
-    referrerEmail: '',
-    referrerPhone: '',
-    referralType: '',
-    telephone: true,
-    emailConsent: true,
-    sms: true,
-    letter: true,
-    preferredContact: '',
-    reason: '',
-    contactPurpose: '',
-    confirmationDate: null
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = React.useRef(null);
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    reset,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      title: '',
+      firstname: '',
+      lastname: '',
+      phone: '',
+      email: '',
+      gender: '',
+      dob: null,
+      address: '',
+      town: '',
+      country: '',
+      pinCode: '',
+      riskNotes: '',
+      keyIndicators: '',
+      service: '',
+      fromDate: null,
+      toDate: null,
+      referDate: null,
+      referrerName: '',
+      referrerJob: '',
+      referrerAddress: '',
+      referrerEmail: '',
+      referrerPhone: '',
+      referralType: '',
+      telephone: true,
+      emailConsent: true,
+      sms: true,
+      letter: true,
+      preferredContact: '',
+      reason: '',
+      contactPurpose: '',
+      confirmationDate: null
+    }
   });
+
   const [restrictAccess, setRestrictAccess] = useState(false);
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
@@ -82,14 +97,47 @@ const AddCaseForm = ({ onCancel }) => {
     setCaseData({ ...caseData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
-    setCaseData({ ...caseData, file: e.target.files[0] });
+  const handleFileClick = () => {
+    fileInputRef.current.click();
   };
 
-  const handleSubmit = () => {
-    console.log('Submitted Data:', caseData);
-    onCancel();
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setValue('attachments', file);
+      console.log('Selected file:', file);
+    }
   };
+
+  const onSubmit = (data) => {
+    const formData = new FormData();
+
+    Object.keys(data).forEach((key) => {
+      if (key === 'attachments' && data[key]) {
+        formData.append('file', data[key]);
+      } else {
+        formData.append(key, data[key]);
+      }
+    });
+
+    console.log('Form Data:', Object.fromEntries(formData));
+    console.log('File:', data.attachments);
+
+    // Here you can add your API call to upload the form data
+    // Example:
+    // fetch('/api/upload', {
+    //   method: 'POST',
+    //   body: formData
+    // });
+
+    reset();
+  };
+
+  const onlyNumbers = /^[0-9]*$/;
+  const onlyLetters = /^[A-Za-z\s]*$/;
+  const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
+  const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
   return (
     <Grid>
@@ -152,33 +200,90 @@ const AddCaseForm = ({ onCancel }) => {
                         </Typography>
                         <Grid container rowSpacing={2} columnSpacing={1}>
                           <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Name of the company"
-                              name="forename"
-                              size="small"
-                              value={caseData.forename}
-                              onChange={handleChange}
+                            <Controller
+                              name="companyname"
+                              control={control}
+                              rules={{
+                                required: 'Company name is required',
+                                minLength: {
+                                  value: 2,
+                                  message: 'Company name must be at least 2 characters'
+                                },
+                                maxLength: {
+                                  value: 50,
+                                  message: 'Company name cannot exceed 50 characters'
+                                },
+                                pattern: {
+                                  value: onlyLetters,
+                                  message: 'Company name can only contain letters'
+                                }
+                              }}
+                              render={({ field }) => (
+                                <TextField
+                                  fullWidth
+                                  label="Name of the company"
+                                  size="small"
+                                  error={!!errors.companyname}
+                                  helperText={errors.companyname?.message}
+                                  inputProps={{
+                                    pattern: onlyLetters.source,
+                                    onKeyPress: (e) => {
+                                      if (!onlyLetters.test(e.key)) {
+                                        e.preventDefault();
+                                      }
+                                    }
+                                  }}
+                                  {...field}
+                                />
+                              )}
                             />
                           </Grid>
+
                           <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Main Contact (Persons Name)"
-                              name="surname"
-                              size="small"
-                              value={caseData.surname}
-                              onChange={handleChange}
+                            <Controller
+                              name="contactname"
+                              control={control}
+                              rules={{
+                                required: 'Contact name is required',
+                                minLength: {
+                                  value: 2,
+                                  message: 'Contact name must be at least 2 characters'
+                                },
+                                maxLength: {
+                                  value: 50,
+                                  message: 'Contact name cannot exceed 50 characters'
+                                },
+                                pattern: {
+                                  value: onlyLetters,
+                                  message: 'Contact name can only contain letters'
+                                }
+                              }}
+                              render={({ field }) => (
+                                <TextField
+                                  fullWidth
+                                  label="Main Contact (Persons Name)"
+                                  size="small"
+                                  error={!!errors.contactname}
+                                  helperText={errors.contactname?.message}
+                                  inputProps={{
+                                    pattern: onlyLetters.source,
+                                    onKeyPress: (e) => {
+                                      if (!onlyLetters.test(e.key)) {
+                                        e.preventDefault();
+                                      }
+                                    }
+                                  }}
+                                  {...field}
+                                />
+                              )}
                             />
                           </Grid>
+
                           <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Socail Media Links"
-                              size="small"
-                              name="ethnicity"
-                              value={caseData.ethnicity}
-                              onChange={handleChange}
+                            <Controller
+                              name="socialmedia"
+                              control={control}
+                              render={({ field }) => <TextField fullWidth label="Social media links" size="small" {...field} />}
                             />
                           </Grid>
                         </Grid>
@@ -194,25 +299,55 @@ const AddCaseForm = ({ onCancel }) => {
                         </Typography>
                         <Grid container rowSpacing={2} columnSpacing={1}>
                           <Grid item xs={12}>
-                            <TextField
-                              fullWidth
-                              label="Other Id"
-                              name="homePhone"
-                              size="small"
-                              value={caseData.homePhone}
-                              onChange={handleChange}
+                            <Controller
+                              name="otherId"
+                              control={control}
+                              rules={{
+                                pattern: {
+                                  value: onlyNumbers,
+                                  message: 'Other Id must contain only numbers'
+                                },
+                                maxLength: {
+                                  value: 10,
+                                  message: 'Other Id must be at least 10 digits'
+                                }
+                              }}
+                              render={({ field }) => (
+                                <TextField
+                                  fullWidth
+                                  label="Other Id"
+                                  size="small"
+                                  error={!!errors.otherId}
+                                  helperText={errors.otherId?.message}
+                                  type="tel"
+                                  inputProps={{
+                                    pattern: onlyNumbers.source,
+                                    onKeyPress: (e) => {
+                                      if (!onlyNumbers.test(e.key)) {
+                                        e.preventDefault();
+                                      }
+                                    }
+                                  }}
+                                  {...field}
+                                />
+                              )}
                             />
                           </Grid>
 
                           <Grid item xs={12}>
-                            <TextField
-                              select
-                              fullWidth
-                              label="Recruitment Campaign"
-                              name="firstLanguage"
-                              size="small"
-                              value={caseData.firstLanguage}
-                              onChange={handleChange}
+                            <Controller
+                              name="campaign"
+                              control={control}
+                              render={({ field }) => (
+                                <TextField
+                                  fullWidth
+                                  label="Recruitment Campaign"
+                                  size="small"
+                                  error={!!errors.campaign}
+                                  helperText={errors.campaign?.message}
+                                  {...field}
+                                />
+                              )}
                             />
                           </Grid>
 
@@ -222,6 +357,7 @@ const AddCaseForm = ({ onCancel }) => {
                               variant="outlined"
                               size="small"
                               fullWidth
+                              value={selectedFile ? selectedFile.name : ''}
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">
@@ -230,10 +366,19 @@ const AddCaseForm = ({ onCancel }) => {
                                 ),
                                 endAdornment: (
                                   <InputAdornment position="end">
-                                    <Link component="button">Upload a file</Link>
+                                    <Link component="button" onClick={handleFileClick}>
+                                      Upload a file
+                                    </Link>
                                   </InputAdornment>
                                 )
                               }}
+                            />
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleFileChange}
+                              style={{ display: 'none' }}
+                              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
                             />
                           </Grid>
                         </Grid>
@@ -247,74 +392,244 @@ const AddCaseForm = ({ onCancel }) => {
                     <Typography variant="h5" m={2}></Typography>
                     <Grid container spacing={2}>
                       <Grid item xs={12} md={6}>
-                        <Paper elevation={2} sx={{ p: 2 }}>
-                          <Typography variant="subtitle1" mb={2}>
-                            Donor Tag
-                          </Typography>
+                        <Grid item xs={12}>
+                          <Box>
+                            <Grid container spacing={2}>
+                              <Grid item xs={12}>
+                                <Paper elevation={2} sx={{ p: 2 }}>
+                                  <Typography variant="subtitle1" mb={2}>
+                                    Donor Tag
+                                  </Typography>
 
-                          <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Beneficiary Information"
-                                name="beneficiaryInformation"
-                                value={caseData.beneficiaryInformation}
-                                onChange={handleChange}
-                              />
+                                  <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                      <Controller
+                                        name="riskNotes"
+                                        rules={{
+                                          required: 'Last name is required',
+                                          minLength: {
+                                            value: 2,
+                                            message: 'Last name must be at least 2 characters'
+                                          },
+                                          maxLength: {
+                                            value: 30,
+                                            message: 'Last name cannot exceed 50 characters'
+                                          },
+                                          pattern: {
+                                            value: onlyLetters,
+                                            message: 'Last name can only contain letters'
+                                          }
+                                        }}
+                                        control={control}
+                                        render={({ field }) => (
+                                          <TextField
+                                            fullWidth
+                                            size="small"
+                                            label="Beneficiary Information"
+                                            inputProps={{
+                                              pattern: onlyLetters.source,
+                                              onKeyPress: (e) => {
+                                                if (!onlyLetters.test(e.key)) {
+                                                  e.preventDefault();
+                                                }
+                                              }
+                                            }}
+                                            {...field}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Controller
+                                        name="keyIndicators"
+                                        rules={{
+                                          required: 'Last name is required',
+                                          minLength: {
+                                            value: 2,
+                                            message: 'Last name must be at least 2 characters'
+                                          },
+                                          maxLength: {
+                                            value: 30,
+                                            message: 'Last name cannot exceed 50 characters'
+                                          },
+                                          pattern: {
+                                            value: onlyLetters,
+                                            message: 'Last name can only contain letters'
+                                          }
+                                        }}
+                                        control={control}
+                                        render={({ field }) => (
+                                          <TextField
+                                            fullWidth
+                                            size="small"
+                                            label="Campaigns Supported"
+                                            inputProps={{
+                                              pattern: onlyLetters.source,
+                                              onKeyPress: (e) => {
+                                                if (!onlyLetters.test(e.key)) {
+                                                  e.preventDefault();
+                                                }
+                                              }
+                                            }}
+                                            {...field}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Controller
+                                        name="engagement"
+                                        rules={{
+                                          required: 'Last name is required',
+                                          minLength: {
+                                            value: 2,
+                                            message: 'Last name must be at least 2 characters'
+                                          },
+                                          maxLength: {
+                                            value: 30,
+                                            message: 'Last name cannot exceed 50 characters'
+                                          },
+                                          pattern: {
+                                            value: onlyLetters,
+                                            message: 'Last name can only contain letters'
+                                          }
+                                        }}
+                                        control={control}
+                                        render={({ field }) => (
+                                          <TextField
+                                            fullWidth
+                                            size="small"
+                                            label="Engagement"
+                                            inputProps={{
+                                              pattern: onlyLetters.source,
+                                              onKeyPress: (e) => {
+                                                if (!onlyLetters.test(e.key)) {
+                                                  e.preventDefault();
+                                                }
+                                              }
+                                            }}
+                                            {...field}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Controller
+                                        name="eventsAttended"
+                                        rules={{
+                                          required: 'Last name is required',
+                                          minLength: {
+                                            value: 2,
+                                            message: 'Last name must be at least 2 characters'
+                                          },
+                                          maxLength: {
+                                            value: 30,
+                                            message: 'Last name cannot exceed 50 characters'
+                                          },
+                                          pattern: {
+                                            value: onlyLetters,
+                                            message: 'Last name can only contain letters'
+                                          }
+                                        }}
+                                        control={control}
+                                        render={({ field }) => (
+                                          <TextField
+                                            fullWidth
+                                            size="small"
+                                            label="Events Attended"
+                                            inputProps={{
+                                              pattern: onlyLetters.source,
+                                              onKeyPress: (e) => {
+                                                if (!onlyLetters.test(e.key)) {
+                                                  e.preventDefault();
+                                                }
+                                              }
+                                            }}
+                                            {...field}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Controller
+                                        name="fundingInterests"
+                                        rules={{
+                                          required: 'Last name is required',
+                                          minLength: {
+                                            value: 2,
+                                            message: 'Last name must be at least 2 characters'
+                                          },
+                                          maxLength: {
+                                            value: 30,
+                                            message: 'Last name cannot exceed 50 characters'
+                                          },
+                                          pattern: {
+                                            value: onlyLetters,
+                                            message: 'Last name can only contain letters'
+                                          }
+                                        }}
+                                        control={control}
+                                        render={({ field }) => (
+                                          <TextField
+                                            fullWidth
+                                            size="small"
+                                            label="Funding Interests"
+                                            inputProps={{
+                                              pattern: onlyLetters.source,
+                                              onKeyPress: (e) => {
+                                                if (!onlyLetters.test(e.key)) {
+                                                  e.preventDefault();
+                                                }
+                                              }
+                                            }}
+                                            {...field}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                      <Controller
+                                        name="fundraisingActivities"
+                                        rules={{
+                                          required: 'Last name is required',
+                                          minLength: {
+                                            value: 2,
+                                            message: 'Last name must be at least 2 characters'
+                                          },
+                                          maxLength: {
+                                            value: 30,
+                                            message: 'Last name cannot exceed 50 characters'
+                                          },
+                                          pattern: {
+                                            value: onlyLetters,
+                                            message: 'Last name can only contain letters'
+                                          }
+                                        }}
+                                        control={control}
+                                        render={({ field }) => (
+                                          <TextField
+                                            fullWidth
+                                            size="small"
+                                            label="Fundraising Activities"
+                                            inputProps={{
+                                              pattern: onlyLetters.source,
+                                              onKeyPress: (e) => {
+                                                if (!onlyLetters.test(e.key)) {
+                                                  e.preventDefault();
+                                                }
+                                              }
+                                            }}
+                                            {...field}
+                                          />
+                                        )}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </Paper>
+                              </Grid>
                             </Grid>
-                            <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Campaigns Supported"
-                                name="campaignsSupported"
-                                value={caseData.campaignsSupported}
-                                onChange={handleChange}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Engagement"
-                                name="engagement"
-                                value={caseData.engagement}
-                                onChange={handleChange}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Events Attended"
-                                name="eventsAttended"
-                                value={caseData.eventsAttended}
-                                onChange={handleChange}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Funding Interests"
-                                name="fundingInterests"
-                                value={caseData.fundingInterests}
-                                onChange={handleChange}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Fundraising Activities"
-                                name="fundraisingActivities"
-                                value={caseData.fundraisingActivities}
-                                onChange={handleChange}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Paper>
+                          </Box>
+                        </Grid>
                       </Grid>
 
                       <Grid item xs={12} md={6}>
@@ -337,101 +652,228 @@ const AddCaseForm = ({ onCancel }) => {
             {tabIndex === 1 && (
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Preferred Method of Contact"
+                  <Controller
                     name="preferredContact"
-                    value={caseData.preferredContact}
-                    onChange={handleChange}
+                    control={control}
+                    rules={{
+                      required: 'Preferred method of contact is required'
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Preferred Method of Contact"
+                        select
+                        {...field}
+                        error={!!errors.preferredContact}
+                        helperText={errors.preferredContact?.message}
+                      >
+                        <MenuItem value="email">Email</MenuItem>
+                        <MenuItem value="phone">Phone</MenuItem>
+                        <MenuItem value="text">Text</MenuItem>
+                        <MenuItem value="letter">Letter</MenuItem>
+                        <MenuItem value="whatsapp">WhatsApp</MenuItem>
+                        <MenuItem value="doNotContact">Do not contact</MenuItem>
+                      </TextField>
+                    )}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Contact Purposes"
+                  <Controller
                     name="contactPurpose"
-                    value={caseData.contactPurpose}
-                    onChange={handleChange}
+                    control={control}
+                    rules={{
+                      required: 'Contact purpose is required'
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Contact Purposes"
+                        select
+                        {...field}
+                        error={!!errors.contactPurpose}
+                        helperText={errors.contactPurpose?.message}
+                      >
+                        <MenuItem value="newsletter">Newsletter</MenuItem>
+                        <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                      </TextField>
+                    )}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="Date of Confirmation"
-                      value={caseData.dob}
-                      onChange={(newValue) => setCaseData({ ...caseData, dob: newValue })}
-                      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                    />
-                  </LocalizationProvider>
-                </Grid>
-
-                <Grid item xs={12} sm={4}>
-                  <TextField fullWidth label="Reason" size="small" name="reason" value={caseData.reason} onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    label="Mobile No."
-                    size="small"
-                    name="contactPurpose"
-                    value={caseData.contactPurpose}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    size="small"
-                    name="contactPurpose"
-                    value={caseData.contactPurpose}
-                    onChange={handleChange}
+                  <Controller
+                    name="confirmationDate"
+                    control={control}
+                    render={({ field }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Date of Confirmation"
+                          value={field.value}
+                          onChange={(newValue) => field.onChange(newValue)}
+                          renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                        />
+                      </LocalizationProvider>
+                    )}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={2}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.telephone} />}
-                    label="Donor Tag"
-                    labelPlacement="start"
-                    sx={{ display: 'flex', gap: '10px' }}
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="reason"
+                    control={control}
+                    rules={{
+                      required: 'Reason is required'
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        label="Reason"
+                        size="small"
+                        select
+                        {...field}
+                        error={!!errors.reason}
+                        helperText={errors.reason?.message}
+                      >
+                        <MenuItem value="byRequest">By Request</MenuItem>
+                        <MenuItem value="deceased">Deceased</MenuItem>
+                        <MenuItem value="goneAway">Gone Away</MenuItem>
+                      </TextField>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="mobilePhone"
+                    control={control}
+                    rules={{
+                      pattern: {
+                        value: onlyNumbers,
+                        message: 'Phone number must contain only numbers'
+                      },
+                      minLength: {
+                        value: 10,
+                        message: 'Phone number must be at least 10 digits'
+                      }
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        label="Mobile Phone No."
+                        size="small"
+                        error={!!errors.mobilePhone}
+                        helperText={errors.mobilePhone?.message}
+                        type="tel"
+                        inputProps={{
+                          pattern: onlyNumbers.source,
+                          onKeyPress: (e) => {
+                            if (!onlyNumbers.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }
+                        }}
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="email"
+                    control={control}
+                    rules={{
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address'
+                      }
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        label="Email"
+                        size="small"
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        {...field}
+                      />
+                    )}
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.telephone} />}
-                    label="Whatsapp"
-                    labelPlacement="start"
-                    sx={{ display: 'flex', gap: '10px' }}
+                  <Controller
+                    name="donortag"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                        label="Donor Tag"
+                        labelPlacement="start"
+                        sx={{ display: 'flex', gap: '10px' }}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.emailConsent} />}
-                    label="Email"
-                    labelPlacement="start"
-                    sx={{ display: 'flex', gap: '10px' }}
+                  <Controller
+                    name="emailConsent"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                        label="Email"
+                        labelPlacement="start"
+                        sx={{ display: 'flex', gap: '10px' }}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.sms} />}
-                    label="SMS"
-                    labelPlacement="start"
-                    sx={{ display: 'flex', gap: '10px' }}
+                  <Controller
+                    name="sms"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                        label="SMS"
+                        labelPlacement="start"
+                        sx={{ display: 'flex', gap: '10px' }}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  <FormControlLabel
-                    control={<AntSwitch checked={caseData.letter} />}
-                    label="Letter"
-                    labelPlacement="start"
-                    sx={{ display: 'flex', gap: '10px' }}
+                  <Controller
+                    name="letter"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                        label="Letter"
+                        labelPlacement="start"
+                        sx={{ display: 'flex', gap: '10px' }}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={2}>
+                  <Controller
+                    name="whatsapp"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                        label="Whatsapp"
+                        labelPlacement="start"
+                        sx={{ display: 'flex', gap: '10px' }}
+                      />
+                    )}
                   />
                 </Grid>
 
@@ -443,7 +885,7 @@ const AddCaseForm = ({ onCancel }) => {
 
         <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
           <Grid item>
-            <Button variant="contained" sx={{ background: '#053146' }}>
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit}>
               Save Changes
             </Button>
           </Grid>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -6,6 +6,8 @@ import TableStyle from '../../ui-component/TableStyle';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel.js';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const serviceTypeFilter = [
   { value: 'Education', label: 'Education' },
@@ -58,24 +60,26 @@ const Lead = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
+  const [rows, setRows] = useState([]);
   const navigate = useNavigate();
 
   const columns = [
     {
-      field: 'title',
+      field: 'name',
       headerName: 'Service Name',
       flex: 2,
       renderCell: (params) => (
         <Stack>
-          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-            {params.row.title}
+          <Typography variant="body1" sx={{ textTransform: 'uppercase', fontWeight: 'normal' }}>
+            {params.row.name}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            {params.row.date}
+            {new Date(params.row.updatedAt).toDateString()}
           </Typography>
         </Stack>
       )
     },
+
     {
       field: 'type',
       headerName: 'Service Type',
@@ -84,24 +88,31 @@ const Lead = () => {
     {
       field: 'code',
       headerName: 'Service Code',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => `#${params.value}`
     },
+
     {
-      field: 'status',
+      field: 'isActive',
       headerName: 'Status',
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          sx={{
-            color: params.value === 'Active' ? '#79dbfb' : '#ff6a67',
-            backgroundColor: params.value === 'Active' ? '#e5f8fe' : '#ffeae9'
-          }}
-        />
-      )
+      renderCell: (params) => {
+        const isActive = params.value;
+        const label = isActive ? 'Active' : 'Inactive';
+        return (
+          <Chip
+            label={label}
+            sx={{
+              color: isActive ? '#79dbfb' : '#ff6a67',
+              backgroundColor: isActive ? '#e5f8fe' : '#ffeae9'
+            }}
+          />
+        );
+      }
     },
+
     {
       field: 'more',
       headerName: 'More',
@@ -109,48 +120,34 @@ const Lead = () => {
       headerAlign: 'center',
       align: 'center',
       renderCell: () => (
-        <Typography color="primary" sx={{ cursor: 'pointer' }}>
-          View
-        </Typography>
+        <Box
+          sx={{
+            backgroundColor: '#f0f0f0',
+            padding: '4px 8px',
+            borderRadius: '8px',
+            cursor: 'pointer'
+          }}
+        >
+          <Typography color="primary">View</Typography>
+        </Box>
       )
     }
   ];
 
-  const rows = [
-    {
-      id: '1',
-      title: 'JACS: Communication',
-      type: 'Education',
-      code: '#127553',
-      date: 'Sat May 25 2024',
-      status: 'Active'
-    },
-    {
-      id: '2',
-      title: 'JACS: Counseling',
-      type: 'Counseling',
-      code: '#127554',
-      date: 'Sat May 25 2024',
-      status: 'Inactive'
-    },
-    {
-      id: '3',
-      title: 'JACS',
-      type: 'Therapy Session',
-      code: '#127555',
-      date: 'Sat May 25 2024',
-      status: 'Active'
-    },
-    {
-      id: '4',
-      title: 'JACS',
-      type: 'Rehabilitation',
-      code: '#127556',
-      date: 'Sat May 25 2024',
-      status: 'Inactive'
-    }
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getApi(urls.service.fetch);
+        if (response?.data) {
+          setRows(response.data.allService);
+        }
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
 
+    fetchServices();
+  }, []);
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
@@ -209,13 +206,12 @@ const Lead = () => {
                     rows={rows}
                     columns={columns}
                     rowHeight={65}
-                    getRowId={(row) => row.id}
+                    getRowId={(row) => row._id}
                     pageSize={5}
                     rowsPerPageOptions={[5, 10]}
                     components={{
                       Toolbar: () => <CustomHeader />
                     }}
-                    // onRowClick={(params) => navigate(`/view-service/${params.id}`)}
                     onRowClick={() => navigate('/view-service')}
                     sx={{
                       '& .MuiDataGrid-row': {

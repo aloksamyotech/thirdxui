@@ -20,6 +20,7 @@ import {
   Autocomplete,
   FormHelperText
 } from '@mui/material';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -36,6 +37,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [restrictAccess, setRestrictAccess] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
 
   const {
     register,
@@ -114,6 +116,7 @@ const AddCaseForm = ({ onCancel }) => {
   };
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
+    setIsloading(true);
     const caseData = {
       personalInfo: {
         title: formData.personalInfo.title,
@@ -149,19 +152,19 @@ const AddCaseForm = ({ onCancel }) => {
         restrictAccess: restrictAccess
       },
       emergencyContact: {
-        title: formData.title,
-        gender: formData.gender,
-        firstName: formData.firstname,
-        lastName: formData.lastname,
-        relationshipToUser: formData.preferred,
+        title: formData.emergencytitle,
+        gender: formData.emergencygender,
+        firstName: formData.emergencyfirstname,
+        lastName: formData.emergencylastname,
+        relationshipToUser: formData.emergencypreferred,
         homePhone: formData.emergencyhomePhone,
         phone: formData.emergencyphone,
-        email: formData.email,
-        addressLine1: formData.address,
-        addressLine2: formData.address2,
-        country: formData.country,
-        town: formData.town,
-        postcode: formData.pinCode
+        email: formData.emergencyemail,
+        addressLine1: formData.emergencyaddress,
+        addressLine2: formData.emergencyaddress2,
+        country: formData.emergencycountry,
+        town: formData.emergencytown,
+        postcode: formData.emergencypinCode
       },
       contactPreferences: {
         preferredMethod: formData.preferredContact,
@@ -182,9 +185,13 @@ const AddCaseForm = ({ onCancel }) => {
 
     try {
       const response = await postApi(urls.serviceuser.create, caseData);
-      console.log('Response:', response);
+      toast.success('Successfully Add Service User ');
+      setIsloading(false);
+      navigate('/volunteer');
     } catch (error) {
       console.error('Error creating user:', error);
+      toast.error('Error in Submitting form');
+      setIsloading(false);
     }
   };
 
@@ -1066,7 +1073,7 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid container rowSpacing={2} columnSpacing={1}>
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="title"
+                              name="emergencytitle"
                               control={control}
                               rules={{ required: 'Title is required' }}
                               render={({ field }) => (
@@ -1091,7 +1098,7 @@ const AddCaseForm = ({ onCancel }) => {
                           </Grid>
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="gender"
+                              name="emergencygender"
                               control={control}
                               rules={{ required: 'Gender is required' }}
                               render={({ field }) => (
@@ -1106,7 +1113,7 @@ const AddCaseForm = ({ onCancel }) => {
                           </Grid>
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="firstname"
+                              name="emergencyfirstname"
                               control={control}
                               rules={{
                                 required: 'First name is required',
@@ -1145,10 +1152,10 @@ const AddCaseForm = ({ onCancel }) => {
                           </Grid>
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="lastname"
+                              name="emergencylastname"
                               control={control}
                               rules={{
-                                // required: 'Last name is required',
+                                required: 'Last name is required',
                                 minLength: {
                                   value: 2,
                                   message: 'Last name must be at least 2 characters'
@@ -1184,7 +1191,7 @@ const AddCaseForm = ({ onCancel }) => {
                           </Grid>
                           <Grid item xs={12}>
                             <Controller
-                              name="preferred"
+                              name="emergencypreferred"
                               control={control}
                               rules={{
                                 maxLength: {
@@ -1284,7 +1291,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="email"
+                              name="emergencyemail"
                               control={control}
                               rules={{
                                 required: 'Email is required',
@@ -1307,7 +1314,7 @@ const AddCaseForm = ({ onCancel }) => {
                           </Grid>
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="address"
+                              name="emergencyaddress"
                               control={control}
                               rules={{
                                 required: 'Address is required',
@@ -1334,7 +1341,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="address2"
+                              name="emergencyaddress2"
                               rules={{
                                 required: 'Address is required',
                                 pattern: {
@@ -1361,7 +1368,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="country"
+                              name="emergencycountry"
                               control={control}
                               render={({ field }) => (
                                 <TextField select fullWidth label="Country" size="small" {...field}>
@@ -1378,7 +1385,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="town"
+                              name="emergencytown"
                               control={control}
                               rules={{
                                 required: 'Town is required',
@@ -1410,7 +1417,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="pinCode"
+                              name="emergencypinCode"
                               control={control}
                               rules={{
                                 required: 'Postcode is required',
@@ -1616,18 +1623,13 @@ const AddCaseForm = ({ onCancel }) => {
 
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
               <Grid item>
-                <Button variant="outlined" color="error" onClick={handleReset}>
-                  Reset
-                </Button>
-              </Grid>
-              <Grid item>
                 <Button variant="outlined" color="error" onClick={onCancel}>
                   Cancel
                 </Button>
               </Grid>
               <Grid item>
-                <Button type="submit" variant="contained" sx={{ background: '#053146' }}>
-                  Save Changes
+                <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Grid>
             </Grid>

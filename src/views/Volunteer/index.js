@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -8,6 +8,8 @@ import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const districts = [
   { value: 'district1', label: 'District 1' },
@@ -34,6 +36,7 @@ const Lead = () => {
   const [dateAddedFilter, setDateAddedFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [rows, setRows] = useState([]);
 
   const CustomHeader = () => {
     return (
@@ -71,20 +74,20 @@ const Lead = () => {
 
   const columns = [
     {
-      field: 'person',
+      field: 'details',
       headerName: 'Details',
       flex: 1,
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
-
+            {/* {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />} */}
+            <PersonIcon />
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
+                {params.row.firstName} {params.row.lastName} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.address} {params.row.country} {params.row.postcode}
               </Typography>
             </Box>
           </Stack>
@@ -99,14 +102,32 @@ const Lead = () => {
     }
   ];
 
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
-    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' },
-    { id: 'C-004', name: 'Emily Davis', address: '321 Pine Avenue, Houston, TX 77001', type: 'apartment' },
-    { id: 'C-005', name: 'David Brown', address: '654 Maple Drive, Miami, FL 33101', type: 'person' },
-    { id: 'C-006', name: 'Sophia Wilson', address: '987 Cedar Lane, San Francisco, CA 94101', type: 'apartment' }
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getAllVolunteer);
+
+        const allVolunteer = response?.data?.allVolunteer || [];
+
+        const formattedUsers = allVolunteer.map((user, index) => ({
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          firstName: user.personalInfo?.firstName || '',
+          lastName: user.personalInfo?.lastName || '',
+          address: user.contactInfo?.addressLine1 || '',
+          country: user.contactInfo?.country || '',
+          postcode: user.contactInfo?.postcode || ''
+        }));
+
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
@@ -164,21 +185,18 @@ const Lead = () => {
                 rows={rows}
                 columns={columns}
                 rowHeight={65}
-                getRowId={(row) => row.id}
-                onRowClick={() => navigate('/view-people')}
+                getRowId={(row) => row._id || row.id}
+                pageSize={5}
+                rowsPerPageOptions={[5, 10]}
                 components={{
                   Toolbar: () => <CustomHeader />
                 }}
+                onRowClick={() => navigate('/view-service')}
                 sx={{
-                  '& .MuiDataGrid-columnHeaders': {
-                    display: 'none'
-                  },
-                  '& .MuiDataGrid-cell': {
-                    textAlign: 'left',
-                    fontSize: '14px'
+                  '& .MuiDataGrid-row': {
+                    borderBottom: '1px solid #ccc'
                   }
                 }}
-                disableSelectionOnClick
               />
             </Card>
           </Grid>

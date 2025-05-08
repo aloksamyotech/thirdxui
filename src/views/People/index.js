@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -8,7 +8,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
-
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const districts = [
   { value: 'district1', label: 'District 1' },
@@ -35,14 +36,7 @@ const Lead = () => {
   const [dateAddedFilter, setDateAddedFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
-
-
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person', district: 'district1', gender: 'male', dateAdded: '2023-05-01' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment', district: 'district2', gender: 'female', dateAdded: '2023-04-20' },
-
-  ];
-
+  const [rows, setRows] = useState([]);
 
   const CustomHeader = () => {
     return (
@@ -80,19 +74,20 @@ const Lead = () => {
 
   const columns = [
     {
-      field: 'person',
+      field: 'details',
       headerName: 'Details',
       flex: 1,
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
+            {/* {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />} */}
+            <PersonIcon />
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
+                {params.row.firstName} {params.row.lastName} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.address} {params.row.country} {params.row.postcode}
               </Typography>
             </Box>
           </Stack>
@@ -106,6 +101,32 @@ const Lead = () => {
       )
     }
   ];
+
+  useEffect(() => {
+    const fetchpeople = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.fetch);
+
+        const allUser = response?.data?.allUser || [];
+
+        const formattedUsers = allUser.map((user, index) => ({
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          firstName: user.personalInfo?.firstName || '',
+          lastName: user.personalInfo?.lastName || '',
+          address: user.contactInfo?.addressLine1 || '',
+          country: user.contactInfo?.country || '',
+          postcode: user.contactInfo?.postcode || ''
+        }));
+
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchpeople();
+  }, []);
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -160,7 +181,7 @@ const Lead = () => {
           <Grid item xs={9}>
             <Card style={{ height: 'auto' }}>
               <DataGrid
-                rows={rows} 
+                rows={rows}
                 columns={columns}
                 rowHeight={65}
                 getRowId={(row) => row.id}

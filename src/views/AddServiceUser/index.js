@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
@@ -28,6 +28,8 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
+import { postApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -80,7 +82,16 @@ const AddCaseForm = ({ onCancel }) => {
       confirmationDate: null
     }
   });
-
+  const ethnicityOptions = [
+    'Arabic or North African',
+    'Asian or Asian British',
+    'Asian-Indian',
+    'Asian-Pakistan',
+    'Asian-Bangladeshi',
+    'Asian–any other Asian background',
+    'Black-Caribbean',
+    'Black-African'
+  ];
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -93,12 +104,87 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
+  const fileInputRef = useRef(null);
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+  };
   const handleToggle = () => setRestrictAccess(!restrictAccess);
+  const onSubmit = async (formData) => {
+    const caseData = {
+      personalInfo: {
+        title: formData.personalInfo.title,
+        firstName: formData.personalInfo.firstName,
+        lastName: formData.personalInfo.lastName,
+        gender: formData.personalInfo.gender,
+        dateOfBirth: formData.personalInfo.dateOfBirth,
+        nickName: formData.personalInfo.nickName,
+        ethnicity: formData.personalInfo.ethnicity
+      },
+      contactInfo: {
+        homePhone: formData.phone,
+        phone: formData.mobilePhone,
+        email: formData.email,
+        addressLine1: formData.address,
+        addressLine2: formData.address2,
+        town: formData.town,
+        district: formData.district,
+        postcode: formData.pinCode,
+        country: formData.country,
+        firstLanguage: formData.language,
+        otherId: formData.otherId
+      },
+      otherInfo: {
+        file: formData.file || '',
+        description: formData.riskNotes,
+        benificiary: formData.Beneficiary,
+        campaigns: formData.Campaigns,
+        engagement: formData.engagement,
+        eventAttanded: formData.eventsAttended,
+        fundingInterest: formData.fundingInterests,
+        fundraisingActivities: formData.fundraisingActivities,
+        restrictAccess: restrictAccess
+      },
+      emergencyContact: {
+        title: formData.title,
+        gender: formData.gender,
+        firstName: formData.firstname,
+        lastName: formData.lastname,
+        relationshipToUser: formData.preferred,
+        homePhone: formData.emergencyhomePhone,
+        phone: formData.emergencyphone,
+        email: formData.email,
+        addressLine1: formData.address,
+        addressLine2: formData.address2,
+        country: formData.country,
+        town: formData.town,
+        postcode: formData.pinCode
+      },
+      contactPreferences: {
+        preferredMethod: formData.preferredContact,
+        reason: formData.reason,
+        contactPurposes: formData.contactPurpose,
+        dateOfConfirmation: formData.confirmationDate,
+        contactMethods: {
+          telephone: formData.telephone,
+          email: formData.emailConsent,
+          sms: formData.sms,
+          letter: formData.letter,
+          whatsapp: formData.whatsapp
+        }
+      },
+      role: 'service_user',
+      isActive: true
+    };
 
-  const onSubmit = (data) => {
-    console.log('Submitted Data:', data);
-    onCancel();
+    try {
+      const response = await postApi(urls.serviceuser.create, caseData);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
   };
 
   const handleReset = () => {
@@ -124,7 +210,7 @@ const AddCaseForm = ({ onCancel }) => {
           </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit, (err) => console.error('Validation Errors:', err))}>
             <Tabs
               value={tabIndex}
               onChange={(e, newValue) => setTabIndex(newValue)}
@@ -185,7 +271,7 @@ const AddCaseForm = ({ onCancel }) => {
                           <Grid container rowSpacing={2} columnSpacing={1}>
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="title"
+                                name="personalInfo.title"
                                 control={control}
                                 rules={{ required: 'Title is required' }}
                                 render={({ field }) => (
@@ -194,8 +280,8 @@ const AddCaseForm = ({ onCancel }) => {
                                     fullWidth
                                     label="Title"
                                     size="small"
-                                    error={!!errors.title}
-                                    helperText={errors.title?.message}
+                                    error={!!errors?.personalInfo?.title}
+                                    helperText={errors?.personalInfo?.title?.message}
                                     {...field}
                                   >
                                     <MenuItem value="Mr">Mr.</MenuItem>
@@ -203,18 +289,27 @@ const AddCaseForm = ({ onCancel }) => {
                                     <MenuItem value="Mrs">Mrs.</MenuItem>
                                     <MenuItem value="Prof">Prof.</MenuItem>
                                     <MenuItem value="Dr">Dr.</MenuItem>
-                                    <MenuItem value="Dr">Lady</MenuItem>
+                                    <MenuItem value="Lady">Lady</MenuItem>
                                   </TextField>
                                 )}
                               />
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="gender"
+                                name="personalInfo.gender"
                                 control={control}
                                 rules={{ required: 'Gender is required' }}
                                 render={({ field }) => (
-                                  <TextField select fullWidth label="Gender" size="small" {...field}>
+                                  <TextField
+                                    select
+                                    fullWidth
+                                    label="Gender"
+                                    size="small"
+                                    error={!!errors?.personalInfo?.gender}
+                                    helperText={errors?.personalInfo?.gender?.message}
+                                    {...field}
+                                  >
                                     <MenuItem value="Male">Male</MenuItem>
                                     <MenuItem value="Female">Female</MenuItem>
                                     <MenuItem value="Non-Binary">Non-Binary</MenuItem>
@@ -223,38 +318,28 @@ const AddCaseForm = ({ onCancel }) => {
                                 )}
                               />
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="firstname"
+                                name="personalInfo.firstName"
                                 control={control}
                                 rules={{
                                   required: 'First name is required',
-                                  minLength: {
-                                    value: 2,
-                                    message: 'First name must be at least 2 characters'
-                                  },
-                                  maxLength: {
-                                    value: 50,
-                                    message: 'First name cannot exceed 50 characters'
-                                  },
-                                  pattern: {
-                                    value: onlyLetters,
-                                    message: 'First name can only contain letters'
-                                  }
+                                  minLength: { value: 2, message: 'First name must be at least 2 characters' },
+                                  maxLength: { value: 50, message: 'First name cannot exceed 50 characters' },
+                                  pattern: { value: onlyLetters, message: 'First name can only contain letters' }
                                 }}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
                                     label="Forename"
                                     size="small"
-                                    error={!!errors.firstname}
-                                    helperText={errors.firstname?.message}
+                                    error={!!errors?.personalInfo?.firstName}
+                                    helperText={errors?.personalInfo?.firstName?.message}
                                     inputProps={{
                                       pattern: onlyLetters.source,
                                       onKeyPress: (e) => {
-                                        if (!onlyLetters.test(e.key)) {
-                                          e.preventDefault();
-                                        }
+                                        if (!onlyLetters.test(e.key)) e.preventDefault();
                                       }
                                     }}
                                     {...field}
@@ -265,36 +350,24 @@ const AddCaseForm = ({ onCancel }) => {
 
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="lastname"
+                                name="personalInfo.lastName"
                                 control={control}
                                 rules={{
-                                  required: 'Last name is required',
-                                  minLength: {
-                                    value: 2,
-                                    message: 'Last name must be at least 2 characters'
-                                  },
-                                  maxLength: {
-                                    value: 50,
-                                    message: 'Last name cannot exceed 50 characters'
-                                  },
-                                  pattern: {
-                                    value: onlyLetters,
-                                    message: 'Last name can only contain letters'
-                                  }
+                                  minLength: { value: 2, message: 'Last name must be at least 2 characters' },
+                                  maxLength: { value: 50, message: 'Last name cannot exceed 50 characters' },
+                                  pattern: { value: onlyLetters, message: 'Last name can only contain letters' }
                                 }}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
                                     label="Surname"
                                     size="small"
-                                    error={!!errors.lastname}
-                                    helperText={errors.lastname?.message}
+                                    error={!!errors?.personalInfo?.lastName}
+                                    helperText={errors?.personalInfo?.lastName?.message}
                                     inputProps={{
                                       pattern: onlyLetters.source,
                                       onKeyPress: (e) => {
-                                        if (!onlyLetters.test(e.key)) {
-                                          e.preventDefault();
-                                        }
+                                        if (!onlyLetters.test(e.key)) e.preventDefault();
                                       }
                                     }}
                                     {...field}
@@ -305,31 +378,23 @@ const AddCaseForm = ({ onCancel }) => {
 
                             <Grid item xs={12}>
                               <Controller
-                                name="preferred"
+                                name="personalInfo.nickName"
                                 control={control}
                                 rules={{
-                                  maxLength: {
-                                    value: 30,
-                                    message: 'Preferred known as cannot exceed 30 characters'
-                                  },
-                                  pattern: {
-                                    value: onlyLetters,
-                                    message: 'Last name can only contain letters'
-                                  }
+                                  maxLength: { value: 30, message: 'Preferred known as cannot exceed 30 characters' },
+                                  pattern: { value: onlyLetters, message: 'Preferred name can only contain letters' }
                                 }}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
                                     label="Preferred Known as"
                                     size="small"
-                                    error={!!errors.preferred}
-                                    helperText={errors.preferred?.message}
+                                    error={!!errors?.personalInfo?.nickName}
+                                    helperText={errors?.personalInfo?.nickName?.message}
                                     inputProps={{
                                       pattern: onlyLetters.source,
                                       onKeyPress: (e) => {
-                                        if (!onlyLetters.test(e.key)) {
-                                          e.preventDefault();
-                                        }
+                                        if (!onlyLetters.test(e.key)) e.preventDefault();
                                       }
                                     }}
                                     {...field}
@@ -337,9 +402,10 @@ const AddCaseForm = ({ onCancel }) => {
                                 )}
                               />
                             </Grid>
+
                             <Grid item xs={12}>
                               <Controller
-                                name="dob"
+                                name="personalInfo.dateOfBirth"
                                 control={control}
                                 render={({ field }) => (
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -357,9 +423,26 @@ const AddCaseForm = ({ onCancel }) => {
 
                             <Grid item xs={12}>
                               <Controller
-                                name="ethnicity"
+                                name="personalInfo.ethnicity"
                                 control={control}
-                                render={({ field }) => <TextField fullWidth label="Ethnicity" size="small" {...field} />}
+                                rules={{ required: 'Ethnicity is required' }}
+                                render={({ field }) => (
+                                  <TextField
+                                    {...field}
+                                    select
+                                    fullWidth
+                                    label="Ethnicity"
+                                    size="small"
+                                    error={!!errors?.personalInfo?.ethnicity}
+                                    helperText={errors?.personalInfo?.ethnicity?.message}
+                                  >
+                                    {ethnicityOptions.map((option, index) => (
+                                      <MenuItem key={index} value={option}>
+                                        {option}
+                                      </MenuItem>
+                                    ))}
+                                  </TextField>
+                                )}
                               />
                             </Grid>
                           </Grid>
@@ -380,12 +463,8 @@ const AddCaseForm = ({ onCancel }) => {
                                 rules={{
                                   required: 'Phone number is required',
                                   pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Phone number must contain only numbers'
-                                  },
-                                  minLength: {
-                                    value: 10,
-                                    message: 'Phone number must be at least 10 digits'
+                                    value: /^[0-9]{10,12}$/,
+                                    message: 'Phone number must be between 10 and 12 digits'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -415,13 +494,10 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="mobilePhone"
                                 control={control}
                                 rules={{
+                                  required: 'Phone number is required',
                                   pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Phone number must contain only numbers'
-                                  },
-                                  minLength: {
-                                    value: 10,
-                                    message: 'Phone number must be at least 10 digits'
+                                    value: /^[0-9]{10,12}$/,
+                                    message: 'Phone number must be between 10 and 12 digits'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -578,7 +654,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 rules={{
                                   required: 'Postcode is required',
                                   pattern: {
-                                    value: ukPostcode,
+                                    value: onlyNumbers,
                                     message: 'Please enter a valid UK postcode'
                                   }
                                 }}
@@ -590,7 +666,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     error={!!errors.pinCode}
                                     helperText={errors.pinCode?.message}
                                     inputProps={{
-                                      pattern: ukPostcode.source
+                                      pattern: onlyNumbers.source
                                     }}
                                     {...field}
                                   />
@@ -603,14 +679,14 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="language"
                                 control={control}
                                 rules={{
-                                  required: 'Last name is required',
+                                  required: 'language is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Last name must be at least 2 characters'
                                   },
                                   maxLength: {
                                     value: 20,
-                                    message: 'Last name cannot exceed 50 characters'
+                                    message: 'language cannot exceed 50 characters'
                                   },
                                   pattern: {
                                     value: onlyLetters,
@@ -675,20 +751,20 @@ const AddCaseForm = ({ onCancel }) => {
                             <Grid container spacing={2}>
                               <Grid item xs={12}>
                                 <Controller
-                                  name="riskNotes"
+                                  name="Beneficiary"
                                   rules={{
-                                    required: 'Last name is required',
+                                    required: 'Beneficiary is required',
                                     minLength: {
                                       value: 2,
-                                      message: 'Last name must be at least 2 characters'
+                                      message: 'Beneficiary must be at least 2 characters'
                                     },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Last name cannot exceed 50 characters'
+                                      message: 'Beneficiary cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Last name can only contain letters'
+                                      message: 'Beneficiary can only contain letters'
                                     }
                                   }}
                                   control={control}
@@ -712,20 +788,20 @@ const AddCaseForm = ({ onCancel }) => {
                               </Grid>
                               <Grid item xs={12}>
                                 <Controller
-                                  name="keyIndicators"
+                                  name="Campaigns"
                                   rules={{
-                                    required: 'Last name is required',
+                                    required: 'Campaigns is required',
                                     minLength: {
                                       value: 2,
-                                      message: 'Last name must be at least 2 characters'
+                                      message: 'Campaigns must be at least 2 characters'
                                     },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Last name cannot exceed 50 characters'
+                                      message: 'Campaigns cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Last name can only contain letters'
+                                      message: 'Campaigns can only contain letters'
                                     }
                                   }}
                                   control={control}
@@ -751,14 +827,14 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="engagement"
                                   rules={{
-                                    required: 'Last name is required',
+                                    required: 'engagement is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Last name must be at least 2 characters'
                                     },
                                     maxLength: {
                                       value: 30,
-                                      message: 'Last name cannot exceed 50 characters'
+                                      message: 'engagement cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
@@ -788,7 +864,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="eventsAttended"
                                   rules={{
-                                    required: 'Last name is required',
+                                    required: 'eventsAttended is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Last name must be at least 2 characters'
@@ -825,7 +901,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="fundingInterests"
                                   rules={{
-                                    required: 'Last name is required',
+                                    required: 'fundingInterests is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Last name must be at least 2 characters'
@@ -862,7 +938,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="fundraisingActivities"
                                   rules={{
-                                    required: 'Last name is required',
+                                    required: 'fundraisingActivities is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Last name must be at least 2 characters'
@@ -902,10 +978,10 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                             <Box mb={2} display="flex" justifyContent="space-between">
+                              <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
                               <TextField
                                 placeholder="Attachments"
                                 variant="outlined"
-                                size="small"
                                 fullWidth
                                 InputProps={{
                                   startAdornment: (
@@ -915,7 +991,9 @@ const AddCaseForm = ({ onCancel }) => {
                                   ),
                                   endAdornment: (
                                     <InputAdornment position="end">
-                                      <Link component="button">Upload a file</Link>
+                                      <Link component="button" type="button" onClick={handleUploadClick}>
+                                        Upload a file
+                                      </Link>
                                     </InputAdornment>
                                   )
                                 }}
@@ -932,11 +1010,11 @@ const AddCaseForm = ({ onCancel }) => {
                                 },
                                 maxLength: {
                                   value: 500,
-                                  message: 'Last name cannot exceed 500 characters'
+                                  message: 'riskNotes cannot exceed 500 characters'
                                 },
                                 pattern: {
                                   value: onlyLetters,
-                                  message: 'Last name can only contain letters'
+                                  message: 'riskNotes can only contain letters'
                                 }
                               }}
                               render={({ field }) => (
@@ -1139,17 +1217,13 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid container rowSpacing={2} columnSpacing={1}>
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="phone"
+                              name="emergencyhomePhone"
                               control={control}
                               rules={{
                                 required: 'Phone number is required',
                                 pattern: {
-                                  value: onlyNumbers,
-                                  message: 'Phone number must contain only numbers'
-                                },
-                                minLength: {
-                                  value: 10,
-                                  message: 'Phone number must be at least 10 digits'
+                                  value: /^[0-9]{10,12}$/,
+                                  message: 'Phone number must be between 10 and 12 digits'
                                 }
                               }}
                               render={({ field }) => (
@@ -1176,16 +1250,13 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="mobilePhone"
+                              name="emergencyphone"
                               control={control}
                               rules={{
+                                required: 'Phone number is required',
                                 pattern: {
-                                  value: onlyNumbers,
-                                  message: 'Phone number must contain only numbers'
-                                },
-                                minLength: {
-                                  value: 10,
-                                  message: 'Phone number must be at least 10 digits'
+                                  value: /^[0-9]{10,12}$/,
+                                  message: 'Phone number must be between 10 and 12 digits'
                                 }
                               }}
                               render={({ field }) => (
@@ -1343,7 +1414,7 @@ const AddCaseForm = ({ onCancel }) => {
                               rules={{
                                 required: 'Postcode is required',
                                 pattern: {
-                                  value: ukPostcode,
+                                  value: onlyNumbers,
                                   message: 'Please enter a valid UK postcode'
                                 }
                               }}
@@ -1355,7 +1426,7 @@ const AddCaseForm = ({ onCancel }) => {
                                   error={!!errors.pinCode}
                                   helperText={errors.pinCode?.message}
                                   inputProps={{
-                                    pattern: ukPostcode.source
+                                    pattern: onlyNumbers.source
                                   }}
                                   {...field}
                                 />

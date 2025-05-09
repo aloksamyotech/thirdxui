@@ -15,7 +15,7 @@ const DonorTypeDialog = ({ open, onClose }) => {
     } else if (type === 'company') {
       navigate('/add-donorCompany');
     } else if (type === 'group') {
-      navigate('/add-donorCompany');
+      navigate('/add-donorGroup');
     }
   };
 

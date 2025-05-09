@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -9,7 +9,8 @@ import InfoIcon from '@mui/icons-material/Info';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
 import DonorTypeDialog from './donorType.js';
-
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
@@ -23,19 +24,19 @@ const dateAddedFilters = [
 ];
 
 const nameFilter = [
-  { value: 'name1' , label:'Name 1'},
-  { value: 'name2' , label:'Name 2'},
+  { value: 'name1', label: 'Name 1' },
+  { value: 'name2', label: 'Name 2' }
 ];
 
 const receiptIdFilter = [
-  { value: '#675' , label:'#675'},
-  { value: '#775' , label:'#775'},
+  { value: '#675', label: '#675' },
+  { value: '#775', label: '#775' }
 ];
 
 const campaignFilter = [
-  { value: 'campaign1' , label:'Campaign 1'},
-  { value: 'campaign2' , label:'Campaign 2'},
-]
+  { value: 'campaign1', label: 'Campaign 1' },
+  { value: 'campaign2', label: 'Campaign 2' }
+];
 
 const Lead = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const Lead = () => {
   const [name, setNameFilter] = useState('');
   const [receiptId, setReceiptIdFilter] = useState('');
   const [campaign, setCampaignFilter] = useState('');
+  const [rows, setRows] = useState([]);
 
   const CustomHeader = () => {
     return (
@@ -89,14 +91,16 @@ const Lead = () => {
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
+            {params.row.role === 'donor' ? <PersonIcon /> : <ApartmentIcon />}
 
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
+                {params.row.companyInformation?.mainContactName || 'No Name'}
+                {params.row.companyInformation?.companyName || 'No Company'}
+                {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.contactInfo?.email || 'No Email'}
               </Typography>
             </Box>
           </Stack>
@@ -110,12 +114,28 @@ const Lead = () => {
       )
     }
   ];
+  useEffect(() => {
+    const fetchDonor = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getalldonor);
+        console.log(response);
 
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
-    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' }
-  ];
+        if (response?.data) {
+          // Adding serial number
+          const donorsWithSerialNumber = response.data.allDonor.map((donor, index) => ({
+            ...donor, // Copy existing properties of donor
+            serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}` // Generate serial number
+          }));
+
+          setRows(donorsWithSerialNumber);
+        }
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchDonor();
+  }, []);
 
   return (
     <>
@@ -169,7 +189,7 @@ const Lead = () => {
               setReceiptIdFilter={setReceiptIdFilter}
               campaigns={campaignFilter}
               setCampaignFilter={setCampaignFilter}
-              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter',  'receiptIdFilter', 'campaignFilter']}
+              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'receiptIdFilter', 'campaignFilter']}
             />
             <Grid item xs={9}>
               <Card style={{ height: 'auto' }}>
@@ -177,7 +197,7 @@ const Lead = () => {
                   rows={rows}
                   columns={columns}
                   rowHeight={65}
-                  getRowId={(row) => row.id}
+                  getRowId={(row) => row._id}
                   onRowClick={() => navigate('/view-donor')}
                   components={{
                     Toolbar: () => <CustomHeader />

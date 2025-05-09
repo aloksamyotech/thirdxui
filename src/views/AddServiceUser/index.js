@@ -20,6 +20,7 @@ import {
   Autocomplete,
   FormHelperText
 } from '@mui/material';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -36,6 +37,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [restrictAccess, setRestrictAccess] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
+  const [file, setFile] = useState(null);
 
   const {
     register,
@@ -110,10 +113,93 @@ const AddCaseForm = ({ onCancel }) => {
     fileInputRef.current?.click();
   };
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const selectedFile = event.target.files[0];
+    setFile(selectedFile);
   };
   const handleToggle = () => setRestrictAccess(!restrictAccess);
+  // const onSubmit = async (formData) => {
+  //   setIsloading(true);
+
+  //   const caseData = {
+  //     personalInfo: {
+  //       title: formData.personalInfo.title,
+  //       firstName: formData.personalInfo.firstName,
+  //       lastName: formData.personalInfo.lastName,
+  //       gender: formData.personalInfo.gender,
+  //       dateOfBirth: formData.personalInfo.dateOfBirth,
+  //       nickName: formData.personalInfo.nickName,
+  //       ethnicity: formData.personalInfo.ethnicity
+  //     },
+  //     contactInfo: {
+  //       homePhone: formData.phone,
+  //       phone: formData.mobilePhone,
+  //       email: formData.email,
+  //       addressLine1: formData.address,
+  //       addressLine2: formData.address2,
+  //       town: formData.town,
+  //       district: formData.district,
+  //       postcode: formData.pinCode,
+  //       country: formData.country,
+  //       firstLanguage: formData.language,
+  //       otherId: formData.otherId
+  //     },
+  //     otherInfo: {
+  //       file: formData.file || '',
+  //       description: formData.riskNotes,
+  //       benificiary: formData.Beneficiary,
+  //       campaigns: formData.Campaigns,
+  //       engagement: formData.engagement,
+  //       eventAttanded: formData.eventsAttended,
+  //       fundingInterest: formData.fundingInterests,
+  //       fundraisingActivities: formData.fundraisingActivities,
+  //       restrictAccess: restrictAccess
+  //     },
+  //     emergencyContact: {
+  //       title: formData.title,
+  //       gender: formData.gender,
+  //       firstName: formData.firstname,
+  //       lastName: formData.lastname,
+  //       relationshipToUser: formData.preferred,
+  //       homePhone: formData.emergencyhomePhone,
+  //       phone: formData.emergencyphone,
+  //       email: formData.email,
+  //       addressLine1: formData.address,
+  //       addressLine2: formData.address2,
+  //       country: formData.country,
+  //       town: formData.town,
+  //       postcode: formData.pinCode
+  //     },
+  //     contactPreferences: {
+  //       preferredMethod: formData.preferredContact,
+  //       reason: formData.reason,
+  //       contactPurposes: formData.contactPurpose,
+  //       dateOfConfirmation: formData.confirmationDate,
+  //       contactMethods: {
+  //         telephone: formData.telephone,
+  //         email: formData.emailConsent,
+  //         sms: formData.sms,
+  //         letter: formData.letter,
+  //         whatsapp: formData.whatsapp
+  //       }
+  //     },
+  //     role: 'service_user',
+  //     isActive: true
+  //   };
+
+  //   try {
+  //     const response = await postApi(urls.serviceuser.create, caseData);
+  //     toast.success('Successfully Add Service User ');
+  //     setIsloading(false);
+  //     navigate('/people');
+  //   } catch (error) {
+  //     console.error('Error creating user:', error);
+  //     setIsloading(false);
+  //   }
+  // };
   const onSubmit = async (formData) => {
+    setIsloading(true);
+
+    // Ensure the role field is included in the form data
     const caseData = {
       personalInfo: {
         title: formData.personalInfo.title,
@@ -176,14 +262,19 @@ const AddCaseForm = ({ onCancel }) => {
           whatsapp: formData.whatsapp
         }
       },
-      role: 'service_user',
+      // Add the role field to the data
+      role: 'service_user', // You can update this based on your form data or conditions
       isActive: true
     };
 
     try {
       const response = await postApi(urls.serviceuser.create, caseData);
+      toast.success('Successfully Added Service User');
+      setIsloading(false);
+      navigate('/people');
     } catch (error) {
       console.error('Error creating user:', error);
+      setIsloading(false);
     }
   };
 
@@ -1614,19 +1705,15 @@ const AddCaseForm = ({ onCancel }) => {
             </Box>
 
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
-              <Grid item>
-                <Button variant="outlined" color="error" onClick={handleReset}>
-                  Reset
-                </Button>
-              </Grid>
+              <Grid item></Grid>
               <Grid item>
                 <Button variant="outlined" color="error" onClick={onCancel}>
                   Cancel
                 </Button>
               </Grid>
               <Grid item>
-                <Button type="submit" variant="contained" sx={{ background: '#053146' }}>
-                  Save Changes
+                <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Grid>
             </Grid>

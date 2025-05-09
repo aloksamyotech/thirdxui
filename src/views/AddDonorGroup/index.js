@@ -151,7 +151,7 @@ const AddCaseForm = ({ onCancel }) => {
         recruitmentCampaign: data.Recruitmentcampaign
       },
       role: 'donor',
-      subRole: 'donar_company'
+      subRole: 'donar_group'
     };
 
     try {

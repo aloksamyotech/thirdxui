@@ -8,11 +8,18 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { getApi, postApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import AntSwitch from 'components/AntSwitch';
+import toast from 'react-hot-toast';
 
-const AddCaseForm = ({ onCancel }) => {
+const AddCaseForm = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsloading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = React.useRef(null);
+  const [rows, setRows] = useState([]);
+  const [services, setServices] = useState([]);
 
   const {
     control,
@@ -25,18 +32,19 @@ const AddCaseForm = ({ onCancel }) => {
       serviceName: '',
       serviceCode: '',
       serviceType: '',
-      startDate: null,
-      endDate: null,
       serviceStatus: '',
-      beneficiaryInfo: '',
-      campaignsSupported: '',
+      caseOpened: null,
+      caseClosed: null,
+      benificiary: '',
+      campaigns: '',
       engagement: '',
-      eventsAttended: '',
-      fundingInterests: '',
+      eventAttanded: '',
+      fundingInterest: '',
       fundraisingActivities: '',
-      notes: '',
-      attachments: null
-    }
+      description: '',
+      files: null
+    },
+    mode:'all'
   });
 
   const handleFileClick = () => {
@@ -52,29 +60,79 @@ const AddCaseForm = ({ onCancel }) => {
     }
   };
 
-  const onSubmit = (data) => {
-    const formData = new FormData();
+  const onSubmit = async (data) => {
+    setIsloading(true);
+    console.log(data);
 
-    Object.keys(data).forEach((key) => {
-      if (key === 'attachments' && data[key]) {
-        formData.append('file', data[key]);
-      } else {
-        formData.append(key, data[key]);
+    try {
+      const formData = new FormData();
+
+      formData.append('serviceName', data.serviceName);
+      formData.append('serviceCode', data.serviceCode);
+      formData.append('serviceType', data.serviceType);
+      formData.append('serviceStatus', data.serviceStatus);
+      formData.append('caseOpened', data.caseOpened);
+      formData.append('caseClosed', data.caseClosed);
+      formData.append('benificiary', data.benificiary);
+      formData.append('campaigns', data.campaigns);
+      formData.append('engagement', data.engagement);
+      formData.append('fundingInterest', data.fundingInterests);
+      formData.append('fundraisingActivities', data.fundraisingActivities);
+      formData.append('description', data.description);
+      formData.append('isActive', data.isActive);
+      if (data.file) {
+        formData.append('file', data.file);
       }
-    });
 
-    console.log('Form Data:', Object.fromEntries(formData));
-    console.log('File:', data.attachments);
+      const response = await postApi(urls.case.create, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
-    // Here you can add your API call to upload the form data
-    // Example:
-    // fetch('/api/upload', {
-    //   method: 'POST',
-    //   body: formData
-    // });
-
-    reset();
+      toast.success('Cases added successfully');
+      navigate('/case');
+      setIsloading(false);
+    } catch (error) {
+      toast.error('Error submitting case');
+      setIsloading(false);
+    }
   };
+
+  useEffect(() => {
+    const fetchpeople = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.fetch);
+
+        const allUser = response?.data?.allUser || [];
+
+        const formattedUsers = allUser.map((user) => ({
+          id: user._id,
+          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        }));
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchpeople();
+  }, []);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getApi(urls.service.fetch);
+        if (response?.data) {
+          setServices(response.data.allService);
+        }
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   const onlyLetters = /^[A-Za-z\s]*$/;
   const onlyNumbers = /^[0-9]*$/;
@@ -101,96 +159,78 @@ const AddCaseForm = ({ onCancel }) => {
                   <Controller
                     name="serviceName"
                     control={control}
-                    rules={{
-                      required: 'Service name is required',
-                      minLength: {
-                        value: 2,
-                        message: 'Service name must be at least 2 characters'
-                      },
-                      maxLength: {
-                        value: 50,
-                        message: 'Service name cannot exceed 50 characters'
-                      },
-                      pattern: {
-                        value: onlyLetters,
-                        message: 'Service name can only contain letters'
-                      }
-                    }}
+                    rules={{ required: 'Service user is required' }}
                     render={({ field }) => (
-                      <TextField
-                        fullWidth
-                        label="Service Name"
-                        size="small"
-                        error={!!errors.serviceName}
-                        helperText={errors.serviceName?.message}
-                        inputProps={{
-                          pattern: onlyLetters.source,
-                          onKeyPress: (e) => {
-                            if (!onlyLetters.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }
-                        }}
-                        {...field}
-                      />
+                      <FormControl fullWidth size="small" error={!!errors.serviceName}>
+                        <InputLabel id="service-user-label">Service User</InputLabel>
+                        <Select {...field} labelId="service-user-label" label="Service User">
+                          {rows.map((user) => (
+                            <MenuItem key={user.id} value={user.id}>
+                              {user.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.serviceName && (
+                          <Typography color="error" variant="caption">
+                            {errors.serviceName.message}
+                          </Typography>
+                        )}
+                      </FormControl>
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={4}>
                   <Controller
                     name="serviceCode"
                     control={control}
-                    rules={{
-                      required: 'Service code is required',
-                      pattern: {
-                        value: onlyNumbers,
-                        message: 'Service code must contain only numbers'
-                      },
-                      maxLength: {
-                        value: 10,
-                        message: 'Service code  cannot exceed 10 digits'
-                      }
-                    }}
+                    rules={{ required: 'Service is required' }}
                     render={({ field }) => (
-                      <TextField
-                        fullWidth
-                        label="Service Code"
-                        size="small"
-                        error={!!errors.serviceCode}
-                        helperText={errors.serviceCode?.message}
-                        inputProps={{
-                          pattern: onlyNumbers.source,
-                          onKeyPress: (e) => {
-                            if (!onlyNumbers.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }
-                        }}
-                        {...field}
-                      />
+                      <FormControl fullWidth size="small" error={!!errors.serviceCode}>
+                        <InputLabel id="service-label">Service</InputLabel>
+                        <Select {...field} labelId="service-label" label="Service">
+                          {services.map((service) => (
+                            <MenuItem key={service._id} value={service._id}>
+                              {service.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.serviceCode && (
+                          <Typography color="error" variant="caption">
+                            {errors.serviceCode.message}
+                          </Typography>
+                        )}
+                      </FormControl>
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={4}>
                   <Controller
                     name="serviceType"
                     control={control}
-                    rules={{ required: 'Service type is required' }}
+                    rules={{ required: 'Service owner is required' }}
                     render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        label="Service Type"
-                        size="small"
-                        error={!!errors.serviceType}
-                        helperText={errors.serviceType?.message}
-                      />
+                      <FormControl fullWidth size="small" error={!!errors.serviceType}>
+                        <InputLabel id="service-type-label">Service Owner</InputLabel>
+                        <Select {...field} labelId="service-type-label" label="Service Owner">
+                          <MenuItem value="owner1">Owner 1</MenuItem>
+                          <MenuItem value="owner2">Owner 2</MenuItem>
+                          <MenuItem value="owner3">Owner 3</MenuItem>
+                        </Select>
+                        {errors.serviceType && (
+                          <Typography color="error" variant="caption">
+                            {errors.serviceType.message}
+                          </Typography>
+                        )}
+                      </FormControl>
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="startDate"
+                    name="caseOpened"
                     control={control}
                     rules={{ required: 'Start date is required' }}
                     render={({ field }) => (
@@ -204,8 +244,8 @@ const AddCaseForm = ({ onCancel }) => {
                               {...params}
                               fullWidth
                               size="small"
-                              error={!!errors.startDate}
-                              helperText={errors.startDate?.message}
+                              error={!!errors.caseOpened}
+                              helperText={errors.caseOpened?.message}
                             />
                           )}
                         />
@@ -215,7 +255,7 @@ const AddCaseForm = ({ onCancel }) => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="endDate"
+                    name="caseClosed"
                     control={control}
                     rules={{ required: 'End date is required' }}
                     render={({ field }) => (
@@ -225,7 +265,13 @@ const AddCaseForm = ({ onCancel }) => {
                           value={field.value}
                           onChange={(newValue) => field.onChange(newValue)}
                           renderInput={(params) => (
-                            <TextField {...params} fullWidth size="small" error={!!errors.endDate} helperText={errors.endDate?.message} />
+                            <TextField
+                              {...params}
+                              fullWidth
+                              size="small"
+                              error={!!errors.caseClosed}
+                              helperText={errors.caseClosed?.message}
+                            />
                           )}
                         />
                       </LocalizationProvider>
@@ -272,7 +318,7 @@ const AddCaseForm = ({ onCancel }) => {
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Controller
-                        name="beneficiaryInfo"
+                        name="benificiary"
                         control={control}
                         rules={{
                           required: 'Beneficiary information is required',
@@ -287,15 +333,15 @@ const AddCaseForm = ({ onCancel }) => {
                             fullWidth
                             size="small"
                             label="Beneficiary Information"
-                            error={!!errors.beneficiaryInfo}
-                            helperText={errors.beneficiaryInfo?.message}
+                            error={!!errors.benificiary}
+                            helperText={errors.benificiary?.message}
                           />
                         )}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <Controller
-                        name="campaignsSupported"
+                        name="campaigns"
                         control={control}
                         rules={{
                           required: 'Campaigns supported is required',
@@ -310,8 +356,8 @@ const AddCaseForm = ({ onCancel }) => {
                             fullWidth
                             size="small"
                             label="Campaigns Supported"
-                            error={!!errors.campaignsSupported}
-                            helperText={errors.campaignsSupported?.message}
+                            error={!!errors.campaigns}
+                            helperText={errors.campaigns?.message}
                           />
                         )}
                       />
@@ -341,7 +387,7 @@ const AddCaseForm = ({ onCancel }) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Controller
-                        name="eventsAttended"
+                        name="eventAttanded"
                         control={control}
                         rules={{
                           required: 'Events attended is required',
@@ -356,15 +402,15 @@ const AddCaseForm = ({ onCancel }) => {
                             fullWidth
                             size="small"
                             label="Events Attended"
-                            error={!!errors.eventsAttended}
-                            helperText={errors.eventsAttended?.message}
+                            error={!!errors.eventAttanded}
+                            helperText={errors.eventAttanded?.message}
                           />
                         )}
                       />
                     </Grid>
                     <Grid item xs={12}>
                       <Controller
-                        name="fundingInterests"
+                        name="fundingInterest"
                         control={control}
                         rules={{
                           required: 'Funding interests is required',
@@ -379,8 +425,8 @@ const AddCaseForm = ({ onCancel }) => {
                             fullWidth
                             size="small"
                             label="Funding Interests"
-                            error={!!errors.fundingInterests}
-                            helperText={errors.fundingInterests?.message}
+                            error={!!errors.fundingInterest}
+                            helperText={errors.fundingInterest?.message}
                           />
                         )}
                       />
@@ -420,13 +466,13 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <TextField
-                          {...field}
-                          placeholder="Attachments"
                           variant="outlined"
                           size="small"
                           fullWidth
-                          value={selectedFile ? selectedFile.name : ''}
+                          value={field.value ? field.value.name : ''}
+                          placeholder="Attachments"
                           InputProps={{
+                            readOnly: true,
                             startAdornment: (
                               <InputAdornment position="start">
                                 <AttachFileIcon fontSize="small" />
@@ -434,9 +480,10 @@ const AddCaseForm = ({ onCancel }) => {
                             ),
                             endAdornment: (
                               <InputAdornment position="end">
-                                <Link component="button" onClick={handleFileClick}>
-                                  Upload a file
-                                </Link>
+                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                  <Link component="span">Upload a file</Link>
+                                  <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                </Button>
                               </InputAdornment>
                             )
                           }}
@@ -452,7 +499,7 @@ const AddCaseForm = ({ onCancel }) => {
                     />
                   </Box>
                   <Controller
-                    name="notes"
+                    name="description"
                     control={control}
                     rules={{
                       required: 'Notes are required',
@@ -474,9 +521,20 @@ const AddCaseForm = ({ onCancel }) => {
                         fullWidth
                         variant="outlined"
                         sx={{ mb: 2 }}
-                        error={!!errors.notes}
-                        helperText={errors.notes?.message}
+                        error={!!errors.description}
+                        helperText={errors.description?.message}
                       />
+                    )}
+                  />
+                  <Controller
+                    name="isActive"
+                    control={control}
+                    defaultValue={true}
+                    render={({ field }) => (
+                      <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Typography variant="subtitle1">Restrict Access</Typography>
+                        <AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} color="primary" />
+                      </Box>
                     )}
                   />
                 </Paper>
@@ -487,8 +545,8 @@ const AddCaseForm = ({ onCancel }) => {
 
         <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
           <Grid item>
-            <Button type="submit" variant="contained" sx={{ background: '#053146' }}>
-              Save Changes
+            <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
           </Grid>
           <Grid item>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography,Switch } from '@mui/material';
+import { Grid, TextField, Box, Paper, Button, InputAdornment, FormControlLabel,Card, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
@@ -9,9 +9,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { postApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
+import AntSwitch from 'components/AntSwitch';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
+  const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
@@ -31,13 +33,15 @@ const AddCaseForm = ({ onCancel }) => {
     }
   };
 
+  const handleToggle = () => setRestrictAccess(!restrictAccess);
+
   const {
     control,
     handleSubmit,
     setValue,
     formState: { errors }
   } = useForm({
-    mode: 'onChange',
+    mode: 'all',
     defaultValues: {
       homePhone: '',
       phone: '',
@@ -69,7 +73,7 @@ const AddCaseForm = ({ onCancel }) => {
       formData.append('fundingInterest', data.fundingInterests);
       formData.append('fundraisingActivities', data.fundraisingActivities);
       formData.append('description', data.notes);
-      formData.append('isActive', data.isActive);
+      formData.append('restrictAccess', restrictAccess);
       if (data.file) {
         formData.append('file', data.file);
       }
@@ -277,16 +281,11 @@ const AddCaseForm = ({ onCancel }) => {
                       />
                     )}
                   />
-                  <Controller
-                    name="isActive"
-                    control={control}
-                    defaultValue={true} 
-                    render={({ field }) => (
-                      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                        <Typography variant="subtitle1">Active</Typography>
-                        <Switch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} color="primary" />
-                      </Box>
-                    )}
+                  <FormControlLabel
+                    control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                    label="Restrict Access?"
+                    labelPlacement="start"
+                    sx={{ gap: 1 }}
                   />
                 </Paper>
               </Grid>

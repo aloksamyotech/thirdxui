@@ -49,8 +49,8 @@ const TabbedDataGrid = () => {
   }, []);
 
   const statusFilter = [
-    { value: true, label: 'Active' },
-    { value: false, label: 'Inactive' }
+    { value: 'true', label: 'Active' },
+    { value: 'false', label: 'Inactive' }
   ];
 
   const fetchConfigurations = async () => {
@@ -80,9 +80,41 @@ const TabbedDataGrid = () => {
     }
   };
 
+  const fetchFilteredConfigurations = async (type, statusFilterVal) => {
+    try {
+      let url = `${urls.configuration.filterType}?type=${encodeURIComponent(type)}`;
+      if (statusFilterVal !== '') {
+        url += `&status=${statusFilterVal}`;
+      }
+
+      const res = await getApi(url);
+      const filteredData = res?.data || [];
+
+      const filteredByStatus = statusFilterVal !== '' 
+        ? filteredData.filter(item => String(item.isActive) === statusFilterVal)
+        : filteredData;
+
+      const grouped = {
+        [type]: filteredByStatus.map((item) => ({
+          id: item._id,
+          name: item.name,
+          status: item.isActive
+        }))
+      };
+
+      setTabData(grouped);
+    } catch (error) {
+      toast.error('Error fetching filtered configurations');
+    }
+  };
+
   useEffect(() => {
-    fetchConfigurations();
-  }, []);
+    if (selectedSection) {
+      fetchFilteredConfigurations(selectedSection, status);
+    } else {
+      fetchConfigurations();
+    }
+  }, [selectedSection, status]);
 
   const handleSaveConfiguration = async () => {
     const payload = {
@@ -101,60 +133,24 @@ const TabbedDataGrid = () => {
     }
   };
 
-  const fetchFilteredConfigurations = async (type, statusFilterVal) => {
-    try {
-      let url = `${urls.configuration.filterType}?type=${type}`;
-      if (statusFilterVal !== '') {
-        url += `&status=${statusFilterVal}`;
-      }
-
-      if (!selectedSection) {
-        url = `${urls.configuration.fetch}`;
-      }
-
-      const res = await getApi(url);
-      const filteredData = res?.data || [];
-
-      const grouped = {
-        [type]: filteredData.map((item) => ({
-          id: item._id,
-          name: item.name,
-          status: item.isActive
-        }))
-      };
-
-      setTabData(grouped);
-    } catch (error) {
-      toast.error('Error fetching filtered configurations:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedSection) {
-      fetchFilteredConfigurations(selectedSection);
-    }
-  }, [selectedSection]);
-
   const handleStatusUpdate = async (itemId, newStatus) => {
     try {
       const payload = {
         isActive: newStatus
       };
-  
+
       const url = `${urls.configuration.updateStatus.replace(':configId', itemId)}`;
-      
+
       const res = await updateApi(url, payload);
       if (res?.data) {
-        setTabData(prevData => {
+        setTabData((prevData) => {
           const newData = { ...prevData };
-          Object.keys(newData).forEach(type => {
-            newData[type] = newData[type].map(item => 
-              item.id === itemId ? { ...item, status: newStatus } : item
-            );
+          Object.keys(newData).forEach((type) => {
+            newData[type] = newData[type].map((item) => (item.id === itemId ? { ...item, status: newStatus } : item));
           });
           return newData;
         });
-  
+
         const statusMessage = newStatus ? 'Active' : 'Inactive';
         toast.success(`Status updated to ${statusMessage}`);
       }
@@ -162,7 +158,12 @@ const TabbedDataGrid = () => {
       toast.error('Error updating status');
     }
   };
-  
+
+  const resetFilters = () => {
+    setSelectedSection('');
+    setStatus('');
+    fetchConfigurations();
+  };
 
   return (
     <>
@@ -178,12 +179,14 @@ const TabbedDataGrid = () => {
           configurationNames={configTypeFilter}
           configurationNameFilter={selectedSection}
           setConfigurationNameFilter={(val) => {
-            if (val !== selectedSection) {
-              setSelectedSection(val);
-            }
+            setSelectedSection(val);
           }}
-          setStatusFilter={setStatus}
+          statusFilter={status}
+          setStatusFilter={(val) => {
+            setStatus(val);
+          }}
           selectedFilters={['configurationNameFilter', 'statusFilter']}
+          onReset={resetFilters}
         />
 
         <Grid item xs={9}>
@@ -258,10 +261,7 @@ const TabbedDataGrid = () => {
                           }}
                         >
                           <Typography sx={{ flex: 1 }}>{item.name}</Typography>
-                          <AntSwitch 
-                            checked={item.status} 
-                            onChange={(e) => handleStatusUpdate(item.id, e.target.checked)}
-                          />
+                          <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
                         </Box>
                       ))
                     ) : (

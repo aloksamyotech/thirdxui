@@ -46,7 +46,7 @@ const AddCaseForm = ({ onCancel }) => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4">Add New Session</Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/view-service')}>
+        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/services')}>
           <ArrowBackIcon sx={{ color: 'grey' }} />
           <Typography variant="h6" sx={{ mr: 1 }}>
             Back

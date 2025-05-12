@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { Grid, Card, Typography, Box, MenuItem, TextField } from '@mui/material';
+import { Grid, Card, Typography, Box, MenuItem, TextField, Button } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { LocalizationProvider, DatePicker, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
@@ -16,6 +17,7 @@ const FilterPanel = ({
   genders,
   setGenderFilter,
   statuses,
+  statusFilter,
   setStatusFilter,
   serviceTypes,
   setServiceTypeFilter,
@@ -67,6 +69,35 @@ const FilterPanel = ({
     setDateAddedFilter(dayjs());
   }, [dateAddedFilter, setDateAddedFilter]);
 
+  const handleReset = () => {
+    if (setFormType) setFormType('');
+    if (setDateFilter) setDateFilter('');
+    if (setDistrictFilter) setDistrictFilter('');
+    if (setGenderFilter) setGenderFilter('');
+    if (setStatusFilter) setStatusFilter('');
+    if (setServiceTypeFilter) setServiceTypeFilter('');
+    if (setDateOpenedFilter) setDateOpenedFilter('');
+    if (setOwnerFilter) setOwnerFilter('');
+    if (setDateAddedFilter) setDateAddedFilter('');
+    if (setListNameFilter) setListNameFilter('');
+    if (setFormNameFilter) setFormNameFilter('');
+    if (setTagFilter) setTagFilter('');
+    if (setNameFilter) setNameFilter('');
+    if (setReceiptIdFilter) setReceiptIdFilter('');
+    if (setCampaignFilter) setCampaignFilter('');
+    if (setCaseIdFilter) setCaseIdFilter('');
+    if (setCountryOfOriginFilter) setCountryOfOriginFilter('');
+    if (setDonorTypeFilter) setDonorTypeFilter('');
+    if (setDurationFilter) setDurationFilter('');
+    if (setAmountRangeFilter) setAmountRangeFilter('');
+    if (setRecruitmentCampaignFilter) setRecruitmentCampaignFilter('');
+    if (setActivityTypeFilter) setActivityTypeFilter('');
+    if (setSessionNameFilter) setSessionNameFilter('');
+    if (setConfigurationNameFilter) setConfigurationNameFilter('');
+    if (setTimeFilter) setTimeFilter('');
+    if (setSessionLeadFilter) setSessionLeadFilter('');
+  };
+
   if (!showFilter) return null;
 
   const filterMapping = {
@@ -98,6 +129,7 @@ const FilterPanel = ({
       data: statuses,
       label: 'By Status',
       onChange: setStatusFilter,
+      value:statusFilter,
       type: 'select'
     },
     serviceTypeFilter: {
@@ -239,11 +271,26 @@ const FilterPanel = ({
           border: '1px solid #e0e0e0'
         }}
       >
-        <Box display="flex" alignItems="center" mb={2}>
-          <FilterListIcon sx={{ color: '#4ba1f8', mr: 1 }} />
-          <Typography variant="subtitle1" fontWeight="bold">
-            Filters
-          </Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box display="flex" alignItems="center">
+            <FilterListIcon sx={{ color: '#4ba1f8', mr: 1 }} />
+            <Typography variant="subtitle1" fontWeight="bold">
+              Filters
+            </Typography>
+          </Box>
+          <Button
+            startIcon={<RestartAltIcon />}
+            onClick={handleReset}
+            size="small"
+            sx={{
+              color: '#4ba1f8',
+              '&:hover': {
+                backgroundColor: 'rgba(75, 161, 248, 0.1)'
+              }
+            }}
+          >
+            Reset
+          </Button>
         </Box>
 
         <Box display="flex" flexDirection="column" gap={2}>

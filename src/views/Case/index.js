@@ -1,15 +1,5 @@
-import React, { useState } from 'react';
-import {
-  Stack,
-  Grid,
-  Typography,
-  Box,
-  Card,
-  TextField,
-  IconButton,
-  Tooltip,
-  Chip,
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -18,9 +8,14 @@ import LoopIcon from '@mui/icons-material/Loop';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
 import { useNavigate } from 'react-router-dom';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const Lead = () => {
   const navigate = useNavigate();
+  const [rows, setRows] = useState([]);
+  const [serviceTypeFilter, setServiceTypeFilterOptions] = useState([]);
+  const [ownerFilters, setOwnerFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
@@ -29,18 +24,9 @@ const Lead = () => {
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
-  const serviceTypeFilter = [
-    { value: 'Education', label: 'Education' },
-    { value: 'Health', label: 'Health' },
-    { value: 'Mentoring', label: 'Mentoring' },
-    { value: 'Group Work', label: 'Group Work' },
-    { value: 'Sports', label: 'Sports' },
-    { value: 'Social Work', label: 'Social Work' }
-  ];
-
   const statusFilter = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'true', label: 'Active' },
+    { value: 'false', label: 'Inactive' }
   ];
 
   const dateAddedFilters = [
@@ -48,11 +34,6 @@ const Lead = () => {
     { value: 'week', label: 'Last 7 Days' },
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
-  ];
-
-  const ownerFilters = [
-    { value: 'owner1', label: 'Owner 1' },
-    { value: 'owner2', label: 'Owner 2' }
   ];
 
   const CustomHeader = () => {
@@ -89,7 +70,7 @@ const Lead = () => {
   };
 
   const columns = [
-    { field: 'caseId', headerName: 'Case Id', width: 100 },
+    { field: 'serialNumber', headerName: 'Case Id', width: 100 },
     { field: 'serviceUser', headerName: 'Service User', width: 150 },
     { field: 'owner', headerName: 'Owner', width: 120 },
     {
@@ -111,28 +92,49 @@ const Lead = () => {
     { field: 'dateClosed', headerName: 'Date Closed', width: 150 }
   ];
 
-  const rows = [
-    {
-      id: 1,
-      caseId: 'C-001',
-      serviceUser: 'John Doe',
-      owner: 'Admin',
-      status: 'Open',
-      service: 'IT Support',
-      dateOpened: '2024-02-01',
-      dateClosed: '2025-08-10'
-    },
-    {
-      id: 2,
-      caseId: 'C-002',
-      serviceUser: 'Jane Smith',
-      owner: 'Manager',
-      status: 'Close',
-      service: 'HR Support',
-      dateOpened: '2024-01-25',
-      dateClosed: '2024-02-10'
-    }
-  ];
+  useEffect(() => {
+    const fetchpeople = async () => {
+      try {
+        const response = await getApi(urls.case.fetch);
+        const allCases = response?.data?.allService || [];
+
+        const formatDate = (dateString) => {
+          if (!dateString) return '';
+          const date = new Date(dateString);
+          return date.toLocaleDateString('en-GB');
+        };
+
+        const formattedUsers = allCases.map((user, index) => ({
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          dateOpened: formatDate(user.caseOpened),
+          dateClosed: formatDate(user.caseClosed),
+          serviceUser: user.serviceName || '',
+          service: user.serviceCode || '',
+          owner: user.serviceType || '',
+          status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
+        }));
+
+        setRows(formattedUsers);
+
+        const uniqueServiceTypes = [...new Set(allCases.map((item) => item.serviceCode).filter(Boolean))].map((value) => ({
+          value,
+          label: value
+        }));
+        setServiceTypeFilterOptions(uniqueServiceTypes);
+
+        const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
+          value,
+          label: value
+        }));
+        setOwnerFilters(uniqueOwners);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchpeople();
+  }, []);
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -177,14 +179,19 @@ const Lead = () => {
             showFilter={showFilter}
             serviceTypes={serviceTypeFilter}
             setServiceTypeFilter={setServiceType}
+            serviceTypeValue={serviceType}
             statuses={statusFilter}
             setStatusFilter={setStatus}
+            statusValue={status}
             dateAddedFilters={dateAddedFilters}
             setDateAddedFilter={setDateOpenedFilter}
+            dateOpenedValue={dateOpenedFilter}
             owners={ownerFilters}
             setOwnerFilter={setOwner}
+            ownerValue={owner}
             selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
           />
+
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">

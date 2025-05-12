@@ -67,7 +67,7 @@ const Lead = () => {
     {
       field: 'name',
       headerName: 'Service Name',
-      flex: 2,
+      flex: 1.5,
       renderCell: (params) => (
         <Stack>
           <Typography variant="body1" sx={{ textTransform: 'uppercase', fontWeight: 'normal' }}>
@@ -88,7 +88,7 @@ const Lead = () => {
     {
       field: 'code',
       headerName: 'Service Code',
-      flex: 1,
+      flex: 0.8,
       renderCell: (params) => `#${params.value}`
     },
 
@@ -128,7 +128,7 @@ const Lead = () => {
             cursor: 'pointer'
           }}
         >
-          <Typography color="primary">View</Typography>
+          <Typography color="black">View More</Typography>
         </Box>
       )
     }
@@ -212,7 +212,7 @@ const Lead = () => {
                     components={{
                       Toolbar: () => <CustomHeader />
                     }}
-                    onRowClick={() => navigate('/view-service')}
+                    onRowClick={(params) => navigate('/view-service', { state: { row: params.row } })}
                     sx={{
                       '& .MuiDataGrid-row': {
                         borderBottom: '1px solid #ccc'

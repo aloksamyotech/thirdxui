@@ -46,6 +46,7 @@ const AddCaseForm = ({ onCancel }) => {
     reset,
     formState: { errors }
   } = useForm({
+    mode:'all',
     defaultValues: {
       title: '',
       firstname: '',

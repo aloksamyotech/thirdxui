@@ -5,7 +5,7 @@ export const urls = Object.freeze({
   configuration: {
     create: `${baseUrl}/config/addconfiguration`,
     fetch: `${baseUrl}/config/getallconfiguration`,
-    filterType: `${baseUrl}/config/filterbyconfigurationtype`,
+    filterType: `${baseUrl}/config/filter`,
     updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`
   },
   serviceuser: {
@@ -14,17 +14,19 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/user/getUserById/:userId`,
     getAllServices: `${baseUrl}/user/getAllServices`,
     getAllVolunteer: `${baseUrl}/user/getAllVolunteer`,
-    getalldonor: `${baseUrl}/user/getalldonor`
+    getalldonor: `${baseUrl}/user/getalldonor`,
+    getDistrict: `${baseUrl}/user/getAllUsDistricts`,
   },
   service: {
     create: `${baseUrl}/services/addServices`,
-    fetch: `${baseUrl}/services/getAllServices`
+    fetch: `${baseUrl}/services/getAllServices`,
+    getById: `${baseUrl}/services/getServiceById/:id`,
   },
   case: {
     create: `${baseUrl}/cases/addCase`,
     fetch: `${baseUrl}/cases/getAllCases`,
     delete: `${baseUrl}/cases/deleteCase/:id`,
-    search: `${baseUrl}/cases/search`,
+    filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,
   },
   mail: {

@@ -48,6 +48,7 @@ const AddCaseForm = () => {
     reset,
     formState: { errors }
   } = useForm({
+     mode:'all',
     defaultValues: {
       title: '',
       firstname: '',

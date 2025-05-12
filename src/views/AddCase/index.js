@@ -30,7 +30,7 @@ const AddCaseForm = () => {
   } = useForm({
     defaultValues: {
       serviceName: '',
-      serviceCode: '',
+      service: '',
       serviceType: '',
       serviceStatus: '',
       caseOpened: null,
@@ -68,7 +68,7 @@ const AddCaseForm = () => {
       const formData = new FormData();
 
       formData.append('serviceName', data.serviceName);
-      formData.append('serviceCode', data.serviceCode);
+      formData.append('service', data.service);
       formData.append('serviceType', data.serviceType);
       formData.append('serviceStatus', data.serviceStatus);
       formData.append('caseOpened', data.caseOpened);
@@ -182,11 +182,11 @@ const AddCaseForm = () => {
 
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="serviceCode"
+                    name="service"
                     control={control}
                     rules={{ required: 'Service is required' }}
                     render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.serviceCode}>
+                      <FormControl fullWidth size="small" error={!!errors.service}>
                         <InputLabel id="service-label">Service</InputLabel>
                         <Select {...field} labelId="service-label" label="Service">
                           {services.map((service) => (
@@ -195,9 +195,9 @@ const AddCaseForm = () => {
                             </MenuItem>
                           ))}
                         </Select>
-                        {errors.serviceCode && (
+                        {errors.service && (
                           <Typography color="error" variant="caption">
-                            {errors.serviceCode.message}
+                            {errors.service.message}
                           </Typography>
                         )}
                       </FormControl>

@@ -21,6 +21,8 @@ const Lead = () => {
   const [status, setStatus] = useState('');
   const [owner, setOwner] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
@@ -92,49 +94,100 @@ const Lead = () => {
     { field: 'dateClosed', headerName: 'Date Closed', width: 150 }
   ];
 
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (serviceType) queryParams.append('serviceType', serviceType);
+      if (status) queryParams.append('serviceStatus', status);
+      if (owner) queryParams.append('serviceName', owner);
+      if (dateOpenedFilter) queryParams.append('caseOpened', dateOpenedFilter);
+      if (searchQuery) queryParams.append('serviceName', searchQuery);
+
+      const response = await getApi(`${urls.case.filterType}?${queryParams.toString()}`);
+      const filteredCases = response?.data || [];
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      };
+
+      const formattedUsers = filteredCases.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        dateOpened: formatDate(user.caseOpened),
+        dateClosed: formatDate(user.caseClosed),
+        serviceUser: user.serviceName || '',
+        service: user.service || '',
+        owner: user.serviceType || '',
+        status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
+      }));
+
+      setRows(formattedUsers);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered cases:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setServiceType('');
+    setStatus('');
+    setOwner('');
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    fetchInitialData();
+  };
+
+  const fetchInitialData = async () => {
+    try {
+      const response = await getApi(urls.case.fetch);
+      const allCases = response?.data?.allService || [];
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      };
+
+      const formattedUsers = allCases.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        dateOpened: formatDate(user.caseOpened),
+        dateClosed: formatDate(user.caseClosed),
+        serviceUser: user.serviceName || '',
+        service: user.service || '',
+        owner: user.serviceType || '',
+        status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
+      }));
+
+      setRows(formattedUsers);
+
+      const uniqueServiceTypes = [...new Set(allCases.map((item) => item.service).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+      setServiceTypeFilterOptions(uniqueServiceTypes);
+
+      const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+      setOwnerFilters(uniqueOwners);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchpeople = async () => {
-      try {
-        const response = await getApi(urls.case.fetch);
-        const allCases = response?.data?.allService || [];
-
-        const formatDate = (dateString) => {
-          if (!dateString) return '';
-          const date = new Date(dateString);
-          return date.toLocaleDateString('en-GB');
-        };
-
-        const formattedUsers = allCases.map((user, index) => ({
-          id: user._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-          dateOpened: formatDate(user.caseOpened),
-          dateClosed: formatDate(user.caseClosed),
-          serviceUser: user.serviceName || '',
-          service: user.serviceCode || '',
-          owner: user.serviceType || '',
-          status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
-        }));
-
-        setRows(formattedUsers);
-
-        const uniqueServiceTypes = [...new Set(allCases.map((item) => item.serviceCode).filter(Boolean))].map((value) => ({
-          value,
-          label: value
-        }));
-        setServiceTypeFilterOptions(uniqueServiceTypes);
-
-        const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
-          value,
-          label: value
-        }));
-        setOwnerFilters(uniqueOwners);
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
-      }
-    };
-
-    fetchpeople();
+    fetchInitialData();
   }, []);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -168,8 +221,15 @@ const Lead = () => {
           <TextField
             size="small"
             placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleFilter();
+              }
+            }}
             InputProps={{
-              endAdornment: <SearchIcon />
+              endAdornment: <SearchIcon onClick={handleFilter} style={{ cursor: 'pointer' }} />
             }}
             sx={{ width: '350px' }}
           />
@@ -178,18 +238,31 @@ const Lead = () => {
           <FilterPanel
             showFilter={showFilter}
             serviceTypes={serviceTypeFilter}
-            setServiceTypeFilter={setServiceType}
-            serviceTypeValue={serviceType}
+            serviceTypeFilter={serviceType}
+            setServiceTypeFilter={(value) => {
+              setServiceType(value);
+              handleFilter();
+            }}
             statuses={statusFilter}
-            setStatusFilter={setStatus}
-            statusValue={status}
+            statusFilter={status}
+            setStatusFilter={(value) => {
+              setStatus(value);
+              handleFilter();
+            }}
             dateAddedFilters={dateAddedFilters}
-            setDateAddedFilter={setDateOpenedFilter}
-            dateOpenedValue={dateOpenedFilter}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => {
+              setDateOpenedFilter(value);
+              handleFilter();
+            }}
             owners={ownerFilters}
-            setOwnerFilter={setOwner}
-            ownerValue={owner}
+            ownerFilter={owner}
+            setOwnerFilter={(value) => {
+              setOwner(value);
+              handleFilter();
+            }}
             selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
+            onReset={handleReset}
           />
 
           <Grid item xs={9}>

@@ -9,58 +9,82 @@ import dayjs from 'dayjs';
 const FilterPanel = ({
   showFilter,
   formTypes,
+  formType,
   setFormType,
   dateFilters,
+  dateFilter,
   setDateFilter,
   districts,
+  districtFilter,
   setDistrictFilter,
   genders,
+  genderFilter,
   setGenderFilter,
   statuses,
   statusFilter,
   setStatusFilter,
   serviceTypes,
+  serviceTypeFilter,
   setServiceTypeFilter,
   dateOpenedFilters,
+  dateOpenedFilter,
   setDateOpenedFilter,
   owners,
+  ownerFilter,
   setOwnerFilter,
   dateAddedFilter,
+  dateAdded,
   setDateAddedFilter,
   listNames,
+  listNameFilter,
   setListNameFilter,
   formNames,
+  formNameFilter,
   setFormNameFilter,
   tags,
+  tagFilter,
   setTagFilter,
   names,
+  nameFilter,
   setNameFilter,
   receipts,
+  receiptIdFilter,
   setReceiptIdFilter,
   campaigns,
+  campaignFilter,
   setCampaignFilter,
   caseIds,
+  caseIdFilter,
   setCaseIdFilter,
   countriesWithFlags,
+  countryOfOriginFilter,
   setCountryOfOriginFilter,
   donorTypes,
+  donorTypeFilter,
   setDonorTypeFilter,
   durationOptions,
+  durationFilter,
   setDurationFilter,
   amountRanges,
+  amountRangeFilter,
   setAmountRangeFilter,
   recruitmentCampaigns,
+  recruitmentCampaignFilter,
   setRecruitmentCampaignFilter,
   activityTypes,
+  activityTypeFilter,
   setActivityTypeFilter,
   sessionNames,
+  sessionNameFilter,
   setSessionNameFilter,
   configurationNames,
   configurationNameFilter,
   setConfigurationNameFilter,
   timeOptions,
+  timeFilter,
   setTimeFilter,
   sessionLeads,
+  sessionLeadFilter,
   setSessionLeadFilter,
   selectedFilters = []
 }) => {
@@ -105,24 +129,28 @@ const FilterPanel = ({
       data: formTypes,
       label: 'Form Type',
       onChange: setFormType,
+      value:formType,
       type: 'select'
     },
     dateFilter: {
       data: dateFilters,
       label: 'By Date',
       onChange: setDateFilter,
+      value:dateFilter,
       type: 'select'
     },
     districtFilter: {
       data: districts,
       label: 'By Borough/District',
       onChange: setDistrictFilter,
+      value:districtFilter,
       type: 'select'
     },
     genderFilter: {
       data: genders,
       label: 'By Gender',
       onChange: setGenderFilter,
+      value:genderFilter,
       type: 'select'
     },
     statusFilter: {
@@ -136,108 +164,125 @@ const FilterPanel = ({
       data: serviceTypes,
       label: 'By Service Type',
       onChange: setServiceTypeFilter,
+      value:serviceTypeFilter,
       type: 'select'
     },
     dateOpenedFilter: {
       data: dateOpenedFilters,
       label: 'By Date Opened',
       onChange: setDateOpenedFilter,
+      value:dateOpenedFilter,
       type: 'date'
     },
     ownerFilter: {
       data: owners,
       label: 'By Owner',
       onChange: setOwnerFilter,
+      value: ownerFilter,
       type: 'select'
     },
     dateAddedFilter: {
       label: 'By Date Added',
       onChange: setDateAddedFilter,
-      value: dateAddedFilter,
+      value: dateAdded,
       type: 'date'
     },
     listNameFilter: {
       data: listNames,
       label: 'By List Name',
       onChange: setListNameFilter,
+      value:listNameFilter,
       type: 'select'
     },
     formNameFilter: {
       data: formNames,
       label: 'By Form Name',
       onChange: setFormNameFilter,
+      value:formNameFilter,
       type: 'select'
     },
     tagFilter: {
       data: tags,
       label: 'By Tags',
       onChange: setTagFilter,
+      value:tagFilter,
       type: 'select'
     },
     nameFilter: {
       data: names,
       label: 'By Name',
       onChange: setNameFilter,
+      value:nameFilter,
       type: 'select'
     },
     receiptIdFilter: {
       data: receipts,
       label: 'By Receipt ID',
       onChange: setReceiptIdFilter,
+      value:receiptIdFilter,
       type: 'select'
     },
     campaignFilter: {
       data: campaigns,
       label: 'By Campaign',
       onChange: setCampaignFilter,
+      value: campaignFilter,
       type: 'select'
     },
     caseIdFilter: {
       data: caseIds,
       label: 'By Case ID',
       onChange: setCaseIdFilter,
+      value:caseIdFilter,
       type: 'select'
     },
     countryOfOriginFilter: {
       data: countriesWithFlags,
       label: 'By Country of Origin',
       onChange: setCountryOfOriginFilter,
+      value:countryOfOriginFilter,
       type: 'select'
     },
     donorTypeFilter: {
       data: donorTypes,
       label: 'By Donor Type',
       onChange: setDonorTypeFilter,
+      value:donorTypeFilter,
       type: 'select'
     },
     durationFilter: {
       data: durationOptions,
       label: 'By Duration',
       onChange: setDurationFilter,
+      value:durationFilter,
       type: 'select'
     },
     amountRangeFilter: {
       data: amountRanges,
       label: 'By Amount Range',
       onChange: setAmountRangeFilter,
+      value:amountRangeFilter,
       type: 'select'
     },
     recruitmentCampaignFilter: {
       data: recruitmentCampaigns,
       label: 'By Recruitment Campaign',
       onChange: setRecruitmentCampaignFilter,
+      value:recruitmentCampaignFilter,
       type: 'select'
     },
     activityTypeFilter: {
       data: activityTypes,
       label: 'By Activity Type',
       onChange: setActivityTypeFilter,
+      value:activityTypeFilter,
       type: 'select'
     },
     sessionNameFilter: {
       data: sessionNames,
       label: 'By Session Name',
       onChange: setSessionNameFilter,
+      value:sessionNameFilter,
       type: 'select'
     },
     configurationNameFilter: {
@@ -251,12 +296,14 @@ const FilterPanel = ({
       data: timeOptions,
       label: 'By Time',
       onChange: setTimeFilter,
+      value: timeFilter,
       type: 'time'
     },
     sessionLeadFilter: {
       data: sessionLeads,
       label: 'By Session Lead',
       onChange: setSessionLeadFilter,
+      value:sessionLeadFilter,
       type: 'select'
     }
   };

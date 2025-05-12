@@ -19,5 +19,22 @@ export const urls = Object.freeze({
   service: {
     create: `${baseUrl}/services/addServices`,
     fetch: `${baseUrl}/services/getAllServices`
+  },
+  case: {
+    create: `${baseUrl}/cases/addCase`,
+    fetch: `${baseUrl}/cases/getAllCases`,
+    delete: `${baseUrl}/cases/deleteCase/:id`,
+    search: `${baseUrl}/cases/search`,
+    getById: `${baseUrl}/cases/getCaseById/:id`,
+  },
+  mail: {
+    create: `${baseUrl}/mail/addmail`,
+    fetch: `${baseUrl}/mail/getallmail`,
+    filterType: `${baseUrl}/mail/filter`,
+  },
+  transaction: {
+    create: `${baseUrl}/transaction/addtransaction`,
+    fetch: `${baseUrl}/transaction/getalltransaction`,
+    filterType: `${baseUrl}/transaction/filter`,
   }
 });

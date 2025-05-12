@@ -119,7 +119,8 @@ const AddCaseForm = ({ onCancel }) => {
     const fd = new FormData();
 
     if (data.file) {
-      fd.append('file', data.file); 
+      fd.append('file', data.file);
+    }
 
     fd.append('contactInfo[Phone]', data.mobilePhone);
     fd.append('contactInfo[email]', data.email);

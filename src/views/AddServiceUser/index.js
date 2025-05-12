@@ -48,6 +48,7 @@ const AddCaseForm = ({ onCancel }) => {
     reset,
     formState: { errors }
   } = useForm({
+    node:'all',
     defaultValues: {
       title: '',
       firstname: '',
@@ -122,7 +123,6 @@ const AddCaseForm = ({ onCancel }) => {
 
     const fd = new FormData();
 
-    // Flattened keys (dot notation won't work unless backend parses them that way)
     fd.append('personalInfo[firstName]', formData.personalInfo.firstName);
     fd.append('personalInfo[lastName]', formData.personalInfo.lastName);
     fd.append('personalInfo[title]', formData.personalInfo.title);
@@ -160,12 +160,12 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[relationshipToUser]', formData.preferred);
     fd.append('emergencyContact[homePhone]', formData.emergencyhomePhone);
     fd.append('emergencyContact[phone]', formData.emergencyphone);
-    fd.append('emergencyContact[email]', formData.email);
-    fd.append('emergencyContact[addressLine1]', formData.address);
-    fd.append('emergencyContact[addressLine2]', formData.address2);
-    fd.append('emergencyContact[country]', formData.country);
-    fd.append('emergencyContact[town]', formData.town);
-    fd.append('emergencyContact[postcode]', formData.pinCode);
+    fd.append('emergencyContact[email]', formData.emergencyemail);
+    fd.append('emergencyContact[addressLine1]', formData.emergencyaddress);
+    fd.append('emergencyContact[addressLine2]', formData.emergencyaddress2);
+    fd.append('emergencyContact[country]', formData.emergencycountry);
+    fd.append('emergencyContact[town]', formData.emergencytown);
+    fd.append('emergencyContact[postcode]', formData.emergencypinCode);
 
     fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
     fd.append('contactPreferences[reason]', formData.reason);
@@ -1307,7 +1307,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="email"
+                              name="emergencyemail"
                               control={control}
                               rules={{
                                 required: 'Email is required',
@@ -1330,7 +1330,7 @@ const AddCaseForm = ({ onCancel }) => {
                           </Grid>
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="address"
+                              name="emergencyaddress"
                               control={control}
                               rules={{
                                 required: 'Address is required',
@@ -1357,7 +1357,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={6}>
                             <Controller
-                              name="address2"
+                              name="emergencyaddress2"
                               rules={{
                                 required: 'Address is required',
                                 pattern: {
@@ -1384,7 +1384,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="country"
+                              name="emergencycountry"
                               control={control}
                               render={({ field }) => (
                                 <TextField select fullWidth label="Country" size="small" {...field}>
@@ -1401,7 +1401,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="town"
+                              name="emergencytown"
                               control={control}
                               rules={{
                                 required: 'Town is required',
@@ -1433,7 +1433,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                           <Grid item xs={12} sm={4}>
                             <Controller
-                              name="pinCode"
+                              name="emergencypinCode"
                               control={control}
                               rules={{
                                 required: 'Postcode is required',

@@ -22,7 +22,8 @@ import AntSwitch from 'components/AntSwitch.js';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
-
+import { useForm, Controller } from 'react-hook-form';
+import { toast } from 'react-toastify';
 const TagForm = () => {
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
@@ -30,12 +31,29 @@ const TagForm = () => {
   const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [tagData, setTagData] = useState({
-    name: '',
-    startDate: null,
-    endDate: null,
-    note: ''
+  const [isLoading, setIsloading] = useState(false);
+
+
+  const { control, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      name: '',
+      startDate: null,
+      endDate: null,
+      note: ''
+    }
   });
+  const onSubmit = async (data) => {
+    setIsloading(true);
+    try {
+      const response = await postApi(urls.tag.create, data);
+      toast.success('Tag created successfully');
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error creating tag:', error);
+    } finally {
+      setIsloading(false);
+    }
+  };
 
   const handleTagChange = (e) => {
     setTagData({ ...tagData, [e.target.name]: e.target.value });
@@ -194,7 +212,6 @@ const TagForm = () => {
             </Grid>
           </Grid>
         </Box>
-
         <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <DialogTitle>
             <Typography variant="h4">Add Tags</Typography>
@@ -203,58 +220,58 @@ const TagForm = () => {
           <DialogContent>
             <Grid container spacing={2} mt={0.5}>
               <Grid item xs={12}>
-                <TextField fullWidth label="Description" size="small" name="name" value={tagData.name} onChange={handleTagChange} />
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+                />
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="Start Date"
-                    value={tagData.startDate}
-                    onChange={(date) => setTagData({ ...tagData, startDate: date })}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        size: 'small'
-                      }
-                    }}
+                  <Controller
+                    name="startDate"
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        label="Start Date"
+                        {...field}
+                        onChange={(date) => setValue('startDate', date)}
+                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                      />
+                    )}
                   />
                 </LocalizationProvider>
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="End Date"
-                    value={tagData.endDate}
-                    onChange={(date) => setTagData({ ...tagData, endDate: date })}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        size: 'small'
-                      }
-                    }}
+                  <Controller
+                    name="endDate"
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        label="End Date"
+                        {...field}
+                        onChange={(date) => setValue('endDate', date)}
+                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                      />
+                    )}
                   />
                 </LocalizationProvider>
               </Grid>
 
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Note"
-                  size="small"
+                <Controller
                   name="note"
-                  multiline
-                  rows={3}
-                  value={tagData.note}
-                  onChange={handleTagChange}
+                  control={control}
+                  render={({ field }) => <TextField {...field} fullWidth label="Note" size="small" multiline rows={3} />}
                 />
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" sx={{ background: '#053146' }}>
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)}>
               Save Changes
             </Button>
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">

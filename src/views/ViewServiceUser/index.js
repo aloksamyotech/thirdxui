@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider } from '@mui/material';
 import { Add as AddIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import Timeline from '@mui/lab/Timeline';
@@ -15,7 +15,9 @@ import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
 import ServiceUser from 'assets/images/serviceUser.png';
 import OptionsPopover from 'components/AddFilter';
-
+import { useLocation } from 'react-router-dom';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 const UserProfileCard = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
@@ -26,7 +28,45 @@ const UserProfileCard = () => {
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const id = location.state.id;
+  const uniqueid = location.state.serialNumber;
+  useEffect(() => {
+    const fetchUserById = async () => {
+      try {
 
+        const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
+
+        const user = response?.data;
+
+        if (user) {
+          setUserData(user);
+        }
+      } catch (error) {
+        console.error('Error fetching user by ID:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) {
+      fetchUserById();
+    }
+  }, [id]);
+  const createdAt = userData?.createdAt;
+  const formattedDate = createdAt
+    ? new Date(createdAt).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      })
+    : '';
+  const personalInfo = userData?.personalInfo || {};
+  const contactInfo = userData?.contactInfo || {};
+  const emergencyContact = userData?.emergencyContact || {};
+  const contactPreferences = userData?.contactPreferences || {};
+  const otherInfo = userData?.otherInfo || {};
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -67,10 +107,8 @@ const UserProfileCard = () => {
   };
 
   const handleSave = (data) => {
-    console.log('Case note submitted:', data);
     setCaseNoteOpen(false);
   };
-
   return (
     <>
       <Grid item xs={12}>
@@ -119,13 +157,13 @@ const UserProfileCard = () => {
                   <img src={ServiceUser} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
                   <Grid item xs>
                     <Typography variant="h5" fontWeight="bold">
-                      John Doe
+                      {`${personalInfo.firstName} ${personalInfo.lastName}`}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      johndoe@example.com
+                      {`${contactInfo.email}`}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      #7864 | Individual | Added 09/10/2024
+                      {`${uniqueid}`} | Individual | {`${formattedDate}`}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -138,7 +176,7 @@ const UserProfileCard = () => {
                     Address
                   </Typography>
                   <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    123 Main Street, New York, NY
+                    {`${contactInfo.addressLine1} ${contactInfo.town} ${contactInfo.country}`}
                   </Typography>
                 </Box>
               </CardContent>
@@ -186,32 +224,33 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Full Name:</strong> <Typography component="span">John Doe</Typography>
+                              <strong>Full Name:</strong>{' '}
+                              <Typography component="span">{`${personalInfo.firstName} ${personalInfo.lastName}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>User ID:</strong> <Typography component="span">123456</Typography>
+                              <strong>User ID:</strong> <Typography component="span">{`${uniqueid}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Ethnicity:</strong> <Typography component="span">Mixed - Black and White Caribbean</Typography>
+                              <strong>Ethnicity:</strong> <Typography component="span">{`${personalInfo.ethnicity}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Language:</strong> <Typography component="span">English</Typography>
+                              <strong>Language:</strong> <Typography component="span">{`${contactInfo.firstLanguage}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Contact:</strong> <Typography component="span">+123456</Typography>
+                              <strong>Contact:</strong> <Typography component="span">+{`${contactInfo.phone}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">200 Dutch Meadows, USA</Typography>
+                              <strong>Address:</strong> <Typography component="span">{`${contactInfo.addressLine1}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -219,27 +258,37 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Gender:</strong> <Typography component="span">Male</Typography>
+                              <strong>Gender:</strong> <Typography component="span">{`${personalInfo.gender}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>DOB:</strong> <Typography component="span">1990-05-15</Typography>
+                              <strong>DOB:</strong>{' '}
+                              <Typography component="span">
+                                {personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
+                              </Typography>
+                            </Typography>
+                          </Box>
+
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography variant="body1">
+                              <strong>Age:</strong>{' '}
+                              <Typography component="span">
+                                {personalInfo.dateOfBirth
+                                  ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
+                                  : ''}
+                              </Typography>
+                            </Typography>
+                          </Box>
+
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography variant="body1">
+                              <strong>Alternative Id:</strong> <Typography component="span">{`${uniqueid}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Age:</strong> <Typography component="span">34</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Alternative Id:</strong> <Typography component="span">XYZ789</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Telephone no:</strong> <Typography component="span">+1 234 567 890</Typography>
+                              <strong>Telephone no:</strong> <Typography component="span">+{`${contactInfo.homePhone}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -258,7 +307,7 @@ const UserProfileCard = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <Typography variant="body1" color="textSecondary">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula purus id est efficitur volutpat.
+                            {`${otherInfo.description}`}
                           </Typography>
                         </Grid>
 
@@ -300,22 +349,24 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Full Name:</strong> <Typography component="span">John Doe</Typography>
+                              <strong>Full Name:</strong>{' '}
+                              <Typography component="span">{`${emergencyContact.firstName} ${emergencyContact.lastName}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Gender:</strong> <Typography component="span">Male</Typography>
+                              <strong>Gender:</strong> <Typography component="span">{`${emergencyContact.gender}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Relationship to Service User:</strong> <Typography component="span">Father</Typography>
+                              <strong>Relationship to Service User:</strong>{' '}
+                              <Typography component="span">{`${emergencyContact.relationshipToUser}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">London</Typography>
+                              <strong>Address:</strong> <Typography component="span">{`${emergencyContact.addressLine1}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -323,17 +374,17 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Home no:</strong> <Typography component="span">+138733</Typography>
+                              <strong>Home no:</strong> <Typography component="span">+{`${emergencyContact.homePhone}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Mobile no:</strong> <Typography component="span">9776526</Typography>
+                              <strong>Mobile no:</strong> <Typography component="span">+{`${emergencyContact.phone}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Email:</strong> <Typography component="span">example@gmail.com</Typography>
+                              <strong>Email:</strong> <Typography component="span">{`${emergencyContact.email}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -348,34 +399,33 @@ const UserProfileCard = () => {
                       <Typography variant="subtitle1" fontWeight="bold" color="#042E4C" gutterBottom>
                         Contact Preferences
                       </Typography>
-
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
                           <Typography fontWeight="bold" variant="body2">
                             Email:{' '}
                             <Typography component="span" fontWeight="normal">
-                              No
+                              {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="bold" variant="body2">
                             Telephone:{' '}
                             <Typography component="span" fontWeight="normal">
-                              No
+                              {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="bold" variant="body2">
                             SMS:{' '}
                             <Typography component="span" fontWeight="normal">
-                              Yes
+                              {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="bold" variant="body2">
                             Letter:{' '}
                             <Typography component="span" fontWeight="normal">
-                              No
+                              {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
                         </Grid>
@@ -384,28 +434,30 @@ const UserProfileCard = () => {
                           <Typography fontWeight="bold" variant="body2">
                             Reason:{' '}
                             <Typography component="span" fontWeight="normal">
-                              personals reason
+                              {contactPreferences?.reason || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="bold" variant="body2">
                             Contact purposes:{' '}
                             <Typography component="span" fontWeight="normal">
-                              No
+                              {contactPreferences?.contactPurposes || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="bold" variant="body2">
                             Preferred Method of Contact:{' '}
                             <Typography component="span" fontWeight="normal">
-                              No
+                              {contactPreferences?.preferredMethod || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="bold" variant="body2">
                             Date of confirmation:{' '}
                             <Typography component="span" fontWeight="normal">
-                              31/10/2024
+                              {contactPreferences?.dateOfConfirmation
+                                ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
+                                : 'N/A'}
                             </Typography>
                           </Typography>
                         </Grid>

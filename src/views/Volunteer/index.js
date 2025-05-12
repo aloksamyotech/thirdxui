@@ -191,7 +191,7 @@ const Lead = () => {
                 components={{
                   Toolbar: () => <CustomHeader />
                 }}
-                onRowClick={() => navigate('/view-service')}
+                onRowClick={(params) => navigate('/view-people', { state: params.row })}
                 sx={{
                   '& .MuiDataGrid-row': {
                     borderBottom: '1px solid #ccc'

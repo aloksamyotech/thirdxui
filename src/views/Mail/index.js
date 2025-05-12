@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -8,12 +8,15 @@ import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const Lead = () => {
   const navigate = useNavigate();
   const [listName, setListName] = useState('');
   const [tag, setTag] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [rows, setRows] = useState([]);
 
   const listNames = [
     { value: 'list-a', label: 'List A' },
@@ -67,14 +70,10 @@ const Lead = () => {
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
-
+            <PersonIcon />
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.name} {params.row.serialNumber}
               </Typography>
             </Box>
           </Stack>
@@ -89,12 +88,26 @@ const Lead = () => {
     }
   ];
 
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
-    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' }
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getApi(urls.mail.fetch);
 
+        const allmail = response?.data?.allMail || [];
+
+        const formattedUsers = allmail.map((user, index) => ({
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          name: user.name || ''
+        }));
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>

@@ -38,5 +38,8 @@ export const urls = Object.freeze({
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
     filterType: `${baseUrl}/transaction/filter`,
+  },
+  tag:{
+    create: `${baseUrl}/tag/addtag`,
   }
 });

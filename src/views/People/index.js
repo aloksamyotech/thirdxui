@@ -185,7 +185,7 @@ const Lead = () => {
                 columns={columns}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                onRowClick={() => navigate('/view-people')}
+                onRowClick={(params) => navigate('/view-people', { state: params.row })}
                 components={{
                   Toolbar: () => <CustomHeader />
                 }}

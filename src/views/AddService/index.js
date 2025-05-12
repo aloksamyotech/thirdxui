@@ -1,18 +1,22 @@
 import React from 'react';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography,Switch } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
+import { postApi } from 'common/apiClient';
+import toast from 'react-hot-toast';
+import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
+  const [isLoading, setIsloading] = useState(false);
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
 
-  // Restrict key presses
   const allowOnlyText = (e) => {
     const regex = /^[A-Za-z\s]$/;
     if (!regex.test(e.key) && e.key !== 'Backspace') {
@@ -33,7 +37,7 @@ const AddCaseForm = ({ onCancel }) => {
     setValue,
     formState: { errors }
   } = useForm({
-    mode: 'onChange', 
+    mode: 'onChange',
     defaultValues: {
       homePhone: '',
       phone: '',
@@ -49,8 +53,41 @@ const AddCaseForm = ({ onCancel }) => {
     }
   });
 
-  const onSubmit = (data) => {
-    onCancel();
+  const onSubmit = async (data) => {
+    setIsloading(true);
+
+    try {
+      const formData = new FormData();
+
+      formData.append('name', data.homePhone);
+      formData.append('code', data.phone);
+      formData.append('type', data.email);
+      formData.append('benificiary', data.beneficiaryInformation);
+      formData.append('campaigns', data.campaignsSupported);
+      formData.append('engagement', data.engagement);
+      formData.append('eventAttanded', data.eventsAttended);
+      formData.append('fundingInterest', data.fundingInterests);
+      formData.append('fundraisingActivities', data.fundraisingActivities);
+      formData.append('description', data.notes);
+      formData.append('isActive', data.isActive);
+      if (data.file) {
+        formData.append('file', data.file);
+      }
+
+      const response = await postApi(urls.service.create, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      toast.success('Service added successfully');
+      navigate('/services');
+      setIsloading(false);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error('Error submitting service');
+      setIsloading(false);
+    }
   };
 
   return (
@@ -165,6 +202,7 @@ const AddCaseForm = ({ onCancel }) => {
                           rules={{
                             required: `${field.replace(/([A-Z])/g, ' $1')} is required`,
                             minLength: { value: 2, message: 'Minimum 2 characters' },
+                            maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                             pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
                           }}
                           render={({ field: controllerField }) => (
@@ -239,14 +277,25 @@ const AddCaseForm = ({ onCancel }) => {
                       />
                     )}
                   />
+                  <Controller
+                    name="isActive"
+                    control={control}
+                    defaultValue={true} 
+                    render={({ field }) => (
+                      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                        <Typography variant="subtitle1">Active</Typography>
+                        <Switch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} color="primary" />
+                      </Box>
+                    )}
+                  />
                 </Paper>
               </Grid>
             </Grid>
 
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
               <Grid item>
-                <Button type="submit" variant="contained" sx={{ background: '#053146' }}>
-                  Save Changes
+                <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Grid>
               <Grid item>

@@ -117,80 +117,81 @@ const AddCaseForm = ({ onCancel }) => {
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
     setIsloading(true);
-    const caseData = {
-      personalInfo: {
-        title: formData.personalInfo.title,
-        firstName: formData.personalInfo.firstName,
-        lastName: formData.personalInfo.lastName,
-        gender: formData.personalInfo.gender,
-        dateOfBirth: formData.personalInfo.dateOfBirth,
-        nickName: formData.personalInfo.nickName,
-        ethnicity: formData.personalInfo.ethnicity
-      },
-      contactInfo: {
-        homePhone: formData.phone,
-        phone: formData.mobilePhone,
-        email: formData.email,
-        addressLine1: formData.address,
-        addressLine2: formData.address2,
-        town: formData.town,
-        district: formData.district,
-        postcode: formData.pinCode,
-        country: formData.country,
-        firstLanguage: formData.language,
-        otherId: formData.otherId
-      },
-      otherInfo: {
-        file: formData.file || '',
-        description: formData.riskNotes,
-        benificiary: formData.Beneficiary,
-        campaigns: formData.Campaigns,
-        engagement: formData.engagement,
-        eventAttanded: formData.eventsAttended,
-        fundingInterest: formData.fundingInterests,
-        fundraisingActivities: formData.fundraisingActivities,
-        restrictAccess: restrictAccess
-      },
-      emergencyContact: {
-        title: formData.emergencytitle,
-        gender: formData.emergencygender,
-        firstName: formData.emergencyfirstname,
-        lastName: formData.emergencylastname,
-        relationshipToUser: formData.emergencypreferred,
-        homePhone: formData.emergencyhomePhone,
-        phone: formData.emergencyphone,
-        email: formData.emergencyemail,
-        addressLine1: formData.emergencyaddress,
-        addressLine2: formData.emergencyaddress2,
-        country: formData.emergencycountry,
-        town: formData.emergencytown,
-        postcode: formData.emergencypinCode
-      },
-      contactPreferences: {
-        preferredMethod: formData.preferredContact,
-        reason: formData.reason,
-        contactPurposes: formData.contactPurpose,
-        dateOfConfirmation: formData.confirmationDate,
-        contactMethods: {
-          telephone: formData.telephone,
-          email: formData.emailConsent,
-          sms: formData.sms,
-          letter: formData.letter,
-          whatsapp: formData.whatsapp
-        }
-      },
-      role: 'volunteer',
-      isActive: true
-    };
+
+    const fd = new FormData();
+
+    fd.append('personalInfo[firstName]', formData.personalInfo.firstName);
+    fd.append('personalInfo[lastName]', formData.personalInfo.lastName);
+    fd.append('personalInfo[title]', formData.personalInfo.title);
+    fd.append('personalInfo[gender]', formData.personalInfo.gender);
+    const dob = formData.personalInfo.dateOfBirth;
+    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
+    fd.append('personalInfo[nickName]', formData.personalInfo.nickName);
+    fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity);
+
+    fd.append('contactInfo[homePhone]', formData.phone);
+    fd.append('contactInfo[phone]', formData.mobilePhone);
+    fd.append('contactInfo[email]', formData.email);
+    fd.append('contactInfo[addressLine1]', formData.address);
+    fd.append('contactInfo[addressLine2]', formData.address2);
+    fd.append('contactInfo[town]', formData.town);
+    fd.append('contactInfo[district]', formData.district);
+    fd.append('contactInfo[postcode]', formData.pinCode);
+    fd.append('contactInfo[country]', formData.country);
+    fd.append('contactInfo[firstLanguage]', formData.language);
+    fd.append('contactInfo[otherId]', formData.otherId);
+
+    fd.append('otherInfo[description]', formData.riskNotes);
+    fd.append('otherInfo[benificiary]', formData.Beneficiary);
+    fd.append('otherInfo[campaigns]', formData.Campaigns);
+    fd.append('otherInfo[engagement]', formData.engagement);
+    fd.append('otherInfo[eventAttanded]', formData.eventsAttended);
+    fd.append('otherInfo[fundingInterest]', formData.fundingInterests);
+    fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities);
+    fd.append('otherInfo[restrictAccess]', restrictAccess);
+
+    fd.append('emergencyContact[firstName]', formData.firstname);
+    fd.append('emergencyContact[lastName]', formData.lastname);
+    fd.append('emergencyContact[title]', formData.title);
+    fd.append('emergencyContact[gender]', formData.gender);
+    fd.append('emergencyContact[relationshipToUser]', formData.preferred);
+    fd.append('emergencyContact[homePhone]', formData.emergencyhomePhone);
+    fd.append('emergencyContact[phone]', formData.emergencyphone);
+    fd.append('emergencyContact[email]', formData.email);
+    fd.append('emergencyContact[addressLine1]', formData.address);
+    fd.append('emergencyContact[addressLine2]', formData.address2);
+    fd.append('emergencyContact[country]', formData.country);
+    fd.append('emergencyContact[town]', formData.town);
+    fd.append('emergencyContact[postcode]', formData.pinCode);
+
+    fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
+    fd.append('contactPreferences[reason]', formData.reason);
+    fd.append('contactPreferences[contactPurposes]', formData.contactPurpose);
+    const confirmDate = formData.confirmationDate;
+    fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
+
+    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone);
+    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent);
+    fd.append('contactPreferences[contactMethods][sms]', formData.sms);
+    fd.append('contactPreferences[contactMethods][letter]', formData.letter);
+    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp);
+
+    fd.append('role', 'volunteer');
+    fd.append('isActive', true);
+
+    if (formData.file) {
+      fd.append('file', formData.file);
+    }
 
     try {
-      const response = await postApi(urls.serviceuser.create, caseData);
-      toast.success('Successfully Add Service User ');
+      const response = await postApi(urls.serviceuser.create, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success('Successfully Added Service User');
       setIsloading(false);
       navigate('/volunteer');
     } catch (error) {
       console.error('Error creating user:', error);
-      toast.error('Error in Submitting form');
       setIsloading(false);
     }
   };
@@ -987,24 +988,36 @@ const AddCaseForm = ({ onCancel }) => {
                           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                             <Box mb={2} display="flex" justifyContent="space-between">
                               <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
-                              <TextField
-                                placeholder="Attachments"
-                                variant="outlined"
-                                fullWidth
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <AttachFileIcon fontSize="small" />
-                                    </InputAdornment>
-                                  ),
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <Link component="button" type="button" onClick={handleUploadClick}>
-                                        Upload a file
-                                      </Link>
-                                    </InputAdornment>
-                                  )
-                                }}
+                              <Controller
+                                name="file"
+                                control={control}
+                                render={({ field }) => (
+                                  <TextField
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    value={field.value ? field.value.name : ''}
+                                    placeholder="Attachments"
+                                    InputProps={{
+                                      readOnly: true,
+                                      startAdornment: (
+                                        <InputAdornment position="start">
+                                          <AttachFileIcon fontSize="small" />
+                                        </InputAdornment>
+                                      ),
+                                      endAdornment: (
+                                        <InputAdornment position="end">
+                                          <Button component="label" sx={{ minWidth: 0, p: 0, whiteSpace: 'nowrap' }}>
+                                            <Link component="span" underline="none">
+                                              Upload a file
+                                            </Link>
+                                            <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                          </Button>
+                                        </InputAdornment>
+                                      )
+                                    }}
+                                  />
+                                )}
                               />
                             </Box>
                             <Controller

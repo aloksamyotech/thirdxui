@@ -29,7 +29,7 @@ import Sessions from './Sessions';
 import Map from '../Map';
 import Shortcut2 from './Shortcut2';
 import EmptyCard from './EmptyCard';
-import Media from './Media';
+// import Media from './Media';
 // import Map from 'components/Map';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //

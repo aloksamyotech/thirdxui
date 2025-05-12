@@ -115,58 +115,56 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   const onSubmit = async (data) => {
-    const payload = {
-      contactInfo: {
-        Phone: data.mobilePhone,
-        email: data.email
-      },
-      otherInfo: {
-        description: data.riskNotes,
-        benificiary: data.Beneficiary,
-        campaigns: data.Campaigns,
-        engagement: data.engagement,
-        eventAttanded: data.eventsAttended,
-        fundingInterest: data.fundingInterests,
-        fundraisingActivities: data.fundraisingActivities,
-        restrictAccess: restrictAccess
-      },
-      contactPreferences: {
-        preferredMethod: data.preferredContact,
-        contactPurposes: data.contactPurpose,
-        dateOfConfirmation: data.confirmationDate,
-        reason: data.reason,
-        contactMethods: {
-          donortag: data.donortag,
-          email: data.emailConsent,
-          sms: data.sms,
-          letter: data.letter,
-          whatsapp: data.whatsapp
-        }
-      },
-      companyInformation: {
-        companyName: data.companyname,
-        mainContactName: data.contactname,
-        otherId: data.otherId,
-        socialMediaLinks: data.socialmedia,
-        recruitmentCampaign: data.Recruitmentcampaign
-      },
-      role: 'donor',
-      subRole: 'donar_company'
-    };
+    setIsloading(true);
+    const fd = new FormData();
+
+    if (data.file) {
+      fd.append('file', data.file); // Make sure `data.file` contains the selected file
+    }
+
+    fd.append('contactInfo[Phone]', data.mobilePhone);
+    fd.append('contactInfo[email]', data.email);
+
+    fd.append('otherInfo[description]', data.riskNotes);
+    fd.append('otherInfo[benificiary]', data.Beneficiary);
+    fd.append('otherInfo[campaigns]', data.Campaigns);
+    fd.append('otherInfo[engagement]', data.engagement);
+    fd.append('otherInfo[eventAttanded]', data.eventsAttended);
+    fd.append('otherInfo[fundingInterest]', data.fundingInterests);
+    fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities);
+    fd.append('otherInfo[restrictAccess]', restrictAccess);
+
+    fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
+    fd.append('contactPreferences[reason]', data.reason);
+    fd.append('contactPreferences[contactMethods][donortag]', data.donortag);
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
+    fd.append('contactPreferences[contactMethods][sms]', data.sms);
+    fd.append('contactPreferences[contactMethods][letter]', data.letter);
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp);
+
+    fd.append('companyInformation[companyName]', data.companyname);
+    fd.append('companyInformation[mainContactName]', data.contactname);
+    fd.append('companyInformation[otherId]', data.otherId);
+    fd.append('companyInformation[socialMediaLinks]', data.socialmedia);
+    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+
+    fd.append('role', 'donor');
+    fd.append('subRole', 'donar_company');
 
     try {
-      const response = await postApi(urls.serviceuser.create, payload, {
+      const response = await postApi(urls.serviceuser.create, fd, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data'
         }
       });
-      toast.success('Successfully Add Service User ');
+      toast.success('Successfully Added Service User');
       setIsloading(false);
       navigate('/donor');
     } catch (error) {
       console.error('Error while adding donor:', error);
       toast.error('Error in Submitting form');
-
       setIsloading(false);
     }
   };
@@ -390,33 +388,36 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              <TextField
-                                placeholder="Attachments"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                value={selectedFile ? selectedFile.name : ''}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <AttachFileIcon fontSize="small" />
-                                    </InputAdornment>
-                                  ),
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <Link component="button" onClick={handleFileClick}>
-                                        Upload a file
-                                      </Link>
-                                    </InputAdornment>
-                                  )
-                                }}
-                              />
-                              <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                style={{ display: 'none' }}
-                                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                              <Controller
+                                name="file"
+                                control={control}
+                                render={({ field }) => (
+                                  <Box mb={2} display="flex" justifyContent="space-between">
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      fullWidth
+                                      value={field.value ? field.value.name : ''}
+                                      placeholder="Attachments"
+                                      InputProps={{
+                                        readOnly: true,
+                                        startAdornment: (
+                                          <InputAdornment position="start">
+                                            <AttachFileIcon fontSize="small" />
+                                          </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                          <InputAdornment position="end">
+                                            <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                              <Link component="span">Upload a file</Link>
+                                              <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                            </Button>
+                                          </InputAdornment>
+                                        )
+                                      }}
+                                    />
+                                  </Box>
+                                )}
                               />
                             </Grid>
                           </Grid>

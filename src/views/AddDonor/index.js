@@ -120,69 +120,66 @@ const AddCaseForm = () => {
       console.log('Selected file:', file);
     }
   };
-  const onSubmit = async (data) => {h
-    const payload = {
-      personalInfo: {
-        title: data.title,
-        firstName: data.firstname,
-        lastName: data.lastname,
-        gender: data.gender,
-        dateOfBirth: data.dob
-      },
-      contactInfo: {
-        phone: data.phone,
-        homePhone: data.mobilePhone,
-        email: data.email,
-        addressLine1: data.address,
-        addressLine2: data.address2,
-        district: data.district,
-        postcode: data.pinCode,
-        country: data.country
-      },
-      otherInfo: {
-        description: data.riskNotes,
-        benificiary: data.Beneficiary,
-        campaigns: data.campaigns,
-        engagement: data.engagement,
-        eventAttanded: data.eventsAttended,
-        fundingInterest: data.fundingInterests,
-        fundraisingActivities: data.fundraisingActivities,
-        restrictAccess: restrictAccess
-      },
-      contactPreferences: {
-        preferredMethod: data.preferredContact,
-        contactPurposes: data.contactPurpose,
-        dateOfConfirmation: data.confirmationDate,
-        reason: data.reason,
-        contactMethods: {
-          email: data.emailConsent,
-          sms: data.sms,
-          letter: data.letter,
-          telephone: data.telephone ?? false
-        }
-      },
-      companyInformation: {
-        socialMediaLinks: data.socialmedia,
-        recruitmentCampaign: data.Recruitmentcampaign
-      },
-      role: 'donor',
-      subRole: 'donar_individual'
-    };
+  const onSubmit = async (data) => {
+    setIsloading(true);
+
+    const fd = new FormData();
+
+    if (data.file) {
+      fd.append('file', data.file); 
+    }
+
+    fd.append('personalInfo[title]', data.title);
+    fd.append('personalInfo[firstName]', data.firstname);
+    fd.append('personalInfo[lastName]', data.lastname);
+    fd.append('personalInfo[gender]', data.gender);
+    fd.append('personalInfo[dateOfBirth]', data.dob);
+
+    fd.append('contactInfo[phone]', data.phone);
+    fd.append('contactInfo[homePhone]', data.mobilePhone);
+    fd.append('contactInfo[email]', data.email);
+    fd.append('contactInfo[addressLine1]', data.address);
+    fd.append('contactInfo[addressLine2]', data.address2);
+    fd.append('contactInfo[district]', data.district);
+    fd.append('contactInfo[postcode]', data.pinCode);
+    fd.append('contactInfo[country]', data.country);
+
+    fd.append('otherInfo[description]', data.riskNotes);
+    fd.append('otherInfo[benificiary]', data.Beneficiary);
+    fd.append('otherInfo[campaigns]', data.campaigns);
+    fd.append('otherInfo[engagement]', data.engagement);
+    fd.append('otherInfo[eventAttanded]', data.eventsAttended);
+    fd.append('otherInfo[fundingInterest]', data.fundingInterests);
+    fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities);
+    fd.append('otherInfo[restrictAccess]', restrictAccess);
+
+    fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
+    fd.append('contactPreferences[reason]', data.reason);
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
+    fd.append('contactPreferences[contactMethods][sms]', data.sms);
+    fd.append('contactPreferences[contactMethods][letter]', data.letter);
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ?? false);
+
+    fd.append('companyInformation[socialMediaLinks]', data.socialmedia);
+    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+
+    fd.append('role', 'donor');
+    fd.append('subRole', 'donar_individual');
 
     try {
-      const response = await postApi(urls.serviceuser.create, payload, {
+      const response = await postApi(urls.serviceuser.create, fd, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data'
         }
       });
-      toast.success('Successfully Add Service User ');
+      toast.success('Successfully Added Donor');
       setIsloading(false);
       navigate('/donor');
-
     } catch (error) {
       console.error('Error while adding donor:', error);
       toast.error('Error in Submitting form');
-
       setIsloading(false);
     }
   };
@@ -930,36 +927,37 @@ const AddCaseForm = () => {
 
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                            <Box mb={2} display="flex" justifyContent="space-between">
-                              <TextField
-                                placeholder="Attachments"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                value={selectedFile ? selectedFile.name : ''}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <AttachFileIcon fontSize="small" />
-                                    </InputAdornment>
-                                  ),
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      <Link component="button" onClick={handleFileClick}>
-                                        Upload a file
-                                      </Link>
-                                    </InputAdornment>
-                                  )
-                                }}
-                              />
-                              <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                style={{ display: 'none' }}
-                                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                              />
-                            </Box>
+                            <Controller
+                              name="file"
+                              control={control}
+                              render={({ field }) => (
+                                <Box mb={2} display="flex" justifyContent="space-between">
+                                  <TextField
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    value={field.value ? field.value.name : ''}
+                                    placeholder="Attachments"
+                                    InputProps={{
+                                      readOnly: true,
+                                      startAdornment: (
+                                        <InputAdornment position="start">
+                                          <AttachFileIcon fontSize="small" />
+                                        </InputAdornment>
+                                      ),
+                                      endAdornment: (
+                                        <InputAdornment position="end">
+                                          <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                            <Link component="span">Upload a file</Link>
+                                            <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                          </Button>
+                                        </InputAdornment>
+                                      )
+                                    }}
+                                  />
+                                </Box>
+                              )}
+                            />
                             <Controller
                               name="riskNotes"
                               control={control}

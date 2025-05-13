@@ -27,8 +27,8 @@ const Lead = () => {
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   const statusFilter = [
-    { value: 'true', label: 'Active' },
-    { value: 'false', label: 'Inactive' }
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
   ];
 
   const dateAddedFilters = [
@@ -97,15 +97,30 @@ const Lead = () => {
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
-      
-      if (serviceType) queryParams.append('serviceType', serviceType);
-      if (status) queryParams.append('serviceStatus', status);
-      if (owner) queryParams.append('serviceName', owner);
-      if (dateOpenedFilter) queryParams.append('caseOpened', dateOpenedFilter);
-      if (searchQuery) queryParams.append('serviceName', searchQuery);
 
-      const response = await getApi(`${urls.case.filterType}?${queryParams.toString()}`);
-      const filteredCases = response?.data || [];
+      if (serviceType && serviceType !== '') {
+        queryParams.append('serviceId', serviceType);
+      }
+      if (status && status !== '') {
+        queryParams.append('serviceStatus', status);
+      }
+      if (owner && owner !== '') {
+        queryParams.append('serviceType', owner);
+      }
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('caseOpened', formattedDate);
+      }
+
+      if (searchQuery && searchQuery !== '') {
+        queryParams.append('search', searchQuery);
+      }
+
+      const queryString = queryParams.toString();
+      const url = `${urls.case.filterType}${queryString ? `?${queryString}` : ''}`;
+      const response = await getApi(url);
+
+    const filteredCases = response?.data || [];
 
       const formatDate = (dateString) => {
         if (!dateString) return '';
@@ -113,16 +128,21 @@ const Lead = () => {
         return date.toLocaleDateString('en-GB');
       };
 
-      const formattedUsers = filteredCases.map((user, index) => ({
-        id: user._id,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-        dateOpened: formatDate(user.caseOpened),
-        dateClosed: formatDate(user.caseClosed),
-        serviceUser: user.serviceName || '',
-        service: user.service || '',
-        owner: user.serviceType || '',
-        status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
-      }));
+      const formattedUsers = filteredCases.map((user, index) => {
+        const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
+        const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
+
+        return {
+          id: user?._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          dateOpened: formatDate(user?.caseOpened),
+          dateClosed: formatDate(user?.caseClosed),
+          serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
+          service: user?.serviceId?.name || '',
+          owner: user?.serviceType || '',
+          status: user?.serviceStatus === 'Active' ? 'Open' : 'Closed'
+        };
+      });
 
       setRows(formattedUsers);
       setIsFiltered(true);
@@ -141,10 +161,16 @@ const Lead = () => {
     fetchInitialData();
   };
 
+  useEffect(() => {
+    if (serviceType || status || owner || dateOpenedFilter || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [serviceType, status, owner, dateOpenedFilter, searchQuery]);
+
   const fetchInitialData = async () => {
     try {
       const response = await getApi(urls.case.fetch);
-      const allCases = response?.data?.allService || [];
+      const allCases = response?.data || [];
 
       const formatDate = (dateString) => {
         if (!dateString) return '';
@@ -152,23 +178,29 @@ const Lead = () => {
         return date.toLocaleDateString('en-GB');
       };
 
-      const formattedUsers = allCases.map((user, index) => ({
-        id: user._id,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-        dateOpened: formatDate(user.caseOpened),
-        dateClosed: formatDate(user.caseClosed),
-        serviceUser: user.serviceName || '',
-        service: user.service || '',
-        owner: user.serviceType || '',
-        status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
-      }));
+      const formattedUsers = allCases?.map((user, index) => {
+        const firstName = user?.userServiceDetails?.personalInfo?.firstName || '';
+        const lastName = user?.userServiceDetails?.personalInfo?.lastName || '';
+
+        return {
+          id: user?._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          dateOpened: formatDate(user?.caseOpened),
+          dateClosed: formatDate(user?.caseClosed),
+          serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
+          service: user?.serviceDetails?.name || '',
+          owner: user?.serviceType || '',
+          status: user?.serviceStatus === 'Active' ? 'Open' : 'Closed'
+        };
+      });
 
       setRows(formattedUsers);
 
-      const uniqueServiceTypes = [...new Set(allCases.map((item) => item.service).filter(Boolean))].map((value) => ({
-        value,
-        label: value
+      const uniqueServiceTypes = [...new Set(allCases.map((item) => item?.serviceDetails).filter(Boolean))].map((service) => ({
+        value: service._id,
+        label: service.name
       }));
+
       setServiceTypeFilterOptions(uniqueServiceTypes);
 
       const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
@@ -239,28 +271,16 @@ const Lead = () => {
             showFilter={showFilter}
             serviceTypes={serviceTypeFilter}
             serviceTypeFilter={serviceType}
-            setServiceTypeFilter={(value) => {
-              setServiceType(value);
-              handleFilter();
-            }}
+            setServiceTypeFilter={(value) => setServiceType(value)}
             statuses={statusFilter}
             statusFilter={status}
-            setStatusFilter={(value) => {
-              setStatus(value);
-              handleFilter();
-            }}
+            setStatusFilter={(value) => setStatus(value)}
             dateAddedFilters={dateAddedFilters}
             dateOpenedFilter={dateOpenedFilter}
-            setDateOpenedFilter={(value) => {
-              setDateOpenedFilter(value);
-              handleFilter();
-            }}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             owners={ownerFilters}
             ownerFilter={owner}
-            setOwnerFilter={(value) => {
-              setOwner(value);
-              handleFilter();
-            }}
+            setOwnerFilter={(value) => setOwner(value)}
             selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
             onReset={handleReset}
           />

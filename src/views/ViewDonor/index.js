@@ -76,7 +76,7 @@ const UserProfileCard = () => {
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
           <Typography variant="h4" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/people')} sx={{ ml: 1 }}>
+            <IconButton onClick={() => navigate('/donor')} sx={{ ml: 1 }}>
               <ArrowBackIcon />
             </IconButton>
             PROFILE
@@ -183,7 +183,7 @@ const UserProfileCard = () => {
 
             {tabValue === 0 && (
               <Grid container>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} md={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
                     <CardContent>
                       <Typography variant="h6" fontWeight="bold" gutterBottom>

@@ -3,9 +3,9 @@ import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
   MenuItem,
-  IconButton,
+  Autocomplete,
   Card,
-  CardHeader,
+  CircularProgress,
   CardContent,
   Tabs,
   Tab,
@@ -27,15 +27,17 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi } from 'common/apiClient';
+import { postApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
-const AddCaseForm = () => {
+const AddDonorForm = () => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [districts, setDistricts] = useState([]);
   const [isLoading, setIsloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fileInputRef = React.useRef(null);
 
@@ -48,7 +50,7 @@ const AddCaseForm = () => {
     reset,
     formState: { errors }
   } = useForm({
-     mode:'all',
+    mode: 'all',
     defaultValues: {
       title: '',
       firstname: '',
@@ -59,26 +61,17 @@ const AddCaseForm = () => {
       gender: '',
       dob: null,
       address: '',
-      // town: '',
       country: '',
       pinCode: '',
       riskNotes: '',
       keyIndicators: '',
       service: '',
       socialmedia: '',
-      // fromDate: null,
-      // toDate: null,
-      // referDate: null,
-      // referrerName: '',
-      // referrerJob: '',
-      // referrerAddress: '',
-      // referrerEmail: '',
-      // referrerPhone: '',
-      // referralType: '',
-      // telephone: true,
+      donortag: true,
       emailConsent: true,
       sms: true,
-      letter: true,
+      telephone: true,
+      whatsapp: true,
       preferredContact: '',
       reason: '',
       contactPurpose: '',
@@ -88,7 +81,7 @@ const AddCaseForm = () => {
     }
   });
 
-  const [restrictAccess, setRestrictAccess] = useState(false);
+  const [restrictAccess, setRestrictAccess] = useState(true);
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   useEffect(() => {
@@ -102,6 +95,23 @@ const AddCaseForm = () => {
         }));
         setCountryList(countries);
       });
+  }, []);
+
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      setLoading(true);
+      try {
+        const response = await getApi(urls.serviceuser.getDistrict);
+        const fetchedDistricts = response?.data?.cities || [];
+        setDistricts(fetchedDistricts);
+      } catch (error) {
+        console.error('Error fetching districts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDistricts();
   }, []);
 
   const handleChange = (e) => {
@@ -127,7 +137,7 @@ const AddCaseForm = () => {
     const fd = new FormData();
 
     if (data.file) {
-      fd.append('file', data.file); 
+      fd.append('file', data.file);
     }
 
     fd.append('personalInfo[title]', data.title);
@@ -159,9 +169,10 @@ const AddCaseForm = () => {
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
     fd.append('contactPreferences[reason]', data.reason);
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
+    fd.append('contactPreferences[contactMethods][donor]', data.donortag);
     fd.append('contactPreferences[contactMethods][sms]', data.sms);
-    fd.append('contactPreferences[contactMethods][letter]', data.letter);
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ?? false);
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp);
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone);
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia);
     fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
@@ -179,7 +190,6 @@ const AddCaseForm = () => {
       setIsloading(false);
       navigate('/donor');
     } catch (error) {
-      console.error('Error while adding donor:', error);
       toast.error('Error in Submitting form');
       setIsloading(false);
     }
@@ -375,6 +385,9 @@ const AddCaseForm = () => {
                               <Controller
                                 name="dob"
                                 control={control}
+                                rules={{
+                                  required: 'Date of Birth is required'
+                                }}
                                 render={({ field }) => (
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
@@ -390,11 +403,6 @@ const AddCaseForm = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              {/* <Controller
-                                name="socialmedia"
-                                control={control}
-                                render={({ field }) => <TextField fullWidth label="Social media links" size="small" {...field} />}
-                              /> */}
                               <Controller
                                 name="socialmedia"
                                 control={control}
@@ -419,8 +427,8 @@ const AddCaseForm = () => {
                                     message: 'Social media link cannot exceed 50 characters'
                                   },
                                   pattern: {
-                                    value: onlyLetters,
-                                    message: 'Social media link can only contain letters'
+                                    value: /^(https?:\/\/)?(www\.)?([a-zA-Z0-9_-]+)(\.[a-zA-Z]{2,})+(\/[a-zA-Z0-9#]+\/?)*$/,
+                                    message: 'Please enter a valid URL'
                                   }
                                 }}
                               />
@@ -542,6 +550,10 @@ const AddCaseForm = () => {
                                   pattern: {
                                     value: onlyLettersAndNumbers,
                                     message: 'Address can only contain letters, numbers and spaces'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address must be at most 100 characters'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -569,6 +581,10 @@ const AddCaseForm = () => {
                                   pattern: {
                                     value: onlyLettersAndNumbers,
                                     message: 'Address can only contain letters, numbers and spaces'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address must be at most 100 characters'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -591,14 +607,31 @@ const AddCaseForm = () => {
                               <Controller
                                 name="district"
                                 control={control}
+                                rules={{ required: 'District is required' }}
                                 render={({ field }) => (
-                                  <TextField
-                                    fullWidth
-                                    label="Borough/District"
-                                    size="small"
-                                    error={!!errors.district}
-                                    helperText={errors.district?.message}
+                                  <Autocomplete
                                     {...field}
+                                    options={districts}
+                                    loading={loading}
+                                    onChange={(_, value) => field.onChange(value)}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Select District"
+                                        size="small"
+                                        error={!!errors.district}
+                                        helperText={errors.district?.message}
+                                        InputProps={{
+                                          ...params.InputProps,
+                                          endAdornment: (
+                                            <>
+                                              {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                              {params.InputProps.endAdornment}
+                                            </>
+                                          )
+                                        }}
+                                      />
+                                    )}
                                   />
                                 )}
                               />
@@ -612,7 +645,7 @@ const AddCaseForm = () => {
                                   required: 'Postcode is required',
                                   pattern: {
                                     value: onlyNumbers,
-                                    message: 'Please enter a valid UK postcode'
+                                    message: 'Please enter a valid postcode'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -635,15 +668,30 @@ const AddCaseForm = () => {
                               <Controller
                                 name="country"
                                 control={control}
-                                render={({ field }) => (
-                                  <TextField select fullWidth label="Country of origin" size="small" {...field}>
-                                    {countryList.map((country) => (
-                                      <MenuItem key={country.code} value={country.name}>
-                                        <img src={country.flag} alt={country.code} style={{ width: 20, height: 14, marginRight: 8 }} />
-                                        {country.name}
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
+                                rules={{ required: 'Country is required' }}
+                                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                  <Autocomplete
+                                    options={countryList}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.name === value}
+                                    value={countryList.find((c) => c.name === value) || null}
+                                    onChange={(_, newValue) => onChange(newValue?.name || '')}
+                                    renderOption={(props, option) => (
+                                      <li {...props}>
+                                        <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
+                                        {option.name}
+                                      </li>
+                                    )}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Country of origin"
+                                        size="small"
+                                        error={!!error}
+                                        helperText={error?.message}
+                                      />
+                                    )}
+                                  />
                                 )}
                               />
                             </Grid>
@@ -652,15 +700,20 @@ const AddCaseForm = () => {
                               <Controller
                                 name="Recruitmentcampaign"
                                 control={control}
+                                rules={{ required: 'Recruitment Campaign is required' }}
                                 render={({ field }) => (
                                   <TextField
+                                    select
                                     fullWidth
                                     label="Recruitment Campaign"
                                     size="small"
-                                    error={!!errors.otherId}
-                                    helperText={errors.otherId?.message}
+                                    error={!!errors.Recruitmentcampaign}
+                                    helperText={errors.Recruitmentcampaign?.message}
                                     {...field}
-                                  />
+                                  >
+                                    <MenuItem value="Campaign 1">Campaign 1</MenuItem>
+                                    <MenuItem value="Campaign 2">Campaign 2</MenuItem>
+                                  </TextField>
                                 )}
                               />
                             </Grid>
@@ -688,7 +741,6 @@ const AddCaseForm = () => {
                                   name="Beneficiary"
                                   control={control}
                                   rules={{
-                                    required: 'Beneficiary information is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Beneficiary information must be at least 2 characters'
@@ -728,7 +780,6 @@ const AddCaseForm = () => {
                                   name="keyIndicators"
                                   control={control}
                                   rules={{
-                                    required: 'Key indicators are required',
                                     minLength: {
                                       value: 2,
                                       message: 'Key indicators must be at least 2 characters'
@@ -768,7 +819,6 @@ const AddCaseForm = () => {
                                   name="engagement"
                                   control={control}
                                   rules={{
-                                    required: 'Engagement is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Engagement must be at least 2 characters'
@@ -808,7 +858,6 @@ const AddCaseForm = () => {
                                   name="eventsAttended"
                                   control={control}
                                   rules={{
-                                    required: 'Events attended information is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Events attended must be at least 2 characters'
@@ -848,7 +897,6 @@ const AddCaseForm = () => {
                                   name="fundingInterests"
                                   control={control}
                                   rules={{
-                                    required: 'Funding interests information is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Funding interests must be at least 2 characters'
@@ -888,7 +936,6 @@ const AddCaseForm = () => {
                                   name="fundraisingActivities"
                                   control={control}
                                   rules={{
-                                    required: 'Fundraising activities information is required',
                                     minLength: {
                                       value: 2,
                                       message: 'Fundraising activities must be at least 2 characters'
@@ -1072,6 +1119,9 @@ const AddCaseForm = () => {
                     <Controller
                       name="confirmationDate"
                       control={control}
+                      rules={{
+                        required: 'Date of Confirmation is required'
+                      }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
@@ -1214,12 +1264,12 @@ const AddCaseForm = () => {
                   </Grid>
                   <Grid item xs={12} sm={2}>
                     <Controller
-                      name="letter"
+                      name="telephone"
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
                           control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="Letter"
+                          label="Telephone"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
                         />
@@ -1259,7 +1309,7 @@ const AddCaseForm = () => {
                 onSubmit(data);
               })}
             >
-              {isLoading ? 'Saving...' : 'Save Changes Individual'}
+              {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
           </Grid>
           <Grid item>
@@ -1273,4 +1323,4 @@ const AddCaseForm = () => {
   );
 };
 
-export default AddCaseForm;
+export default AddDonorForm;

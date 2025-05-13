@@ -19,7 +19,7 @@ import {
   FormControlLabel
 } from '@mui/material';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Link from '@mui/material/Link';
@@ -37,6 +37,9 @@ const AddCaseForm = ({ onCancel }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const fileInputRef = React.useRef(null);
+  const location = useLocation();
+  const subRole = location.state?.subRole;
+
   const {
     register,
     handleSubmit,
@@ -46,7 +49,7 @@ const AddCaseForm = ({ onCancel }) => {
     reset,
     formState: { errors }
   } = useForm({
-     mode:'all',
+    mode: 'all',
     defaultValues: {
       title: '',
       firstname: '',
@@ -74,7 +77,8 @@ const AddCaseForm = ({ onCancel }) => {
       telephone: true,
       emailConsent: true,
       sms: true,
-      letter: true,
+      donortag: true,
+      whatsapp: true,
       preferredContact: '',
       reason: '',
       contactPurpose: '',
@@ -82,7 +86,7 @@ const AddCaseForm = ({ onCancel }) => {
     }
   });
 
-  const [restrictAccess, setRestrictAccess] = useState(false);
+  const [restrictAccess, setRestrictAccess] = useState(true);
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   useEffect(() => {
@@ -111,7 +115,6 @@ const AddCaseForm = ({ onCancel }) => {
     if (file) {
       setSelectedFile(file);
       setValue('attachments', file);
-      console.log('Selected file:', file);
     }
   };
 
@@ -120,7 +123,7 @@ const AddCaseForm = ({ onCancel }) => {
     const fd = new FormData();
 
     if (data.file) {
-      fd.append('file', data.file); // Make sure `data.file` contains the selected file
+      fd.append('file', data.file);
     }
 
     fd.append('contactInfo[Phone]', data.mobilePhone);
@@ -142,7 +145,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[contactMethods][donortag]', data.donortag);
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
     fd.append('contactPreferences[contactMethods][sms]', data.sms);
-    fd.append('contactPreferences[contactMethods][letter]', data.letter);
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone);
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp);
 
     fd.append('companyInformation[companyName]', data.companyname);
@@ -152,7 +155,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
 
     fd.append('role', 'donor');
-    fd.append('subRole', 'donar_company');
+    fd.append('subRole', subRole);
 
     try {
       const response = await postApi(urls.serviceuser.create, fd, {
@@ -160,11 +163,17 @@ const AddCaseForm = ({ onCancel }) => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      toast.success('Successfully Added Service User');
+      toast.success(
+        subRole === 'donar_group'
+          ? 'Donor group added successfully!'
+          : subRole === 'donar_company'
+          ? 'Donor company added successfully!'
+          : 'Donor added successfully!'
+      );
+
       setIsloading(false);
       navigate('/donor');
     } catch (error) {
-      console.error('Error while adding donor:', error);
       toast.error('Error in Submitting form');
       setIsloading(false);
     }
@@ -179,7 +188,9 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">Add Donor</Typography>
+          <Typography variant="h4">
+            {subRole === 'donar_company' ? 'Add Donor Company' : subRole === 'donar_group' ? 'Add Donor Group' : 'Add Donor'}
+          </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />
@@ -320,7 +331,31 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="socialmedia"
                                 control={control}
-                                render={({ field }) => <TextField fullWidth label="Social media links" size="small" {...field} />}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Social Media Links"
+                                    size="small"
+                                    error={!!errors.socialmedia}
+                                    helperText={errors.socialmedia?.message}
+                                    {...field}
+                                  />
+                                )}
+                                rules={{
+                                  required: 'Social media link is required',
+                                  minLength: {
+                                    value: 2,
+                                    message: 'Social media link must be at least 2 characters'
+                                  },
+                                  maxLength: {
+                                    value: 50,
+                                    message: 'Social media link cannot exceed 50 characters'
+                                  },
+                                  pattern: {
+                                    value: /^(https?:\/\/)?(www\.)?([a-zA-Z0-9_-]+)(\.[a-zA-Z]{2,})+(\/[a-zA-Z0-9#]+\/?)*$/,
+                                    message: 'Please enter a valid URL'
+                                  }
+                                }}
                               />
                             </Grid>
                           </Grid>
@@ -375,15 +410,20 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="Recruitmentcampaign"
                                 control={control}
+                                rules={{ required: 'Recruitment Campaign is required' }}
                                 render={({ field }) => (
                                   <TextField
+                                    select
                                     fullWidth
                                     label="Recruitment Campaign"
                                     size="small"
-                                    error={!!errors.campaign}
-                                    helperText={errors.campaign?.message}
+                                    error={!!errors.Recruitmentcampaign}
+                                    helperText={errors.Recruitmentcampaign?.message}
                                     {...field}
-                                  />
+                                  >
+                                    <MenuItem value="Campaign 1">Campaign 1</MenuItem>
+                                    <MenuItem value="Campaign 2">Campaign 2</MenuItem>
+                                  </TextField>
                                 )}
                               />
                             </Grid>
@@ -393,7 +433,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="file"
                                 control={control}
                                 render={({ field }) => (
-                                  <Box mb={2} display="flex" justifyContent="space-between">
+                                  <Box display="flex" justifyContent="space-between">
                                     <TextField
                                       variant="outlined"
                                       size="small"
@@ -446,14 +486,13 @@ const AddCaseForm = ({ onCancel }) => {
                                         <Controller
                                           name="Beneficiary"
                                           rules={{
-                                            required: 'Last name is required',
                                             minLength: {
                                               value: 2,
-                                              message: 'Last name must be at least 2 characters'
+                                              message: 'Required at least 2 characters'
                                             },
                                             maxLength: {
-                                              value: 30,
-                                              message: 'Last name cannot exceed 50 characters'
+                                              value: 50,
+                                              message: 'Cannot exceed 50 characters'
                                             },
                                             pattern: {
                                               value: onlyLetters,
@@ -483,14 +522,13 @@ const AddCaseForm = ({ onCancel }) => {
                                         <Controller
                                           name="Campaigns"
                                           rules={{
-                                            required: 'Last name is required',
                                             minLength: {
                                               value: 2,
-                                              message: 'Last name must be at least 2 characters'
+                                              message: 'Required at least 2 characters'
                                             },
                                             maxLength: {
-                                              value: 30,
-                                              message: 'Last name cannot exceed 50 characters'
+                                              value: 50,
+                                              message: 'Cannot exceed 50 characters'
                                             },
                                             pattern: {
                                               value: onlyLetters,
@@ -520,14 +558,13 @@ const AddCaseForm = ({ onCancel }) => {
                                         <Controller
                                           name="engagement"
                                           rules={{
-                                            required: 'Last name is required',
                                             minLength: {
                                               value: 2,
-                                              message: 'Last name must be at least 2 characters'
+                                              message: 'Required at least 2 characters'
                                             },
                                             maxLength: {
-                                              value: 30,
-                                              message: 'Last name cannot exceed 50 characters'
+                                              value: 50,
+                                              message: 'Cannot exceed 50 characters'
                                             },
                                             pattern: {
                                               value: onlyLetters,
@@ -557,14 +594,13 @@ const AddCaseForm = ({ onCancel }) => {
                                         <Controller
                                           name="eventsAttended"
                                           rules={{
-                                            required: 'Last name is required',
                                             minLength: {
                                               value: 2,
-                                              message: 'Last name must be at least 2 characters'
+                                              message: 'Required at least 2 characters'
                                             },
                                             maxLength: {
-                                              value: 30,
-                                              message: 'Last name cannot exceed 50 characters'
+                                              value: 50,
+                                              message: 'Cannot exceed 50 characters'
                                             },
                                             pattern: {
                                               value: onlyLetters,
@@ -594,14 +630,13 @@ const AddCaseForm = ({ onCancel }) => {
                                         <Controller
                                           name="fundingInterests"
                                           rules={{
-                                            required: 'Last name is required',
                                             minLength: {
                                               value: 2,
-                                              message: 'Last name must be at least 2 characters'
+                                              message: 'Required at least 2 characters'
                                             },
                                             maxLength: {
-                                              value: 30,
-                                              message: 'Last name cannot exceed 50 characters'
+                                              value: 50,
+                                              message: 'Cannot exceed 50 characters'
                                             },
                                             pattern: {
                                               value: onlyLetters,
@@ -631,14 +666,13 @@ const AddCaseForm = ({ onCancel }) => {
                                         <Controller
                                           name="fundraisingActivities"
                                           rules={{
-                                            required: 'Last name is required',
                                             minLength: {
                                               value: 2,
-                                              message: 'Last name must be at least 2 characters'
+                                              message: 'Required at least 2 characters'
                                             },
                                             maxLength: {
-                                              value: 30,
-                                              message: 'Last name cannot exceed 50 characters'
+                                              value: 50,
+                                              message: 'Cannot exceed 50 characters'
                                             },
                                             pattern: {
                                               value: onlyLetters,
@@ -786,6 +820,9 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="confirmationDate"
                       control={control}
+                      rules={{
+                        required: 'Date is required'
+                      }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
@@ -928,12 +965,12 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                   <Grid item xs={12} sm={2}>
                     <Controller
-                      name="letter"
+                      name="telephone"
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
                           control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="Letter"
+                          label="Telephone"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
                         />
@@ -955,8 +992,6 @@ const AddCaseForm = ({ onCancel }) => {
                       )}
                     />
                   </Grid>
-
-                  <Grid item sm={4}></Grid>
                 </Grid>
               )}
             </Box>

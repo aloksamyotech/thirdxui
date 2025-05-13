@@ -91,12 +91,15 @@ const Lead = () => {
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {params.row.role === 'donor' ? <PersonIcon /> : <ApartmentIcon />}
+            {params.row.subRole === 'donar_individual' ? <PersonIcon /> : <ApartmentIcon />}
 
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.companyInformation?.mainContactName || 'No Name'}
-                {params.row.companyInformation?.companyName || 'No Company'}
+                {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
+                  ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
+                  : params.row.companyInformation?.companyName
+                  ? params.row.companyInformation.companyName
+                  : 'No Name Available'}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -118,13 +121,11 @@ const Lead = () => {
     const fetchDonor = async () => {
       try {
         const response = await getApi(urls.serviceuser.getalldonor);
-        console.log(response);
 
         if (response?.data) {
-          // Adding serial number
           const donorsWithSerialNumber = response.data.allDonor.map((donor, index) => ({
-            ...donor, // Copy existing properties of donor
-            serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}` // Generate serial number
+            ...donor,
+            serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
           }));
 
           setRows(donorsWithSerialNumber);

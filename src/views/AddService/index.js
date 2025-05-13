@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, FormControlLabel,Card, Typography } from '@mui/material';
+import { Grid, TextField, Box, Paper, Button, MenuItem, InputAdornment, FormControlLabel, Card, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
@@ -13,7 +13,7 @@ import AntSwitch from 'components/AntSwitch';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
-  const [restrictAccess, setRestrictAccess] = useState(false);
+  const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
@@ -33,6 +33,8 @@ const AddCaseForm = ({ onCancel }) => {
     }
   };
 
+  const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
+
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   const {
@@ -44,8 +46,8 @@ const AddCaseForm = ({ onCancel }) => {
     mode: 'all',
     defaultValues: {
       homePhone: '',
-      phone: '',
-      email: '',
+      code: '',
+      serviceType: '',
       beneficiaryInformation: '',
       campaignsSupported: '',
       engagement: '',
@@ -64,8 +66,8 @@ const AddCaseForm = ({ onCancel }) => {
       const formData = new FormData();
 
       formData.append('name', data.homePhone);
-      formData.append('code', data.phone);
-      formData.append('type', data.email);
+      formData.append('code', data.code);
+      formData.append('type', data.serviceType);
       formData.append('benificiary', data.beneficiaryInformation);
       formData.append('campaigns', data.campaignsSupported);
       formData.append('engagement', data.engagement);
@@ -134,16 +136,15 @@ const AddCaseForm = ({ onCancel }) => {
                     )}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="phone"
+                    name="code"
                     control={control}
                     rules={{
                       required: 'Service Code is required',
-                      pattern: { value: numberOnlyRegex, message: 'Only numbers allowed' },
-                      minLength: { value: 3, message: 'Minimum 3 digits' },
-                      maxLength: { value: 10, message: 'Maximum 10 digits' }
+                      pattern: { value: onlyLettersAndNumbers, message: 'Only letters and numbers allowed' },
+                      minLength: { value: 3, message: 'Minimum 3 char' },
+                      maxLength: { value: 10, message: 'Maximum 10 char' }
                     }}
                     render={({ field }) => (
                       <TextField
@@ -151,9 +152,9 @@ const AddCaseForm = ({ onCancel }) => {
                         fullWidth
                         label="Service Code"
                         size="small"
-                        onKeyDown={allowOnlyNumber}
-                        error={!!errors.phone}
-                        helperText={errors.phone?.message}
+                        onKeyDown={onlyLettersAndNumbers}
+                        error={!!errors.code}
+                        helperText={errors.code?.message}
                       />
                     )}
                   />
@@ -161,22 +162,29 @@ const AddCaseForm = ({ onCancel }) => {
 
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="email"
+                    name="serviceType"
                     control={control}
                     rules={{
-                      required: 'Service Type is required',
-                      pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
+                      required: 'Service Type is required'
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
+                        select
                         fullWidth
                         label="Service Type"
                         size="small"
-                        onKeyDown={allowOnlyText}
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                      />
+                        error={!!errors.serviceType}
+                        helperText={errors.serviceType?.message}
+                      >
+                        <MenuItem value="Education">Education</MenuItem>
+                        <MenuItem value="Health">Health</MenuItem>
+                        <MenuItem value="Mentoring">Mentoring</MenuItem>
+                        <MenuItem value="Group Work">Group Work</MenuItem>
+                        <MenuItem value="Sports">Sports</MenuItem>
+                        <MenuItem value="Social Programs">Social Programs</MenuItem>
+                        <MenuItem value="Arts and Culture">Arts and Culture</MenuItem>
+                      </TextField>
                     )}
                   />
                 </Grid>
@@ -265,7 +273,8 @@ const AddCaseForm = ({ onCancel }) => {
                     name="notes"
                     control={control}
                     rules={{
-                      maxLength: { value: 1000, message: 'Maximum 1000 characters allowed' }
+                      required: 'This field is required',
+                      maxLength: { value: 500, message: 'Maximum 500 characters allowed' }
                     }}
                     render={({ field }) => (
                       <TextField

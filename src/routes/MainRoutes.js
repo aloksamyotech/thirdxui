@@ -33,8 +33,6 @@ const AddCase = Loadable(lazy(() => import('views/AddCase')));
 const AddMail = Loadable(lazy(() => import('views/AddMail')));
 const AddDonor = Loadable(lazy(() => import('views/AddDonor')));
 const AddDonorCompany = Loadable(lazy(() => import('views/AddDonorCompany')));
-const AddDonorGroup = Loadable(lazy(() => import('views/AddDonorGroup')));
-
 const AddTransaction = Loadable(lazy(() => import('views/AddTransaction')));
 const AddTag = Loadable(lazy(() => import('views/AddTag')));
 const AddSession = Loadable(lazy(() => import('views/AddSession')));
@@ -119,10 +117,6 @@ const MainRoutes = {
     {
       path: 'add-donorCompany',
       element: <AddDonorCompany />
-    },
-    {
-      path: 'add-donorGroup',
-      element: <AddDonorGroup />
     },
     {
       path: 'financial',

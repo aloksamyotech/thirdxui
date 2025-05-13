@@ -597,7 +597,7 @@ const AddDonorForm = () => {
                               <Controller
                                 name="address"
                                 control={control}
-                               rules={{
+                                rules={{
                                   required: 'Address is required',
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
@@ -618,7 +618,6 @@ const AddDonorForm = () => {
                                   />
                                 )}
                               />
-                              
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
@@ -1181,7 +1180,15 @@ const AddDonorForm = () => {
                               label="Date of Confirmation"
                               value={field.value}
                               onChange={(newValue) => field.onChange(newValue)}
-                              renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  fullWidth
+                                  size="small"
+                                  error={!!errors.confirmationDate}
+                                  helperText={errors.confirmationDate?.message}
+                                />
+                              )}
                             />
                           </LocalizationProvider>
                         )}
@@ -1218,6 +1225,7 @@ const AddDonorForm = () => {
                         name="mobilePhone"
                         control={control}
                         rules={{
+                          required: 'Phone number is required',
                           pattern: {
                             value: onlyNumbers,
                             message: 'Phone number must contain only numbers'
@@ -1265,8 +1273,8 @@ const AddDonorForm = () => {
                             fullWidth
                             label="Email"
                             size="small"
-                            error={!!errors.email}
-                            helperText={errors.email?.message}
+                            error={!!errors.contactemail}
+                            helperText={errors.contactemail?.message}
                             {...field}
                           />
                         )}

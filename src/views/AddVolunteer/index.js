@@ -217,7 +217,7 @@ const AddCaseForm = ({ onCancel }) => {
       const response = await postApi(urls.serviceuser.create, fd, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('Successfully Added Service User');
+      toast.success('Volunteer added successfully!');
       setIsloading(false);
       navigate('/volunteer');
     } catch (error) {

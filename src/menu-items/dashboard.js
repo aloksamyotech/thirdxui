@@ -55,21 +55,21 @@ const dashboard = {
           id: '02',
           title: 'Service Users',
           type: 'item',
-          url: '/dashboard/people',
+          url: '/people',
           breadcrumbs: false
         },
         {
           id: '03',
           title: 'Volunteers',
           type: 'item',
-          url: '/dashboard/volunteer',
+          url: '/volunteer',
           breadcrumbs: false
         },
         {
           id: '04',
           title: 'New Referral',
           type: 'item',
-          url: '/dashboard/referral',
+          url: '/referral',
           breadcrumbs: false
         }
       ]
@@ -78,7 +78,7 @@ const dashboard = {
       id: '05',
       title: 'Services',
       type: 'item',
-      url: '/dashboard/services',
+      url: '/services',
       icon: icons.IconSettingsAutomation,
       breadcrumbs: false
     },
@@ -86,7 +86,7 @@ const dashboard = {
       id: '06',
       title: 'Cases',
       type: 'item',
-      url: '/dashboard/case',
+      url: '/case',
       icon: icons.IconFileInvoice,
       breadcrumbs: false
     },
@@ -94,123 +94,145 @@ const dashboard = {
       id: '07',
       title: 'Mailing List',
       type: 'item',
-      url: '/dashboard/mail',
+      url: '/mail',
       icon: icons.IconMail,
       breadcrumbs: false
     },
     {
       id: '08',
+      title: 'Donor Management',
+      type: 'collapse',
+      icon: icons.IconSeeding,
+      children: [
+        {
+          id: '09',
+          title: 'Donor',
+          type: 'item',
+          url: '/donor',
+          breadcrumbs: false
+        },
+        {
+          id: '10',
+          title: 'Financial',
+          type: 'item',
+          url: '/financial',
+          breadcrumbs: false
+        },
+        {
+          id: '11',
+          title: 'Mailing Lists',
+          type: 'item',
+          url: '/mailing-list',
+          breadcrumbs: false
+        }
+      ]
+    },
+
+    {
+      id: '12',
       title: 'Forms',
       type: 'collapse',
       icon: icons.IconClipboardData,
       children: [
         {
-          id: '09',
+          id: '13',
           title: 'Manage Form',
           type: 'item',
-          url: '/dashboard/manage-form',
+          url: '/manage-form',
           breadcrumbs: false
         },
         {
-          id: '10',
+          id: '14',
           title: 'Submission',
           type: 'item',
-          url: '/dashboard/appearance',
+          url: '/submission',
           breadcrumbs: false
         },
         {
-          id: '11',
+          id: '15',
           title: 'History',
           type: 'item',
-          url: '/dashboard/history',
+          url: '/history',
           breadcrumbs: false
         }
       ]
     },
     {
-      id: '12',
+      id: '16',
       title: 'Report',
       type: 'item',
-      url: '/dashboard/report',
+      url: '/report',
       icon: icons.IconChartBar,
       breadcrumbs: false
     },
     {
-      id: '13',
-      title: 'Donor Management',
-      type: 'item',
-      url: '/dashboard/report',
-      icon: icons.IconSeeding,
-      breadcrumbs: false
-    },
-    {
-      id: '14',
+      id: '17',
       title: 'Data Management',
       type: 'collapse',
       icon: icons.IconRefresh,
       children: [
         {
-          id: '15',
+          id: '18',
           title: 'Bulk Upload',
           type: 'item',
-          url: '/dashboard/bulkupload',
+          url: '/bulkupload',
           breadcrumbs: false
         },
         {
-          id: '16',
+          id: '19',
           title: 'Duplicate',
           type: 'item',
-          url: '/dashboard/duplicate',
+          url: '/duplicate',
           breadcrumbs: false
         },
         {
-          id: '17',
+          id: '20',
           title: 'Bulk Delete',
           type: 'item',
-          url: '/dashboard/bulkdelete',
+          url: '/bulkdelete',
           breadcrumbs: false
         },
         {
-          id: '18',
+          id: '21',
           title: 'Archives',
           type: 'item',
-          url: '/dashboard/archives',
+          url: '/archives',
           breadcrumbs: false
         }
       ]
     },
     {
-      id: '19',
+      id: '22',
       title: 'Configuration',
       type: 'collapse',
       icon: icons.IconSettings,
       children: [
         {
-          id: '20',
+          id: '23',
           title: 'Configuration',
           type: 'item',
-          url: '/dashboard/configuration',
+          url: '/configuration',
           breadcrumbs: false
         },
         {
-          id: '21',
+          id: '24',
           title: 'Tags',
           type: 'item',
-          url: '/dashboard/tags',
+          url: '/tags',
           breadcrumbs: false
         },
         {
-          id: '22',
+          id: '25',
           title: 'Users',
           type: 'item',
-          url: '/dashboard/users',
+          url: '/users',
           breadcrumbs: false
         },
         {
-          id: '23',
+          id: '26',
           title: 'Account',
           type: 'item',
-          url: '/dashboard/account',
+          url: '/account',
           breadcrumbs: false
         }
       ]

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -15,296 +15,234 @@ import {
   Tooltip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import Background from 'assets/images/groupWork.jpg';
-import Profile from 'assets/images/viewProfile.png';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import PersonIcon from '@mui/icons-material/Person';
-import AddSessionForm from './addSession.js';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
-
+import InfoIcon from '@mui/icons-material/Info';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Background from 'assets/images/groupWork.jpg';
+import FilterPanel from 'components/FilterPanel';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
+import { useActionState } from 'react';
+ 
 const UserProfile = () => {
+ 
+const image_Url = 'http://localhost:7200/'
+ 
   const navigate = useNavigate();
-  const [showForm, setShowForm] = useState(false);
-  const [date, setDate] = useState(null);
-  const [time, setTime] = useState('');
-  const [location, setLocation] = useState('');
-  const [sessionLead, setSessionLead] = useState('');
+  const location = useLocation()
+  const serviceId = location.state?.row;
+const userId = serviceId?._id;
+  const [showFilter, setShowFilter] = useState(true);
+  const [countriesWithFlags, setCountriesWithFlags] = useState([]);
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [timeFilter, setTimeFilter] = useState('');
+  const [sessionLeadFilter, setSessionLeadFilter] = useState('');
+  const [serviceData,setServiceData] = useState('')
+   const [loading, setLoading] = useState(true);
+ 
   const sessionData = [
-    { date: '8 Apr 2023', time: '10:00 AM', status: 'Cover letter writing-Group sessions', name: 'MARKET ROAD ATP-You', users: 9 },
-    { date: '8 Apr 2023', time: '10:00 AM', status: 'Cover letter writing-Group sessions', name: 'MARKET ROAD ATP-You', users: 5 },
-    { date: '8 Apr 2023', time: '10:00 AM', status: 'Cover letter writing-Group sessions', name: 'MARKET ROAD ATP-You', users: 3 }
+    { date: '25 Oct’24', time: '18:00', title: 'Cover Letter Writing', subtitle: 'Online session conducted by Maria imparted…' },
+    { date: '25 Oct’24', time: '18:00', title: 'Cover Letter Writing', subtitle: 'Online session conducted by Maria imparted…' },
+    { date: '25 Oct’24', time: '18:00', title: 'Cover Letter Writing', subtitle: 'Online session conducted by Maria imparted…' }
   ];
-
+ 
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
+ 
+   const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+ 
+  console.log(serviceId._id)
+  useEffect(() => {
+    fetch('https://restcountries.com/v3.1/all')
+      .then((res) => res.json())
+      .then((data) => {
+        const countries = data.map((country) => ({
+          value: country.cca2,
+          label: country.name.common,
+          flag: country.flags.png
+        }));
+        setCountriesWithFlags(countries);
+      });
+  }, []);
+ 
+useEffect(() => {
+    const fetchService = async () => {
+      // Assuming service data is fetched here
+      const res = await getApi(urls.service.getById.replace(':id', userId));
+      setServiceData(res?.data?.userData || {});
+      setLoading(false); // Set loading to false once data is fetched
+    };
+ 
+    fetchService();
+  }, [userId]);
+ 
+ 
+console.log(serviceData.file);
+ 
   return (
-    <Card sx={{ backgroundColor: '#eef2f6' }}>
-      {showForm ? (
-        <AddSessionForm onCancel={() => setShowForm(false)} />
-      ) : (
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Stack direction="row" alignItems="center">
-              <Typography variant="h4" display="flex" alignItems="center">
-                <IconButton onClick={() => navigate('/dashboard/services')} sx={{ ml: 1 }}>
-                  <ArrowBackIcon />
-                </IconButton>
-                DETAILS
-              </Typography>
-            </Stack>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ borderRadius: 3, overflow: 'hidden', maxWidth: 400, height: '450px' }}>
+    <Box>
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+        <IconButton onClick={() => navigate('/services')}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h6" fontWeight="bold">
+          Service Details
+        </Typography>
+      </Stack>
+ 
+      <Grid container spacing={2}>
+        <FilterPanel
+          showFilter={showFilter}
+          dateAddedFilters={dateAddedFilters}
+          setDateAddedFilter={setDateOpenedFilter}
+          countriesWithFlags={countriesWithFlags}
+          timeFilter={timeFilter}
+          setTimeFilter={setTimeFilter}
+          sessionLeads={[
+            { value: 'john_doe', label: 'John Doe' },
+            { value: 'jane_smith', label: 'Jane Smith' }
+          ]}
+          setSessionLeadFilter={setSessionLeadFilter}
+          selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
+        />
+ 
+        <Grid item xs={12} md={9}>
+          <Card sx={{ borderRadius: 3, mb: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
               <Box
-                sx={{
-                  height: 110,
-                  backgroundImage: `url(${Background})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  filter: 'blur(0.5px)',
-                  px: 2
-                }}
-              ></Box>
-
-              <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'left', mt: -6 }}>
-                <Avatar
-                  src={Profile}
-                  alt="User Avatar"
-                  sx={{
-                    width: 70,
-                    height: 70,
-                    border: '4px solid white'
-                  }}
-                />
-
-                <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-                  <Typography variant="h4" fontWeight="bold">
-                    John Doe
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: '#41c048',
-                      color: 'white',
-                      fontSize: '8px',
-                      borderRadius: '10px',
-                      px: 1,
-                      py: 0.5,
-                      minWidth: 'auto'
-                    }}
-                  >
-                    CURRENTLY ACTIVE
-                  </Button>
-                </Box>
-
-                <Typography variant="body2" color="textSecondary">
-                  Service Code: SC-12345
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Start Date: 2024-03-01
-                </Typography>
-
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                  <span style={{ fontWeight: 'bold' }}>Service Description:</span>&nbsp; Lorem ipsum dolor sit amet, consectetur adipiscing
-                  elit. Nulla convallis egestas rhoncus. Donec facilisis fermentum sem, ac viverra ante luctus vel.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={8}>
-            <Card sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: '20px', height: '450px' }}>
-              <Box display="flex" alignItems="center" gap={2}>
-                <Typography variant="h4" fontWeight="bold">
-                  Session List
-                </Typography>
-                <Tooltip title="Add Session" arrow>
-                  <IconButton
-                    onClick={() => setShowForm(true)}
-                    sx={{
-                      backgroundColor: '#41C048',
-                      borderRadius: '50%',
-                      width: '30px',
-                      height: '30px',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      boxShadow: 3,
-                      color: 'white',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: '#41C048',
-                        color: '#ffffff'
-                      }
-                    }}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <FilterAltIcon />
-                <Typography variant="h6" fontWeight="bold">
-                  Filter
-                </Typography>
-              </Stack>
-
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Stack direction="row" alignItems="center" spacing={2} sx={{ flexWrap: 'wrap', mb: 3 }}>
-                  <Box sx={{ width: 100 }}>
-                    <DatePicker
-                      label="Date"
-                      value={date}
-                      onChange={(newValue) => setDate(newValue)}
-                      slotProps={{
-                        textField: {
-                          size: 'small',
-                          sx: { width: '100%' }
-                        }
-                      }}
-                    />
+        component="img"
+        src={loading ? Background : (serviceData.file ? `${image_Url}${serviceData.file}` : Background)}
+        alt="Service"
+        sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
+      />
+              </Grid>
+ 
+              <Grid item xs={12} md={8}>
+                <Stack>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="h5" fontWeight="bold">
+                      JACS : COMMUNICATION
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
+                      onClick={() => navigate('/add-session')}
+                    >
+                      Add New Session
+                    </Button>
                   </Box>
-
-                  <TextField
-                    select
-                    label="Time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    variant="outlined"
-                    size="small"
-                    sx={{ width: 100 }}
-                  >
-                    <MenuItem value="Morning">Morning</MenuItem>
-                    <MenuItem value="Afternoon">Afternoon</MenuItem>
-                    <MenuItem value="Evening">Evening</MenuItem>
-                  </TextField>
-
-                  <TextField
-                    select
-                    label="Location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    variant="outlined"
-                    size="small"
-                    sx={{ width: 120 }}
-                  >
-                    <MenuItem value="Delhi">Delhi</MenuItem>
-                    <MenuItem value="Mumbai">Mumbai</MenuItem>
-                  </TextField>
-
-                  <TextField
-                    select
-                    label="Session Lead"
-                    value={sessionLead}
-                    onChange={(e) => setSessionLead(e.target.value)}
-                    variant="outlined"
-                    size="small"
-                    sx={{ width: 120 }}
-                  >
-                    <MenuItem value="Lead 1">Lead 1</MenuItem>
-                    <MenuItem value="Lead 2">Lead 2</MenuItem>
-                  </TextField>
-
-                  <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
-                    Apply
-                  </Button>
+ 
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green' }} />
+                    <Typography variant="body2" color="green" fontWeight="bold">
+                       {serviceData.isActive ? 'ACTIVE' : 'INACTIVE'}
+                    </Typography>
+                  </Stack>
+ 
+                  <Typography variant="body2" color="textSecondary">
+                    Service Code - {serviceData.code}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Start Date - {formatDate(serviceData.createdAt)}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Service Description - </strong>
+                     {serviceData.description}
+                  </Typography>
                 </Stack>
-              </LocalizationProvider>
-
-              <Card
-                sx={{
-                  height: 400,
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                    height: '8px'
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    background: '#f1f1f1',
-                    borderRadius: '10px'
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: '#888',
-                    borderRadius: '10px'
-                  },
-                  '&::-webkit-scrollbar-thumb:hover': {
-                    background: '#555'
-                  }
-                }}
-              >
-                <Grid container spacing={2}>
-                  {sessionData.map((session, index) => (
-                    <Grid item xs={12} key={index}>
-                      <Card
-                        sx={{
-                          m:1,
-                          p: 2,
-                          borderRadius: 2,
-                          boxShadow: 4
-                        }}
-                      >
-                        <Box display="flex" justifyContent="flex-start" gap={4}>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            {session.date}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            {session.status}
-                          </Typography>
-                        </Box>
-
-                        <Box display="flex" justifyContent="flex-start" gap={5}>
-                          <Typography variant="body2" color="textSecondary">
-                            {session.time}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            {session.name}
-                          </Typography>
-                        </Box>
-
-                        <Box display="flex" alignItems="center" justifyContent="left" gap={6}>
-                          <Box display="flex" alignItems="center" sx={{ mr: 2 }}>
-                            <PersonIcon fontSize="small" />
-                            <Typography variant="body1" sx={{ ml: 0.5 }}>
-                              {session.users}
-                            </Typography>
-                          </Box>
-
-                          <Box display="flex" alignItems="center">
-                            {['Edit Register', 'Edit Session', 'Add Media', 'Notes'].map((option, i) => (
-                              <Box key={i} display="flex" alignItems="center">
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    px: 1,
-                                    cursor: 'pointer',
-                                    color: 'primary.main',
-                                    textAlign: 'center'
-                                  }}
-                                >
-                                  {option}
-                                </Typography>
-                                {i < 3 && <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 20 }} />}
-                              </Box>
-                            ))}
-                          </Box>
-                        </Box>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Card>
-            </Card>
-          </Grid>
+              </Grid>
+            </Grid>
+          </Card>
+ 
+          <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff' }}>
+            <Typography variant="h6" fontWeight="bold" mb={1}>
+              Session List
+            </Typography>
+            <Divider />
+ 
+            <Stack spacing={1} mt={2}>
+              {sessionData.map((session, index) => (
+                <Box
+                  key={index}
+                  onClick={() => navigate('/view-session')}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    px: 2,
+                    py: 1.5,
+                    borderBottom: '1px solid #e0e0e0',
+                    flexWrap: 'wrap'
+                  }}
+                >
+                  <Box minWidth={90}>
+                    <Typography variant="subtitle2" fontWeight="bold">
+                      {session.date}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {session.time}
+                    </Typography>
+                  </Box>
+ 
+                  <Box sx={{ flexGrow: 1, px: 2, minWidth: 200 }}>
+                    <Typography variant="subtitle2" fontWeight="bold" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                      {session.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                      {session.subtitle}
+                    </Typography>
+                  </Box>
+ 
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{
+                        backgroundColor: '#1B4B66',
+                        textTransform: 'none',
+                        fontSize: '10px',
+                        py: 0.1,
+                        px: 0.5,
+                        minHeight: '30px'
+                      }}
+                    >
+                      Edit Session
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        textTransform: 'none',
+                        color: '#1B4B66',
+                        fontSize: '10px',
+                        py: 0.5,
+                        px: 0.5,
+                        minHeight: '30px'
+                      }}
+                    >
+                      Add Attendee
+                    </Button>
+                    <IconButton size="small">
+                      <InfoIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+          </Card>
         </Grid>
-      )}
-    </Card>
+      </Grid>
+    </Box>
   );
 };
-
+ 
 export default UserProfile;

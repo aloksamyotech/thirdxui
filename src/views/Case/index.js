@@ -1,52 +1,83 @@
-import React, { useState } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, Menu, MenuItem, IconButton, InputAdornment, Tooltip, Chip, Toolbar } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import FilterAltOffOutlinedIcon from '@mui/icons-material/FilterAltOffOutlined';
+import React, { useState, useEffect } from 'react';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
+import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TableStyle from '../../ui-component/TableStyle';
 import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
-import AddCaseForm from './AddCase.js';
-import { Search, Download, PictureAsPdf, Print, ExpandMore, Archive, Edit, MergeType, Delete } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
+import { useNavigate } from 'react-router-dom';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const Lead = () => {
-  const [district, setDistrict] = useState('');
-  const [owner, setOwner] = useState('');
-  const [status, setStatus] = useState('');
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [showSearch, setShowSearch] = useState(false);
+  const navigate = useNavigate();
+  const [rows, setRows] = useState([]);
+  const [serviceTypeFilter, setServiceTypeFilterOptions] = useState([]);
+  const [ownerFilters, setOwnerFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [serviceType, setServiceType] = useState('');
+  const [status, setStatus] = useState('');
+  const [owner, setOwner] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const statusFilter = [
+    { value: 'true', label: 'Active' },
+    { value: 'false', label: 'Inactive' }
+  ];
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
 
-  const handleFilterApply = () => {
-    console.log('Filters Applied:', { district, owner, status, fromDate, toDate });
+  const CustomHeader = () => {
+    return (
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            CASE LIST
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
   };
 
   const columns = [
-    { field: 'caseId', headerName: 'CASE ID', width: 100 },
-    { field: 'serviceUser', headerName: 'SERVICE USER', width: 150 },
-    { field: 'owner', headerName: 'OWNER', width: 120 },
+    { field: 'serialNumber', headerName: 'Case Id', width: 100 },
+    { field: 'serviceUser', headerName: 'Service User', width: 150 },
+    { field: 'owner', headerName: 'Owner', width: 120 },
     {
       field: 'status',
-      headerName: 'STATUS',
+      headerName: 'Status',
       width: 120,
       renderCell: (params) => (
         <Chip
@@ -58,259 +89,210 @@ const Lead = () => {
         />
       )
     },
-    { field: 'service', headerName: 'SERVICE', width: 120 },
-    { field: 'dateOpened', headerName: 'DATE OPENED', width: 150 },
-    { field: 'dateClosed', headerName: 'DATE CLOSED', width: 150 }
+    { field: 'service', headerName: 'Service', width: 120 },
+    { field: 'dateOpened', headerName: 'Date Opened', width: 150 },
+    { field: 'dateClosed', headerName: 'Date Closed', width: 150 }
   ];
 
-  const rows = [
-    {
-      id: 1,
-      caseId: 'C-001',
-      serviceUser: 'John Doe',
-      owner: 'Admin',
-      status: 'Open',
-      service: 'IT Support',
-      dateOpened: '2024-02-01',
-      dateClosed: '2025-08-10'
-    },
-    {
-      id: 2,
-      caseId: 'C-002',
-      serviceUser: 'Jane Smith',
-      owner: 'Manager',
-      status: 'Close',
-      service: 'HR Support',
-      dateOpened: '2024-01-25',
-      dateClosed: '2024-02-10'
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (serviceType) queryParams.append('serviceType', serviceType);
+      if (status) queryParams.append('serviceStatus', status);
+      if (owner) queryParams.append('serviceName', owner);
+      if (dateOpenedFilter) queryParams.append('caseOpened', dateOpenedFilter);
+      if (searchQuery) queryParams.append('serviceName', searchQuery);
+
+      const response = await getApi(`${urls.case.filterType}?${queryParams.toString()}`);
+      const filteredCases = response?.data || [];
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      };
+
+      const formattedUsers = filteredCases.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        dateOpened: formatDate(user.caseOpened),
+        dateClosed: formatDate(user.caseClosed),
+        serviceUser: user.serviceName || '',
+        service: user.service || '',
+        owner: user.serviceType || '',
+        status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
+      }));
+
+      setRows(formattedUsers);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered cases:', error);
     }
-  ];
-  const formTypes = [
-    { value: 'Self Referral form', label: 'Self Referral form' },
-    { value: 'Community Referral form', label: 'Community Referral form' },
-    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-  ];
+  };
 
-  const dateFilters = [
-    { value: 'today', label: 'All Dates' },
-    { value: 'week', label: 'Last 7 days' },
-    { value: 'month', label: 'Last 30 days' },
-    { value: 'year', label: 'Last 2 months' }
-  ];
+  const handleReset = () => {
+    setServiceType('');
+    setStatus('');
+    setOwner('');
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    fetchInitialData();
+  };
+
+  const fetchInitialData = async () => {
+    try {
+      const response = await getApi(urls.case.fetch);
+      const allCases = response?.data?.allService || [];
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      };
+
+      const formattedUsers = allCases.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        dateOpened: formatDate(user.caseOpened),
+        dateClosed: formatDate(user.caseClosed),
+        serviceUser: user.serviceName || '',
+        service: user.service || '',
+        owner: user.serviceType || '',
+        status: user.serviceStatus === 'Active' ? 'Open' : 'Closed'
+      }));
+
+      setRows(formattedUsers);
+
+      const uniqueServiceTypes = [...new Set(allCases.map((item) => item.service).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+      setServiceTypeFilterOptions(uniqueServiceTypes);
+
+      const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+      setOwnerFilters(uniqueOwners);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
-      {showForm ? (
-        <AddCaseForm onCancel={() => setShowForm(false)} />
-      ) : (
-        <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4">Add Cases</Typography>
-            <Tooltip title="Add Case" arrow>
-              <IconButton
-                onClick={() => setShowForm(true)}
-                sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#41C048',
-                    color: '#ffffff'
-                  }
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          <Card sx={{ marginBottom: 3, backgroundColor: '#eef2f6' }}>
-            <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-              <FilterAltOutlinedIcon color="grey" />
-              <Typography variant="h6">Filter</Typography>
-            </Stack>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ whiteSpace: 'nowrap' }}>
-                <TextField
-                  select
-                  label="Select District"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="District 1">District 1</MenuItem>
-                  <MenuItem value="District 2">District 2</MenuItem>
-                </TextField>
+      <Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-case')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: 'auto',
+                height: '35px',
+                px: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add New Case <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-                <TextField
-                  select
-                  label="Select Owner"
-                  value={owner}
-                  onChange={(e) => setOwner(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="Owner 1">Owner 1</MenuItem>
-                  <MenuItem value="Owner 2">Owner 2</MenuItem>
-                </TextField>
+          <TextField
+            size="small"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleFilter();
+              }
+            }}
+            InputProps={{
+              endAdornment: <SearchIcon onClick={handleFilter} style={{ cursor: 'pointer' }} />
+            }}
+            sx={{ width: '350px' }}
+          />
+        </Stack>
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            serviceTypes={serviceTypeFilter}
+            serviceTypeFilter={serviceType}
+            setServiceTypeFilter={(value) => {
+              setServiceType(value);
+              handleFilter();
+            }}
+            statuses={statusFilter}
+            statusFilter={status}
+            setStatusFilter={(value) => {
+              setStatus(value);
+              handleFilter();
+            }}
+            dateAddedFilters={dateAddedFilters}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => {
+              setDateOpenedFilter(value);
+              handleFilter();
+            }}
+            owners={ownerFilters}
+            ownerFilter={owner}
+            setOwnerFilter={(value) => {
+              setOwner(value);
+              handleFilter();
+            }}
+            selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
+            onReset={handleReset}
+          />
 
-                <TextField
-                  select
-                  label="Select Status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
-                </TextField>
-
-                <Box sx={{ width: 150 }}>
-                  <DatePicker
-                    label="From"
-                    value={fromDate}
-                    onChange={(newValue) => setFromDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        sx: {
-                          width: '100%',
-                          '& .MuiInputBase-input': {
-                            fontSize: '12px',
-                            padding: '6px 8px',
-                            textAlign: 'center'
-                          }
-                        }
+          <Grid item xs={9}>
+            <TableStyle>
+              <Box width="100%">
+                <Card style={{ height: 'auto' }}>
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    rowHeight={60}
+                    checkboxSelection
+                    components={{
+                      Toolbar: () => <CustomHeader />
+                    }}
+                    onRowClick={() => navigate('/view-case')}
+                    getRowId={(row) => row.id}
+                    pageSize={5}
+                    rowsPerPageOptions={[5, 10]}
+                    sx={{
+                      '& .MuiDataGrid-row': {
+                        borderBottom: '1px solid #ccc'
                       }
                     }}
                   />
-                </Box>
-
-                <Box sx={{ width: 150 }}>
-                  <DatePicker
-                    label="To"
-                    value={toDate}
-                    onChange={(newValue) => setToDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        sx: {
-                          width: '100%',
-                          '& .MuiInputBase-input': {
-                            fontSize: '12px',
-                            padding: '6px 8px',
-                            textAlign: 'center'
-                          }
-                        }
-                      }
-                    }}
-                  />
-                </Box>
-
-                <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
-                  Apply
-                </Button>
-
-                <FilterAltOffOutlinedIcon color="grey" />
-              </Stack>
-            </LocalizationProvider>
-          </Card>
-          {/* <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" spacing={1}>
-              <TextField
-                variant="outlined"
-                size="small"
-                placeholder="Quick Action"
-                onClick={handleClick}
-                InputProps={{
-                  readOnly: true,
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleClick}>
-                        <ExpandMore />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-                sx={{ maxWidth: 180 }}
-              />
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                <MenuItem onClick={handleClose}>
-                  <Archive fontSize="small" sx={{ mr: 1 }} /> Archive
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <MergeType fontSize="small" sx={{ mr: 1 }} /> Merge
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
-                </MenuItem>
-              </Menu>
-            </Stack>
-
-            <Stack direction="row">
-              <IconButton onClick={toggleSearch}>
-                <Search />
-              </IconButton>
-              {showSearch && <TextField variant="outlined" size="small" placeholder="Search..." autoFocus />}
-              <IconButton>
-                <Download />
-              </IconButton>
-              <IconButton>
-                <PictureAsPdf />
-              </IconButton>
-              <IconButton>
-                <Print />
-              </IconButton>
-            </Stack>
-          </Stack> */}
-          <Grid container spacing={4}>
-            <FilterPanel
-              showFilter={showFilter}
-              formTypes={formTypes}
-              setFormType={setFormType}
-              dateFilters={dateFilters}
-              setDateFilter={setDateFilter} />
-            <Grid item xs={9}>
-              <TableStyle>
-                <Box width="100%">
-                  <Card style={{ height: '600px' }}>
-                    <DataGrid
-                      rows={rows}
-                      columns={columns}
-                      rowHeight={60}
-                      checkboxSelection
-                      getRowId={(row) => row.id}
-                      pageSize={5}
-                      rowsPerPageOptions={[5, 10]}
-                      sx={{
-                        '& .MuiDataGrid-row': {
-                          borderBottom: '1px solid #ccc'
-                        }
-                      }}
-                    />
-                  </Card>
-                </Box>
-              </TableStyle>
-            </Grid>
+                </Card>
+              </Box>
+            </TableStyle>
           </Grid>
         </Grid>
-      )}
+      </Grid>
     </Card>
   );
 };

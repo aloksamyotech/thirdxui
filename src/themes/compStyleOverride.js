@@ -1,3 +1,5 @@
+import { height, lineHeight } from "@mui/system";
+
 export default function componentStyleOverrides(theme) {
   const bgColor = theme.colors?.grey50;
   return {
@@ -26,7 +28,7 @@ export default function componentStyleOverrides(theme) {
       styleOverrides: {
         root: {
           color: theme.colors?.textDark,
-          padding: '24px'
+          padding: '12px'
         },
         title: {
           fontSize: '1.125rem'
@@ -36,14 +38,14 @@ export default function componentStyleOverrides(theme) {
     MuiCardContent: {
       styleOverrides: {
         root: {
-          padding: '24px'
+          padding: '16px'
         }
       }
     },
     MuiCardActions: {
       styleOverrides: {
         root: {
-          padding: '24px'
+          padding: '16px'
         }
       }
     },
@@ -51,8 +53,8 @@ export default function componentStyleOverrides(theme) {
       styleOverrides: {
         root: {
           color: theme.darkTextPrimary,
-          paddingTop: '10px',
-          paddingBottom: '10px',
+          paddingTop: '4px',
+          paddingBottom: '4px',
           '&.Mui-selected': {
             color: theme.menuSelected,
             backgroundColor: theme.menuSelectedBack,
@@ -94,7 +96,7 @@ export default function componentStyleOverrides(theme) {
           color: theme.textDark,
           '&::placeholder': {
             color: theme.darkTextSecondary,
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
           }
         }
       }

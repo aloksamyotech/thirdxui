@@ -1,44 +1,42 @@
-import { useState } from 'react';
-import {
-  Stack,
-  Grid,
-  Typography,
-  Box,
-  Card,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { DataGrid, GridToolbarContainer } from '@mui/x-data-grid';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
-import AddCaseForm from './addVolunteer.js';
-import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
 import ApartmentIcon from '@mui/icons-material/Apartment';
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import FilterPanel from 'components/FilterPanel';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+const districts = [
+  { value: 'district1', label: 'District 1' },
+  { value: 'district2', label: 'District 2' },
+  { value: 'district3', label: 'District 3' }
 ];
 
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
+const dateAddedFilters = [
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'Last 7 Days' },
+  { value: 'month', label: 'Last 30 Days' },
+  { value: 'year', label: 'Last 1 Year' }
 ];
+
+const genders = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'other', label: 'Other' }
+];
+
 const Lead = () => {
   const navigate = useNavigate();
-  const [showForm, setShowForm] = useState(false);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [districtFilter, setDistrictFilter] = useState('');
+  const [dateAddedFilter, setDateAddedFilter] = useState('');
+  const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [rows, setRows] = useState([]);
 
   const CustomHeader = () => {
     return (
@@ -60,13 +58,15 @@ const Lead = () => {
             sx={{
               fontWeight: 'bold',
               color: '#333',
-              ml: 2,
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
             VOLUNTEER LIST
           </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
         </GridToolbarContainer>
       </Box>
     );
@@ -74,21 +74,20 @@ const Lead = () => {
 
   const columns = [
     {
-      field: 'person',
+      field: 'details',
       headerName: 'Details',
       flex: 1,
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {/* Conditional Icon Rendering */}
-            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
-
+            {/* {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />} */}
+            <PersonIcon />
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
+                {params.row.firstName} {params.row.lastName} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.address} {params.row.country} {params.row.postcode}
               </Typography>
             </Box>
           </Stack>
@@ -103,88 +102,106 @@ const Lead = () => {
     }
   ];
 
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
-    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' },
-    { id: 'C-004', name: 'Emily Davis', address: '321 Pine Avenue, Houston, TX 77001', type: 'apartment' },
-    { id: 'C-005', name: 'David Brown', address: '654 Maple Drive, Miami, FL 33101', type: 'person' },
-    { id: 'C-006', name: 'Sophia Wilson', address: '987 Cedar Lane, San Francisco, CA 94101', type: 'apartment' }
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getAllVolunteer);
+
+        const allVolunteer = response?.data?.allVolunteer || [];
+
+        const formattedUsers = allVolunteer.map((user, index) => ({
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          firstName: user.personalInfo?.firstName || '',
+          lastName: user.personalInfo?.lastName || '',
+          address: user.contactInfo?.addressLine1 || '',
+          country: user.contactInfo?.country || '',
+          postcode: user.contactInfo?.postcode || ''
+        }));
+
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
-      {showForm ? (
-        <AddCaseForm onCancel={() => setShowForm(false)} />
-      ) : (
-        <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-              Add Volunteer
-            </Typography>
-            <Tooltip title="Add Volunteer" arrow>
-              <IconButton
-                onClick={() => setShowForm(true)}
+      <Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-volunteer')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: 'auto',
+                height: '35px',
+                px: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add New Volunteer <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <TextField
+            size="small"
+            placeholder="Search..."
+            InputProps={{
+              endAdornment: <SearchIcon />
+            }}
+            sx={{ width: '350px' }}
+          />
+        </Stack>
+
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            districts={districts}
+            setDistrictFilter={setDistrictFilter}
+            genders={genders}
+            setGenderFilter={setGenderFilter}
+            dateAddedFilters={dateAddedFilters}
+            setDateAddedFilter={setDateAddedFilter}
+            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter']}
+          />
+
+          <Grid item xs={9}>
+            <Card style={{ height: 'auto' }}>
+              <DataGrid
+                rows={rows}
+                columns={columns}
+                rowHeight={65}
+                getRowId={(row) => row._id || row.id}
+                pageSize={5}
+                rowsPerPageOptions={[5, 10]}
+                components={{
+                  Toolbar: () => <CustomHeader />
+                }}
+                onRowClick={(params) => navigate('/view-people', { state: params.row })}
                 sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#41C048',
-                    color: '#ffffff'
+                  '& .MuiDataGrid-row': {
+                    borderBottom: '1px solid #ccc'
                   }
                 }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-      
-
-          <Grid container spacing={3}>
-            <FilterPanel
-                showFilter={showFilter}
-                formTypes={formTypes}
-                setFormType={setFormType}
-                dateFilters={dateFilters}
-                setDateFilter={setDateFilter}
-              /> 
-            <Grid item xs={9}>
-              <Card style={{ height: '600px' }}>
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  rowHeight={65}
-                  getRowId={(row) => row.id}
-                  onRowClick={() => navigate('/dashboard/view-people')}
-                  components={{
-                    Toolbar: () => <CustomHeader />
-                  }}
-                  sx={{
-                    '& .MuiDataGrid-columnHeaders': {
-                      display: 'none'
-                    },
-                    '& .MuiDataGrid-row:nth-of-type(2n)': {
-                      backgroundColor: '#f9f9f9'
-                    },
-                    '& .MuiDataGrid-cell': {
-                      textAlign: 'left',
-                      fontSize: '14px'
-                    }
-                  }}
-                  disableSelectionOnClick
-                />
-              </Card>
-            </Grid>
+              />
+            </Card>
           </Grid>
         </Grid>
-      )}
+      </Grid>
     </Card>
   );
 };

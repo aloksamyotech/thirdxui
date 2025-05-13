@@ -1,0 +1,117 @@
+import React from 'react';
+import {
+  Box,
+  Grid,
+  Typography,
+  IconButton,
+  Card,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Stack
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+
+const attendees = ['John Doe', 'Jane Smith', 'Alice Cooper'];
+
+export default function SessionRegisterPage() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box display="flex" alignItems="center">
+          <IconButton onClick={() => navigate('/view-session')}>
+            <ArrowBackIcon />
+          </IconButton>
+
+          <Typography fontWeight="bold">SESSION REGISTER</Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Typography color="text.secondary">Add Session attendees</Typography>
+        </Box>
+      </Box>
+
+      <Box sx={{ minHeight: '100vh', mt: '10px' }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={5}>
+            <Card sx={{ p: 2 }}>
+              <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                <Box>
+                  <Typography fontWeight="bold">16 Jan 2023 12:00 - 1h</Typography>
+                  <Typography mt={1}>Lunch Club</Typography>
+                  <Box display="flex" alignItems="center" mt={1}>
+                    <LocationOnIcon fontSize="small" color="action" />
+                    <Typography ml={0.5} color="text.secondary">
+                      Kyson Primary
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box textAlign="right">
+                  <Typography fontSize={14} mb={1} color="text.secondary">
+                    Session Registrar
+                  </Typography>
+                  <Typography>Alfie James</Typography>
+                </Box>
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end" gap={1}>
+                <Button variant="contained" size="small" sx={{ backgroundColor: '#042E4C' }}>
+                  View Map
+                </Button>
+                <Button variant="outlined" size="small" sx={{ color: '#042E4C' }}>
+                  Media
+                </Button>
+              </Box>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={7}>
+            <Card sx={{ p: 2, height: '250px' }}>
+              <Box display="flex" alignItems="center" gap={1} mb={2}>
+                <Typography fontWeight="bold">Add An Attendee</Typography>
+                <AddCircleIcon sx={{ color: 'green' }}  onClick={() => navigate('/add-serviceuser')}/>
+              </Box>
+
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={8}>
+                  <FormControl fullWidth>
+                    <InputLabel>Select Attendee</InputLabel>
+                    <Select defaultValue="">
+                      {attendees.map((name, idx) => (
+                        <MenuItem key={idx} value={name}>
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Box display="flex" justifyContent="flex-end">
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: '#042E4C',
+                        px: 2,
+                        py: 1,
+                        borderRadius: 2
+                      }}
+                    >
+                      SUBMIT
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
+  );
+}

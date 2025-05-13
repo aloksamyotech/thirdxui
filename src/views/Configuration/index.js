@@ -1,251 +1,315 @@
-import React, { useState } from 'react';
-import { Tabs, Tab, Box, Switch, IconButton, Card, styled, Modal, Typography, TextField, Button, Grid } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { Edit, Delete, Add } from '@mui/icons-material';
-import AntSwitch from 'components/AntSwitch.js';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button } from '@mui/material';
+import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
+import SearchIcon from '@mui/icons-material/Search';
+import AntSwitch from 'components/AntSwitch';
+import { postApi, getApi, updateApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
-const tabLabels = [
+const defaultTabTypes = [
   'Contact Types',
   'Referral Types',
   'Contact Purpose',
-  'Key Indicator',
-  'Archive Reason',
+  'Key Indicators',
   'Payment Method',
+  'Archive Reason',
   'Form Types',
   'Reason',
-  'Service Types',
-  'Locations'
+  'Service Types'
 ];
 
-const tabData = {
-  'Contact Types': [
-    { id: 1, name: 'Email', status: true },
-    { id: 2, name: 'Phone text', status: true },
-    { id: 3, name: 'Group sessions', status: true },
-    { id: 4, name: 'Missed appointments', status: true },
-    { id: 5, name: 'Bertha Heller', status: true },
-    { id: 6, name: 'Note', status: true }
-  ],
-  'Referral Types': [
-    { id: 1, name: 'Family Member', status: true },
-    { id: 2, name: 'Community Member', status: true },
-    { id: 3, name: 'Parent', status: true },
-    { id: 4, name: 'School', status: true },
-    { id: 5, name: 'Self Referral', status: true }
-  ],
-  'Contact Purpose': [
-    { id: 1, name: 'Newsletter', status: true },
-    { id: 2, name: 'Upcoming Events', status: true },
-    { id: 3, name: 'Professional Meetings', status: true }
-  ],
-  'Key Indicator': [
-    { id: 1, name: 'Poor School Attendance and Engagement', status: true },
-    { id: 2, name: 'School Exclusion (temp or perm)', status: true },
-    { id: 3, name: 'Not in education,trianing or work (NEET)', status: true },
-    { id: 4, name: 'Parent', status: true },
-    { id: 5, name: 'CAHMS', status: true },
-    { id: 6, name: 'Social Service', status: true },
-    { id: 7, name: 'Child Criminal and Sexual Exploitation (CRE/CSE)', status: true }
-  ],
-  'Archive Reason': [
-    { id: 1, name: 'Deceased', status: true },
-    { id: 2, name: 'Gone Away', status: true }
-  ],
-  'Payment Method': [
-    { id: 1, name: 'Credit or Debit Card', status: true },
-    { id: 2, name: 'Cash', status: true },
-    { id: 3, name: 'Cheque', status: true },
-    { id: 4, name: 'ApplePal', status: true }
-  ],
-  'Form Types': [
-    { id: 1, name: 'Referral Form', status: true },
-    { id: 12, name: 'Workshop Sign-up form', status: true }
-  ],
-  Reason: [
-    { id: 1, name: 'By Request', status: true },
-    { id: 2, name: 'Legitimate Interest', status: true },
-    { id: 3, name: 'Deceased', status: true },
-    { id: 4, name: 'Gone Away', status: true }
-  ],
-  'Service Types': [
-    { id: 1, name: 'Education', status: true },
-    { id: 2, name: 'Health', status: true },
-    { id: 3, name: 'Mentoring', status: true },
-    { id: 4, name: 'Groupwork', status: true },
-    { id: 5, name: 'Sports', status: true },
-    { id: 6, name: 'Arts and Culture', status: true },
-    { id: 7, name: 'Social Programs', status: true }
-  ],
-  Locations: [
-    { id: 1, name: 'Youth Center', status: true },
-    { id: 12, name: 'Youth Center', status: true }
-  ]
-};
-
-const columns = [
-  { field: 'name', headerName: 'CONFIGURATION', flex: 1 },
-  {
-    field: 'status',
-    headerName: 'STATUS',
-    renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
-    flex: 1
-  },
-  {
-    field: 'actions',
-    headerName: 'DELETE/EDIT',
-    headerAlign: 'right',
-    renderCell: (params) => (
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-        <IconButton color="error" size="small">
-          <Delete sx={{ fontSize: '16px' }} />
-        </IconButton>
-        <IconButton color="error" size="small">
-          <Edit sx={{ fontSize: '16px' }} />
-        </IconButton>
-      </Box>
-    ),
-    flex: 1,
-    align: 'right'
-  }
-];
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-];
-
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
-];
 const TabbedDataGrid = () => {
-  const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-  const [selectedTab, setSelectedTab] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [toggleValue, setToggleValue] = useState(true);
+  const [selectedSection, setSelectedSection] = useState('');
+  const [status, setStatus] = useState('');
+  const [tabData, setTabData] = useState({});
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [showFilter, setShowFilter] = useState(true);
 
-  const handleOpenModal = () => setOpenModal(true);
+  const handleOpenModal = (section) => {
+    setSelectedSection(section);
+    setOpenModal(true);
+  };
+
   const handleCloseModal = () => {
     setOpenModal(false);
     setInputValue('');
     setToggleValue(true);
   };
 
-  return (
-    <Grid container spacing={2}>
-      <FilterPanel
-        showFilter={showFilter}
-        formTypes={formTypes}
-        setFormType={setFormType}
-        dateFilters={dateFilters}
-        setDateFilter={setDateFilter} />
+  const configTypeFilter = useMemo(() => {
+    return defaultTabTypes.map((type) => ({
+      value: type,
+      label: type
+    }));
+  }, []);
 
-      <Grid item xs={9}>
-        <Card sx={{ backgroundColor: 'white', height: '100%' }}>
-          <Box sx={{ width: '100%', p: 1 }}>
-            <Tabs
-              value={selectedTab}
-              onChange={(e, newValue) => setSelectedTab(newValue)}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{ '& .MuiTab-root': { fontSize: '0.85rem', display: 'flex', alignItems: 'center' }, borderBottom: '1px solid #1e87e4' }}
-            >
-              {tabLabels.map((label, index) => (
-                <Tab
-                  key={index}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {label}
-                      {selectedTab === index && (
-                        <IconButton
-                          onClick={handleOpenModal}
+  const statusFilter = [
+    { value: 'true', label: 'Active' },
+    { value: 'false', label: 'Inactive' }
+  ];
+
+  const fetchConfigurations = async () => {
+    try {
+      const res = await getApi(urls.configuration.fetch);
+      const data = res?.data?.allConfiguration || [];
+
+      const grouped = {};
+      defaultTabTypes.forEach((type) => {
+        grouped[type] = [];
+      });
+
+      data.forEach((item) => {
+        const type = item.configurationType;
+        if (!grouped[type]) {
+          grouped[type] = [];
+        }
+        grouped[type].push({
+          id: item._id,
+          name: item.name,
+          status: item.isActive
+        });
+      });
+      setTabData(grouped);
+    } catch (error) {
+      toast.error('Error fetching configurations:', error);
+    }
+  };
+
+  const fetchFilteredConfigurations = async (type, statusFilterVal) => {
+    try {
+      let url = `${urls.configuration.filterType}?type=${encodeURIComponent(type)}`;
+      if (statusFilterVal !== '') {
+        url += `&status=${statusFilterVal}`;
+      }
+
+      const res = await getApi(url);
+      const filteredData = res?.data || [];
+
+      const filteredByStatus = statusFilterVal !== '' 
+        ? filteredData.filter(item => String(item.isActive) === statusFilterVal)
+        : filteredData;
+
+      const grouped = {
+        [type]: filteredByStatus.map((item) => ({
+          id: item._id,
+          name: item.name,
+          status: item.isActive
+        }))
+      };
+
+      setTabData(grouped);
+    } catch (error) {
+      toast.error('Error fetching filtered configurations');
+    }
+  };
+
+  useEffect(() => {
+    if (selectedSection) {
+      fetchFilteredConfigurations(selectedSection, status);
+    } else {
+      fetchConfigurations();
+    }
+  }, [selectedSection, status]);
+
+  const handleSaveConfiguration = async () => {
+    const payload = {
+      name: inputValue,
+      isActive: toggleValue,
+      configurationType: selectedSection
+    };
+
+    try {
+      const res = await postApi(urls.configuration.create, payload);
+      toast.success('Data added successfully!');
+      fetchConfigurations();
+      handleCloseModal();
+    } catch (err) {
+      toast.error('Error adding configuration:', err);
+    }
+  };
+
+  const handleStatusUpdate = async (itemId, newStatus) => {
+    try {
+      const payload = {
+        isActive: newStatus
+      };
+
+      const url = `${urls.configuration.updateStatus.replace(':configId', itemId)}`;
+
+      const res = await updateApi(url, payload);
+      if (res?.data) {
+        setTabData((prevData) => {
+          const newData = { ...prevData };
+          Object.keys(newData).forEach((type) => {
+            newData[type] = newData[type].map((item) => (item.id === itemId ? { ...item, status: newStatus } : item));
+          });
+          return newData;
+        });
+
+        const statusMessage = newStatus ? 'Active' : 'Inactive';
+        toast.success(`Status updated to ${statusMessage}`);
+      }
+    } catch (error) {
+      toast.error('Error updating status');
+    }
+  };
+
+  const resetFilters = () => {
+    setSelectedSection('');
+    setStatus('');
+    fetchConfigurations();
+  };
+
+  return (
+    <>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Typography variant="h4">Configurations</Typography>
+        <TextField size="small" placeholder="Search..." InputProps={{ endAdornment: <SearchIcon /> }} sx={{ width: '350px' }} />
+      </Stack>
+
+      <Grid container spacing={2}>
+        <FilterPanel
+          showFilter={showFilter}
+          statuses={statusFilter}
+          configurationNames={configTypeFilter}
+          configurationNameFilter={selectedSection}
+          setConfigurationNameFilter={(val) => {
+            setSelectedSection(val);
+          }}
+          statusFilter={status}
+          setStatusFilter={(val) => {
+            setStatus(val);
+          }}
+          selectedFilters={['configurationNameFilter', 'statusFilter']}
+          onReset={resetFilters}
+        />
+
+        <Grid item xs={9}>
+          <Grid container spacing={2}>
+            {Object.entries(tabData).map(([section, items]) => (
+              <Grid item xs={12} sm={6} md={4} key={section}>
+                <Card
+                  sx={{
+                    p: 0,
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    height: '300px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderBottom: '1px solid #e0e0e0',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {section}
+                      </Typography>
+                      <IconButton
+                        onClick={() => handleOpenModal(section)}
+                        sx={{
+                          backgroundColor: '#41C048',
+                          borderRadius: '50%',
+                          width: '25px',
+                          height: '25px',
+                          boxShadow: 3,
+                          color: 'white',
+                          '&:hover': { backgroundColor: '#41C048' }
+                        }}
+                      >
+                        <Add sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ px: 2, py: 1, backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="subtitle2" fontWeight="medium">
+                        Configuration
+                      </Typography>
+                      <Typography variant="subtitle2" fontWeight="medium">
+                        Status
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
+                    {items.length > 0 ? (
+                      items.map((item) => (
+                        <Box
+                          key={item.id}
                           sx={{
-                            bgcolor: '#41c048',
-                            color: 'white',
-                            width: 15,
-                            height: 15,
-                            borderRadius: '50%',
-                            '&:hover': { bgcolor: '#41c048', color: 'white' }
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mb: 1,
+                            pb: 1,
+                            borderBottom: '1px solid #f0f0f0'
                           }}
                         >
-                          <Add sx={{ fontSize: '16px' }} />
-                        </IconButton>
-                      )}
-                    </Box>
-                  }
-                  sx={{
-                    backgroundColor: selectedTab === index ? '#e3f2fd' : 'transparent',
-                    transition: 'background-color 0.3s ease',
-                    marginRight: 2,
-                  }}
-                />
-              ))}
-            </Tabs>
+                          <Typography sx={{ flex: 1 }}>{item.name}</Typography>
+                          <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="textSecondary">
+                        No items found
+                      </Typography>
+                    )}
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
 
-            <Modal open={openModal} onClose={handleCloseModal}>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 500,
-                  bgcolor: 'white',
-                  p: 3,
-                  borderRadius: 2,
-                  boxShadow: 24
-                }}
-              >
-                <Typography variant="h4" sx={{ mb: 2 }}>
-                  New Item
-                </Typography>
-                <TextField label="Enter Name" fullWidth value={inputValue} onChange={(e) => setInputValue(e.target.value)} sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="body1">Active or Inactive ?</Typography>
-                  <Switch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} />
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                  <Button variant="contained" color="secondary" onClick={handleCloseModal}>
-                    Submit
-                  </Button>
-                  <Button onClick={handleCloseModal} variant="outlined" color="error">
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
-
-            <Box sx={{ height: 'auto', mt: 2 }}>
-              <DataGrid
-                rows={tabData[tabLabels[selectedTab]] || []}
-                columns={columns}
-                pageSize={5}
-                disableSelectionOnClick
-                getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                sx={{
-                  '& .even-row': { backgroundColor: '#ffffff' },
-                  '& .odd-row': { backgroundColor: '#f5f5f5' },
-                  '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #ccc'
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor: '#f5f5f5'
-                  }
-                }}
-              />
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 500,
+              bgcolor: 'white',
+              p: 3,
+              borderRadius: 2,
+              boxShadow: 24
+            }}
+          >
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              Add to {selectedSection}
+            </Typography>
+            <TextField fullWidth label="New Item" value={inputValue} onChange={(e) => setInputValue(e.target.value)} sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Typography variant="body1">Active?</Typography>
+              <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+              <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSaveConfiguration}>
+                Save Changes
+              </Button>
+              <Button variant="outlined" color="error" onClick={handleCloseModal}>
+                Cancel
+              </Button>
             </Box>
           </Box>
-        </Card>
+        </Modal>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

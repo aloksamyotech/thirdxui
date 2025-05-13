@@ -1,0 +1,570 @@
+import React, { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography } from '@mui/material';
+import { MenuItem, Select, Chip, FormControl, InputLabel } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import Link from '@mui/material/Link';
+import { useNavigate } from 'react-router-dom';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { getApi, postApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import AntSwitch from 'components/AntSwitch';
+import toast from 'react-hot-toast';
+
+const AddCaseForm = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsloading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = React.useRef(null);
+  const [rows, setRows] = useState([]);
+  const [services, setServices] = useState([]);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      serviceName: '',
+      service: '',
+      serviceType: '',
+      serviceStatus: '',
+      caseOpened: null,
+      caseClosed: null,
+      benificiary: '',
+      campaigns: '',
+      engagement: '',
+      eventAttanded: '',
+      fundingInterest: '',
+      fundraisingActivities: '',
+      description: '',
+      files: null
+    },
+    mode:'all'
+  });
+
+  const handleFileClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setValue('attachments', file);
+      console.log('Selected file:', file);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setIsloading(true);
+    console.log(data);
+
+    try {
+      const formData = new FormData();
+
+      formData.append('serviceName', data.serviceName);
+      formData.append('service', data.service);
+      formData.append('serviceType', data.serviceType);
+      formData.append('serviceStatus', data.serviceStatus);
+      formData.append('caseOpened', data.caseOpened);
+      formData.append('caseClosed', data.caseClosed);
+      formData.append('benificiary', data.benificiary);
+      formData.append('campaigns', data.campaigns);
+      formData.append('engagement', data.engagement);
+      formData.append('fundingInterest', data.fundingInterests);
+      formData.append('fundraisingActivities', data.fundraisingActivities);
+      formData.append('description', data.description);
+      formData.append('isActive', data.isActive);
+      if (data.file) {
+        formData.append('file', data.file);
+      }
+
+      const response = await postApi(urls.case.create, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      toast.success('Cases added successfully');
+      navigate('/case');
+      setIsloading(false);
+    } catch (error) {
+      toast.error('Error submitting case');
+      setIsloading(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchpeople = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.fetch);
+
+        const allUser = response?.data?.allUser || [];
+
+        const formattedUsers = allUser.map((user) => ({
+          id: user._id,
+          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        }));
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchpeople();
+  }, []);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getApi(urls.service.fetch);
+        if (response?.data) {
+          setServices(response.data.allService);
+        }
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  const onlyLetters = /^[A-Za-z\s]*$/;
+  const onlyNumbers = /^[0-9]*$/;
+
+  return (
+    <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4">Add New Case</Typography>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/case')}>
+          <ArrowBackIcon sx={{ color: 'grey' }} />
+          <Typography variant="h6" sx={{ mr: 1 }}>
+            Back
+          </Typography>
+        </Box>
+      </Box>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card sx={{ padding: 2, marginTop: 2 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="serviceName"
+                    control={control}
+                    rules={{ required: 'Service user is required' }}
+                    render={({ field }) => (
+                      <FormControl fullWidth size="small" error={!!errors.serviceName}>
+                        <InputLabel id="service-user-label">Service User</InputLabel>
+                        <Select {...field} labelId="service-user-label" label="Service User">
+                          {rows.map((user) => (
+                            <MenuItem key={user.id} value={user.id}>
+                              {user.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.serviceName && (
+                          <Typography color="error" variant="caption">
+                            {errors.serviceName.message}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="service"
+                    control={control}
+                    rules={{ required: 'Service is required' }}
+                    render={({ field }) => (
+                      <FormControl fullWidth size="small" error={!!errors.service}>
+                        <InputLabel id="service-label">Service</InputLabel>
+                        <Select {...field} labelId="service-label" label="Service">
+                          {services.map((service) => (
+                            <MenuItem key={service._id} value={service._id}>
+                              {service.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors.service && (
+                          <Typography color="error" variant="caption">
+                            {errors.service.message}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="serviceType"
+                    control={control}
+                    rules={{ required: 'Service owner is required' }}
+                    render={({ field }) => (
+                      <FormControl fullWidth size="small" error={!!errors.serviceType}>
+                        <InputLabel id="service-type-label">Service Owner</InputLabel>
+                        <Select {...field} labelId="service-type-label" label="Service Owner">
+                          <MenuItem value="owner1">Owner 1</MenuItem>
+                          <MenuItem value="owner2">Owner 2</MenuItem>
+                          <MenuItem value="owner3">Owner 3</MenuItem>
+                        </Select>
+                        {errors.serviceType && (
+                          <Typography color="error" variant="caption">
+                            {errors.serviceType.message}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="caseOpened"
+                    control={control}
+                    rules={{ required: 'Start date is required' }}
+                    render={({ field }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Date Case Opened"
+                          value={field.value}
+                          onChange={(newValue) => field.onChange(newValue)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              fullWidth
+                              size="small"
+                              error={!!errors.caseOpened}
+                              helperText={errors.caseOpened?.message}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="caseClosed"
+                    control={control}
+                    rules={{ required: 'End date is required' }}
+                    render={({ field }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Date Case Closed"
+                          value={field.value}
+                          onChange={(newValue) => field.onChange(newValue)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              fullWidth
+                              size="small"
+                              error={!!errors.caseClosed}
+                              helperText={errors.caseClosed?.message}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="serviceStatus"
+                    control={control}
+                    rules={{ required: 'Service status is required' }}
+                    render={({ field }) => (
+                      <FormControl fullWidth size="small" error={!!errors.serviceStatus}>
+                        <InputLabel id="status-label">Service Status</InputLabel>
+                        <Select {...field} labelId="status-label" label="Service Status">
+                          {['Active', 'Inactive'].map((status) => (
+                            <MenuItem key={status} value={status}>
+                              <Chip
+                                label={status}
+                                sx={{
+                                  color: status === 'Active' ? '#79dbfb' : '#ff6a67',
+                                  backgroundColor: status === 'Active' ? '#e5f8fe' : '#ffeae9',
+                                  fontWeight: 500
+                                }}
+                              />
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ p: 2 }}>
+              <Grid item xs={12} md={6}>
+                <Paper elevation={2} sx={{ p: 2 }}>
+                  <Typography variant="subtitle1" mb={2}>
+                    Service Tag
+                  </Typography>
+
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Controller
+                        name="benificiary"
+                        control={control}
+                        rules={{
+                          required: 'Beneficiary information is required',
+                          pattern: {
+                            value: onlyLetters,
+                            message: 'Only letters are allowed'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Beneficiary Information"
+                            error={!!errors.benificiary}
+                            helperText={errors.benificiary?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Controller
+                        name="campaigns"
+                        control={control}
+                        rules={{
+                          required: 'Campaigns supported is required',
+                          pattern: {
+                            value: onlyLetters,
+                            message: 'Only letters are allowed'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Campaigns Supported"
+                            error={!!errors.campaigns}
+                            helperText={errors.campaigns?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Controller
+                        name="engagement"
+                        control={control}
+                        rules={{
+                          required: 'Engagement is required',
+                          pattern: {
+                            value: onlyLetters,
+                            message: 'Only letters are allowed'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Engagement"
+                            error={!!errors.engagement}
+                            helperText={errors.engagement?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Controller
+                        name="eventAttanded"
+                        control={control}
+                        rules={{
+                          required: 'Events attended is required',
+                          pattern: {
+                            value: onlyLetters,
+                            message: 'Only letters are allowed'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Events Attended"
+                            error={!!errors.eventAttanded}
+                            helperText={errors.eventAttanded?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Controller
+                        name="fundingInterest"
+                        control={control}
+                        rules={{
+                          required: 'Funding interests is required',
+                          pattern: {
+                            value: onlyLetters,
+                            message: 'Only letters are allowed'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Funding Interests"
+                            error={!!errors.fundingInterest}
+                            helperText={errors.fundingInterest?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Controller
+                        name="fundraisingActivities"
+                        control={control}
+                        rules={{
+                          required: 'Fundraising activities is required',
+                          pattern: {
+                            value: onlyLetters,
+                            message: 'Only letters are allowed'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            size="small"
+                            label="Fundraising Activities"
+                            error={!!errors.fundraisingActivities}
+                            helperText={errors.fundraisingActivities?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                  <Box mb={2} display="flex" justifyContent="space-between">
+                    <Controller
+                      name="attachments"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          value={field.value ? field.value.name : ''}
+                          placeholder="Attachments"
+                          InputProps={{
+                            readOnly: true,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AttachFileIcon fontSize="small" />
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                  <Link component="span">Upload a file</Link>
+                                  <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                </Button>
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      )}
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      style={{ display: 'none' }}
+                      accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                    />
+                  </Box>
+                  <Controller
+                    name="description"
+                    control={control}
+                    rules={{
+                      required: 'Notes are required',
+                      minLength: {
+                        value: 10,
+                        message: 'Notes must be at least 10 characters long'
+                      },
+                      maxLength: {
+                        value: 500,
+                        message: 'Notes cannot exceed 500 characters'
+                      }
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Notes"
+                        multiline
+                        minRows={12}
+                        fullWidth
+                        variant="outlined"
+                        sx={{ mb: 2 }}
+                        error={!!errors.description}
+                        helperText={errors.description?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="isActive"
+                    control={control}
+                    defaultValue={true}
+                    render={({ field }) => (
+                      <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Typography variant="subtitle1">Restrict Access</Typography>
+                        <AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} color="primary" />
+                      </Box>
+                    )}
+                  />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Card>
+
+        <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+          <Grid item>
+            <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                reset();
+                onCancel();
+              }}
+            >
+              Cancel
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </Card>
+  );
+};
+
+export default AddCaseForm;

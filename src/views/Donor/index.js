@@ -199,18 +199,25 @@ const Lead = () => {
                   columns={columns}
                   rowHeight={65}
                   getRowId={(row) => row._id}
-                  onRowClick={() => navigate('/view-donor')}
-                  components={{
-                    Toolbar: () => <CustomHeader />
-                  }}
+                  onRowClick={(params) => navigate('/view-donor', { state: params.row })}
+                  // onRowClick={(params) => {
+                  //   const subRole = params.row.subRole;
+                  //   console.log('subRole:', subRole);
+
+                  //   if (subRole === 'donar_individual') {
+                  //     console.log('donor_individual clicking -----');
+
+                  //     navigate('/view-donor', { state: params.row });
+                  //   } else if (subRole === 'donor_company') {
+                  //     navigate('/view-company-donor', { state: params.row });
+                  //   } else {
+                  //     console.warn('Unknown donor subRole:', subRole);
+                  //   }
+                  // }}
+                  components={{ Toolbar: () => <CustomHeader /> }}
                   sx={{
-                    '& .MuiDataGrid-columnHeaders': {
-                      display: 'none'
-                    },
-                    '& .MuiDataGrid-cell': {
-                      textAlign: 'left',
-                      fontSize: '14px'
-                    }
+                    '& .MuiDataGrid-columnHeaders': { display: 'none' },
+                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' }
                   }}
                   disableSelectionOnClick
                 />

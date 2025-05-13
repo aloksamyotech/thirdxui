@@ -108,7 +108,7 @@ const Dashboard = () => {
               { name: 'PickleBall', image: pickleball }
             ]}
           /> */}
-          <Media />
+          {/* <Media /> */}
         </Grid>
         <Grid item xs={6}>
           <Map />

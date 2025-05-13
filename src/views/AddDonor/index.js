@@ -48,6 +48,7 @@ const AddDonorForm = () => {
     setValue,
     watch,
     reset,
+    trigger,
     formState: { errors }
   } = useForm({
     mode: 'all',
@@ -128,9 +129,9 @@ const AddDonorForm = () => {
     if (file) {
       setSelectedFile(file);
       setValue('attachments', file);
-      console.log('Selected file:', file);
     }
   };
+
   const onSubmit = async (data) => {
     setIsloading(true);
 
@@ -168,6 +169,7 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
     fd.append('contactPreferences[reason]', data.reason);
+    fd.append('contactPreferences[email]', data.contactemail);
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
     fd.append('contactPreferences[contactMethods][donor]', data.donortag);
     fd.append('contactPreferences[contactMethods][sms]', data.sms);
@@ -200,6 +202,39 @@ const AddDonorForm = () => {
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
   const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
+  const handleTabChange = async (newValue) => {
+    if (newValue > tabIndex) {
+      const firstTabFields = [
+        'title',
+        'firstname',
+        'lastname',
+        'phone',
+        'email',
+        'gender',
+        'dob',
+        'address',
+        'country',
+        'pinCode',
+        'riskNotes',
+        'socialmedia',
+        'district'
+      ];
+
+      try {
+        const isValid = await trigger(firstTabFields);
+        if (isValid) {
+          setTabIndex(newValue);
+        } else {
+          toast.error('Please fill all required fields before proceeding');
+        }
+      } catch (error) {
+        toast.error('Error validating form fields');
+      }
+    } else {
+      setTabIndex(newValue);
+    }
+  };
+
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -217,7 +252,7 @@ const AddDonorForm = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Tabs
               value={tabIndex}
-              onChange={(e, newValue) => setTabIndex(newValue)}
+              onChange={(e, newValue) => handleTabChange(newValue)}
               sx={{
                 display: 'flex',
                 gap: 2,
@@ -292,7 +327,15 @@ const AddDonorForm = () => {
                                 control={control}
                                 rules={{ required: 'Gender is required' }}
                                 render={({ field }) => (
-                                  <TextField select fullWidth label="Gender" size="small" {...field}>
+                                  <TextField
+                                    select
+                                    fullWidth
+                                    label="Gender"
+                                    size="small"
+                                    {...field}
+                                    error={!!errors.gender}
+                                    helperText={errors.gender?.message}
+                                  >
                                     <MenuItem value="Male">Male</MenuItem>
                                     <MenuItem value="Female">Female</MenuItem>
                                     <MenuItem value="Non-Binary">Non-Binary</MenuItem>
@@ -301,6 +344,7 @@ const AddDonorForm = () => {
                                 )}
                               />
                             </Grid>
+
                             <Grid item xs={12} sm={6}>
                               <Controller
                                 name="firstname"
@@ -395,7 +439,15 @@ const AddDonorForm = () => {
                                       value={field.value}
                                       onChange={(newValue) => field.onChange(newValue)}
                                       maxDate={dayjs()}
-                                      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                                      renderInput={(params) => (
+                                        <TextField
+                                          {...params}
+                                          fullWidth
+                                          error={!!errors.dob}
+                                          helperText={errors.dob?.message}
+                                          size="small"
+                                        />
+                                      )}
                                     />
                                   </LocalizationProvider>
                                 )}
@@ -545,15 +597,11 @@ const AddDonorForm = () => {
                               <Controller
                                 name="address"
                                 control={control}
-                                rules={{
+                               rules={{
                                   required: 'Address is required',
                                   pattern: {
-                                    value: onlyLettersAndNumbers,
-                                    message: 'Address can only contain letters, numbers and spaces'
-                                  },
-                                  maxLength: {
-                                    value: 100,
-                                    message: 'Address must be at most 100 characters'
+                                    value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
+                                    message: 'Address can only contain letters, numbers, spaces, and valid special characters'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -570,6 +618,7 @@ const AddDonorForm = () => {
                                   />
                                 )}
                               />
+                              
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
@@ -579,12 +628,8 @@ const AddDonorForm = () => {
                                 rules={{
                                   required: 'Address is required',
                                   pattern: {
-                                    value: onlyLettersAndNumbers,
-                                    message: 'Address can only contain letters, numbers and spaces'
-                                  },
-                                  maxLength: {
-                                    value: 100,
-                                    message: 'Address must be at most 100 characters'
+                                    value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
+                                    message: 'Address can only contain letters, numbers, spaces, and valid special characters'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -592,8 +637,8 @@ const AddDonorForm = () => {
                                     fullWidth
                                     label="Address Line 2"
                                     size="small"
-                                    error={!!errors.address}
-                                    helperText={errors.address?.message}
+                                    error={!!errors.address2}
+                                    helperText={errors.address2?.message}
                                     inputProps={{
                                       pattern: onlyLettersAndNumbers.source
                                     }}
@@ -700,7 +745,6 @@ const AddDonorForm = () => {
                               <Controller
                                 name="Recruitmentcampaign"
                                 control={control}
-                                rules={{ required: 'Recruitment Campaign is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -1058,266 +1102,276 @@ const AddDonorForm = () => {
                       </Grid>
                     </Box>
                   </Grid>
+
+                  <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+                    <Grid item>
+                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(1)}>
+                        Next
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </>
               )}
 
               {tabIndex === 1 && (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={4}>
-                    <Controller
-                      name="preferredContact"
-                      control={control}
-                      rules={{
-                        required: 'Preferred method of contact is required'
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Preferred Method of Contact"
-                          select
-                          {...field}
-                          error={!!errors.preferredContact}
-                          helperText={errors.preferredContact?.message}
-                        >
-                          <MenuItem value="email">Email</MenuItem>
-                          <MenuItem value="phone">Phone</MenuItem>
-                          <MenuItem value="text">Text</MenuItem>
-                          <MenuItem value="letter">Letter</MenuItem>
-                          <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                          <MenuItem value="doNotContact">Do not contact</MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  </Grid>
+                <>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="preferredContact"
+                        control={control}
+                        rules={{
+                          required: 'Preferred method of contact is required'
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Preferred Method of Contact"
+                            select
+                            {...field}
+                            error={!!errors.preferredContact}
+                            helperText={errors.preferredContact?.message}
+                          >
+                            <MenuItem value="email">Email</MenuItem>
+                            <MenuItem value="phone">Phone</MenuItem>
+                            <MenuItem value="text">Text</MenuItem>
+                            <MenuItem value="letter">Letter</MenuItem>
+                            <MenuItem value="whatsapp">WhatsApp</MenuItem>
+                            <MenuItem value="doNotContact">Do not contact</MenuItem>
+                          </TextField>
+                        )}
+                      />
+                    </Grid>
 
-                  <Grid item xs={12} sm={4}>
-                    <Controller
-                      name="contactPurpose"
-                      control={control}
-                      rules={{
-                        required: 'Contact purpose is required'
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Contact Purposes"
-                          select
-                          {...field}
-                          error={!!errors.contactPurpose}
-                          helperText={errors.contactPurpose?.message}
-                        >
-                          <MenuItem value="newsletter">Newsletter</MenuItem>
-                          <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="contactPurpose"
+                        control={control}
+                        rules={{
+                          required: 'Contact purpose is required'
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            fullWidth
+                            size="small"
+                            label="Contact Purposes"
+                            select
+                            {...field}
+                            error={!!errors.contactPurpose}
+                            helperText={errors.contactPurpose?.message}
+                          >
+                            <MenuItem value="newsletter">Newsletter</MenuItem>
+                            <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                          </TextField>
+                        )}
+                      />
+                    </Grid>
 
-                  <Grid item xs={12} sm={4}>
-                    <Controller
-                      name="confirmationDate"
-                      control={control}
-                      rules={{
-                        required: 'Date of Confirmation is required'
-                      }}
-                      render={({ field }) => (
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            label="Date of Confirmation"
-                            value={field.value}
-                            onChange={(newValue) => field.onChange(newValue)}
-                            renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                          />
-                        </LocalizationProvider>
-                      )}
-                    />
-                  </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="confirmationDate"
+                        control={control}
+                        rules={{
+                          required: 'Date of Confirmation is required'
+                        }}
+                        render={({ field }) => (
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                              label="Date of Confirmation"
+                              value={field.value}
+                              onChange={(newValue) => field.onChange(newValue)}
+                              renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                            />
+                          </LocalizationProvider>
+                        )}
+                      />
+                    </Grid>
 
-                  <Grid item xs={12} sm={4}>
-                    <Controller
-                      name="reason"
-                      control={control}
-                      rules={{
-                        required: 'Reason is required'
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          label="Reason"
-                          size="small"
-                          select
-                          {...field}
-                          error={!!errors.reason}
-                          helperText={errors.reason?.message}
-                        >
-                          <MenuItem value="byRequest">By Request</MenuItem>
-                          <MenuItem value="deceased">Deceased</MenuItem>
-                          <MenuItem value="goneAway">Gone Away</MenuItem>
-                        </TextField>
-                      )}
-                    />
-                  </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="reason"
+                        control={control}
+                        rules={{
+                          required: 'Reason is required'
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            fullWidth
+                            label="Reason"
+                            size="small"
+                            select
+                            {...field}
+                            error={!!errors.reason}
+                            helperText={errors.reason?.message}
+                          >
+                            <MenuItem value="byRequest">By Request</MenuItem>
+                            <MenuItem value="deceased">Deceased</MenuItem>
+                            <MenuItem value="goneAway">Gone Away</MenuItem>
+                          </TextField>
+                        )}
+                      />
+                    </Grid>
 
-                  <Grid item xs={12} sm={4}>
-                    <Controller
-                      name="mobilePhone"
-                      control={control}
-                      rules={{
-                        pattern: {
-                          value: onlyNumbers,
-                          message: 'Phone number must contain only numbers'
-                        },
-                        minLength: {
-                          value: 10,
-                          message: 'Phone number must be at least 10 digits'
-                        }
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          label="Mobile Phone No."
-                          size="small"
-                          error={!!errors.mobilePhone}
-                          helperText={errors.mobilePhone?.message}
-                          type="tel"
-                          inputProps={{
-                            pattern: onlyNumbers.source,
-                            onKeyPress: (e) => {
-                              if (!onlyNumbers.test(e.key)) {
-                                e.preventDefault();
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="mobilePhone"
+                        control={control}
+                        rules={{
+                          pattern: {
+                            value: onlyNumbers,
+                            message: 'Phone number must contain only numbers'
+                          },
+                          minLength: {
+                            value: 10,
+                            message: 'Phone number must be at least 10 digits'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            fullWidth
+                            label="Mobile Phone No."
+                            size="small"
+                            error={!!errors.mobilePhone}
+                            helperText={errors.mobilePhone?.message}
+                            type="tel"
+                            inputProps={{
+                              pattern: onlyNumbers.source,
+                              onKeyPress: (e) => {
+                                if (!onlyNumbers.test(e.key)) {
+                                  e.preventDefault();
+                                }
                               }
-                            }
-                          }}
-                          {...field}
-                        />
-                      )}
-                    />
+                            }}
+                            {...field}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="contactemail"
+                        control={control}
+                        rules={{
+                          required: 'Email is required',
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: 'Invalid email address'
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            fullWidth
+                            label="Email"
+                            size="small"
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                            {...field}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2}>
+                      <Controller
+                        name="donortag"
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            label="Donor Tag"
+                            labelPlacement="start"
+                            sx={{ display: 'flex', gap: '10px' }}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                      <Controller
+                        name="emailConsent"
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            label="Email"
+                            labelPlacement="start"
+                            sx={{ display: 'flex', gap: '10px' }}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                      <Controller
+                        name="sms"
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            label="SMS"
+                            labelPlacement="start"
+                            sx={{ display: 'flex', gap: '10px' }}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2}>
+                      <Controller
+                        name="telephone"
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            label="Telephone"
+                            labelPlacement="start"
+                            sx={{ display: 'flex', gap: '10px' }}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={2}>
+                      <Controller
+                        name="whatsapp"
+                        control={control}
+                        render={({ field }) => (
+                          <FormControlLabel
+                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            label="Whatsapp"
+                            labelPlacement="start"
+                            sx={{ display: 'flex', gap: '10px' }}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid item sm={4}></Grid>
                   </Grid>
 
-                  <Grid item xs={12} sm={4}>
-                    <Controller
-                      name="email"
-                      control={control}
-                      rules={{
-                        required: 'Email is required',
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Invalid email address'
-                        }
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          label="Email"
-                          size="small"
-                          error={!!errors.email}
-                          helperText={errors.email?.message}
-                          {...field}
-                        />
-                      )}
-                    />
+                  <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        sx={{ background: '#053146' }}
+                        disabled={isLoading}
+                        onClick={handleSubmit((data) => {
+                          onSubmit(data);
+                        })}
+                      >
+                        {isLoading ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/donor')}>
+                        Cancel
+                      </Button>
+                    </Grid>
                   </Grid>
-
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="donortag"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="Donor Tag"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="emailConsent"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="Email"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="sms"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="SMS"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="telephone"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="Telephone"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="whatsapp"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
-                          label="Whatsapp"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-
-                  <Grid item sm={4}></Grid>
-                </Grid>
+                </>
               )}
             </Box>
           </form>
         </Card>
-
-        <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
-          <Grid item>
-            <Button
-              variant="contained"
-              sx={{ background: '#053146' }}
-              disabled={isLoading}
-              onClick={handleSubmit((data) => {
-                onSubmit(data);
-              })}
-            >
-              {isLoading ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button variant="outlined" color="error">
-              Cancel
-            </Button>
-          </Grid>
-        </Grid>
       </Card>
     </Grid>
   );

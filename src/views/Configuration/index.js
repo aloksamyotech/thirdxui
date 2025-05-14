@@ -29,6 +29,7 @@ const TabbedDataGrid = () => {
   const [tabData, setTabData] = useState({});
   const [selectedTab, setSelectedTab] = useState(0);
   const [showFilter, setShowFilter] = useState(true);
+  const [inputError, setInputError] = useState('');
 
   const handleOpenModal = (section) => {
     setSelectedSection(section);
@@ -39,6 +40,7 @@ const TabbedDataGrid = () => {
     setOpenModal(false);
     setInputValue('');
     setToggleValue(true);
+    setInputError('');
   };
 
   const configTypeFilter = useMemo(() => {
@@ -116,7 +118,34 @@ const TabbedDataGrid = () => {
     }
   }, [selectedSection, status]);
 
+  const validateInput = (value) => {
+    if (!value) {
+      setInputError('This field is required');
+      return false;
+    }
+    if (!/^[A-Za-z\s]+$/.test(value)) {
+      setInputError('Only letters and spaces are allowed');
+      return false;
+    }
+    if (value.length < 1 || value.length > 25) {
+      setInputError('Length must be between 1 and 25 characters');
+      return false;
+    }
+    setInputError('');
+    return true;
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    validateInput(value);
+  };
+
   const handleSaveConfiguration = async () => {
+    if (!validateInput(inputValue)) {
+      return;
+    }
+    
     const payload = {
       name: inputValue,
       isActive: toggleValue,
@@ -293,9 +322,17 @@ const TabbedDataGrid = () => {
             <Typography variant="h5" sx={{ mb: 2 }}>
               Add to {selectedSection}
             </Typography>
-            <TextField fullWidth label="New Item" value={inputValue} onChange={(e) => setInputValue(e.target.value)} sx={{ mb: 2 }} />
+            <TextField 
+              fullWidth 
+              label="New Item" 
+              value={inputValue} 
+              onChange={handleInputChange}
+              error={!!inputError}
+              helperText={inputError}
+              sx={{ mb: 2 }} 
+            />
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="body1">Active?</Typography>
+              <Typography variant="body1">Active?</Typography>&nbsp;&nbsp;&nbsp;
               <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>

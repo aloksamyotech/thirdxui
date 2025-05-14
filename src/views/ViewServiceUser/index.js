@@ -154,16 +154,20 @@ const UserProfileCard = () => {
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
-                  <img src={ServiceUser} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
+                  <img
+                    src={ServiceUser}
+                    alt={personalInfo?.firstName || 'User'}
+                    style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
+                  />
                   <Grid item xs>
                     <Typography variant="h5" fontWeight="bold">
-                      {`${personalInfo.firstName} ${personalInfo.lastName}`}
+                      {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      {`${contactInfo.email}`}
+                      {contactInfo?.email ?? ''}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      {`${uniqueid}`} | Individual | {`${formattedDate}`}
+                      {uniqueid ?? ''} | Individual | {formattedDate ?? ''}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -172,11 +176,11 @@ const UserProfileCard = () => {
                   <Button variant="contained" onClick={handleClick} sx={{ mb: 1, backgroundColor: '#00AEEF' }}>
                     Manage
                   </Button>
-                  <Typography variant="body2" color="textSecondary">
-                    Address
+                  <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
+                    Address : {contactInfo?.addressLine1 ?? ''}
                   </Typography>
                   <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    {`${contactInfo.addressLine1} ${contactInfo.town} ${contactInfo.country}`}
+                    {`${contactInfo?.town ?? ''} ${contactInfo?.country ?? ''}`}
                   </Typography>
                 </Box>
               </CardContent>
@@ -225,32 +229,32 @@ const UserProfileCard = () => {
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
                               <strong>Full Name:</strong>{' '}
-                              <Typography component="span">{`${personalInfo.firstName} ${personalInfo.lastName}`}</Typography>
+                              <Typography component="span">{`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>User ID:</strong> <Typography component="span">{`${uniqueid}`}</Typography>
+                              <strong>User ID:</strong> <Typography component="span">{`${uniqueid ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Ethnicity:</strong> <Typography component="span">{`${personalInfo.ethnicity}`}</Typography>
+                              <strong>Ethnicity:</strong> <Typography component="span">{`${personalInfo?.ethnicity ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Language:</strong> <Typography component="span">{`${contactInfo.firstLanguage}`}</Typography>
+                              <strong>Language:</strong> <Typography component="span">{`${contactInfo?.firstLanguage ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Contact:</strong> <Typography component="span">+{`${contactInfo.phone}`}</Typography>
+                              <strong>Contact:</strong> <Typography component="span">+{`${contactInfo?.phone ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">{`${contactInfo.addressLine1}`}</Typography>
+                              <strong>Address:</strong> <Typography component="span">{`${contactInfo?.addressLine1 ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -258,14 +262,14 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Gender:</strong> <Typography component="span">{`${personalInfo.gender}`}</Typography>
+                              <strong>Gender:</strong> <Typography component="span">{`${personalInfo?.gender ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
                               <strong>DOB:</strong>{' '}
                               <Typography component="span">
-                                {personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
+                                {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
                               </Typography>
                             </Typography>
                           </Box>
@@ -274,7 +278,7 @@ const UserProfileCard = () => {
                             <Typography variant="body1">
                               <strong>Age:</strong>{' '}
                               <Typography component="span">
-                                {personalInfo.dateOfBirth
+                                {personalInfo?.dateOfBirth
                                   ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
                                   : ''}
                               </Typography>
@@ -283,12 +287,12 @@ const UserProfileCard = () => {
 
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Alternative Id:</strong> <Typography component="span">{`${uniqueid}`}</Typography>
+                              <strong>Alternative Id:</strong> <Typography component="span">{`${uniqueid ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Telephone no:</strong> <Typography component="span">+{`${contactInfo.homePhone}`}</Typography>
+                              <strong>Telephone no:</strong> <Typography component="span">+{`${contactInfo?.homePhone ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -307,7 +311,7 @@ const UserProfileCard = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <Typography variant="body1" color="textSecondary">
-                            {`${otherInfo.description}`}
+                            {otherInfo?.description ?? 'No description available.'}
                           </Typography>
                         </Grid>
 
@@ -350,23 +354,26 @@ const UserProfileCard = () => {
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
                               <strong>Full Name:</strong>{' '}
-                              <Typography component="span">{`${emergencyContact.firstName} ${emergencyContact.lastName}`}</Typography>
+                              <Typography component="span">{`${emergencyContact?.firstName ?? ''} ${
+                                emergencyContact?.lastName ?? ''
+                              }`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Gender:</strong> <Typography component="span">{`${emergencyContact.gender}`}</Typography>
+                              <strong>Gender:</strong> <Typography component="span">{`${emergencyContact?.gender ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
                               <strong>Relationship to Service User:</strong>{' '}
-                              <Typography component="span">{`${emergencyContact.relationshipToUser}`}</Typography>
+                              <Typography component="span">{`${emergencyContact?.relationshipToUser ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">{`${emergencyContact.addressLine1}`}</Typography>
+                              <strong>Address:</strong>{' '}
+                              <Typography component="span">{`${emergencyContact?.addressLine1 ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>
@@ -374,17 +381,17 @@ const UserProfileCard = () => {
                         <Grid item xs={6}>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Home no:</strong> <Typography component="span">+{`${emergencyContact.homePhone}`}</Typography>
+                              <strong>Home no:</strong> <Typography component="span">+{`${emergencyContact?.homePhone ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Mobile no:</strong> <Typography component="span">+{`${emergencyContact.phone}`}</Typography>
+                              <strong>Mobile no:</strong> <Typography component="span">+{`${emergencyContact?.phone ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" mb={1}>
                             <Typography variant="body1">
-                              <strong>Email:</strong> <Typography component="span">{`${emergencyContact.email}`}</Typography>
+                              <strong>Email:</strong> <Typography component="span">{`${emergencyContact?.email ?? ''}`}</Typography>
                             </Typography>
                           </Box>
                         </Grid>

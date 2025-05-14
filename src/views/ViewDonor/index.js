@@ -34,6 +34,8 @@ const UserProfileCard = () => {
   const location = useLocation();
   const id = location.state._id;
   const uniqueid = location.state.serialNumber;
+  const sub_role = location.state.subRole;
+
   useEffect(() => {
     const fetchUserById = async () => {
       try {
@@ -110,7 +112,6 @@ const UserProfileCard = () => {
   };
 
   const handleSave = (data) => {
-    console.log('Case note submitted:', data);
     setCaseNoteOpen(false);
   };
 
@@ -176,7 +177,15 @@ const UserProfileCard = () => {
                       {contactInfo.email}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      {uniqueid} | Individual | Added {formattedDate}
+                      {uniqueid} |{' '}
+                      {sub_role === 'donar_individual'
+                        ? 'Individual'
+                        : sub_role === 'donar_company'
+                        ? 'Company'
+                        : sub_role === 'donar_group'
+                        ? 'Group'
+                        : sub_role}{' '}
+                      | Added {formattedDate}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -185,14 +194,16 @@ const UserProfileCard = () => {
                   <Button variant="contained" onClick={handleClick} sx={{ mb: 1, backgroundColor: '#00AEEF' }}>
                     Edit
                   </Button>
-                  <Typography variant="body2" color="textSecondary">
-                    Address
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    {contactInfo.addressLine1}
-                    {contactInfo.district}
-                    {contactInfo.country}
-                  </Typography>
+                  {sub_role === 'donar_individual' && (
+                    <>
+                      <Typography variant="body2" color="textSecondary">
+                        Address
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
+                        {contactInfo?.addressLine1} {contactInfo?.district} {contactInfo?.country}
+                      </Typography>
+                    </>
+                  )}
                 </Box>
               </CardContent>
             </Card>
@@ -236,66 +247,102 @@ const UserProfileCard = () => {
                         About
                       </Typography>
                       <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Full Name:</strong>{' '}
-                              <Typography component="span">
-                                {personalInfo.firstName}
-                                {personalInfo.lastName}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Phone:</strong> <Typography component="span">{contactInfo.phone}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>DOB:</strong>{' '}
-                              {personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Age:</strong>{' '}
-                              <Typography component="span">
-                                {personalInfo.dateOfBirth
-                                  ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
-                                  : ''}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Donor Id:</strong> <Typography component="span">123</Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
+                        {sub_role === 'donar_individual' && (
+                          <>
+                            <Grid item xs={6}>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Full Name:</strong>{' '}
+                                  <Typography component="span">
+                                    {personalInfo?.firstName} {personalInfo?.lastName}
+                                  </Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Phone:</strong> <Typography component="span">{contactInfo?.phone}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>DOB:</strong>{' '}
+                                  {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Age:</strong>{' '}
+                                  <Typography component="span">
+                                    {personalInfo?.dateOfBirth
+                                      ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
+                                      : ''}
+                                  </Typography>
+                                </Typography>
+                              </Box>
+                            </Grid>
 
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Address:</strong> <Typography component="span">{contactInfo.addressLine1}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>country</strong> <Typography component="span">{contactInfo.country}</Typography>
-                            </Typography>
-                          </Box>
-                           {/*<Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Alternative Id:</strong> <Typography component="span">XYZ789</Typography>
-                            </Typography>
-                          </Box> */}
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1">
-                              <strong>Telephone no:</strong> <Typography component="span">{contactInfo.homePhone}</Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
+                            <Grid item xs={6}>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Address:</strong> <Typography component="span">{contactInfo?.addressLine1}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Country:</strong> <Typography component="span">{contactInfo?.country}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Telephone no:</strong> <Typography component="span">{contactInfo?.homePhone}</Typography>
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          </>
+                        )}
+
+                        {(sub_role === 'donar_company' || sub_role === 'donar_group') && (
+                          <>
+                            <Grid item xs={6}>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Company Name:</strong> <Typography component="span">{companyInformation.companyName}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Contact person Name:</strong>{' '}
+                                  <Typography component="span">{companyInformation.mainContactName}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Email:</strong> <Typography component="span">{contactInfo.email}</Typography>
+                                </Typography>
+                              </Box>
+                            </Grid>
+
+                            <Grid item xs={6}>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Recruitment Campaign:</strong>{' '}
+                                  <Typography component="span">{companyInformation.recruitmentCampaign}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Social Media Link:</strong>{' '}
+                                  <Typography component="span">{companyInformation.socialMediaLinks}</Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1">
+                                  <strong>Phone no.:</strong> <Typography component="span">{contactInfo.phone}</Typography>
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          </>
+                        )}
                       </Grid>
                     </CardContent>
                   </Card>

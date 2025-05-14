@@ -203,7 +203,6 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[contactMethods][telephone]', formData.telephone);
     fd.append('contactPreferences[contactMethods][email]', formData.emailConsent);
     fd.append('contactPreferences[contactMethods][sms]', formData.sms);
-    fd.append('contactPreferences[contactMethods][letter]', formData.letter);
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp);
 
     fd.append('role', 'volunteer');

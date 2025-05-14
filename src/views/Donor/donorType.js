@@ -13,9 +13,9 @@ const DonorTypeDialog = ({ open, onClose }) => {
     if (type === 'individual') {
       navigate('/add-donor');
     } else if (type === 'company') {
-      navigate('/add-donorCompany');
+      navigate('/add-donorCompany', { state: { subRole: 'donar_company' } });
     } else if (type === 'group') {
-      navigate('/add-donorGroup');
+      navigate('/add-donorCompany', { state: { subRole: 'donar_group' } });
     }
   };
 
@@ -40,7 +40,7 @@ const DonorTypeDialog = ({ open, onClose }) => {
               }}
             >
               <IconButton>
-                <PersonIcon fontSize="large" sx={{color:'black'}}/>
+                <PersonIcon fontSize="large" sx={{ color: 'black' }} />
               </IconButton>
               <Typography>Individual</Typography>
             </Paper>
@@ -59,7 +59,7 @@ const DonorTypeDialog = ({ open, onClose }) => {
               }}
             >
               <IconButton>
-                <BusinessIcon fontSize="large" sx={{color:'black'}}/>
+                <BusinessIcon fontSize="large" sx={{ color: 'black' }} />
               </IconButton>
               <Typography>Company</Typography>
             </Paper>
@@ -78,7 +78,7 @@ const DonorTypeDialog = ({ open, onClose }) => {
               }}
             >
               <IconButton>
-                <GroupsIcon fontSize="large" sx={{color:'black'}}/>
+                <GroupsIcon fontSize="large" sx={{ color: 'black' }} />
               </IconButton>
               <Typography>Group</Typography>
             </Paper>

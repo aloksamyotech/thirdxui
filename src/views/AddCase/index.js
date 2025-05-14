@@ -29,8 +29,8 @@ const AddCaseForm = () => {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      serviceName: '',
-      service: '',
+      serviceUserId: '',
+      serviceId: '',
       serviceType: '',
       serviceStatus: '',
       caseOpened: null,
@@ -44,7 +44,7 @@ const AddCaseForm = () => {
       description: '',
       files: null
     },
-    mode:'all'
+    mode: 'all'
   });
 
   const handleFileClick = () => {
@@ -56,19 +56,17 @@ const AddCaseForm = () => {
     if (file) {
       setSelectedFile(file);
       setValue('attachments', file);
-      console.log('Selected file:', file);
     }
   };
 
   const onSubmit = async (data) => {
     setIsloading(true);
-    console.log(data);
 
     try {
       const formData = new FormData();
 
-      formData.append('serviceName', data.serviceName);
-      formData.append('service', data.service);
+      formData.append('serviceUserId', data.serviceUserId);
+      formData.append('serviceId', data.serviceId);
       formData.append('serviceType', data.serviceType);
       formData.append('serviceStatus', data.serviceStatus);
       formData.append('caseOpened', data.caseOpened);
@@ -101,36 +99,24 @@ const AddCaseForm = () => {
 
   useEffect(() => {
     const fetchpeople = async () => {
-      try {
-        const response = await getApi(urls.serviceuser.fetch);
-
-        const allUser = response?.data?.allUser || [];
-
-        const formattedUsers = allUser.map((user) => ({
-          id: user._id,
-          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
-        }));
-        setRows(formattedUsers);
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
-      }
+      const response = await getApi(urls.serviceuser.fetch);
+      const allUser = response?.data?.allUser || [];
+      const formattedUsers = allUser.map((user) => ({
+        id: user._id,
+        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+      }));
+      setRows(formattedUsers);
     };
-
     fetchpeople();
   }, []);
 
   useEffect(() => {
     const fetchServices = async () => {
-      try {
-        const response = await getApi(urls.service.fetch);
-        if (response?.data) {
-          setServices(response.data.allService);
-        }
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
+      const response = await getApi(urls.service.fetch);
+      if (response?.data) {
+        setServices(response.data.allService);
       }
     };
-
     fetchServices();
   }, []);
 
@@ -157,11 +143,11 @@ const AddCaseForm = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="serviceName"
+                    name="serviceUserId"
                     control={control}
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.serviceName}>
+                      <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                         <InputLabel id="service-user-label">Service User</InputLabel>
                         <Select {...field} labelId="service-user-label" label="Service User">
                           {rows.map((user) => (
@@ -170,9 +156,9 @@ const AddCaseForm = () => {
                             </MenuItem>
                           ))}
                         </Select>
-                        {errors.serviceName && (
+                        {errors.serviceUserId && (
                           <Typography color="error" variant="caption">
-                            {errors.serviceName.message}
+                            {errors.serviceUserId.message}
                           </Typography>
                         )}
                       </FormControl>
@@ -182,11 +168,11 @@ const AddCaseForm = () => {
 
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="service"
+                    name="serviceId"
                     control={control}
                     rules={{ required: 'Service is required' }}
                     render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.service}>
+                      <FormControl fullWidth size="small" error={!!errors.serviceId}>
                         <InputLabel id="service-label">Service</InputLabel>
                         <Select {...field} labelId="service-label" label="Service">
                           {services.map((service) => (
@@ -195,9 +181,9 @@ const AddCaseForm = () => {
                             </MenuItem>
                           ))}
                         </Select>
-                        {errors.service && (
+                        {errors.serviceId && (
                           <Typography color="error" variant="caption">
-                            {errors.service.message}
+                            {errors.serviceId.message}
                           </Typography>
                         )}
                       </FormControl>
@@ -321,7 +307,8 @@ const AddCaseForm = () => {
                         name="benificiary"
                         control={control}
                         rules={{
-                          required: 'Beneficiary information is required',
+                          minLength: { value: 2, message: 'Minimum 2 characters' },
+                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                           pattern: {
                             value: onlyLetters,
                             message: 'Only letters are allowed'
@@ -344,7 +331,8 @@ const AddCaseForm = () => {
                         name="campaigns"
                         control={control}
                         rules={{
-                          required: 'Campaigns supported is required',
+                          minLength: { value: 2, message: 'Minimum 2 characters' },
+                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                           pattern: {
                             value: onlyLetters,
                             message: 'Only letters are allowed'
@@ -367,7 +355,8 @@ const AddCaseForm = () => {
                         name="engagement"
                         control={control}
                         rules={{
-                          required: 'Engagement is required',
+                          minLength: { value: 2, message: 'Minimum 2 characters' },
+                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                           pattern: {
                             value: onlyLetters,
                             message: 'Only letters are allowed'
@@ -390,7 +379,8 @@ const AddCaseForm = () => {
                         name="eventAttanded"
                         control={control}
                         rules={{
-                          required: 'Events attended is required',
+                          minLength: { value: 2, message: 'Minimum 2 characters' },
+                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                           pattern: {
                             value: onlyLetters,
                             message: 'Only letters are allowed'
@@ -413,7 +403,8 @@ const AddCaseForm = () => {
                         name="fundingInterest"
                         control={control}
                         rules={{
-                          required: 'Funding interests is required',
+                          minLength: { value: 2, message: 'Minimum 2 characters' },
+                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                           pattern: {
                             value: onlyLetters,
                             message: 'Only letters are allowed'
@@ -436,7 +427,8 @@ const AddCaseForm = () => {
                         name="fundraisingActivities"
                         control={control}
                         rules={{
-                          required: 'Fundraising activities is required',
+                          minLength: { value: 2, message: 'Minimum 2 characters' },
+                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                           pattern: {
                             value: onlyLetters,
                             message: 'Only letters are allowed'
@@ -462,7 +454,7 @@ const AddCaseForm = () => {
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                   <Box mb={2} display="flex" justifyContent="space-between">
                     <Controller
-                      name="attachments"
+                      name="file"
                       control={control}
                       render={({ field }) => (
                         <TextField
@@ -517,7 +509,7 @@ const AddCaseForm = () => {
                         {...field}
                         label="Notes"
                         multiline
-                        minRows={12}
+                        minRows={10}
                         fullWidth
                         variant="outlined"
                         sx={{ mb: 2 }}

@@ -1,4 +1,4 @@
-import { Divider, Select, MenuItem, TextField, Typography } from '@mui/material';
+import { Divider, Select, MenuItem, TextField, Button, IconButton, Typography } from '@mui/material';
 import { Box, Container, Stack } from '@mui/system';
 import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
@@ -42,56 +42,40 @@ const Sessions = () => {
               <Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Maria imparted...</Typography>
             </Stack>
           </Stack>
-          <Stack direction="row" spacing={1} sx={{ mt: '16px', ml: '30px' }}>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: '#053146',
-                color: 'white',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#021d2a',
-                  color: 'white'
-                }
-              }}
-            >
-              Edit Session
-            </Box>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: 'white',
-                color: '#053146',
-                border: '1px solid #053146',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#f0f0f0',
-                  color: '#053146',
-                  border: '2px solid #053146'
-                }
-              }}
-            >
-              Add Register
+          <Stack direction="row" spacing={1} sx={{ ml: '30px' }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  backgroundColor: '#1B4B66',
+                  textTransform: 'none',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Edit Session
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  textTransform: 'none',
+                  color: '#1B4B66',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Add Register
+              </Button>
             </Box>
           </Stack>
 
-          <Stack sx={{ mt: '12px', ml: '70px' }}>
+          <Stack sx={{ mt: '18px', ml: '70px' }}>
             <InfoIcon />
           </Stack>
         </Stack>
@@ -116,56 +100,40 @@ const Sessions = () => {
               <Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Maria imparted...</Typography>
             </Stack>
           </Stack>
-          <Stack direction="row" spacing={1} sx={{ mt: '16px', ml: '30px' }}>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: '#053146',
-                color: 'white',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#021d2a',
-                  color: 'white'
-                }
-              }}
-            >
-              Edit Session
-            </Box>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: 'white',
-                color: '#053146',
-                border: '1px solid #053146',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#f0f0f0',
-                  color: '#053146',
-                  border: '2px solid #053146'
-                }
-              }}
-            >
-              Add Register
+          <Stack direction="row" spacing={1} sx={{ ml: '30px' }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  backgroundColor: '#1B4B66',
+                  textTransform: 'none',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Edit Session
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  textTransform: 'none',
+                  color: '#1B4B66',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Add Register
+              </Button>
             </Box>
           </Stack>
 
-          <Stack sx={{ mt: '12px', ml: '70px' }}>
+          <Stack sx={{ mt: '18px', ml: '70px' }}>
             <InfoIcon />
           </Stack>
         </Stack>
@@ -190,56 +158,40 @@ const Sessions = () => {
               <Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Maria imparted...</Typography>
             </Stack>
           </Stack>
-          <Stack direction="row" spacing={1} sx={{ mt: '16px', ml: '30px' }}>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: '#053146',
-                color: 'white',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#021d2a',
-                  color: 'white'
-                }
-              }}
-            >
-              Edit Session
-            </Box>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: 'white',
-                color: '#053146',
-                border: '1px solid #053146',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#f0f0f0',
-                  color: '#053146',
-                  border: '2px solid #053146'
-                }
-              }}
-            >
-              Add Register
+          <Stack direction="row" spacing={1} sx={{ ml: '30px' }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  backgroundColor: '#1B4B66',
+                  textTransform: 'none',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Edit Session
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  textTransform: 'none',
+                  color: '#1B4B66',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Add Register
+              </Button>
             </Box>
           </Stack>
 
-          <Stack sx={{ mt: '12px', ml: '70px' }}>
+          <Stack sx={{ mt: '18px', ml: '70px' }}>
             <InfoIcon />
           </Stack>
         </Stack>
@@ -264,56 +216,40 @@ const Sessions = () => {
               <Typography sx={{ opacity: '0.9', fontSize: '12px' }}>Maria imparted...</Typography>
             </Stack>
           </Stack>
-          <Stack direction="row" spacing={1} sx={{ mt: '16px', ml: '30px' }}>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: '#053146',
-                color: 'white',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#021d2a',
-                  color: 'white'
-                }
-              }}
-            >
-              Edit Session
-            </Box>
-            <Box
-              sx={{
-                fontSize: '10px',
-                textTransform: 'none',
-                backgroundColor: 'white',
-                color: '#053146',
-                border: '1px solid #053146',
-                borderRadius: '4px',
-                padding: '1px 2px',
-                maxWidth: '90px',
-                maxHeight: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#f0f0f0',
-                  color: '#053146',
-                  border: '2px solid #053146'
-                }
-              }}
-            >
-              Add Register
+          <Stack direction="row" spacing={1} sx={{ ml: '30px' }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  backgroundColor: '#1B4B66',
+                  textTransform: 'none',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Edit Session
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{
+                  textTransform: 'none',
+                  color: '#1B4B66',
+                  fontSize: '8px',
+                  py: 0.5,
+                  px: 0.5,
+                  maxHeight: '50px'
+                }}
+              >
+                Add Register
+              </Button>
             </Box>
           </Stack>
 
-          <Stack sx={{ mt: '12px', ml: '70px' }}>
+          <Stack sx={{ mt: '18px', ml: '70px' }}>
             <InfoIcon />
           </Stack>
         </Stack>

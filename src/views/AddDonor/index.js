@@ -170,6 +170,7 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
     fd.append('contactPreferences[reason]', data.reason);
     fd.append('contactPreferences[email]', data.contactemail);
+    fd.append('contactPreferences[phone]', data.mobilePhone);
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
     fd.append('contactPreferences[contactMethods][donor]', data.donortag);
     fd.append('contactPreferences[contactMethods][sms]', data.sms);
@@ -200,7 +201,6 @@ const AddDonorForm = () => {
   const onlyNumbers = /^[0-9]*$/;
   const onlyLetters = /^[A-Za-z\s]*$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
-  const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
   const handleTabChange = async (newValue) => {
     if (newValue > tabIndex) {
@@ -599,6 +599,14 @@ const AddDonorForm = () => {
                                 control={control}
                                 rules={{
                                   required: 'Address is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
                                     message: 'Address can only contain letters, numbers, spaces, and valid special characters'
@@ -625,7 +633,14 @@ const AddDonorForm = () => {
                                 name="address2"
                                 control={control}
                                 rules={{
-                                  required: 'Address is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
                                     message: 'Address can only contain letters, numbers, spaces, and valid special characters'
@@ -687,9 +702,17 @@ const AddDonorForm = () => {
                                 control={control}
                                 rules={{
                                   required: 'Postcode is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Postcode must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
+                                  },
                                   pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Please enter a valid postcode'
+                                    value: /^[a-zA-Z0-9]+$/,
+                                    message: 'Postcode can only contain letters and numbers (no spaces or special characters)'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -1058,13 +1081,14 @@ const AddDonorForm = () => {
                                   value: 10,
                                   message: 'Notes must be at least 10 characters long'
                                 },
-                                maxLength: {
-                                  value: 500,
-                                  message: 'Last name cannot exceed 500 characters'
-                                },
-                                pattern: {
-                                  value: onlyLetters,
-                                  message: 'Last name can only contain letters'
+                                validate: {
+                                  maxWords: (value) => {
+                                    const wordCount = value.trim().split(/\s+/).length;
+                                    return wordCount <= 500 || 'Notes cannot exceed 500 words';
+                                  },
+                                  validCharacters: (value) =>
+                                    /^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value) ||
+                                    'Notes can only contain letters, numbers, and common punctuation'
                                 }
                               }}
                               render={({ field }) => (

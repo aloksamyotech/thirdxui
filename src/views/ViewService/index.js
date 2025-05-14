@@ -55,7 +55,6 @@ const UserProfile = () => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
-  console.log(serviceId._id);
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -79,7 +78,6 @@ const UserProfile = () => {
     fetchService();
   }, [userId]);
 
-  console.log(serviceData.file);
 
   return (
     <Box>
@@ -206,9 +204,9 @@ const UserProfile = () => {
                         backgroundColor: '#1B4B66',
                         textTransform: 'none',
                         fontSize: '10px',
-                        py: 0.1,
+                        py: 0.5,
                         px: 0.5,
-                        minHeight: '30px'
+                        maxHeight: '50px'
                       }}
                     >
                       Edit Session
@@ -222,7 +220,7 @@ const UserProfile = () => {
                         fontSize: '10px',
                         py: 0.5,
                         px: 0.5,
-                        minHeight: '30px'
+                        maxHeight: '50px'
                       }}
                     >
                       Add Attendee

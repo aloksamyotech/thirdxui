@@ -29,7 +29,7 @@ import Sessions from './Sessions';
 import Map from '../Map';
 import Shortcut2 from './Shortcut2';
 import EmptyCard from './EmptyCard';
-// import Media from './Media';
+import Media from './Media';
 // import Map from 'components/Map';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
@@ -44,9 +44,9 @@ const Dashboard = () => {
   return (
     <Grid container spacing={gridSpacing}>
       <Grid item xs={12}>
-        <Grid container spacing={4}>
+        <Grid container spacing={2}>
           <Grid item xs={3}>
-            <DashboardCard title='Actice Service User' num1='234' num2='119' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
+            <DashboardCard title='Active Service User' num1='234' num2='119' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
           </Grid>
           <Grid item xs={3}>
             <DashboardCard title='Open Cases' num1='145' num2='62' color="linear-gradient(135deg,rgb(255, 162, 75) 0%,rgb(255, 136, 39) 100%)" color2='#ff7c11' />
@@ -60,7 +60,7 @@ const Dashboard = () => {
         </Grid>
       </Grid>
       <Grid item xs={12}>
-        <Grid container spacing={8} sx={{ px: '20px' }}>
+        <Grid container spacing={6} sx={{ px: '20px' }}>
           <Grid item xs={3}>
             <Shortcut2 icon={1} title={'Add Person'} path={'/add-serviceuser'} />
           </Grid>
@@ -68,7 +68,7 @@ const Dashboard = () => {
             <Shortcut2 icon={2} title={'Add New Case'} path={'/add-case'} />
           </Grid>
           <Grid item xs={3}>
-            <Shortcut2 icon={3} title={'Add Session Attendies'} path={'/'} />
+            <Shortcut2 icon={3} title={'Add Session Attendies'} path={'/add-session'} />
           </Grid>
           <Grid item xs={3}>
             <Shortcut2 icon={4} title={'Add Donor'} path={'/add-donor'} />

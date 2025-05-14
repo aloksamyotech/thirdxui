@@ -127,9 +127,9 @@ const AddCaseForm = ({ onCancel }) => {
       fd.append('file', data.file);
     }
 
-    fd.append('contactInfo[Phone]', data.mobilePhone);
+    fd.append('contactInfo[phone]', data.mobilePhone);
     fd.append('contactInfo[email]', data.email);
-
+ 
     fd.append('otherInfo[description]', data.riskNotes);
     fd.append('otherInfo[benificiary]', data.Beneficiary);
     fd.append('otherInfo[campaigns]', data.Campaigns);

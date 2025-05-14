@@ -26,6 +26,7 @@ const AddCaseForm = () => {
     handleSubmit,
     reset,
     watch,
+    getValues,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -214,7 +215,7 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                {/* <Grid item xs={12} sm={4}>
                   <Controller
                     name="caseOpened"
                     control={control}
@@ -249,6 +250,65 @@ const AddCaseForm = () => {
                         <DatePicker
                           label="Date Case Closed"
                           value={field.value}
+                          onChange={(newValue) => field.onChange(newValue)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              fullWidth
+                              size="small"
+                              error={!!errors.caseClosed}
+                              helperText={errors.caseClosed?.message}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                    )}
+                  />
+                </Grid> */}
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="caseOpened"
+                    control={control}
+                    rules={{ required: 'Start date is required' }}
+                    render={({ field }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Date Case Opened"
+                          value={field.value}
+                          onChange={(newValue) => field.onChange(newValue)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              fullWidth
+                              size="small"
+                              error={!!errors.caseOpened}
+                              helperText={errors.caseOpened?.message}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="caseClosed"
+                    control={control}
+                    rules={{
+                      required: 'End date is required',
+
+                      validate: (value) =>
+                        !value || !getValues('caseOpened') || value.isAfter(getValues('caseOpened'))
+                          ? true
+                          : 'End date must be after start date'
+                    }}
+                    render={({ field }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                          label="Date Case Closed"
+                          value={field.value}
+                          minDate={getValues('caseOpened') || undefined} // restrict selection
                           onChange={(newValue) => field.onChange(newValue)}
                           renderInput={(params) => (
                             <TextField
@@ -493,17 +553,7 @@ const AddCaseForm = () => {
                   <Controller
                     name="description"
                     control={control}
-                    rules={{
-                      required: 'Notes are required',
-                      minLength: {
-                        value: 10,
-                        message: 'Notes must be at least 10 characters long'
-                      },
-                      maxLength: {
-                        value: 500,
-                        message: 'Notes cannot exceed 500 characters'
-                      }
-                    }}
+                    notes
                     render={({ field }) => (
                       <TextField
                         {...field}

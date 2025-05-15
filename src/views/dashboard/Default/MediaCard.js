@@ -4,7 +4,7 @@ import React from 'react';
 import InfoIcon from '@mui/icons-material/Info';
 import { IconSeeding } from '@tabler/icons';
 
-const Media = () => {
+const Card = () => {
   return (
     <Box sx={{ bgcolor: '#fff', p: '10px', borderRadius: '10px',height:'350px' }}>
       <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '10px' }}>
@@ -130,4 +130,4 @@ const Media = () => {
   );
 };
 
-export default Media;
+export default Card;

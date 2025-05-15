@@ -35,7 +35,6 @@ const AddDonorForm = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [districts, setDistricts] = useState([]);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -98,23 +97,6 @@ const AddDonorForm = () => {
       });
   }, []);
 
-  useEffect(() => {
-    const fetchDistricts = async () => {
-      setLoading(true);
-      try {
-        const response = await getApi(urls.serviceuser.getDistrict);
-        const fetchedDistricts = response?.data?.cities || [];
-        setDistricts(fetchedDistricts);
-      } catch (error) {
-        console.error('Error fetching districts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDistricts();
-  }, []);
-
   const handleChange = (e) => {
     setCaseData({ ...caseData, [e.target.name]: e.target.value });
   };
@@ -170,7 +152,7 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
     fd.append('contactPreferences[reason]', data.reason);
     fd.append('contactPreferences[email]', data.contactemail);
-    fd.append('contactPreferences[phone]', data.mobilePhone);
+    fd.append('contactPreferences[phone]', data.contactNo);
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
     fd.append('contactPreferences[contactMethods][donor]', data.donortag);
     fd.append('contactPreferences[contactMethods][sms]', data.sms);
@@ -189,7 +171,7 @@ const AddDonorForm = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      toast.success('Successfully Added Donor');
+      toast.success('Donor added successfully!');
       setIsloading(false);
       navigate('/donor');
     } catch (error) {
@@ -200,7 +182,19 @@ const AddDonorForm = () => {
 
   const onlyNumbers = /^[0-9]*$/;
   const onlyLetters = /^[A-Za-z\s]*$/;
+  const onlyLetterNumberSpace = /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
+
+  const districts = [
+    { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
+    { label: 'Adur District', value: 'adur_district' },
+    { label: 'Amber Valley Borough', value: 'amber_valley_borough' },
+    { label: 'Arun District', value: 'arun_district' },
+    { label: 'Ashford Borough', value: 'ashford_borough' },
+    { label: 'Babergh District', value: 'babergh_district' },
+    { label: 'Ashfield District', value: 'ashfield_district' },
+    { label: 'Basildon Borough', value: 'basildon_borough' }
+  ];
 
   const handleTabChange = async (newValue) => {
     if (newValue > tabIndex) {
@@ -671,6 +665,7 @@ const AddDonorForm = () => {
                                   <Autocomplete
                                     {...field}
                                     options={districts}
+                                    getOptionLabel={(option) => option.label || ''}
                                     loading={loading}
                                     onChange={(_, value) => field.onChange(value)}
                                     renderInput={(params) => (
@@ -711,8 +706,8 @@ const AddDonorForm = () => {
                                     message: 'Postcode cannot exceed 10 characters'
                                   },
                                   pattern: {
-                                    value: /^[a-zA-Z0-9]+$/,
-                                    message: 'Postcode can only contain letters and numbers (no spaces or special characters)'
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -723,7 +718,7 @@ const AddDonorForm = () => {
                                     error={!!errors.pinCode}
                                     helperText={errors.pinCode?.message}
                                     inputProps={{
-                                      pattern: onlyNumbers.source
+                                      pattern: onlyLetterNumberSpace.source
                                     }}
                                     {...field}
                                   />
@@ -736,18 +731,18 @@ const AddDonorForm = () => {
                                 name="country"
                                 control={control}
                                 rules={{ required: 'Country is required' }}
-                                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                                render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={countryList}
                                     getOptionLabel={(option) => option.name}
-                                    isOptionEqualToValue={(option, value) => option.name === value}
-                                    value={countryList.find((c) => c.name === value) || null}
-                                    onChange={(_, newValue) => onChange(newValue?.name || '')}
+                                    isOptionEqualToValue={(option, value) => option.code === value.code}
+                                    onChange={(_, value) => field.onChange(value)}
+                                    value={field.value || null}
                                     renderOption={(props, option) => (
-                                      <li {...props}>
+                                      <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
                                         <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
                                         {option.name}
-                                      </li>
+                                      </Box>
                                     )}
                                     renderInput={(params) => (
                                       <TextField
@@ -755,9 +750,34 @@ const AddDonorForm = () => {
                                         label="Country of origin"
                                         size="small"
                                         error={!!error}
-                                        helperText={error?.message}
+                                        helperText={error ? error.message : ''}
                                       />
                                     )}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'preventOverflow',
+                                          options: {
+                                            altBoundary: true,
+                                            rootBoundary: 'viewport',
+                                            tether: false
+                                          }
+                                        },
+                                        {
+                                          name: 'flip',
+                                          options: {
+                                            fallbackPlacements: ['bottom-start']
+                                          }
+                                        }
+                                      ],
+                                      placement: 'bottom-start'
+                                    }}
+                                    ListboxProps={{
+                                      style: {
+                                        maxHeight: 200,
+                                        overflowY: 'auto'
+                                      }
+                                    }}
                                   />
                                 )}
                               />
@@ -1236,6 +1256,7 @@ const AddDonorForm = () => {
                             error={!!errors.reason}
                             helperText={errors.reason?.message}
                           >
+                            <MenuItem value="interest">Legitimate Interest</MenuItem>
                             <MenuItem value="byRequest">By Request</MenuItem>
                             <MenuItem value="deceased">Deceased</MenuItem>
                             <MenuItem value="goneAway">Gone Away</MenuItem>
@@ -1246,7 +1267,7 @@ const AddDonorForm = () => {
 
                     <Grid item xs={12} sm={4}>
                       <Controller
-                        name="mobilePhone"
+                        name="contactNo"
                         control={control}
                         rules={{
                           required: 'Phone number is required',
@@ -1264,8 +1285,8 @@ const AddDonorForm = () => {
                             fullWidth
                             label="Mobile Phone No."
                             size="small"
-                            error={!!errors.mobilePhone}
-                            helperText={errors.mobilePhone?.message}
+                            error={!!errors.contactNo}
+                            helperText={errors.contactNo?.message}
                             type="tel"
                             inputProps={{
                               pattern: onlyNumbers.source,

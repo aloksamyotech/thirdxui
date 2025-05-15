@@ -1,97 +1,95 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
-// material-ui
+import SearchIcon from '@mui/icons-material/Search';
 import { useTheme } from '@mui/material/styles';
-import { Grid, MenuItem, TextField, Typography, FormControl, InputLabel, Select } from '@mui/material';
-
-// third-party
-import ApexCharts from 'apexcharts';
+import { Grid, MenuItem, TextField, Stack, InputAdornment, Typography, FormControl, Select } from '@mui/material';
 import Chart from 'react-apexcharts';
-
-// project imports
 import SkeletonTotalGrowthBarChart from 'ui-component/cards/Skeleton/TotalGrowthBarChart';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 
-// chart data
-import chartData from './chart-data/total-growth-bar-chart';
-import { BarChart } from '@mui/x-charts';
-
-const status = [
-  {
-    value: 'today',
-    label: 'Today'
-  },
-  {
-    value: 'month',
-    label: 'This Month'
-  },
-  {
-    value: 'year',
-    label: 'This Year'
-  }
-];
-
-// ==============================|| DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
+const optionsList = ['Borough', 'Case owner', 'Service', 'Ethnicity', 'Country of origin', 'Referral type'];
 
 const TotalGrowthBarChart = ({ isLoading }) => {
   const [value, setValue] = useState('today');
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
 
-  const { navType } = customization;
-  const { primary } = theme.palette.text;
-  const darkLight = theme.palette.dark.light;
-  const grey200 = theme.palette.grey[200];
-  const grey500 = theme.palette.grey[500];
-
-  const primary200 = theme.palette.primary[200];
-  const primaryDark = theme.palette.primary.dark;
-  const secondaryMain = theme.palette.secondary.main;
-  const secondaryLight = theme.palette.secondary.light;
-
+  const { primary, secondary, text } = theme.palette;
   const [selectedValue, setSelectedValue] = useState('Borough');
 
-  const options = ['Borough', 'Case owner', 'Service', 'Ethnicity', 'Country of origin', 'Referral type'];
-
-  useEffect(() => {
-    const newChartData = {
-      ...chartData.options,
-      colors: [primaryDark, secondaryMain],
-      xaxis: {
-        labels: {
-          style: {
-            colors: [primary, primary, primary, primary, primary, primary, primary, primary, primary, primary, primary, primary]
-          }
-        }
-      },
-      yaxis: {
-        labels: {
-          style: {
-            colors: [primary]
-          }
-        }
-      },
-      grid: {
-        borderColor: grey200
-      },
-      tooltip: {
-        theme: 'light'
-      },
-      legend: {
-        labels: {
-          colors: grey500
+  const chartOptions = {
+    chart: {
+      id: 'bar-chart',
+      stacked: true,
+      toolbar: { show: false }
+    },
+    colors: ['#2E86DE', '#E091FF'],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '50%'
+      }
+    },
+    xaxis: {
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      labels: {
+        style: {
+          colors: Array(7).fill(text.primary)
         }
       }
-    };
-
-    // do not load chart when loading
-    if (!isLoading) {
-      ApexCharts.exec(`bar-chart`, 'updateOptions', newChartData);
+    },
+    yaxis: [
+      {
+        title: {
+          text: 'Website Blog',
+          style: { color: text.primary }
+        },
+        max: 100000,
+        labels: {
+          formatter: (val) => `${val / 1000}k`,
+          style: { colors: text.primary }
+        }
+      },
+      {
+        opposite: true,
+        title: {
+          text: 'Social Media',
+          style: { color: text.primary }
+        },
+        max: 40,
+        labels: {
+          style: { colors: text.primary }
+        }
+      }
+    ],
+    grid: {
+      borderColor: theme.palette.grey[200]
+    },
+    legend: {
+      position: 'top',
+      labels: {
+        colors: theme.palette.grey[600]
+      }
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
+      theme: 'light'
     }
-  }, [navType, primary200, primaryDark, secondaryMain, secondaryLight, primary, darkLight, grey200, isLoading, grey500]);
+  };
+
+  const chartSeries = [
+    {
+      name: 'Website Blog',
+      data: [28000, 32000, 60000, 21000, 40000, 32000, 32000]
+    },
+    {
+      name: 'Social Media',
+      data: [13000, 22000, 23000, 17000, 7000, 39000, 39000]
+    }
+  ];
 
   return (
     <>
@@ -102,48 +100,40 @@ const TotalGrowthBarChart = ({ isLoading }) => {
           <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
               <Grid container alignItems="center" justifyContent="space-between">
-                <Grid item>
-                  <Grid container direction="column" spacing={1}>
-                    <Grid item>
-                      <Typography variant="h4">Open Cases By</Typography>
-                    </Grid>
-                    <Grid item>
-                      <FormControl fullWidth variant='standard'>
-                        <Select value={selectedValue} onChange={(e) => setSelectedValue(e.target.value)} disableUnderline >
-                          {options.map((option) => (
-                            <MenuItem key={option} value={option}>
-                              {option}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item>
-                  <TextField id="standard-select-currency" select value={value} onChange={(e) => setValue(e.target.value)}>
-                    {status.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                  Open Cases By
+                </Typography>
+
+                <Stack direction="row" spacing={2}>
+                  <Select
+                    value="Borough"
+                    size="small"
+                    sx={{ minWidth: 120 }}
+                  >
+                    <MenuItem value="Borough" disabled>
+                      Borough
+                    </MenuItem>
+                    <MenuItem value="arun_district">Adur and Worthing Borough</MenuItem>
+                    <MenuItem value="arun_district">Adur District</MenuItem>
+                    <MenuItem value="amber_valley">Amber Valley Borough</MenuItem>
+                    <MenuItem value="arun_district">Arun District</MenuItem>
+                    <MenuItem value="ashford_borough">Ashford Borough</MenuItem>
+                    <MenuItem value="babergh_district">Babergh District</MenuItem>
+                    <MenuItem value="ashfield_district">Ashfield District</MenuItem>
+                    <MenuItem value="basildon_borough">Basildon Borough</MenuItem>
+                  </Select>
+
+                  <Select value="This Week" size="small" sx={{ minWidth: 120 }}>
+                    <MenuItem value="This Week">This Week</MenuItem>
+                    <MenuItem value="This Month">This Month</MenuItem>
+                    <MenuItem value="This Year">This Year</MenuItem>
+                  </Select>
+                </Stack>
               </Grid>
             </Grid>
+
             <Grid item xs={12}>
-              {/* <Chart {...chartData} /> */}
-              <BarChart
-                series={[
-                  { data: [35, 44, 24, 34] },
-                  { data: [51, 6, 49, 30] },
-                  { data: [15, 25, 30, 50] },
-                  { data: [60, 50, 15, 25] },
-                ]}
-                height={290}
-                xAxis={[{ data: ['Q1', 'Q2', 'Q3', 'Q4'], scaleType: 'band' }]}
-                margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
-              />
+              <Chart options={chartOptions} series={chartSeries} type="bar" height={290} />
             </Grid>
           </Grid>
         </MainCard>

@@ -3,15 +3,23 @@ import { useState } from 'react';
 // form
 import { useForm, Controller } from 'react-hook-form';
 // @mui
-import { Card, Stack, Divider, TextField, Checkbox, MenuItem, IconButton, Select, Typography, CardHeader, FormControlLabel } from '@mui/material';
-// components
-
-import Iconify from '../../../ui-component/iconify';
+import {
+  Card,
+  Box,
+  Stack,
+  Divider,
+  Typography,
+  TextField,
+  Checkbox,
+  MenuItem,
+  IconButton,
+  Select,
+  InputAdornment,
+  CardHeader,
+  FormControlLabel
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-
-// ----------------------------------------------------------------------
-
+import Iconify from '../../../ui-component/iconify';
 AppTasks.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
@@ -26,20 +34,46 @@ export default function AppTasks({ title, subheader, list, ...other }) {
   });
 
   return (
-    <Card {...other} sx={{height:'350px'}}>
-      <CardHeader title={title} subheader={subheader}
-        action={
-          <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '0px' }}>
-            <Stack direction="row" spacing={1}>
-              <Select value="This Week" size="small">
-                <MenuItem value="This Week">This Week</MenuItem>
-                <MenuItem value="This Month">This Month</MenuItem>
-                <MenuItem value="This Year">This Year</MenuItem>
-              </Select>
-              <TextField variant="outlined" placeholder="search" size="small" />
-            </Stack>
-          </Stack>
-        } />
+    <Box
+      sx={{
+        height: '310px',
+        bgcolor: '#fff',
+        borderRadius: 2,
+        boxShadow: '0 1px 6px rgba(0,0,0,0.1)'
+      }}
+    >
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        spacing={2}
+        sx={{ p:2 }}
+      >
+        <Typography variant="h5" fontWeight={600}>
+          My Task
+        </Typography>
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          <Select value="This Week" size="small">
+            <MenuItem value="This Week">This Week</MenuItem>
+            <MenuItem value="This Month">This Month</MenuItem>
+            <MenuItem value="This Year">This Year</MenuItem>
+          </Select>
+          <TextField
+            variant="outlined"
+            placeholder="Search"
+            size="small"
+            sx={{ maxWidth: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+          />
+        </Stack>
+      </Stack>
+
       <Divider />
       <Controller
         name="taskCompleted"
@@ -65,7 +99,7 @@ export default function AppTasks({ title, subheader, list, ...other }) {
           );
         }}
       />
-    </Card>
+    </Box>
   );
 }
 
@@ -91,26 +125,6 @@ function TaskItem({ task, checked, onChange }) {
     setOpen(null);
   };
 
-  const handleMarkComplete = () => {
-    handleCloseMenu();
-    console.log('MARK COMPLETE', task.id);
-  };
-
-  const handleShare = () => {
-    handleCloseMenu();
-    console.log('SHARE', task.id);
-  };
-
-  const handleEdit = () => {
-    handleCloseMenu();
-    console.log('EDIT', task.id);
-  };
-
-  const handleDelete = () => {
-    handleCloseMenu();
-    console.log('DELETE', task.id);
-  };
-
   return (
     <Stack
       direction="row"
@@ -128,49 +142,9 @@ function TaskItem({ task, checked, onChange }) {
       <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
         <Iconify icon={'eva:edit-fill'} />
       </IconButton>
-      <IconButton size="large" color="error" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
+      <IconButton size="large" color="error" onClick={handleOpenMenu}>
         <Iconify icon={'eva:trash-2-outline'} />
       </IconButton>
-
-      {/* <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75
-            }
-          }
-        }}
-      >
-        <MenuItem onClick={handleMarkComplete}>
-          <Iconify icon={'eva:checkmark-circle-2-fill'} sx={{ mr: 2 }} />
-          Mark Complete
-        </MenuItem>
-
-        <MenuItem onClick={handleEdit}>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
-        <MenuItem onClick={handleShare}>
-          <Iconify icon={'eva:share-fill'} sx={{ mr: 2 }} />
-          Share
-        </MenuItem>
-
-        <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover> */}
     </Stack>
   );
 }

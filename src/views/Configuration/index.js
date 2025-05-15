@@ -12,6 +12,7 @@ const defaultTabTypes = [
   'Contact Types',
   'Referral Types',
   'Contact Purpose',
+  'Campaign',
   'Key Indicators',
   'Payment Method',
   'Archive Reason',

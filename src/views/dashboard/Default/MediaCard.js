@@ -1,12 +1,14 @@
-import { Divider, Select, MenuItem, TextField, Typography } from '@mui/material';
+import { Divider, Select, MenuItem, TextField, Typography ,InputAdornment} from '@mui/material';
 import { Box, Container, Stack } from '@mui/system';
 import React from 'react';
 import InfoIcon from '@mui/icons-material/Info';
 import { IconSeeding } from '@tabler/icons';
+import SearchIcon from '@mui/icons-material/Search';
+
 
 const Card = () => {
   return (
-    <Box sx={{ bgcolor: '#fff', p: '10px', borderRadius: '10px',height:'350px' }}>
+    <Box sx={{ bgcolor: '#fff', p: 1, borderRadius: '10px',height:'auto' }}>
       <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '10px' }}>
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
           Recent Media
@@ -17,7 +19,19 @@ const Card = () => {
             <MenuItem value="This Month">This Month</MenuItem>
             <MenuItem value="This Year">This Year</MenuItem>
           </Select>
-          <TextField variant="outlined" placeholder="search" size="small" />
+         <TextField
+            variant="outlined"
+            placeholder="Search"
+            size="small"
+            sx={{ maxWidth: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+          />
         </Stack>
       </Stack>
 

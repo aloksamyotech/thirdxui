@@ -29,5 +29,5 @@ jobs:
             git pull origin develop
             git log -1
             npm install -f
-            NODE_ENV=production NODE_OPTIONS="--max-old-space-size=4096" npm run build
+            npm run build
 

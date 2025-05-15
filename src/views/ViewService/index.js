@@ -66,7 +66,6 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchService = async () => {
       const res = await getApi(urls.service.getById.replace(':id', userId));
-      console.log(res);
 
       setServiceData(res?.data?.userData || {});
       setLoading(false);

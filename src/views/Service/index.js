@@ -95,7 +95,7 @@ const Lead = () => {
     {
       field: 'isActive',
       headerName: 'Status',
-      flex: 1,
+      flex: 0.8,
       headerAlign: 'center',
       align: 'center',
       renderCell: (params) => {
@@ -116,7 +116,7 @@ const Lead = () => {
     {
       field: 'more',
       headerName: 'More',
-      flex: 0.5,
+      flex: 0.8,
       headerAlign: 'center',
       align: 'center',
       renderCell: () => (

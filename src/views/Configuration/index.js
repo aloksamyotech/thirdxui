@@ -24,24 +24,29 @@ const TabbedDataGrid = () => {
   const [openModal, setOpenModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [toggleValue, setToggleValue] = useState(true);
-  const [selectedSection, setSelectedSection] = useState('');
+ const [configurationNameFilter, setConfigurationNameFilter] = useState('');
+const [modalSection, setModalSection] = useState('');
+
   const [status, setStatus] = useState('');
   const [tabData, setTabData] = useState({});
   const [selectedTab, setSelectedTab] = useState(0);
   const [showFilter, setShowFilter] = useState(true);
   const [inputError, setInputError] = useState('');
 
-  const handleOpenModal = (section) => {
-    setSelectedSection(section);
-    setOpenModal(true);
-  };
+const handleOpenModal = (section) => {
+  setModalSection(section);
+  setOpenModal(true);
+};
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setInputValue('');
-    setToggleValue(true);
-    setInputError('');
-  };
+
+const handleCloseModal = () => {
+  setOpenModal(false);
+  setInputValue('');
+  setToggleValue(true);
+  setInputError('');
+  setModalSection('');
+};
+
 
   const configTypeFilter = useMemo(() => {
     return defaultTabTypes.map((type) => ({
@@ -110,13 +115,14 @@ const TabbedDataGrid = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedSection) {
-      fetchFilteredConfigurations(selectedSection, status);
-    } else {
-      fetchConfigurations();
-    }
-  }, [selectedSection, status]);
+useEffect(() => {
+  if (configurationNameFilter) {
+    fetchFilteredConfigurations(configurationNameFilter, status);
+  } else {
+    fetchConfigurations();
+  }
+}, [configurationNameFilter, status]);
+
 
   const validateInput = (value) => {
     if (!value) {
@@ -149,7 +155,7 @@ const TabbedDataGrid = () => {
     const payload = {
       name: inputValue,
       isActive: toggleValue,
-      configurationType: selectedSection
+      configurationType: modalSection
     };
 
     try {
@@ -206,10 +212,10 @@ const TabbedDataGrid = () => {
           showFilter={showFilter}
           statuses={statusFilter}
           configurationNames={configTypeFilter}
-          configurationNameFilter={selectedSection}
-          setConfigurationNameFilter={(val) => {
-            setSelectedSection(val);
-          }}
+           configurationNameFilter={configurationNameFilter}
+  setConfigurationNameFilter={(val) => {
+    setConfigurationNameFilter(val);
+  }}
           statusFilter={status}
           setStatusFilter={(val) => {
             setStatus(val);
@@ -320,7 +326,7 @@ const TabbedDataGrid = () => {
             }}
           >
             <Typography variant="h5" sx={{ mb: 2 }}>
-              Add to {selectedSection}
+              Add to {modalSection}
             </Typography>
             <TextField 
               fullWidth 

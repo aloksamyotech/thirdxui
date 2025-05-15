@@ -297,7 +297,7 @@ const Lead = () => {
                     components={{
                       Toolbar: () => <CustomHeader />
                     }}
-                    onRowClick={() => navigate('/view-case')}
+                    onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}
                     getRowId={(row) => row.id}
                     pageSize={5}
                     rowsPerPageOptions={[5, 10]}

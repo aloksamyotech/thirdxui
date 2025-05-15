@@ -39,7 +39,10 @@ const UserProfileCard = () => {
 
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
 
+       
+
         const user = response?.data;
+       
 
         if (user) {
           setUserData(user);

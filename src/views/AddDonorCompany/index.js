@@ -129,7 +129,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     fd.append('contactInfo[phone]', data.mobilePhone);
     fd.append('contactInfo[email]', data.email);
- 
+
     fd.append('otherInfo[description]', data.riskNotes);
     fd.append('otherInfo[benificiary]', data.Beneficiary);
     fd.append('otherInfo[campaigns]', data.Campaigns);
@@ -404,13 +404,18 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="otherId"
                                 control={control}
                                 rules={{
-                                  pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Other Id must contain only numbers'
+                                  required: 'Other Id is required',
+                                  minLength: {
+                                    value: 3,
+                                    message: 'Other Id must be at least 3 characters'
                                   },
                                   maxLength: {
-                                    value: 10,
-                                    message: 'Other Id must be at least 10 digits'
+                                    value: 12,
+                                    message: 'Other Id cannot exceed 12 characters'
+                                  },
+                                  pattern: {
+                                    value: /^[A-Za-z0-9_-]+$/,
+                                    message: 'Only letters, numbers, underscores, and hyphens are allowed'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -420,15 +425,6 @@ const AddCaseForm = ({ onCancel }) => {
                                     size="small"
                                     error={!!errors.otherId}
                                     helperText={errors.otherId?.message}
-                                    type="tel"
-                                    inputProps={{
-                                      pattern: onlyNumbers.source,
-                                      onKeyPress: (e) => {
-                                        if (!onlyNumbers.test(e.key)) {
-                                          e.preventDefault();
-                                        }
-                                      }
-                                    }}
                                     {...field}
                                   />
                                 )}
@@ -899,6 +895,7 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.reason}
                             helperText={errors.reason?.message}
                           >
+                            <MenuItem value="interest">Legitimate Interest</MenuItem>
                             <MenuItem value="byRequest">By Request</MenuItem>
                             <MenuItem value="deceased">Deceased</MenuItem>
                             <MenuItem value="goneAway">Gone Away</MenuItem>

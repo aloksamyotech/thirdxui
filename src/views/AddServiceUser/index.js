@@ -39,7 +39,6 @@ const AddCaseForm = ({ onCancel }) => {
   const [countryList, setCountryList] = useState([]);
   const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
-  const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const {
@@ -114,22 +113,17 @@ const AddCaseForm = ({ onCancel }) => {
       });
   }, []);
 
-  useEffect(() => {
-    const fetchDistricts = async () => {
-      setLoading(true);
-      try {
-        const response = await getApi(urls.serviceuser.getDistrict);
-        const fetchedDistricts = response?.data?.cities || [];
-        setDistricts(fetchedDistricts);
-      } catch (error) {
-        console.error('Error fetching districts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const districts = [
+    { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
+    { label: 'Adur District', value: 'adur_district' },
+    { label: 'Amber Valley Borough', value: 'amber_valley_borough' },
+    { label: 'Arun District', value: 'arun_district' },
+    { label: 'Ashford Borough', value: 'ashford_borough' },
+    { label: 'Babergh District', value: 'babergh_district' },
+    { label: 'Ashfield District', value: 'ashfield_district' },
+    { label: 'Basildon Borough', value: 'basildon_borough' }
+  ];
 
-    fetchDistricts();
-  }, []);
   const fileInputRef = useRef(null);
 
   const handleUploadClick = () => {
@@ -215,7 +209,7 @@ const AddCaseForm = ({ onCancel }) => {
       const response = await postApi(urls.serviceuser.create, fd, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('Successfully Added Service User');
+      toast.success('Service user added successfully!');
       setIsloading(false);
       navigate('/people');
     } catch (error) {
@@ -230,6 +224,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   const onlyNumbers = /^[0-9]*$/;
   const onlyLetters = /^[A-Za-z\s]*$/;
+  const onlyLetterNumberSpace= /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
 
   const tabFieldMap = {
@@ -452,7 +447,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="personalInfo.lastName"
                                 control={control}
                                 rules={{
-                                  required: 'lastName is required',
+                                  required: 'Last name is required',
                                   minLength: { value: 2, message: 'Last name must be at least 2 characters' },
                                   maxLength: { value: 50, message: 'Last name cannot exceed 50 characters' },
                                   pattern: { value: onlyLetters, message: 'Last name can only contain letters' }
@@ -763,6 +758,7 @@ const AddCaseForm = ({ onCancel }) => {
                                   <Autocomplete
                                     {...field}
                                     options={districts}
+                                    getOptionLabel={(option) => option.label || ''}
                                     loading={loading}
                                     onChange={(_, value) => field.onChange(value)}
                                     renderInput={(params) => (
@@ -792,26 +788,55 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="country"
                                 control={control}
-                                rules={{
-                                  required: 'Country is required'
-                                }}
+                                rules={{ required: 'Country is required' }}
                                 render={({ field, fieldState: { error } }) => (
-                                  <TextField
-                                    select
-                                    fullWidth
-                                    label="Country of origin"
-                                    size="small"
-                                    error={!!error}
-                                    helperText={error ? error.message : ''}
-                                    {...field}
-                                  >
-                                    {countryList.map((country) => (
-                                      <MenuItem key={country.code} value={country.name}>
-                                        <img src={country.flag} alt={country.code} style={{ width: 20, height: 14, marginRight: 8 }} />
-                                        {country.name}
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
+                                  <Autocomplete
+                                    options={countryList}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.code === value.code}
+                                    onChange={(_, value) => field.onChange(value)}
+                                    value={field.value || null}
+                                    renderOption={(props, option) => (
+                                      <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
+                                        {option.name}
+                                      </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Country of origin"
+                                        size="small"
+                                        error={!!error}
+                                        helperText={error ? error.message : ''}
+                                      />
+                                    )}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'preventOverflow',
+                                          options: {
+                                            altBoundary: true,
+                                            rootBoundary: 'viewport',
+                                            tether: false
+                                          }
+                                        },
+                                        {
+                                          name: 'flip',
+                                          options: {
+                                            fallbackPlacements: ['bottom-start']
+                                          }
+                                        }
+                                      ],
+                                      placement: 'bottom-start'
+                                    }}
+                                    ListboxProps={{
+                                      style: {
+                                        maxHeight: 200,
+                                        overflowY: 'auto'
+                                      }
+                                    }}
+                                  />
                                 )}
                               />
                             </Grid>
@@ -822,9 +847,17 @@ const AddCaseForm = ({ onCancel }) => {
                                 control={control}
                                 rules={{
                                   required: 'Postcode is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Postcode must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
+                                  },
                                   pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Please enter a valid UK postcode'
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -835,7 +868,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     error={!!errors.pinCode}
                                     helperText={errors.pinCode?.message}
                                     inputProps={{
-                                      pattern: onlyNumbers.source
+                                      pattern: onlyLetterNumberSpace.source
                                     }}
                                     {...field}
                                   />
@@ -1680,12 +1713,12 @@ const AddCaseForm = ({ onCancel }) => {
                                     message: 'Postcode must be at least 5 characters'
                                   },
                                   maxLength: {
-                                    value: 8,
-                                    message: 'Postcode cannot exceed 8 characters'
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
                                   },
                                   pattern: {
-                                    value: /^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2})$/i,
-                                    message: 'Please enter a valid UK postcode'
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -1696,7 +1729,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     error={!!errors.emergencypinCode}
                                     helperText={errors.emergencypinCode?.message}
                                     inputProps={{
-                                      pattern: onlyNumbers.source
+                                      pattern: onlyLetterNumberSpace.source
                                     }}
                                     {...field}
                                   />
@@ -1815,6 +1848,7 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.reason}
                           helperText={errors.reason?.message}
                         >
+                          <MenuItem value="interest">Legitimate Interest</MenuItem>
                           <MenuItem value="byRequest">By Request</MenuItem>
                           <MenuItem value="deceased">Deceased</MenuItem>
                           <MenuItem value="goneAway">Gone Away</MenuItem>

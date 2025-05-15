@@ -11,11 +11,14 @@ import { postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
+import { useLocation } from 'react-router-dom';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [countryList, setCountryList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
+  const serviceId = location.state?.serviceId;
 
   const {
     control,
@@ -55,6 +58,7 @@ const AddCaseForm = ({ onCancel }) => {
       formData.append('eventAttanded', data.eventAttanded);
       formData.append('fundingInterest', data.fundingInterest);
       formData.append('fundraisingActivities', data.fundraisingActivities);
+      formData.append('serviceId', serviceId);
 
       if (data.file) {
         formData.append('file', data.file);

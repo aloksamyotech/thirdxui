@@ -4,13 +4,18 @@ export const imageUrl = 'https://thirdex.samyotech.in/';
 // const baseUrl = 'http://localhost:7200/api/v1';
 // export const imageUrl = 'http://localhost:7200/';
 
+
+
+
 export const urls = Object.freeze({
   baseUrl,
   configuration: {
     create: `${baseUrl}/config/addconfiguration`,
     fetch: `${baseUrl}/config/getallconfiguration`,
     filterType: `${baseUrl}/config/filter`,
-    updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`
+    updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`,
+    delete :`${baseUrl}/config/deleteconfiguration/:configId`,
+    updatedData :`${baseUrl}/config/updateConfigurationData/:configId`,
   },
   serviceuser: {
     create: `${baseUrl}/user/adduser`,
@@ -49,6 +54,7 @@ export const urls = Object.freeze({
   session: {
     create: `${baseUrl}/session/addSession`,
     filter: `${baseUrl}/session/search`,
-    fetch: `${baseUrl}/session/getAllSession`
+    fetch: `${baseUrl}/session/getAllSession`,
+    getById: `${baseUrl}/session/getSessionById/:id`
   }
 });

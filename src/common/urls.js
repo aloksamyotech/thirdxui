@@ -49,6 +49,7 @@ export const urls = Object.freeze({
   session: {
     create: `${baseUrl}/session/addSession`,
     filter: `${baseUrl}/session/search`,
-    fetch: `${baseUrl}/session/getAllSession`
+    fetch: `${baseUrl}/session/getAllSession`,
+    getById: `${baseUrl}/session/getSessionById/:id`
   }
 });

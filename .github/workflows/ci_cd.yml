@@ -29,5 +29,5 @@ jobs:
             git pull origin develop
             git log -1
             npm install -f
-            npm run build
+            npm run build | tee build.log
 

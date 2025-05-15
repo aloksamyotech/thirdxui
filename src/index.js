@@ -9,7 +9,7 @@ import config from './config';
 import { Toaster } from 'react-hot-toast';
 
 const container = document.getElementById('root');
-console.log('ci cd is running');
+
 
 const root = createRoot(container);
 root.render(

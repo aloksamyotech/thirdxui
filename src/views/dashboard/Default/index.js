@@ -29,7 +29,7 @@ import Sessions from './Sessions';
 import Map from '../Map';
 import Shortcut2 from './Shortcut2';
 import EmptyCard from './EmptyCard';
-import Media from './Media';
+import Card from './MediaCard';
 // import Map from 'components/Map';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
@@ -110,7 +110,7 @@ const Dashboard = () => {
               { name: 'PickleBall', image: pickleball }
             ]}
           /> */}
-          <Media />
+          <Card />
         </Grid>
         <Grid item xs={6}>
           <Map />

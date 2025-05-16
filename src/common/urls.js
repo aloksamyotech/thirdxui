@@ -1,12 +1,6 @@
 const baseUrl = 'https://thirdex.samyotech.in/api/v1' ;
 export const imageUrl = 'https://thirdex.samyotech.in/';
 
-// const baseUrl = 'http://localhost:7200/api/v1';
-// export const imageUrl = 'http://localhost:7200/';
-
-
-
-
 export const urls = Object.freeze({
   baseUrl,
   configuration: {
@@ -24,7 +18,9 @@ export const urls = Object.freeze({
     getAllServices: `${baseUrl}/user/getAllServices`,
     getAllVolunteer: `${baseUrl}/user/getAllVolunteer`,
     getalldonor: `${baseUrl}/user/getalldonor`,
-    getDistrict: `${baseUrl}/user/getAllUsDistricts`
+    getDistrict: `${baseUrl}/user/getAllUsDistricts`,
+    editUser:  `${baseUrl}/user/edituser`,
+    deleteUser:  `${baseUrl}/user/deleteuser`
   },
   service: {
     create: `${baseUrl}/services/addServices`,

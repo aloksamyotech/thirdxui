@@ -34,6 +34,7 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
+  const onlyLetters = /^[A-Za-z\s]*$/;
 
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
@@ -268,20 +269,31 @@ const AddCaseForm = ({ onCancel }) => {
                       </Box>
                     )}
                   />
-
                   <Controller
                     name="notes"
                     control={control}
                     rules={{
-                      required: 'This field is required',
-                      maxLength: { value: 500, message: 'Maximum 500 characters allowed' }
+                      required: 'Notes are required',
+                      minLength: {
+                        value: 10,
+                        message: 'Notes must be at least 10 characters long'
+                      },
+                      validate: {
+                        maxWords: (value) => {
+                          const wordCount = value.trim().split(/\s+/).length;
+                          return wordCount <= 500 || 'Notes cannot exceed 500 words';
+                        },
+                        validCharacters: (value) =>
+                          /^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value) ||
+                          'Notes can only contain letters, numbers, and common punctuation'
+                      }
                     }}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label="Notes"
                         multiline
-                        minRows={12}
+                        minRows={11}
                         fullWidth
                         variant="outlined"
                         sx={{ mb: 2 }}
@@ -290,6 +302,7 @@ const AddCaseForm = ({ onCancel }) => {
                       />
                     )}
                   />
+
                   <FormControlLabel
                     control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
                     label="Restrict Access?"

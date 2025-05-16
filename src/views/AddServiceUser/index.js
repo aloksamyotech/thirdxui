@@ -32,7 +32,6 @@ import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
 import { postApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
-import { useFormContext } from 'react-hook-form';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -40,7 +39,6 @@ const AddCaseForm = ({ onCancel }) => {
   const [countryList, setCountryList] = useState([]);
   const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
-  const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const {
@@ -115,22 +113,17 @@ const AddCaseForm = ({ onCancel }) => {
       });
   }, []);
 
-  useEffect(() => {
-    const fetchDistricts = async () => {
-      setLoading(true);
-      try {
-        const response = await getApi(urls.serviceuser.getDistrict);
-        const fetchedDistricts = response?.data?.cities || [];
-        setDistricts(fetchedDistricts);
-      } catch (error) {
-        console.error('Error fetching districts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const districts = [
+    { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
+    { label: 'Adur District', value: 'adur_district' },
+    { label: 'Amber Valley Borough', value: 'amber_valley_borough' },
+    { label: 'Arun District', value: 'arun_district' },
+    { label: 'Ashford Borough', value: 'ashford_borough' },
+    { label: 'Babergh District', value: 'babergh_district' },
+    { label: 'Ashfield District', value: 'ashfield_district' },
+    { label: 'Basildon Borough', value: 'basildon_borough' }
+  ];
 
-    fetchDistricts();
-  }, []);
   const fileInputRef = useRef(null);
 
   const handleUploadClick = () => {
@@ -203,7 +196,6 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[contactMethods][telephone]', formData.telephone);
     fd.append('contactPreferences[contactMethods][email]', formData.emailConsent);
     fd.append('contactPreferences[contactMethods][sms]', formData.sms);
-    fd.append('contactPreferences[contactMethods][letter]', formData.letter);
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp);
 
     fd.append('role', 'service_user');
@@ -217,7 +209,7 @@ const AddCaseForm = ({ onCancel }) => {
       const response = await postApi(urls.serviceuser.create, fd, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('Successfully Added Service User');
+      toast.success('Service user added successfully!');
       setIsloading(false);
       navigate('/people');
     } catch (error) {
@@ -232,8 +224,8 @@ const AddCaseForm = ({ onCancel }) => {
 
   const onlyNumbers = /^[0-9]*$/;
   const onlyLetters = /^[A-Za-z\s]*$/;
+  const onlyLetterNumberSpace= /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
-  const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
   const tabFieldMap = {
     0: [
@@ -455,7 +447,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="personalInfo.lastName"
                                 control={control}
                                 rules={{
-                                  required: 'lastName is required',
+                                  required: 'Last name is required',
                                   minLength: { value: 2, message: 'Last name must be at least 2 characters' },
                                   maxLength: { value: 50, message: 'Last name cannot exceed 50 characters' },
                                   pattern: { value: onlyLetters, message: 'Last name can only contain letters' }
@@ -666,6 +658,14 @@ const AddCaseForm = ({ onCancel }) => {
                                 control={control}
                                 rules={{
                                   required: 'Address is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
                                     message: 'Address can only contain letters, numbers, spaces, and valid special characters'
@@ -692,6 +692,14 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="address2"
                                 control={control}
                                 rules={{
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
                                     message: 'Address can only contain letters, numbers, spaces, and valid special characters'
@@ -707,9 +715,17 @@ const AddCaseForm = ({ onCancel }) => {
                                 control={control}
                                 rules={{
                                   required: 'Town is required',
+                                  minLength: {
+                                    value: 2,
+                                    message: 'Town must be at least 2 characters'
+                                  },
+                                  maxLength: {
+                                    value: 50,
+                                    message: 'Town cannot exceed 50 characters'
+                                  },
                                   pattern: {
-                                    value: onlyLetters,
-                                    message: 'Town can only contain letters'
+                                    value: /^[A-Za-z\s'-]+$/,
+                                    message: 'Town can only contain letters, spaces, apostrophes, and hyphens'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -742,6 +758,7 @@ const AddCaseForm = ({ onCancel }) => {
                                   <Autocomplete
                                     {...field}
                                     options={districts}
+                                    getOptionLabel={(option) => option.label || ''}
                                     loading={loading}
                                     onChange={(_, value) => field.onChange(value)}
                                     renderInput={(params) => (
@@ -771,26 +788,55 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="country"
                                 control={control}
-                                rules={{
-                                  required: 'Country is required'
-                                }}
+                                rules={{ required: 'Country is required' }}
                                 render={({ field, fieldState: { error } }) => (
-                                  <TextField
-                                    select
-                                    fullWidth
-                                    label="Country of origin"
-                                    size="small"
-                                    error={!!error}
-                                    helperText={error ? error.message : ''}
-                                    {...field}
-                                  >
-                                    {countryList.map((country) => (
-                                      <MenuItem key={country.code} value={country.name}>
-                                        <img src={country.flag} alt={country.code} style={{ width: 20, height: 14, marginRight: 8 }} />
-                                        {country.name}
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
+                                  <Autocomplete
+                                    options={countryList}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.code === value.code}
+                                    onChange={(_, value) => field.onChange(value)}
+                                    value={field.value || null}
+                                    renderOption={(props, option) => (
+                                      <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
+                                        {option.name}
+                                      </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Country of origin"
+                                        size="small"
+                                        error={!!error}
+                                        helperText={error ? error.message : ''}
+                                      />
+                                    )}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'preventOverflow',
+                                          options: {
+                                            altBoundary: true,
+                                            rootBoundary: 'viewport',
+                                            tether: false
+                                          }
+                                        },
+                                        {
+                                          name: 'flip',
+                                          options: {
+                                            fallbackPlacements: ['bottom-start']
+                                          }
+                                        }
+                                      ],
+                                      placement: 'bottom-start'
+                                    }}
+                                    ListboxProps={{
+                                      style: {
+                                        maxHeight: 200,
+                                        overflowY: 'auto'
+                                      }
+                                    }}
+                                  />
                                 )}
                               />
                             </Grid>
@@ -801,9 +847,17 @@ const AddCaseForm = ({ onCancel }) => {
                                 control={control}
                                 rules={{
                                   required: 'Postcode is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Postcode must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
+                                  },
                                   pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Please enter a valid UK postcode'
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -814,7 +868,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     error={!!errors.pinCode}
                                     helperText={errors.pinCode?.message}
                                     inputProps={{
-                                      pattern: onlyNumbers.source
+                                      pattern: onlyLetterNumberSpace.source
                                     }}
                                     {...field}
                                   />
@@ -827,6 +881,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="language"
                                 control={control}
                                 rules={{
+                                  required: 'This is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Last name must be at least 2 characters'
@@ -865,6 +920,21 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="otherId"
                                 control={control}
+                                rules={{
+                                  required: 'Other Id is required',
+                                  minLength: {
+                                    value: 3,
+                                    message: 'Other Id must be at least 3 characters'
+                                  },
+                                  maxLength: {
+                                    value: 20,
+                                    message: 'Other Id cannot exceed 20 characters'
+                                  },
+                                  pattern: {
+                                    value: /^[A-Za-z0-9_-]+$/,
+                                    message: 'Only letters, numbers, underscores, and hyphens are allowed'
+                                  }
+                                }}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
@@ -899,26 +969,28 @@ const AddCaseForm = ({ onCancel }) => {
                               <Grid item xs={12}>
                                 <Controller
                                   name="Beneficiary"
+                                  control={control}
                                   rules={{
                                     minLength: {
                                       value: 2,
-                                      message: 'Beneficiary must be at least 2 characters'
+                                      message: 'Beneficiary information must be at least 2 characters'
                                     },
                                     maxLength: {
-                                      value: 30,
-                                      message: 'Beneficiary cannot exceed 50 characters'
+                                      value: 50,
+                                      message: 'Beneficiary information cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Beneficiary can only contain letters'
+                                      message: 'Beneficiary information can only contain letters'
                                     }
                                   }}
-                                  control={control}
                                   render={({ field }) => (
                                     <TextField
                                       fullWidth
                                       size="small"
                                       label="Beneficiary Information"
+                                      error={!!errors.Beneficiary}
+                                      helperText={errors.Beneficiary?.message}
                                       inputProps={{
                                         pattern: onlyLetters.source,
                                         onKeyPress: (e) => {
@@ -932,29 +1004,32 @@ const AddCaseForm = ({ onCancel }) => {
                                   )}
                                 />
                               </Grid>
+
                               <Grid item xs={12}>
                                 <Controller
                                   name="Campaigns"
+                                  control={control}
                                   rules={{
                                     minLength: {
                                       value: 2,
-                                      message: 'Campaigns must be at least 2 characters'
+                                      message: 'Must be at least 2 characters'
                                     },
                                     maxLength: {
-                                      value: 30,
-                                      message: 'Campaigns cannot exceed 50 characters'
+                                      value: 50,
+                                      message: 'Cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Campaigns can only contain letters'
+                                      message: 'Only contain letters'
                                     }
                                   }}
-                                  control={control}
                                   render={({ field }) => (
                                     <TextField
                                       fullWidth
                                       size="small"
                                       label="Campaigns Supported"
+                                      error={!!errors.Campaigns}
+                                      helperText={errors.Campaigns?.message}
                                       inputProps={{
                                         pattern: onlyLetters.source,
                                         onKeyPress: (e) => {
@@ -968,29 +1043,32 @@ const AddCaseForm = ({ onCancel }) => {
                                   )}
                                 />
                               </Grid>
+
                               <Grid item xs={12}>
                                 <Controller
                                   name="engagement"
+                                  control={control}
                                   rules={{
                                     minLength: {
                                       value: 2,
-                                      message: 'Last name must be at least 2 characters'
+                                      message: 'Engagement must be at least 2 characters'
                                     },
                                     maxLength: {
-                                      value: 30,
-                                      message: 'engagement cannot exceed 50 characters'
+                                      value: 50,
+                                      message: 'Engagement cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Last name can only contain letters'
+                                      message: 'Engagement can only contain letters'
                                     }
                                   }}
-                                  control={control}
                                   render={({ field }) => (
                                     <TextField
                                       fullWidth
                                       size="small"
                                       label="Engagement"
+                                      error={!!errors.engagement}
+                                      helperText={errors.engagement?.message}
                                       inputProps={{
                                         pattern: onlyLetters.source,
                                         onKeyPress: (e) => {
@@ -1004,29 +1082,32 @@ const AddCaseForm = ({ onCancel }) => {
                                   )}
                                 />
                               </Grid>
+
                               <Grid item xs={12}>
                                 <Controller
                                   name="eventsAttended"
+                                  control={control}
                                   rules={{
                                     minLength: {
                                       value: 2,
-                                      message: 'Events Attended must be at least 2 characters'
+                                      message: 'Events attended must be at least 2 characters'
                                     },
                                     maxLength: {
-                                      value: 30,
-                                      message: 'Events Attended cannot exceed 50 characters'
+                                      value: 50,
+                                      message: 'Events attended cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Events Attended can only contain letters'
+                                      message: 'Events attended can only contain letters'
                                     }
                                   }}
-                                  control={control}
                                   render={({ field }) => (
                                     <TextField
                                       fullWidth
                                       size="small"
                                       label="Events Attended"
+                                      error={!!errors.eventsAttended}
+                                      helperText={errors.eventsAttended?.message}
                                       inputProps={{
                                         pattern: onlyLetters.source,
                                         onKeyPress: (e) => {
@@ -1040,29 +1121,32 @@ const AddCaseForm = ({ onCancel }) => {
                                   )}
                                 />
                               </Grid>
+
                               <Grid item xs={12}>
                                 <Controller
                                   name="fundingInterests"
+                                  control={control}
                                   rules={{
                                     minLength: {
                                       value: 2,
-                                      message: 'Funding Interests must be at least 2 characters'
+                                      message: 'Funding interests must be at least 2 characters'
                                     },
                                     maxLength: {
-                                      value: 30,
-                                      message: 'Funding Interests cannot exceed 50 characters'
+                                      value: 50,
+                                      message: 'Funding interests cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Funding Interests can only contain letters'
+                                      message: 'Funding interests can only contain letters'
                                     }
                                   }}
-                                  control={control}
                                   render={({ field }) => (
                                     <TextField
                                       fullWidth
                                       size="small"
                                       label="Funding Interests"
+                                      error={!!errors.fundingInterests}
+                                      helperText={errors.fundingInterests?.message}
                                       inputProps={{
                                         pattern: onlyLetters.source,
                                         onKeyPress: (e) => {
@@ -1076,29 +1160,32 @@ const AddCaseForm = ({ onCancel }) => {
                                   )}
                                 />
                               </Grid>
+
                               <Grid item xs={12}>
                                 <Controller
                                   name="fundraisingActivities"
+                                  control={control}
                                   rules={{
                                     minLength: {
                                       value: 2,
-                                      message: 'Fundraising Activities must be at least 2 characters'
+                                      message: 'Fundraising activities must be at least 2 characters'
                                     },
                                     maxLength: {
-                                      value: 30,
-                                      message: 'Fundraising Activities cannot exceed 50 characters'
+                                      value: 50,
+                                      message: 'Fundraising activities cannot exceed 50 characters'
                                     },
                                     pattern: {
                                       value: onlyLetters,
-                                      message: 'Fundraising Activities can only contain letters'
+                                      message: 'Fundraising activities can only contain letters'
                                     }
                                   }}
-                                  control={control}
                                   render={({ field }) => (
                                     <TextField
                                       fullWidth
                                       size="small"
                                       label="Fundraising Activities"
+                                      error={!!errors.fundraisingActivities}
+                                      helperText={errors.fundraisingActivities?.message}
                                       inputProps={{
                                         pattern: onlyLetters.source,
                                         onKeyPress: (e) => {
@@ -1161,13 +1248,14 @@ const AddCaseForm = ({ onCancel }) => {
                                   value: 10,
                                   message: 'Notes must be at least 10 characters long'
                                 },
-                                maxLength: {
-                                  value: 500,
-                                  message: 'riskNotes cannot exceed 500 characters'
-                                },
-                                pattern: {
-                                  value: onlyLetters,
-                                  message: 'riskNotes can only contain letters'
+                                validate: {
+                                  maxWords: (value) => {
+                                    const wordCount = value.trim().split(/\s+/).length;
+                                    return wordCount <= 500 || 'Notes cannot exceed 500 words';
+                                  },
+                                  validCharacters: (value) =>
+                                    /^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value) ||
+                                    'Notes can only contain letters, numbers, and common punctuation'
                                 }
                               }}
                               render={({ field }) => (
@@ -1491,6 +1579,14 @@ const AddCaseForm = ({ onCancel }) => {
                                 control={control}
                                 rules={{
                                   required: 'Address is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
                                     message: 'Address can only contain letters, numbers, spaces, and valid special characters'
@@ -1517,6 +1613,14 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyaddress2"
                                 control={control}
                                 rules={{
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
                                   pattern: {
                                     value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
                                     message: 'Address can only contain letters, numbers, spaces, and valid special characters'
@@ -1604,9 +1708,17 @@ const AddCaseForm = ({ onCancel }) => {
                                 control={control}
                                 rules={{
                                   required: 'Postcode is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Postcode must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
+                                  },
                                   pattern: {
-                                    value: onlyNumbers,
-                                    message: 'Please enter a valid UK postcode'
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
                                   }
                                 }}
                                 render={({ field }) => (
@@ -1617,7 +1729,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     error={!!errors.emergencypinCode}
                                     helperText={errors.emergencypinCode?.message}
                                     inputProps={{
-                                      pattern: onlyNumbers.source
+                                      pattern: onlyLetterNumberSpace.source
                                     }}
                                     {...field}
                                   />
@@ -1641,7 +1753,7 @@ const AddCaseForm = ({ onCancel }) => {
               )}
 
               {tabIndex === 2 && (
-                <Grid container spacing={4}>
+                <Grid container spacing={2}>
                   <Grid item xs={12} sm={3}>
                     <Controller
                       name="preferredContact"
@@ -1736,6 +1848,7 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.reason}
                           helperText={errors.reason?.message}
                         >
+                          <MenuItem value="interest">Legitimate Interest</MenuItem>
                           <MenuItem value="byRequest">By Request</MenuItem>
                           <MenuItem value="deceased">Deceased</MenuItem>
                           <MenuItem value="goneAway">Gone Away</MenuItem>

@@ -35,13 +35,8 @@ const UserProfile = () => {
   const [timeFilter, setTimeFilter] = useState('');
   const [sessionLeadFilter, setSessionLeadFilter] = useState('');
   const [serviceData, setServiceData] = useState('');
+  const [sessionData, setSessionData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const sessionData = [
-    { date: '25 Oct’24', time: '18:00', title: 'Cover Letter Writing', subtitle: 'Online session conducted by Maria imparted…' },
-    { date: '25 Oct’24', time: '18:00', title: 'Cover Letter Writing', subtitle: 'Online session conducted by Maria imparted…' },
-    { date: '25 Oct’24', time: '18:00', title: 'Cover Letter Writing', subtitle: 'Online session conducted by Maria imparted…' }
-  ];
 
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
@@ -55,7 +50,6 @@ const UserProfile = () => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
-  console.log(serviceId._id);
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -72,14 +66,20 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchService = async () => {
       const res = await getApi(urls.service.getById.replace(':id', userId));
+
       setServiceData(res?.data?.userData || {});
       setLoading(false);
     };
 
     fetchService();
   }, [userId]);
-
-  console.log(serviceData.file);
+  useEffect(() => {
+    const fetchSessionlist = async () => {
+      const response = await getApi(urls.session.getById.replace(':id', serviceData._id));
+      setSessionData(response?.data?.userData);
+    };
+    fetchSessionlist();
+  }, [serviceData._id]);
 
   return (
     <Box>
@@ -131,7 +131,7 @@ const UserProfile = () => {
                       variant="contained"
                       startIcon={<AddIcon />}
                       sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
-                      onClick={() => navigate('/add-session')}
+                      onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                     >
                       Add New Session
                     </Button>
@@ -182,7 +182,11 @@ const UserProfile = () => {
                 >
                   <Box minWidth={90}>
                     <Typography variant="subtitle2" fontWeight="bold">
-                      {session.date}
+                      {new Date(session.date).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {session.time}
@@ -191,10 +195,7 @@ const UserProfile = () => {
 
                   <Box sx={{ flexGrow: 1, px: 2, minWidth: 200 }}>
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                      {session.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                      {session.subtitle}
+                      {session.campaigns}
                     </Typography>
                   </Box>
 
@@ -206,9 +207,9 @@ const UserProfile = () => {
                         backgroundColor: '#1B4B66',
                         textTransform: 'none',
                         fontSize: '10px',
-                        py: 0.1,
+                        py: 0.5,
                         px: 0.5,
-                        minHeight: '30px'
+                        maxHeight: '50px'
                       }}
                     >
                       Edit Session
@@ -222,7 +223,7 @@ const UserProfile = () => {
                         fontSize: '10px',
                         py: 0.5,
                         px: 0.5,
-                        minHeight: '30px'
+                        maxHeight: '50px'
                       }}
                     >
                       Add Attendee

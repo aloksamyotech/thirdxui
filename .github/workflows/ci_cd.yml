@@ -29,6 +29,5 @@ jobs:
             git pull origin develop
             git log -1
             npm install -f
-            npm install postcss@latest
-            npm install postcss-resolve-url@latest
-            npm run build
+            npm run build | tee build.log
+

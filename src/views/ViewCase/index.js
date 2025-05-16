@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Card, CardContent, Grid, Typography, Stack, Button, IconButton, Chip, TextField } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,6 +10,9 @@ import LoopIcon from '@mui/icons-material/Loop';
 import { useNavigate } from 'react-router-dom';
 import CaseNoteDialog from 'components/AddCaseNote';
 import UserProfileDialog from './userProfile.js';
+import { useLocation } from 'react-router-dom';
+import { getApi } from 'common/apiClient.js';
+import { urls } from 'common/urls';
 
 const sampleUser = {
   name: 'Aidan Ayonaudu',
@@ -34,6 +37,11 @@ const CaseDetailsPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [caseData, setCaseData] = useState(null);
+  const [serviceName, setServiceName] = useState('');
+
+  const location = useLocation();
+  const { id } = location.state || {};
 
   const CustomHeader = () => {
     return (
@@ -203,6 +211,25 @@ const CaseDetailsPage = () => {
       renderCell: (params) => <IconButton>{params.value ? <VisibilityOff /> : <Visibility />}</IconButton>
     }
   ];
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.case.getById.replace(':id', id));
+
+        const caseData = response?.data?.caseData;
+        setCaseData(caseData);
+
+        const name = caseData?.serviceDetails?.name || '';
+        setServiceName(name);
+      } catch (error) {
+        console.error('Error fetching case data:', error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   return (
     <>
@@ -215,7 +242,7 @@ const CaseDetailsPage = () => {
                   <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h5" gutterBottom>
-                  Aidan Ayonaudu Case
+                  {serviceName}
                 </Typography>
               </Stack>
 

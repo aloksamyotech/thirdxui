@@ -14,9 +14,11 @@ import { urls } from 'common/urls';
 const Lead = () => {
   const navigate = useNavigate();
   const [listName, setListName] = useState('');
+  const [listFilters, setListFilters] = useState([]);
   const [tag, setTag] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
+   const [isFiltered, setIsFiltered] = useState(false);
 
   const listNames = [
     { value: 'list-a', label: 'List A' },
@@ -88,6 +90,47 @@ const Lead = () => {
     }
   ];
 
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (listName && listName !== '') {
+        queryParams.append('name', listName);
+      }
+      const queryString = queryParams.toString();
+      const url = `${urls.mail.filterType}${queryString ? `?${queryString}` : ''}`;
+      
+      
+      const response = await getApi(url);
+
+      const filteredMails = response?.data || [];
+      
+
+      const formattedUsers = filteredMails.map((user, index) => {
+        return {
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          name: user.name || ''
+        };
+      });
+
+      setRows(formattedUsers);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered cases:', error);
+    }
+  };
+  const handleReset = () => {
+    setListName('');
+    setIsFiltered(false);
+  };
+
+  useEffect(() => {
+    if (listName || isFiltered) {
+      handleFilter();
+    }
+  }, [listName]);
+
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -101,6 +144,13 @@ const Lead = () => {
           name: user.name || ''
         }));
         setRows(formattedUsers);
+
+        const uniqueList = [...new Set(allmail.map((item) => item.name).filter(Boolean))].map((value) => ({
+          value,
+          label: value
+        }));
+        
+        setListFilters(uniqueList);
       } catch (error) {
         console.error('Failed to fetch services:', error);
       }
@@ -149,11 +199,13 @@ const Lead = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            listNames={listNames}
-            setListNameFilter={setListName}
+            listNames={listFilters}
+            listNameFilter={listName}
+            setListNameFilter={(value)=>setListName(value)}
             tags={tags}
             setTagFilter={setTag}
             selectedFilters={['listNameFilter', 'tagFilter']}
+            onReset={handleReset}
           />
 
           <Grid item xs={9}>

@@ -173,66 +173,66 @@ const ethnicityOptions = [
     }
     setIsloading(true);
     const fd = new FormData();
-    fd.append('personalInfo[firstName]', formData.personalInfo.firstName);
-    fd.append('personalInfo[lastName]', formData.personalInfo.lastName);
-    fd.append('personalInfo[title]', formData.personalInfo.title);
-    fd.append('personalInfo[gender]', formData.personalInfo.gender);
+    fd.append('personalInfo[firstName]', formData.personalInfo.firstName || '');
+    fd.append('personalInfo[lastName]', formData.personalInfo.lastName || '');
+    fd.append('personalInfo[title]', formData.personalInfo.title || '');
+    fd.append('personalInfo[gender]', formData.personalInfo.gender || '');
     const dob = formData.personalInfo.dateOfBirth;
     fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
-    fd.append('personalInfo[nickName]', formData.personalInfo.nickName);
-    fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity);
+    fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
+    fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
 
-    fd.append('contactInfo[homePhone]', formData.phone);
-    fd.append('contactInfo[phone]', formData.mobilePhone);
-    fd.append('contactInfo[email]', formData.email);
-    fd.append('contactInfo[addressLine1]', formData.address);
-    fd.append('contactInfo[addressLine2]', formData.address2);
-    fd.append('contactInfo[town]', formData.town);
-    fd.append('contactInfo[district]', formData.district);
-    fd.append('contactInfo[postcode]', formData.pinCode);
-    fd.append('contactInfo[country]', formData.country);
-    fd.append('contactInfo[firstLanguage]', formData.language);
-    fd.append('contactInfo[otherId]', formData.otherId);
+    fd.append('contactInfo[homePhone]', formData.phone || '');
+    fd.append('contactInfo[phone]', formData.mobilePhone || '');
+    fd.append('contactInfo[email]', formData.email || '');
+    fd.append('contactInfo[addressLine1]', formData.address || '');
+    fd.append('contactInfo[addressLine2]', formData.address2 || '');
+    fd.append('contactInfo[town]', formData.town || '');
+    fd.append('contactInfo[district]', formData.district || '');
+    fd.append('contactInfo[postcode]', formData.pinCode || '');
+    fd.append('contactInfo[country]', formData.country || '');
+    fd.append('contactInfo[firstLanguage]', formData.language || '');
+    fd.append('contactInfo[otherId]', formData.otherId || '');
 
-    fd.append('otherInfo[description]', formData.riskNotes);
-    fd.append('otherInfo[benificiary]', formData.Beneficiary);
-    fd.append('otherInfo[campaigns]', formData.Campaigns);
-    fd.append('otherInfo[engagement]', formData.engagement);
-    fd.append('otherInfo[eventAttanded]', formData.eventsAttended);
-    fd.append('otherInfo[fundingInterest]', formData.fundingInterests);
-    fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities);
+    fd.append('otherInfo[description]', formData.riskNotes || '');
+    fd.append('otherInfo[benificiary]', formData.Beneficiary || '');
+    fd.append('otherInfo[campaigns]', formData.Campaigns || '');
+    fd.append('otherInfo[engagement]', formData.engagement || '');
+    fd.append('otherInfo[eventAttanded]', formData.eventsAttended || '');
+    fd.append('otherInfo[fundingInterest]', formData.fundingInterests || '');
+    fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities || '');
     fd.append('otherInfo[restrictAccess]', restrictAccess);
 
-    fd.append('emergencyContact[firstName]', formData.firstname);
-    fd.append('emergencyContact[lastName]', formData.lastname);
-    fd.append('emergencyContact[title]', formData.title);
-    fd.append('emergencyContact[gender]', formData.gender);
-    fd.append('emergencyContact[relationshipToUser]', formData.preferred);
-    fd.append('emergencyContact[homePhone]', formData.emergencyhomePhone);
-    fd.append('emergencyContact[phone]', formData.emergencyphone);
-    fd.append('emergencyContact[email]', formData.emergencyemail);
-    fd.append('emergencyContact[addressLine1]', formData.emergencyaddress);
-    fd.append('emergencyContact[addressLine2]', formData.emergencyaddress2);
-    fd.append('emergencyContact[country]', formData.emergencycountry);
-    fd.append('emergencyContact[town]', formData.emergencytown);
-    fd.append('emergencyContact[postcode]', formData.emergencypinCode);
+    fd.append('emergencyContact[firstName]', formData.firstname || '');
+    fd.append('emergencyContact[lastName]', formData.lastname || '');
+    fd.append('emergencyContact[title]', formData.title || '');
+    fd.append('emergencyContact[gender]', formData.gender || '');
+    fd.append('emergencyContact[relationshipToUser]', formData.preferred || '');
+    fd.append('emergencyContact[homePhone]', formData.emergencyhomePhone || '');
+    fd.append('emergencyContact[phone]', formData.emergencyphone || '');
+    fd.append('emergencyContact[email]', formData.emergencyemail || '');
+    fd.append('emergencyContact[addressLine1]', formData.emergencyaddress || '');
+    fd.append('emergencyContact[addressLine2]', formData.emergencyaddress2 || '');
+    fd.append('emergencyContact[country]', formData.emergencycountry || '');
+    fd.append('emergencyContact[town]', formData.emergencytown || '');
+    fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
 
-    fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
-    fd.append('contactPreferences[reason]', formData.reason);
-    fd.append('contactPreferences[contactPurposes]', formData.contactPurpose);
+    fd.append('contactPreferences[preferredMethod]', formData.preferredContact || '');
+    fd.append('contactPreferences[reason]', formData.reason || '');
+    fd.append('contactPreferences[contactPurposes]', formData.contactPurpose || '');
     const confirmDate = formData.confirmationDate;
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 
-    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone);
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent);
-    fd.append('contactPreferences[contactMethods][sms]', formData.sms);
-    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp);
+    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone || '');
+    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent || '');
+    fd.append('contactPreferences[contactMethods][sms]', formData.sms || '');
+    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp || '');
 
     fd.append('role', 'service_user');
     fd.append('isActive', true);
 
     if (formData.file) {
-      fd.append('file', formData.file);
+      fd.append('file', formData.file || '');
     }
 
     try {
@@ -264,7 +264,7 @@ const ethnicityOptions = [
 
   const onlyNumbers = /^[0-9]*$/;
   const onlyLetters = /^[A-Za-z\s]*$/;
-  const onlyLetterNumberSpace= /^[a-zA-Z0-9 ]+$/;
+  const onlyLetterNumberSpace = /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
 
   const tabFieldMap = {
@@ -314,20 +314,23 @@ const ethnicityOptions = [
     2: ['preferredContact', 'reason', 'contactPurpose', 'confirmDate', 'telephone', 'emailConsent', 'sms', 'letter', 'whatsapp']
   };
 
-  const handleTabChange = async (newIndex) => {
-    if (newIndex < tabIndex) {
-      setTabIndex(newIndex);
-      return;
-    }
+  // const handleTabChange = async (newIndex) => {
+  //   if (newIndex < tabIndex) {
+  //     setTabIndex(newIndex);
+  //     return;
+  //   }
 
-    const currentFields = tabFieldMap[tabIndex];
-    const isValid = await trigger(currentFields);
+  //   const currentFields = tabFieldMap[tabIndex];
+  //   const isValid = await trigger(currentFields);
 
-    if (isValid) {
-      setTabIndex(newIndex);
-    } else {
-      toast.error('Please fix validation errors before continuing.');
-    }
+  //   if (isValid) {
+  //     setTabIndex(newIndex);
+  //   } else {
+  //     toast.error('Please fix validation errors before continuing.');
+  //   }
+  // };
+  const handleTabChange = (newIndex) => {
+    setTabIndex(newIndex);
   };
 
   return (
@@ -824,20 +827,21 @@ const ethnicityOptions = [
                                 name="district"
                                 control={control}
                                 rules={{ required: 'District is required' }}
-                                render={({ field }) => (
+                                render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
-                                    {...field}
                                     options={districts}
-                                    getOptionLabel={(option) => option.label || ''}
+                                    getOptionLabel={(option) => option?.label || ''}
+                                    isOptionEqualToValue={(option, value) => option.value === value}
+                                    value={districts.find((d) => d.value === field.value) || null}
+                                    onChange={(_, selectedOption) => field.onChange(selectedOption?.value || '')}
                                     loading={loading}
-                                    onChange={(_, value) => field.onChange(value)}
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
                                         label="Select District"
                                         size="small"
-                                        error={!!errors.district}
-                                        helperText={errors.district?.message}
+                                        error={!!error}
+                                        helperText={error?.message}
                                         InputProps={{
                                           ...params.InputProps,
                                           endAdornment: (
@@ -864,8 +868,8 @@ const ethnicityOptions = [
                                     options={countryList}
                                     getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) => option.code === value.code}
-                                    onChange={(_, value) => field.onChange(value)}
-                                    value={field.value || null}
+                                    onChange={(_, value) => field.onChange(value?.name || '')}
+                                    value={countryList.find((c) => c.name === field.value) || null}
                                     renderOption={(props, option) => (
                                       <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
                                         <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
@@ -1719,23 +1723,54 @@ const ethnicityOptions = [
                                 rules={{
                                   required: 'Country is required'
                                 }}
-                                render={({ field }) => (
-                                  <TextField
-                                    select
-                                    fullWidth
-                                    label="Country"
-                                    size="small"
-                                    error={!!errors.emergencycountry}
-                                    helperText={errors.emergencycountry?.message}
-                                    {...field}
-                                  >
-                                    {countryList.map((country) => (
-                                      <MenuItem key={country.code} value={country.name}>
-                                        <img src={country.flag} alt={country.code} style={{ width: 20, height: 14, marginRight: 8 }} />
-                                        {country.name}
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
+                                render={({ field, fieldState: { error } }) => (
+                                  <Autocomplete
+                                    options={countryList}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.code === value.code}
+                                    onChange={(_, value) => field.onChange(value?.name || '')}
+                                    value={countryList.find((c) => c.name === field.value) || null}
+                                    renderOption={(props, option) => (
+                                      <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
+                                        {option.name}
+                                      </Box>
+                                    )}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Country of origin"
+                                        size="small"
+                                        error={!!error}
+                                        helperText={error ? error.message : ''}
+                                      />
+                                    )}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'preventOverflow',
+                                          options: {
+                                            altBoundary: true,
+                                            rootBoundary: 'viewport',
+                                            tether: false
+                                          }
+                                        },
+                                        {
+                                          name: 'flip',
+                                          options: {
+                                            fallbackPlacements: ['bottom-start']
+                                          }
+                                        }
+                                      ],
+                                      placement: 'bottom-start'
+                                    }}
+                                    ListboxProps={{
+                                      style: {
+                                        maxHeight: 200,
+                                        overflowY: 'auto'
+                                      }
+                                    }}
+                                  />
                                 )}
                               />
                             </Grid>

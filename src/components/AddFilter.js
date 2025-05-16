@@ -1,11 +1,58 @@
+/* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
-import { Popover, List, ListItem, ListItemIcon, ListItemText, IconButton } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import {
+  Popover,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import MergeTypeIcon from '@mui/icons-material/MergeType';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { urls } from 'common/urls';
+import { updateApi } from 'common/apiClient';
+import toast from 'react-hot-toast';
 
-const OptionsPopover = ({ anchorEl, open, onClose }) => {
+
+const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
+  const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleOptionClick = (label) => {
+    if (label === 'Edit') {
+      navigate('/add-serviceuser', { state: data });
+      onClose();
+    } else if (label === 'Delete') {
+      setConfirmOpen(true);
+    } else {
+      onClose();
+    }
+  };
+
+
+const handleConfirmDelete = async () => {
+  // try {
+    await updateApi(`${urls.serviceuser.deleteUser}/${data._id}`);
+    toast.success('Service user deleted successfully!');
+    setConfirmOpen(false);
+    onClose();
+    navigate('/people'); 
+  // } catch (error) {
+  //   console.error('Error deleting user:', error);
+  //   toast.error('Failed to delete the user.');
+  // }
+};
+
+
+
   const options = [
     { label: 'Edit', icon: <EditIcon /> },
     { label: 'Archive', icon: <ArchiveIcon /> },
@@ -14,28 +61,45 @@ const OptionsPopover = ({ anchorEl, open, onClose }) => {
   ];
 
   return (
-    <Popover
-      open={open}
-      anchorEl={anchorEl}
-      onClose={onClose}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'center'
-      }}
-      transformOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center'
-      }}
-    >
-      <List>
-        {options.map((option) => (
-          <ListItem button key={option.label} onClick={() => alert(`${option.label} clicked`)}>
-            <ListItemIcon>{option.icon}</ListItemIcon>
-            <ListItemText primary={option.label} />
-          </ListItem>
-        ))}
-      </List>
-    </Popover>
+    <>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={onClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+      >
+        <List>
+          {options.map((option) => (
+            <ListItem button key={option.label} onClick={() => handleOptionClick(option.label)}>
+              <ListItemIcon>{option.icon}</ListItemIcon>
+              <ListItemText primary={option.label} />
+            </ListItem>
+          ))}
+        </List>
+      </Popover>
+
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this user? 
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

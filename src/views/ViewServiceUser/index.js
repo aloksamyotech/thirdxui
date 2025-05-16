@@ -33,17 +33,13 @@ const UserProfileCard = () => {
   const location = useLocation();
   const id = location.state.id;
   const uniqueid = location.state.serialNumber;
+ 
   useEffect(() => {
     const fetchUserById = async () => {
       try {
-
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
-
-       
-
         const user = response?.data;
-       
-
+      
         if (user) {
           setUserData(user);
         }
@@ -585,7 +581,7 @@ const UserProfileCard = () => {
         </Grid>
       </Card>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} />
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData}/>
     </>
   );
 };

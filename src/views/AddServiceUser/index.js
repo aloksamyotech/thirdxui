@@ -35,7 +35,7 @@ import dayjs from 'dayjs';
 import { postApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
-const AddCaseForm = ({ onCancel, data }) => {
+const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);

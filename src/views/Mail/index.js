@@ -18,12 +18,7 @@ const Lead = () => {
   const [tag, setTag] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
-   const [isFiltered, setIsFiltered] = useState(false);
-
-  const listNames = [
-    { value: 'list-a', label: 'List A' },
-    { value: 'list-b', label: 'List B' }
-  ];
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const tags = [
     { value: 'urgent', label: 'Urgent' },
@@ -120,6 +115,7 @@ const Lead = () => {
       console.error('Failed to fetch filtered cases:', error);
     }
   };
+
   const handleReset = () => {
     setListName('');
     setIsFiltered(false);
@@ -158,6 +154,7 @@ const Lead = () => {
 
     fetchServices();
   }, []);
+  
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>

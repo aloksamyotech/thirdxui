@@ -99,11 +99,11 @@ const Lead = () => {
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
                   ? params.row.companyInformation.companyName
-                  : 'No Name Available'}
+                  : ''}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.contactInfo?.email || 'No Email'}
+                {params.row.contactInfo?.email || ''}
               </Typography>
             </Box>
           </Stack>
@@ -200,20 +200,6 @@ const Lead = () => {
                   rowHeight={65}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
-                  // onRowClick={(params) => {
-                  //   const subRole = params.row.subRole;
-                  //   console.log('subRole:', subRole);
-
-                  //   if (subRole === 'donar_individual') {
-                  //     console.log('donor_individual clicking -----');
-
-                  //     navigate('/view-donor', { state: params.row });
-                  //   } else if (subRole === 'donor_company') {
-                  //     navigate('/view-company-donor', { state: params.row });
-                  //   } else {
-                  //     console.warn('Unknown donor subRole:', subRole);
-                  //   }
-                  // }}
                   components={{ Toolbar: () => <CustomHeader /> }}
                   sx={{
                     '& .MuiDataGrid-columnHeaders': { display: 'none' },

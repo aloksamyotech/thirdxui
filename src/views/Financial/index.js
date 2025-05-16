@@ -70,6 +70,9 @@ const Lead = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [rows, setRows] = useState([]);
 
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [rows, setRows] = useState([]);
+ 
   const columns = [
     {
       field: 'title',
@@ -114,11 +117,11 @@ const Lead = () => {
       renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
     }
   ];
-
+ 
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
-
+ 
       if (name && name !== '') {
         queryParams.append('name', name);
       }
@@ -126,13 +129,13 @@ const Lead = () => {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('date', formattedDate);
       }
-
+ 
       const queryString = queryParams.toString();
       const url = `${urls.transaction.filterType}${queryString ? `?${queryString}` : ''}`;
       const response = await getApi(url);
-
+ 
       const filteredtransactions = response?.data || [];
-
+ 
       const formattedUsers = filteredtransactions.map((item, index) => {
         return {
           id: item._id || index,
@@ -143,26 +146,26 @@ const Lead = () => {
           more: item.transactionId || ''
         };
       });
-
+ 
       setRows(formattedUsers);
       setIsFiltered(true);
     } catch (error) {
       console.error('Failed to fetch filtered cases:', error);
     }
   };
-
+ 
   const handleReset = () => {
     setNameFilter('');
     setDateOpenedFilter('');
     setIsFiltered(false);
   };
-
+ 
   useEffect(() => {
     if (name || dateOpenedFilter || isFiltered) {
       handleFilter();
     }
   }, [name, dateOpenedFilter]);
-
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -181,7 +184,7 @@ const Lead = () => {
           value,
           label: value
         }));
-
+ 
         setNameFilters(uniqueList);
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -190,7 +193,7 @@ const Lead = () => {
 
     fetchData();
   }, []);
-
+ 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>

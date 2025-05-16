@@ -27,8 +27,8 @@ const Lead = () => {
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   const statusFilter = [
-    { value: 'Active', label: 'Active' },
-    { value: 'Inactive', label: 'Inactive' }
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
   ];
 
   const dateAddedFilters = [

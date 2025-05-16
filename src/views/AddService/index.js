@@ -66,19 +66,19 @@ const AddCaseForm = ({ onCancel }) => {
     try {
       const formData = new FormData();
 
-      formData.append('name', data.homePhone);
-      formData.append('code', data.code);
-      formData.append('type', data.serviceType);
-      formData.append('benificiary', data.beneficiaryInformation);
-      formData.append('campaigns', data.campaignsSupported);
-      formData.append('engagement', data.engagement);
-      formData.append('eventAttanded', data.eventsAttended);
-      formData.append('fundingInterest', data.fundingInterests);
-      formData.append('fundraisingActivities', data.fundraisingActivities);
-      formData.append('description', data.notes);
-      formData.append('restrictAccess', restrictAccess);
+      formData.append('name', data.homePhone || '');
+      formData.append('code', data.code || '');
+      formData.append('type', data.serviceType || '');
+      formData.append('benificiary', data.beneficiaryInformation || '');
+      formData.append('campaigns', data.campaignsSupported || '');
+      formData.append('engagement', data.engagement || '');
+      formData.append('eventAttanded', data.eventsAttended || '');
+      formData.append('fundingInterest', data.fundingInterests || '');
+      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      formData.append('description', data.notes || '');
+      formData.append('restrictAccess', restrictAccess || '');
       if (data.file) {
-        formData.append('file', data.file);
+        formData.append('file', data.file || '');
       }
 
       const response = await postApi(urls.service.create, formData, {

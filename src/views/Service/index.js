@@ -15,7 +15,8 @@ const serviceTypeFilter = [
   { value: 'Mentoring', label: 'Mentoring' },
   { value: 'Group Work', label: 'Group Work' },
   { value: 'Sports', label: 'Sports' },
-  { value: 'Social Work', label: 'Social Work' }
+  { value: 'Social Programs', label: 'Social Programs' },
+  { value: 'Arts and Culture', label: 'Arts and Culture' }
 ];
 
 const statusFilter = [
@@ -61,6 +62,8 @@ const Lead = () => {
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
   const [rows, setRows] = useState([]);
+  const [isFiltered, setIsFiltered] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
   const columns = [
@@ -99,14 +102,16 @@ const Lead = () => {
       headerAlign: 'center',
       align: 'center',
       renderCell: (params) => {
-        const isActive = params.value;
+        const isActive = typeof params.value === 'boolean' ? params.value : params.value === 'active';
         const label = isActive ? 'Active' : 'Inactive';
         return (
           <Chip
             label={label}
             sx={{
               color: isActive ? '#79dbfb' : '#ff6a67',
-              backgroundColor: isActive ? '#e5f8fe' : '#ffeae9'
+              backgroundColor: isActive ? '#e5f8fe' : '#ffeae9',
+              fontWeight: 'bold',
+              minWidth: '80px'
             }}
           />
         );
@@ -134,20 +139,64 @@ const Lead = () => {
     }
   ];
 
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await getApi(urls.service.fetch);
-        if (response?.data) {
-          setRows(response.data.allService);
-        }
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
-      }
-    };
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
 
+      if (serviceType && serviceType !== '') {
+        queryParams.append('type', serviceType);
+      }
+      if (status && status !== '') {
+        const isActive = status === 'active';
+        queryParams.append('isActive', isActive);
+      }
+
+      const queryString = queryParams.toString();
+      const url = `${urls.service.filterType}${queryString ? `?${queryString}` : ''}`;
+      const response = await getApi(url);
+
+      if (response?.data) {
+        setRows(response.data.services || []);
+        setIsFiltered(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch filtered services:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setServiceType('');
+    setStatus('');
+    setIsFiltered(false);
+    fetchServices();
+  };
+
+  const fetchServices = async () => {
+    try {
+      const response = await getApi(urls.service.fetch);
+      console.log('All Services:', response.data.allService);
+      if (response?.data) {
+        setRows(response.data.allService || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchServices();
   }, []);
+
+  useEffect(() => {
+    if (serviceType || status || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [serviceType, status, searchQuery]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
@@ -192,10 +241,17 @@ const Lead = () => {
           <FilterPanel
             showFilter={showFilter}
             serviceTypes={serviceTypeFilter}
-            setServiceTypeFilter={setServiceType}
+            serviceTypeFilter={serviceType}
+            setServiceTypeFilter={(val) => {
+              setServiceType(val);
+            }}
             statuses={statusFilter}
-            setStatusFilter={setStatus}
+            statusFilter={status}
+            setStatusFilter={(val) => {
+              setStatus(val);
+            }}
             selectedFilters={['statusFilter', 'serviceTypeFilter']}
+            onReset={handleReset}
           />
 
           <Grid item xs={9}>

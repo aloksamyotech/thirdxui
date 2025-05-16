@@ -56,10 +56,10 @@ const MailingListForm = () => {
     try {
       const formData = {
         ...data,
-        name: data.listName,
-        tags: data.tags,
-        channelSettings: data.channelSettings,
-        purposeSettings: data.purposeSettings,
+        name: data.listName || '',
+        tags: data.tags || '',
+        channelSettings: data.channelSettings || '',
+        purposeSettings: data.purposeSettings || '',
         filters
       };
       const response = await postApi(urls.mail.create, formData);

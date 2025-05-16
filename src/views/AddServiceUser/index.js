@@ -109,16 +109,26 @@ const AddCaseForm = ({ onCancel }) => {
   }
 });
 
-  const ethnicityOptions = [
-    'Arabic or North African',
-    'Asian or Asian British',
-    'Asian-Indian',
-    'Asian-Pakistan',
-    'Asian-Bangladeshi',
-    'Asian–any other Asian background',
-    'Black-Caribbean',
-    'Black-African'
-  ];
+const ethnicityOptions = [
+  'Arabic or North African',
+  'Asian or Asian British – Indian',
+  'Asian – Pakistani',
+  'Asian – Bangladeshi',
+  'Asian – Any other Asian background',
+  'Black – Caribbean',
+  'Black – African',
+  'Black – Any other Black background',
+  'Mixed – White and Black Caribbean',
+  'Mixed – White and Black African',
+  'Mixed – White and Asian',
+  'Mixed – Other',
+  'Chinese',
+  'White – British',
+  'White – Irish',
+  'White – Other',
+  'Unknown'
+];
+
 
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
@@ -560,30 +570,57 @@ const AddCaseForm = ({ onCancel }) => {
                               />
                             </Grid>
 
-                            <Grid item xs={12}>
-                              <Controller
-                                name="personalInfo.ethnicity"
-                                control={control}
-                                rules={{ required: 'Ethnicity is required' }}
-                                render={({ field }) => (
-                                  <TextField
-                                    {...field}
-                                    select
-                                    fullWidth
-                                    label="Ethnicity"
-                                    size="small"
-                                    error={!!errors?.personalInfo?.ethnicity}
-                                    helperText={errors?.personalInfo?.ethnicity?.message}
-                                  >
-                                    {ethnicityOptions.map((option, index) => (
-                                      <MenuItem key={index} value={option}>
-                                        {option}
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
-                                )}
-                              />
-                            </Grid>
+                        <Grid item xs={12}>
+  <Controller
+    name="personalInfo.ethnicity"
+    control={control}
+    rules={{ required: 'Ethnicity is required' }}
+    render={({ field, fieldState: { error } }) => (
+      <Autocomplete
+        options={ethnicityOptions}
+        getOptionLabel={(option) => option}
+        onChange={(_, value) => field.onChange(value)}
+        value={field.value || null}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Ethnicity"
+            size="small"
+            error={!!error}
+            helperText={error ? error.message : ''}
+            fullWidth
+          />
+        )}
+        PopperProps={{
+          modifiers: [
+            {
+              name: 'preventOverflow',
+              options: {
+                altBoundary: true,
+                rootBoundary: 'viewport',
+                tether: false
+              }
+            },
+            {
+              name: 'flip',
+              options: {
+                fallbackPlacements: ['bottom-start']
+              }
+            }
+          ],
+          placement: 'bottom-start'
+        }}
+        ListboxProps={{
+          style: {
+            maxHeight: 200,
+            overflowY: 'auto'
+          }
+        }}
+      />
+    )}
+  />
+</Grid>
+
                           </Grid>
                         </CardContent>
                       </Card>

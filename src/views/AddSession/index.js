@@ -47,21 +47,21 @@ const AddCaseForm = ({ onCancel }) => {
     try {
       const formData = new FormData();
 
-      formData.append('country', data.countryOfOrigin);
-      formData.append('name', data.type);
-      formData.append('date', data.date);
-      formData.append('time', data.time);
-      formData.append('description', data.description);
-      formData.append('benificiary', data.benificiary);
-      formData.append('campaigns', data.campaigns);
-      formData.append('engagement', data.engagement);
-      formData.append('eventAttanded', data.eventAttanded);
-      formData.append('fundingInterest', data.fundingInterest);
-      formData.append('fundraisingActivities', data.fundraisingActivities);
-      formData.append('serviceId', serviceId);
+      formData.append('country', data.countryOfOrigin || '');
+      formData.append('name', data.type || '');
+      formData.append('date', data.date || '');
+      formData.append('time', data.time || '');
+      formData.append('description', data.description || '');
+      formData.append('benificiary', data.benificiary || '');
+      formData.append('campaigns', data.campaigns || '');
+      formData.append('engagement', data.engagement || '');
+      formData.append('eventAttanded', data.eventAttanded || '');
+      formData.append('fundingInterest', data.fundingInterest || '');
+      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      formData.append('serviceId', serviceId || '');
 
       if (data.file) {
-        formData.append('file', data.file);
+        formData.append('file', data.file || '');
       }
 
       const response = await postApi(urls.session.create, formData, {

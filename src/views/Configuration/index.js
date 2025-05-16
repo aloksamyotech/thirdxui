@@ -4,10 +4,10 @@ import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import AntSwitch from 'components/AntSwitch';
-import { postApi, getApi, updateApi,deleteApi } from 'common/apiClient';
+import { postApi, getApi, updateApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
 const defaultTabTypes = [
@@ -27,83 +27,69 @@ const TabbedDataGrid = () => {
   const [openModal, setOpenModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [toggleValue, setToggleValue] = useState(true);
- const [configurationNameFilter, setConfigurationNameFilter] = useState('');
-const [modalSection, setModalSection] = useState('');
-const [editMode, setEditMode] = useState(false);
-const [currentItem, setCurrentItem] = useState(null);
-
-const [editId, setEditId] = useState(null);
-
-
+  const [configurationNameFilter, setConfigurationNameFilter] = useState('');
+  const [modalSection, setModalSection] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [status, setStatus] = useState('');
   const [tabData, setTabData] = useState({});
   const [selectedTab, setSelectedTab] = useState(0);
   const [showFilter, setShowFilter] = useState(true);
   const [inputError, setInputError] = useState('');
 
-const handleEdit = (item) => {
-  setInputValue(item.name);
-  setToggleValue(item.status); 
-  setEditMode(true);
-  setEditId(item.id);
-  setModalSection(item.configurationType); 
-  setOpenModal(true);
-};
+  const handleEdit = (item) => {
+    setInputValue(item.name);
+    setToggleValue(item.status);
+    setEditMode(true);
+    setEditId(item.id);
+    const sectionName = Object.entries(tabData).find(([_, items]) => 
+      items.some(configItem => configItem.id === item.id)
+    )?.[0];
+    setModalSection(sectionName);
+    setOpenModal(true);
+  };
 
+  const handleDelete = async (id) => {
+    const res = await updateApi(urls.configuration.delete.replace(':configId', id));
+    await fetchConfigurations();
+    toast.success('Item deleted successfully!');
+  };
 
-const handleDelete = async(id) => {
- 
- const res = await updateApi(urls.configuration.delete.replace(':configId',id))
-  await fetchConfigurations()
-     toast.success('Item deleted successfully!');
- };
+  const handleUpdateConfiguration = () => {
+    if (!inputValue.trim()) {
+      setInputError('This field is required.');
+      return;
+    }
 
+    const res = updateApi(urls.configuration.updatedData.replace(':configId', id));
+    const updatedItems = items.map((item) => (item.id === currentItem.id ? { ...item, name: inputValue, status: toggleValue } : item));
 
-const handleUpdateConfiguration = () => {
-  if (!inputValue.trim()) {
-    setInputError('This field is required.');
-    return;
-  }
+    setItems(updatedItems);
+    setOpenModal(false);
+    setInputValue('');
+    setInputError('');
+    setEditMode(false);
+    setCurrentItem(null);
+  };
 
- 
- const res = updateApi(urls.configuration.updatedData.replace(':configId',id))
- const updatedItems = items.map(item =>
-    item.id === currentItem.id
-      ? { ...item, name: inputValue, status: toggleValue }
-      : item
-  );
+  const handleOpenModal = (section) => {
+    setModalSection(section);
+    setInputValue('');
+    setToggleValue(true);
+    setEditMode(false);
+    setCurrentItem(null);
+    setOpenModal(true);
+  };
 
-  setItems(updatedItems); 
-  setOpenModal(false);
-  setInputValue('');
-  setInputError('');
-  setEditMode(false);
-  setCurrentItem(null);
-};
-
-
-
-
-
-const handleOpenModal = (section) => {
-  setModalSection(section);
-  setInputValue('');
-  setToggleValue(true);
-  setEditMode(false);            
-  setCurrentItem(null);          
-  setOpenModal(true);
-};
-
-const handleCloseModal = () => {
-  setOpenModal(false);
-  setInputValue('');
-  setToggleValue(true);
-  setEditMode(false);
-  setEditId(null);
-  setInputError('');
-};
-
-
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setInputValue('');
+    setToggleValue(true);
+    setEditMode(false);
+    setEditId(null);
+    setInputError('');
+  };
 
   const configTypeFilter = useMemo(() => {
     return defaultTabTypes.map((type) => ({
@@ -113,8 +99,8 @@ const handleCloseModal = () => {
   }, []);
 
   const statusFilter = [
-    { value: 'true', label: 'Active' },
-    { value: 'false', label: 'Inactive' }
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
   ];
 
   const fetchConfigurations = async () => {
@@ -148,15 +134,14 @@ const handleCloseModal = () => {
     try {
       let url = `${urls.configuration.filterType}?type=${encodeURIComponent(type)}`;
       if (statusFilterVal !== '') {
-        url += `&status=${statusFilterVal}`;
+        url += `&status=${statusFilterVal === 'active' ? 'true' : 'false'}`;
       }
 
       const res = await getApi(url);
       const filteredData = res?.data || [];
 
-      const filteredByStatus = statusFilterVal !== '' 
-        ? filteredData.filter(item => String(item.isActive) === statusFilterVal)
-        : filteredData;
+      const filteredByStatus =
+        statusFilterVal !== '' ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false')) : filteredData;
 
       const grouped = {
         [type]: filteredByStatus.map((item) => ({
@@ -172,14 +157,13 @@ const handleCloseModal = () => {
     }
   };
 
-useEffect(() => {
-  if (configurationNameFilter) {
-    fetchFilteredConfigurations(configurationNameFilter, status);
-  } else {
-    fetchConfigurations();
-  }
-}, [configurationNameFilter, status]);
-
+  useEffect(() => {
+    if (configurationNameFilter) {
+      fetchFilteredConfigurations(configurationNameFilter, status);
+    } else {
+      fetchConfigurations();
+    }
+  }, [configurationNameFilter, status]);
 
   const validateInput = (value) => {
     if (!value) {
@@ -204,37 +188,34 @@ useEffect(() => {
     validateInput(value);
   };
 
-const handleSaveConfiguration = async () => {
-  if (!validateInput(inputValue)) {
-    return;
-  }
-
-  const payload = {
-    name: inputValue,
-    isActive: toggleValue,
-    configurationType: modalSection
-  };
-
-  try {
-    if (editMode) {
-      const res = await updateApi(urls.configuration.updatedData.replace(':configId',editId),
-        payload
-      );
-      toast.success('Item updated successfully!');
-    } else {
-      const res = await postApi(urls.configuration.create, payload);
-      toast.success('Item added successfully!');
+  const handleSaveConfiguration = async () => {
+    if (!validateInput(inputValue)) {
+      return;
     }
 
-    fetchConfigurations();
-    handleCloseModal();
-    setEditMode(false); 
-    setEditId(null);
-  } catch (err) {
-    toast.error('Error saving configuration.');
-  }
-};
+    const payload = {
+      name: inputValue,
+      isActive: toggleValue,
+      configurationType: modalSection
+    };
 
+    try {
+      if (editMode) {
+        const res = await updateApi(urls.configuration.updatedData.replace(':configId', editId), payload);
+        toast.success('Item updated successfully!');
+      } else {
+        const res = await postApi(urls.configuration.create, payload);
+        toast.success('Item added successfully!');
+      }
+
+      fetchConfigurations();
+      handleCloseModal();
+      setEditMode(false);
+      setEditId(null);
+    } catch (err) {
+      toast.error('Error saving configuration.');
+    }
+  };
 
   const handleStatusUpdate = async (itemId, newStatus) => {
     try {
@@ -280,10 +261,10 @@ const handleSaveConfiguration = async () => {
           showFilter={showFilter}
           statuses={statusFilter}
           configurationNames={configTypeFilter}
-           configurationNameFilter={configurationNameFilter}
-  setConfigurationNameFilter={(val) => {
-    setConfigurationNameFilter(val);
-  }}
+          configurationNameFilter={configurationNameFilter}
+          setConfigurationNameFilter={(val) => {
+            setConfigurationNameFilter(val);
+          }}
           statusFilter={status}
           setStatusFilter={(val) => {
             setStatus(val);
@@ -348,64 +329,67 @@ const handleSaveConfiguration = async () => {
                       </Typography>
                     </Box>
                   </Box>
-<Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
-  {items.length > 0 ? (
-    items.map((item) => (
-      <Box
-        key={item.id}
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 1,
-          pb: 1,
-          borderBottom: '1px solid #f0f0f0'
-        }}
-      >
-        <Typography sx={{ flex: 1 }}>{item.name}</Typography>
+                  <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
+                    {items.length > 0 ? (
+                      items.map((item) => (
+                        <Box
+                          key={item.id}
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mb: 1,
+                            pb: 1,
+                            borderBottom: '1px solid #f0f0f0',
+                            flexWrap: 'wrap'
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              wordBreak: 'break-word',
+                              whiteSpace: 'pre-line',
+                              pr: 2,
+                              maxWidth: '60%'
+                            }}
+                          >
+                            {item.name}
+                          </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <AntSwitch
-            checked={item.status}
-            onChange={(e) => handleStatusUpdate(item.id, e.target.checked)}
-          />
-
-          {/* EDIT Icon with ID passed */}
-          <IconButton
-            onClick={() => handleEdit(item)} // pass full item or just item.id
-            sx={{
-              backgroundColor: '#fff',
-              color: '#FF5C5C',
-              width: 30,
-              height: 30
-            }}
-          >
-            <EditOutlinedIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-
-          {/* DELETE Icon with ID passed */}
-          <IconButton
-            onClick={() => handleDelete(item.id)} // passing the item id
-            sx={{
-              backgroundColor: "#fff",
-              color: '#FF5C5C',
-              width: 30,
-              height: 30
-            }}
-          >
-            <DeleteOutlineOutlinedIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        </Box>
-      </Box>
-    ))
-  ) : (
-    <Typography variant="body2" color="textSecondary">
-      No items found
-    </Typography>
-  )}
-</Box>
-
-
+                          <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
+                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
+                            <IconButton
+                              onClick={() => handleEdit(item)}
+                              sx={{
+                                backgroundColor: 'transparent',
+                                color: '#FF5C5C',
+                                width: 28,
+                                height: 28
+                              }}
+                            >
+                              <EditIcon sx={{ fontSize: 18 }} />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleDelete(item.id)}
+                              sx={{
+                                backgroundColor: 'transparent',
+                                color: '#FF5C5C',
+                                width: 28,
+                                height: 28
+                              }}
+                            >
+                              <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="textSecondary">
+                        No items found
+                      </Typography>
+                    )}
+                  </Box>
                 </Card>
               </Grid>
             ))}
@@ -426,33 +410,36 @@ const handleSaveConfiguration = async () => {
               boxShadow: 24
             }}
           >
-         <Typography variant="h5" sx={{ mb: 2 }}>
-  {editMode ? `Edit ${modalSection}` : `Add to ${modalSection}`}
-</Typography>
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              {editMode ? `Edit ${modalSection}` : `Add to ${modalSection}`}
+            </Typography>
 
-            <TextField 
-              fullWidth 
-              label="New Item" 
-              value={inputValue} 
+            <TextField
+              fullWidth
+              label="New Item"
+              value={inputValue}
               onChange={handleInputChange}
               error={!!inputError}
               helperText={inputError}
-              sx={{ mb: 2 }} 
-               inputProps={{ maxLength: 10 }}
+              sx={{ mb: 2 }}
+              inputProps={{ 
+                maxLength: 25,
+                style: { 
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word'
+                }
+              }}
+              multiline
+              rows={2}
             />
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Typography variant="body1">Active?</Typography>&nbsp;&nbsp;&nbsp;
               <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-            
- <Button
-  variant="contained"
-  sx={{ background: '#053146' }}
-  onClick={handleSaveConfiguration}
->
-  {editMode ? 'Update' : 'Save Changes'}
-</Button>
+              <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSaveConfiguration}>
+                {editMode ? 'Update' : 'Save Changes'}
+              </Button>
 
               <Button variant="outlined" color="error" onClick={handleCloseModal}>
                 Cancel

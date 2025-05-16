@@ -1,13 +1,13 @@
-name: Deploy to develop
+name: Deploy to samyotech
 
 on:
   push:
     branches:
-      - "develop"
+      - "samyotech"
 
 jobs:
   redeploy_frontend:
-    name: Deploy frontend to develop
+    name: Deploy frontend to samyotech
     runs-on: ubuntu-latest
 
     steps:
@@ -25,8 +25,8 @@ jobs:
             cd /thirdx/thirdxui
             git stash
             git fetch --all
-            git checkout develop
-            git pull origin develop
+            git checkout samyotech
+            git pull origin samyotech
             git log -1
             npm install -f
             npm run build | tee build.log

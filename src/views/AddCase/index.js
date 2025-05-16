@@ -66,21 +66,21 @@ const AddCaseForm = () => {
     try {
       const formData = new FormData();
 
-      formData.append('serviceUserId', data.serviceUserId);
-      formData.append('serviceId', data.serviceId);
-      formData.append('serviceType', data.serviceType);
-      formData.append('serviceStatus', data.serviceStatus);
-      formData.append('caseOpened', data.caseOpened);
-      formData.append('caseClosed', data.caseClosed);
-      formData.append('benificiary', data.benificiary);
-      formData.append('campaigns', data.campaigns);
-      formData.append('engagement', data.engagement);
-      formData.append('fundingInterest', data.fundingInterests);
-      formData.append('fundraisingActivities', data.fundraisingActivities);
-      formData.append('description', data.description);
-      formData.append('isActive', data.isActive);
+      formData.append('serviceUserId', data.serviceUserId || '');
+      formData.append('serviceId', data.serviceId || '');
+      formData.append('serviceType', data.serviceType || '');
+      formData.append('serviceStatus', data.serviceStatus || '');
+      formData.append('caseOpened', data.caseOpened || '');
+      formData.append('caseClosed', data.caseClosed || '');
+      formData.append('benificiary', data.benificiary || '');
+      formData.append('campaigns', data.campaigns || '');
+      formData.append('engagement', data.engagement || '');
+      formData.append('fundingInterest', data.fundingInterests || '');
+      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      formData.append('description', data.description || '');
+      formData.append('isActive', data.isActive || '');
       if (data.file) {
-        formData.append('file', data.file);
+        formData.append('file', data.file || '');
       }
 
       const response = await postApi(urls.case.create, formData, {

@@ -15,6 +15,7 @@ import {
   Tooltip
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import OptionsPopover from 'components/AddFilter';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +49,17 @@ const rows = [
 
 const UserProfile = () => {
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   return (
     <>
@@ -88,6 +100,22 @@ const UserProfile = () => {
           }}
         />
       </Box>
+      <Box display="flex" flexDirection="row">
+        <Button
+          variant="contained"
+          onClick={handleClick}
+          sx={{
+            mt: 2,
+            mb: 1,
+            backgroundColor: '#00AEEF',
+            ml: 'auto'
+          }}
+        >
+          Manage
+        </Button>
+      </Box>
+
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} />
     </>
   );
 };

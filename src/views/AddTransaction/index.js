@@ -25,26 +25,20 @@ const AddCaseForm = ({ onCancel }) => {
 
   const onSubmit = async (data) => {
     try {
-      // Prepare payload as a plain object
       const payload = {
-        assignedTo: data.assignedTo,
-        campaign: data.campaign,
-        amountPaid: data.amountPaid,
-        paymentMethod: data.paymentMethod,
-        processingCost: data.processingCost,
-        currency: data.currency,
-        receiptNumber: data.receiptNumber,
-        transactionId: data.transactionId
+        assignedTo: data.assignedTo || '',
+        campaign: data.campaign || '',
+        amountPaid: data.amountPaid || '',
+        paymentMethod: data.paymentMethod || '',
+        processingCost: data.processingCost || '',
+        currency: data.currency || '',
+        receiptNumber: data.receiptNumber || '',
+        transactionId: data.transactionId || ''
       };
 
-      console.log('Submitted Data:', payload);
-
-      // ✅ Send JSON payload
       const res = await postApi(urls.transaction.create, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
-
-      console.log('Response:', res);
       toast.success('Transaction added successfully!');
       navigate('/financial');
     } catch (error) {

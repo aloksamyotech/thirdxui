@@ -127,33 +127,33 @@ const AddCaseForm = ({ onCancel }) => {
       fd.append('file', data.file);
     }
 
-    fd.append('contactInfo[phone]', data.mobilePhone);
-    fd.append('contactInfo[email]', data.email);
+    fd.append('contactInfo[phone]', data.mobilePhone || '');
+    fd.append('contactInfo[email]', data.email || '');
 
-    fd.append('otherInfo[description]', data.riskNotes);
-    fd.append('otherInfo[benificiary]', data.Beneficiary);
-    fd.append('otherInfo[campaigns]', data.Campaigns);
-    fd.append('otherInfo[engagement]', data.engagement);
-    fd.append('otherInfo[eventAttanded]', data.eventsAttended);
-    fd.append('otherInfo[fundingInterest]', data.fundingInterests);
-    fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities);
-    fd.append('otherInfo[restrictAccess]', restrictAccess);
+    fd.append('otherInfo[description]', data.riskNotes || '');
+    fd.append('otherInfo[benificiary]', data.Beneficiary || '');
+    fd.append('otherInfo[campaigns]', data.Campaigns || '');
+    fd.append('otherInfo[engagement]', data.engagement || '');
+    fd.append('otherInfo[eventAttanded]', data.eventsAttended || '');
+    fd.append('otherInfo[fundingInterest]', data.fundingInterests || '');
+    fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
+    fd.append('otherInfo[restrictAccess]', restrictAccess || '');
 
-    fd.append('contactPreferences[preferredMethod]', data.preferredContact);
-    fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
-    fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
-    fd.append('contactPreferences[reason]', data.reason);
-    fd.append('contactPreferences[contactMethods][donortag]', data.donortag);
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
-    fd.append('contactPreferences[contactMethods][sms]', data.sms);
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone);
-    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp);
+    fd.append('contactPreferences[preferredMethod]', data.preferredContact || '');
+    fd.append('contactPreferences[contactPurposes]', data.contactPurpose || '');
+    fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
+    fd.append('contactPreferences[reason]', data.reason || '');
+    fd.append('contactPreferences[contactMethods][donortag]', data.donortag || '');
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent || '');
+    fd.append('contactPreferences[contactMethods][sms]', data.sms || '');
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone || '');
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp || '');
 
-    fd.append('companyInformation[companyName]', data.companyname);
-    fd.append('companyInformation[mainContactName]', data.contactname);
-    fd.append('companyInformation[otherId]', data.otherId);
-    fd.append('companyInformation[socialMediaLinks]', data.socialmedia);
-    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+    fd.append('companyInformation[companyName]', data.companyname || '');
+    fd.append('companyInformation[mainContactName]', data.contactname || '');
+    fd.append('companyInformation[otherId]', data.otherId || '');
+    fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
+    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign || '');
 
     fd.append('role', 'donor');
     fd.append('subRole', subRole);
@@ -185,32 +185,35 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
   const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
-  const handleTabChange = async (newValue) => {
-    if (newValue > tabIndex) {
-      const firstTabFields = [
-        'companyname',
-        'contactname',
-        'socialmedia',
-        'otherId',
-        'Recruitmentcampaign',
-        'Beneficiary',
-        'Campaigns',
-        'engagement',
-        'eventsAttended',
-        'fundingInterests',
-        'fundraisingActivities',
-        'riskNotes'
-      ];
-      const isValid = await trigger(firstTabFields);
+  // const handleTabChange = async (newValue) => {
+  //   if (newValue > tabIndex) {
+  //     const firstTabFields = [
+  //       'companyname',
+  //       'contactname',
+  //       'socialmedia',
+  //       'otherId',
+  //       'Recruitmentcampaign',
+  //       'Beneficiary',
+  //       'Campaigns',
+  //       'engagement',
+  //       'eventsAttended',
+  //       'fundingInterests',
+  //       'fundraisingActivities',
+  //       'riskNotes'
+  //     ];
+  //     const isValid = await trigger(firstTabFields);
 
-      if (isValid) {
-        setTabIndex(newValue);
-      } else {
-        toast.error('Please fill all required fields before proceeding');
-      }
-    } else {
-      setTabIndex(newValue);
-    }
+  //     if (isValid) {
+  //       setTabIndex(newValue);
+  //     } else {
+  //       toast.error('Please fill all required fields before proceeding');
+  //     }
+  //   } else {
+  //     setTabIndex(newValue);
+  //   }
+  // };
+  const handleTabChange = (newIndex) => {
+    setTabIndex(newIndex);
   };
 
   return (

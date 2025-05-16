@@ -29,7 +29,8 @@ export const urls = Object.freeze({
   service: {
     create: `${baseUrl}/services/addServices`,
     fetch: `${baseUrl}/services/getAllServices`,
-    getById: `${baseUrl}/services/getServiceById/:id`
+    getById: `${baseUrl}/services/getServiceById/:id`,
+    filterType: `${baseUrl}/services/search`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,
@@ -55,6 +56,7 @@ export const urls = Object.freeze({
     create: `${baseUrl}/session/addSession`,
     filter: `${baseUrl}/session/search`,
     fetch: `${baseUrl}/session/getAllSession`,
-    getById: `${baseUrl}/session/getSessionById/:id`
+    getById: `${baseUrl}/session/getSessionById/:id`,
+    update: `${baseUrl}/session/updateSession/:id`
   }
 });

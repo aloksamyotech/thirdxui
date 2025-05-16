@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -17,11 +17,26 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-
-const attendees = ['John Doe', 'Jane Smith', 'Alice Cooper'];
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
 
 export default function SessionRegisterPage() {
   const navigate = useNavigate();
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    const fetchpeople = async () => {
+      const response = await getApi(urls.serviceuser.fetch);
+      const allUser = response?.data?.allUser || [];
+      const formattedUsers = allUser.map((user) => ({
+        id: user._id,
+        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+      }));
+      setRows(formattedUsers);
+    };
+    fetchpeople();
+  }, []);
+
   return (
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -76,7 +91,7 @@ export default function SessionRegisterPage() {
             <Card sx={{ p: 2, height: '250px' }}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Typography fontWeight="bold">Add An Attendee</Typography>
-                <AddCircleIcon sx={{ color: 'green' }}  onClick={() => navigate('/add-serviceuser')}/>
+                <AddCircleIcon sx={{ color: 'green' }} onClick={() => navigate('/add-serviceuser')} />
               </Box>
 
               <Grid container spacing={2} alignItems="center">
@@ -84,9 +99,9 @@ export default function SessionRegisterPage() {
                   <FormControl fullWidth>
                     <InputLabel>Select Attendee</InputLabel>
                     <Select defaultValue="">
-                      {attendees.map((name, idx) => (
-                        <MenuItem key={idx} value={name}>
-                          {name}
+                      {rows.map((user) => (
+                        <MenuItem key={user.id} value={user.id}>
+                          {user.name}
                         </MenuItem>
                       ))}
                     </Select>

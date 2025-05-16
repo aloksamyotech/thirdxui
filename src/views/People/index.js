@@ -12,9 +12,14 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const districts = [
-  { value: 'district1', label: 'District 1' },
-  { value: 'district2', label: 'District 2' },
-  { value: 'district3', label: 'District 3' }
+  { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
+  { label: 'Adur District', value: 'adur_district' },
+  { label: 'Amber Valley Borough', value: 'amber_valley_borough' },
+  { label: 'Arun District', value: 'arun_district' },
+  { label: 'Ashford Borough', value: 'ashford_borough' },
+  { label: 'Babergh District', value: 'babergh_district' },
+  { label: 'Ashfield District', value: 'ashfield_district' },
+  { label: 'Basildon Borough', value: 'basildon_borough' }
 ];
 
 const dateAddedFilters = [
@@ -25,9 +30,10 @@ const dateAddedFilters = [
 ];
 
 const genders = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'other', label: 'Other' }
+  { value: 'Male', label: 'Male' },
+  { value: 'Female', label: 'Female' },
+  { value: 'Non-Binary', label: 'Non-Binary' },
+  { value: 'Others', label: 'Prefer not to say' }
 ];
 
 const Lead = () => {

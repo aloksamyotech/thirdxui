@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Grid, Card, Typography, Box, MenuItem, TextField, Button } from '@mui/material';
+import { Grid, Card, Typography, Box, MenuItem, Chip, TextField, Button, Autocomplete } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { LocalizationProvider, DatePicker, DesktopTimePicker } from '@mui/x-date-pickers';
@@ -129,49 +129,49 @@ const FilterPanel = ({
       data: formTypes,
       label: 'Form Type',
       onChange: setFormType,
-      value:formType,
+      value: formType,
       type: 'select'
     },
     dateFilter: {
       data: dateFilters,
       label: 'By Date',
       onChange: setDateFilter,
-      value:dateFilter,
+      value: dateFilter,
       type: 'select'
     },
     districtFilter: {
       data: districts,
       label: 'By Borough/District',
       onChange: setDistrictFilter,
-      value:districtFilter,
+      value: districtFilter,
       type: 'select'
     },
     genderFilter: {
       data: genders,
       label: 'By Gender',
       onChange: setGenderFilter,
-      value:genderFilter,
+      value: genderFilter,
       type: 'select'
     },
     statusFilter: {
       data: statuses,
       label: 'By Status',
       onChange: setStatusFilter,
-      value:statusFilter,
+      value: statusFilter,
       type: 'select'
     },
     serviceTypeFilter: {
       data: serviceTypes,
       label: 'By Service Type',
       onChange: setServiceTypeFilter,
-      value:serviceTypeFilter,
+      value: serviceTypeFilter,
       type: 'select'
     },
     dateOpenedFilter: {
       data: dateOpenedFilters,
       label: 'By Date Opened',
       onChange: setDateOpenedFilter,
-      value:dateOpenedFilter,
+      value: dateOpenedFilter,
       type: 'date'
     },
     ownerFilter: {
@@ -191,35 +191,35 @@ const FilterPanel = ({
       data: listNames,
       label: 'By List Name',
       onChange: setListNameFilter,
-      value:listNameFilter,
+      value: listNameFilter,
       type: 'select'
     },
     formNameFilter: {
       data: formNames,
       label: 'By Form Name',
       onChange: setFormNameFilter,
-      value:formNameFilter,
+      value: formNameFilter,
       type: 'select'
     },
     tagFilter: {
       data: tags,
       label: 'By Tags',
       onChange: setTagFilter,
-      value:tagFilter,
+      value: tagFilter,
       type: 'select'
     },
     nameFilter: {
       data: names,
       label: 'By Name',
       onChange: setNameFilter,
-      value:nameFilter,
+      value: nameFilter,
       type: 'select'
     },
     receiptIdFilter: {
       data: receipts,
       label: 'By Receipt ID',
       onChange: setReceiptIdFilter,
-      value:receiptIdFilter,
+      value: receiptIdFilter,
       type: 'select'
     },
     campaignFilter: {
@@ -233,56 +233,56 @@ const FilterPanel = ({
       data: caseIds,
       label: 'By Case ID',
       onChange: setCaseIdFilter,
-      value:caseIdFilter,
+      value: caseIdFilter,
       type: 'select'
     },
     countryOfOriginFilter: {
       data: countriesWithFlags,
       label: 'By Country of Origin',
       onChange: setCountryOfOriginFilter,
-      value:countryOfOriginFilter,
+      value: countryOfOriginFilter,
       type: 'select'
     },
     donorTypeFilter: {
       data: donorTypes,
       label: 'By Donor Type',
       onChange: setDonorTypeFilter,
-      value:donorTypeFilter,
+      value: donorTypeFilter,
       type: 'select'
     },
     durationFilter: {
       data: durationOptions,
       label: 'By Duration',
       onChange: setDurationFilter,
-      value:durationFilter,
+      value: durationFilter,
       type: 'select'
     },
     amountRangeFilter: {
       data: amountRanges,
       label: 'By Amount Range',
       onChange: setAmountRangeFilter,
-      value:amountRangeFilter,
+      value: amountRangeFilter,
       type: 'select'
     },
     recruitmentCampaignFilter: {
       data: recruitmentCampaigns,
       label: 'By Recruitment Campaign',
       onChange: setRecruitmentCampaignFilter,
-      value:recruitmentCampaignFilter,
+      value: recruitmentCampaignFilter,
       type: 'select'
     },
     activityTypeFilter: {
       data: activityTypes,
       label: 'By Activity Type',
       onChange: setActivityTypeFilter,
-      value:activityTypeFilter,
+      value: activityTypeFilter,
       type: 'select'
     },
     sessionNameFilter: {
       data: sessionNames,
       label: 'By Session Name',
       onChange: setSessionNameFilter,
-      value:sessionNameFilter,
+      value: sessionNameFilter,
       type: 'select'
     },
     configurationNameFilter: {
@@ -303,7 +303,7 @@ const FilterPanel = ({
       data: sessionLeads,
       label: 'By Session Lead',
       onChange: setSessionLeadFilter,
-      value:sessionLeadFilter,
+      value: sessionLeadFilter,
       type: 'select'
     }
   };
@@ -359,23 +359,92 @@ const FilterPanel = ({
             }
 
             if (filter.type === 'select') {
+              if (filterKey === 'statusFilter') {
+                return (
+                  <TextField
+                    key={filterKey}
+                    select
+                    label={filter.label}
+                    fullWidth
+                    size="small"
+                    value={filter.value || ''}
+                    onChange={(e) => filter.onChange(e.target.value)}
+                    SelectProps={{
+                      renderValue: (selected) =>
+                        selected ? (
+                          <Chip
+                            label={filter.data?.find((status) => status.value === selected)?.label || selected}
+                            sx={{
+                              color:
+                                selected?.toLowerCase() === 'active'
+                                  ? '#79dbfb'
+                                  : selected?.toLowerCase() === 'inactive'
+                                  ? '#ff6a67'
+                                  : 'white',
+                              backgroundColor:
+                                selected?.toLowerCase() === 'active'
+                                  ? '#e5f8fe'
+                                  : selected?.toLowerCase() === 'inactive'
+                                  ? '#ffeae9'
+                                  : '#e0e0e0',
+                              fontWeight: 500,
+                              px: 1
+                            }}
+                          />
+                        ) : (
+                          ''
+                        )
+                    }}
+                  >
+                    {filter.data?.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <Chip
+                          label={option.label}
+                          sx={{
+                            color:
+                              option.value?.toLowerCase() === 'active'
+                                ? '#79dbfb'
+                                : option.value?.toLowerCase() === 'inactive'
+                                ? '#ff6a67'
+                                : 'white',
+                            backgroundColor:
+                              option.value?.toLowerCase() === 'active'
+                                ? '#e5f8fe'
+                                : option.value?.toLowerCase() === 'inactive'
+                                ? '#ffeae9'
+                                : '#e0e0e0',
+                            fontWeight: 500
+                          }}
+                        />
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                );
+              }
               return (
-                <TextField
-                  key={filterKey}
-                  select
-                  label={filter.label}
-                  fullWidth
-                  size="small"
-                  value={filter.value || ''}
-                  onChange={(e) => filter.onChange(e.target.value)}
-                >
-                  {filter.data?.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.flag && <img src={option.flag} alt={option.label} style={{ width: 20, height: 15, marginRight: 8 }} />}
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                <Box key={filterKey}>
+                  <Autocomplete
+                    options={filter.data || []}
+                    getOptionLabel={(option) => option.label}
+                    value={filter.data?.find((option) => option.value === filter.value) || null}
+                    onChange={(_, newValue) => filter.onChange(newValue?.value || '')}
+                    renderInput={(params) => <TextField {...params} label={filter.label} size="small" fullWidth />}
+                    renderOption={(props, option) => (
+                      <li {...props}>
+                        {option.flag && <img src={option.flag} alt={option.label} style={{ width: 20, height: 15, marginRight: 8 }} />}
+                        {option.label}
+                      </li>
+                    )}
+                    ListboxProps={{
+                      style: {
+                        maxHeight: '200px'
+                      }
+                    }}
+                    PopperProps={{
+                      placement: 'bottom-start'
+                    }}
+                  />
+                </Box>
               );
             }
 

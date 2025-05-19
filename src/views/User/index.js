@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button } from '@mui/material';
 import TableStyle from '../../ui-component/TableStyle';
 import { Edit, Delete, Add, Close } from '@mui/icons-material';
@@ -6,8 +7,10 @@ import FilterPanel from 'components/FilterPanel';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
 
-const getCountryFlag = (countryCode) => `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+// const getCountryFlag = (countryCode) => `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
@@ -16,6 +19,8 @@ const User = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
+  const [rows, setRows] = useState([]);
+  const navigate = useNavigate();
 
   const columns = [
     {
@@ -50,7 +55,7 @@ const User = () => {
       flex: 1.5,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <img src={getCountryFlag(params.row.countryCode)} alt={params.value} width="24px" height="16px" />
+          {/* <img src={getCountryFlag(params.row.countryCode)} alt={params.value} width="24px" height="16px" /> */}
           <Typography>{params.value}</Typography>
         </Box>
       )
@@ -74,70 +79,8 @@ const User = () => {
     }
   ];
 
-  const rows = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      country: 'USA',
-      countryCode: 'US',
-      date: '2025/02/28',
-      age: 30,
-      status: 'Active'
-    },
-    {
-      id: 2,
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      country: 'UK',
-      countryCode: 'GB',
-      date: '2025/01/15',
-      age: 25,
-      status: 'Inactive'
-    },
-    {
-      id: 3,
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      country: 'India',
-      countryCode: 'IN',
-      date: '2024/12/10',
-      age: 35,
-      status: 'Active'
-    },
-    {
-      id: 4,
-      name: 'Hilda Rath',
-      email: 'rath@example.com',
-      country: 'United Arab Emirates',
-      countryCode: 'AE',
-      date: '2024/02/28',
-      age: 30,
-      status: 'Inactive'
-    },
-    {
-      id: 5,
-      name: 'Herman Miller',
-      email: 'miller@example.com',
-      country: 'Switzerland',
-      countryCode: 'CH',
-      date: '2024/01/15',
-      age: 25,
-      status: 'Inactive'
-    },
-    {
-      id: 6,
-      name: 'Jaccy Smith',
-      email: 'smith@example.com',
-      country: 'Canada',
-      countryCode: 'CA',
-      date: '2023/12/10',
-      age: 35,
-      status: 'Active'
-    }
-  ];
 
-  const CustomHeader = () => {
+const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
         <GridToolbarContainer
@@ -186,17 +129,61 @@ const User = () => {
     { value: 'name2', label: 'Name 2' }
   ];
 
+  // useEffect(() => {
+  //   fetch('https://restcountries.com/v3.1/all')
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       const countries = data.map((country) => ({
+  //         value: country.cca2,
+  //         label: country.name.common,
+  //         flag: country.flags.png
+  //       }));
+  //       setCountriesWithFlags(countries);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
-      .then((res) => res.json())
-      .then((data) => {
-        const countries = data.map((country) => ({
-          value: country.cca2,
-          label: country.name.common,
-          flag: country.flags.png
-        }));
-        setCountriesWithFlags(countries);
-      });
+    const fetchUser = async () => {
+      try {
+        const response = await getApi(urls?.serviceuser?.getAllUser);
+       
+
+        const allUser = response?.data?.allVolunteer || [];
+       
+
+       
+        const formattedUsers = allUser.map((user, index) => {
+          const dob = new Date(user.personalInfo?.dateOfBirth);
+          const today = new Date();
+
+          let age = '';
+          if (!isNaN(dob)) {
+            age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+              age--;
+            }
+          }
+
+          return {
+            id: user._id,
+            serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+            name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim(),
+            date: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '',
+            
+            country: user.contactInfo?.country || '',
+            status: user.isActive ? 'Active' : 'Deactive',
+            age: age
+          };
+        });
+
+        setRows(formattedUsers);
+      } catch (error) {
+        console.error('Failed to fetch services:', error);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   return (
@@ -206,7 +193,7 @@ const User = () => {
           <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
             <Tooltip title="Add" arrow>
               <IconButton
-                onClick={() => setShowForm(true)}
+                onClick={() => navigate('/add-user')}
                 sx={{
                   backgroundColor: '#009fc7',
                   borderRadius: '4px',

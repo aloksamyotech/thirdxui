@@ -122,20 +122,32 @@ const UserProfile = () => {
 
               <Grid item xs={12} md={8}>
                 <Stack>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h5" fontWeight="bold">
-                      {(serviceData?.name || '').toUpperCase()}
-                    </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+  <Tooltip title={(serviceData?.name || '').toUpperCase()}>
+    <Typography
+      variant="h5"
+      fontWeight="bold"
+      sx={{
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        maxWidth: '60%' // adjust based on layout
+      }}
+    >
+      {(serviceData?.name || '').toUpperCase()}
+    </Typography>
+  </Tooltip>
 
-                    <Button
-                      variant="contained"
-                      startIcon={<AddIcon />}
-                      sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
-                      onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
-                    >
-                      Add New Session
-                    </Button>
-                  </Box>
+  <Button
+    variant="contained"
+    startIcon={<AddIcon />}
+    sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
+    onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
+  >
+    Add New Session
+  </Button>
+</Box>
+
 
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green' }} />

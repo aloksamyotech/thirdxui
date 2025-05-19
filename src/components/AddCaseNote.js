@@ -8,10 +8,13 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { getApi, postApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
+
+import dayjs from 'dayjs';
 
 const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', initialData = null, caseid }) => {
   const [formData, setFormData] = useState({
-    date: null,
+    date: dayjs(),
     time: '',
     notes: '',
     contactPurpose: '',
@@ -22,7 +25,12 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
   });
 
   const [contactPurposeEntry, setContactPurposeEntry] = useState([]);
+  const [errors, setErrors] = useState({ notes: '', subject: '' });
+
   const fileInputRef = useRef();
+  useEffect(() => {
+    if (initialData) setFormData(initialData);
+  }, [initialData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +69,32 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
     setFormData((prev) => ({ ...prev, toggle: e.target.checked }));
   };
 
+  // const handleSubmit = async () => {
+  //   try {
+  //     const form = new FormData();
+
+  //     form.append('date', formData.date?.toISOString?.() || '');
+  //     form.append('time', formData.time);
+  //     form.append('note', formData.notes);
+  //     form.append('subject', formData.subject);
+  //     form.append('isActive', formData.toggle);
+  //     form.append('caseId', formData.caseId);
+  //     form.append('configurationId', formData.contactPurpose);
+
+  //     if (formData.file) {
+  //       form.append('file', formData.file);
+  //     }
+
+  //     const response = await postApi(urls.casenote.create, form, {
+  //       headers: { 'Content-Type': 'multipart/form-data' }
+  //     });
+
+  //     onSubmit(response.data);
+  //     toast.success('Successfully added caseNote');
+  //   } catch (error) {
+  //     console.error('Error submitting case note:', error);
+  //   }
+  // };
   const handleSubmit = async () => {
     try {
       const form = new FormData();
@@ -70,8 +104,8 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
       form.append('note', formData.notes);
       form.append('subject', formData.subject);
       form.append('isActive', formData.toggle);
-      form.append('caseId', formData.caseId); // ✅ append caseId
-      form.append('configurationId', formData.contactPurpose); // ✅ append configurationId
+      form.append('caseId', formData.caseId);
+      form.append('configurationId', formData.contactPurpose);
 
       if (formData.file) {
         form.append('file', formData.file);
@@ -81,7 +115,23 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      onSubmit?.(response.data);
+      onSubmit(response.data);
+      toast.success('Successfully added caseNote');
+
+      setFormData({
+        date: dayjs(),
+        time: '',
+        notes: '',
+        contactPurpose: '',
+        subject: '',
+        toggle: false,
+        file: null,
+        caseId: caseid
+      });
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
     } catch (error) {
       console.error('Error submitting case note:', error);
     }
@@ -172,6 +222,8 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
           value={formData.notes}
           onChange={handleChange}
           sx={{ mb: 2 }}
+          inputProps={{ maxLength: 100 }}
+          error={formData.notes.length > 100}
         />
 
         <TextField
@@ -184,6 +236,8 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
           value={formData.subject}
           onChange={handleChange}
           sx={{ mb: 2 }}
+          inputProps={{ maxLength: 50 }}
+          error={formData.subject.length > 50}
         />
 
         <FormControlLabel

@@ -18,6 +18,8 @@ import OptionsPopover from 'components/AddFilter';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import { imageUrl } from 'common/urls';
+
 const UserProfileCard = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
@@ -40,9 +42,7 @@ const UserProfileCard = () => {
     const fetchUserById = async () => {
       try {
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
-        console.log(response);
-
-        const user = response?.data;
+      const user = response?.data;
 
         if (user) {
           setUserData(user);
@@ -72,9 +72,13 @@ const UserProfileCard = () => {
   const contactPreferences = userData?.contactPreferences || {};
   const otherInfo = userData?.otherInfo || {};
   const companyInformation = userData?.companyInformation || {};
+  const imagePath = userData?.otherInfo?.file;
+  const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -114,6 +118,7 @@ const UserProfileCard = () => {
   const handleSave = (data) => {
     setCaseNoteOpen(false);
   };
+
 
   return (
     <>
@@ -160,7 +165,7 @@ const UserProfileCard = () => {
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
-                  <img src={ServiceUser} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
+                  <img src={fullImageUrl} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
                   <Grid item xs>
                     <Typography component="span">
                       {personalInfo.firstName || personalInfo.lastName

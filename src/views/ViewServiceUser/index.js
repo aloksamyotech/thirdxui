@@ -18,6 +18,8 @@ import OptionsPopover from 'components/AddFilter';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import { imageUrl } from 'common/urls';
+
 const UserProfileCard = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
@@ -108,6 +110,11 @@ const UserProfileCard = () => {
   const handleSave = (data) => {
     setCaseNoteOpen(false);
   };
+
+
+  const imagePath = userData?.otherInfo?.file;
+const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
+
   return (
     <>
       <Grid item xs={12}>
@@ -154,7 +161,7 @@ const UserProfileCard = () => {
               >
                 <Grid container alignItems="center" spacing={2}>
                   <img
-                    src={ServiceUser}
+                   src={fullImageUrl}
                     alt={personalInfo?.firstName || 'User'}
                     style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
                   />

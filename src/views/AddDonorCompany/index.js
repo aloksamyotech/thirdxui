@@ -373,21 +373,6 @@ const AddCaseForm = ({ onCancel }) => {
                                     {...field}
                                   />
                                 )}
-                                rules={{
-                                  required: 'Social media link is required',
-                                  minLength: {
-                                    value: 2,
-                                    message: 'Social media link must be at least 2 characters'
-                                  },
-                                  maxLength: {
-                                    value: 50,
-                                    message: 'Social media link cannot exceed 50 characters'
-                                  },
-                                  pattern: {
-                                    value: /^(https?:\/\/)?(www\.)?([a-zA-Z0-9_-]+)(\.[a-zA-Z]{2,})+(\/[a-zA-Z0-9#]+\/?)*$/,
-                                    message: 'Please enter a valid URL'
-                                  }
-                                }}
                               />
                             </Grid>
                           </Grid>

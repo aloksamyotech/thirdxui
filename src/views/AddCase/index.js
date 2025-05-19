@@ -114,9 +114,8 @@ const AddCaseForm = () => {
   useEffect(() => {
     const fetchServices = async () => {
       const response = await getApi(urls.service.fetch);
-      if (response?.data) {
-        setServices(response.data.allService);
-      }
+
+      setServices(response?.data);
     };
     fetchServices();
   }, []);
@@ -150,7 +149,7 @@ const AddCaseForm = () => {
                       <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                         <InputLabel id="service-user-label">Service User</InputLabel>
                         <Select {...field} labelId="service-user-label" label="Service User">
-                          {rows.map((user) => (
+                          {rows?.map((user) => (
                             <MenuItem key={user.id} value={user.id}>
                               {user.name}
                             </MenuItem>
@@ -175,7 +174,7 @@ const AddCaseForm = () => {
                       <FormControl fullWidth size="small" error={!!errors.serviceId}>
                         <InputLabel id="service-label">Service</InputLabel>
                         <Select {...field} labelId="service-label" label="Service">
-                          {services.map((service) => (
+                          {services?.map((service) => (
                             <MenuItem key={service._id} value={service._id}>
                               {service.name}
                             </MenuItem>

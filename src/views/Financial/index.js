@@ -69,9 +69,6 @@ const Lead = () => {
   const navigate = useNavigate();
   const [isFiltered, setIsFiltered] = useState(false);
   const [rows, setRows] = useState([]);
-
-  const [isFiltered, setIsFiltered] = useState(false);
-  const [rows, setRows] = useState([]);
  
   const columns = [
     {

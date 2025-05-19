@@ -69,32 +69,6 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
     setFormData((prev) => ({ ...prev, toggle: e.target.checked }));
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     const form = new FormData();
-
-  //     form.append('date', formData.date?.toISOString?.() || '');
-  //     form.append('time', formData.time);
-  //     form.append('note', formData.notes);
-  //     form.append('subject', formData.subject);
-  //     form.append('isActive', formData.toggle);
-  //     form.append('caseId', formData.caseId);
-  //     form.append('configurationId', formData.contactPurpose);
-
-  //     if (formData.file) {
-  //       form.append('file', formData.file);
-  //     }
-
-  //     const response = await postApi(urls.casenote.create, form, {
-  //       headers: { 'Content-Type': 'multipart/form-data' }
-  //     });
-
-  //     onSubmit(response.data);
-  //     toast.success('Successfully added caseNote');
-  //   } catch (error) {
-  //     console.error('Error submitting case note:', error);
-  //   }
-  // };
   const handleSubmit = async () => {
     try {
       const form = new FormData();

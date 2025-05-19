@@ -66,21 +66,21 @@ const AddCaseForm = () => {
     try {
       const formData = new FormData();
 
-      formData.append('serviceUserId', data.serviceUserId);
-      formData.append('serviceId', data.serviceId);
-      formData.append('serviceType', data.serviceType);
-      formData.append('serviceStatus', data.serviceStatus);
-      formData.append('caseOpened', data.caseOpened);
-      formData.append('caseClosed', data.caseClosed);
-      formData.append('benificiary', data.benificiary);
-      formData.append('campaigns', data.campaigns);
-      formData.append('engagement', data.engagement);
-      formData.append('fundingInterest', data.fundingInterests);
-      formData.append('fundraisingActivities', data.fundraisingActivities);
-      formData.append('description', data.description);
-      formData.append('isActive', data.isActive);
+      formData.append('serviceUserId', data.serviceUserId || '');
+      formData.append('serviceId', data.serviceId || '');
+      formData.append('serviceType', data.serviceType || '');
+      formData.append('serviceStatus', data.serviceStatus || '');
+      formData.append('caseOpened', data.caseOpened || '');
+      formData.append('caseClosed', data.caseClosed || '');
+      formData.append('benificiary', data.benificiary || '');
+      formData.append('campaigns', data.campaigns || '');
+      formData.append('engagement', data.engagement || '');
+      formData.append('fundingInterest', data.fundingInterests || '');
+      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      formData.append('description', data.description || '');
+      formData.append('isActive', data.isActive || '');
       if (data.file) {
-        formData.append('file', data.file);
+        formData.append('file', data.file || '');
       }
 
       const response = await postApi(urls.case.create, formData, {
@@ -122,7 +122,6 @@ const AddCaseForm = () => {
   }, []);
 
   const onlyLetters = /^[A-Za-z\s]*$/;
-  const onlyNumbers = /^[0-9]*$/;
 
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -215,56 +214,6 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                {/* <Grid item xs={12} sm={4}>
-                  <Controller
-                    name="caseOpened"
-                    control={control}
-                    rules={{ required: 'Start date is required' }}
-                    render={({ field }) => (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Date Case Opened"
-                          value={field.value}
-                          onChange={(newValue) => field.onChange(newValue)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              fullWidth
-                              size="small"
-                              error={!!errors.caseOpened}
-                              helperText={errors.caseOpened?.message}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Controller
-                    name="caseClosed"
-                    control={control}
-                    rules={{ required: 'End date is required' }}
-                    render={({ field }) => (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Date Case Closed"
-                          value={field.value}
-                          onChange={(newValue) => field.onChange(newValue)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              fullWidth
-                              size="small"
-                              error={!!errors.caseClosed}
-                              helperText={errors.caseClosed?.message}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    )}
-                  />
-                </Grid> */}
                 <Grid item xs={12} sm={4}>
                   <Controller
                     name="caseOpened"

@@ -19,17 +19,21 @@ export const urls = Object.freeze({
   },
   serviceuser: {
     create: `${baseUrl}/user/adduser`,
-    fetch: `${baseUrl}/user/getalluser`,
+   fetch: `${baseUrl}/user/getallServiceUser`,
+    getAllUser: `${baseUrl}/user/getalluser`,
     getById: `${baseUrl}/user/getUserById/:userId`,
     getAllServices: `${baseUrl}/user/getAllServices`,
     getAllVolunteer: `${baseUrl}/user/getAllVolunteer`,
     getalldonor: `${baseUrl}/user/getalldonor`,
-    getDistrict: `${baseUrl}/user/getAllUsDistricts`
+    getDistrict: `${baseUrl}/user/getAllUsDistricts`,
+    editUser:  `${baseUrl}/user/edituser`,
+    deleteUser:  `${baseUrl}/user/deleteuser`
   },
   service: {
     create: `${baseUrl}/services/addServices`,
     fetch: `${baseUrl}/services/getAllServices`,
-    getById: `${baseUrl}/services/getServiceById/:id`
+    getById: `${baseUrl}/services/getServiceById/:id`,
+    filterType: `${baseUrl}/services/search`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,
@@ -55,6 +59,7 @@ export const urls = Object.freeze({
     create: `${baseUrl}/session/addSession`,
     filter: `${baseUrl}/session/search`,
     fetch: `${baseUrl}/session/getAllSession`,
-    getById: `${baseUrl}/session/getSessionById/:id`
+    getById: `${baseUrl}/session/getSessionById/:id`,
+    update: `${baseUrl}/session/editSession/:id`
   }
 });

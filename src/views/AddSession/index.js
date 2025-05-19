@@ -7,7 +7,7 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { postApi } from 'common/apiClient';
+import { postApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -17,13 +17,16 @@ const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [countryList, setCountryList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [serviceid, setServiceid] = useState();
   const location = useLocation();
-  const serviceId = location.state?.serviceId;
+  const session = location.state.session;
+  const serviceId = session?.serviceId || location.state?.serviceId;
 
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -36,45 +39,73 @@ const AddCaseForm = ({ onCancel }) => {
       eventAttanded: '',
       fundingInterest: '',
       fundraisingActivities: '',
-      time: dayjs().format('HH:mm'), 
+      time: dayjs().format('HH:mm'),
       description: '',
       file: null
     }
   });
 
+  useEffect(() => {
+    if (session && Object.keys(session).length > 0) {
+      const formData = {
+        countryOfOrigin: session.country || '',
+        type: session.name || '',
+        date: session.date ? dayjs(session.date) : dayjs(),
+        time: session.time || dayjs().format('HH:mm'),
+        description: session.description || '',
+        benificiary: session.benificiary || '',
+        campaigns: session.campaigns || '',
+        engagement: session.engagement || '',
+        eventAttanded: session.eventAttanded || '',
+        fundingInterest: session.fundingInterest || '',
+        fundraisingActivities: session.fundraisingActivities || '',
+        serviceId: session.serviceId,
+        file: null
+      };
+
+      reset(formData);
+    }
+  }, [session, reset, serviceId]);
+
   const onSubmit = async (data) => {
     setIsLoading(true);
+    let response;
     try {
       const formData = new FormData();
 
-      formData.append('country', data.countryOfOrigin);
-      formData.append('name', data.type);
-      formData.append('date', data.date);
-      formData.append('time', data.time);
-      formData.append('description', data.description);
-      formData.append('benificiary', data.benificiary);
-      formData.append('campaigns', data.campaigns);
-      formData.append('engagement', data.engagement);
-      formData.append('eventAttanded', data.eventAttanded);
-      formData.append('fundingInterest', data.fundingInterest);
-      formData.append('fundraisingActivities', data.fundraisingActivities);
-      formData.append('serviceId', serviceId);
+      formData.append('country', data.countryOfOrigin || '');
+      formData.append('name', data.type || '');
+      formData.append('date', data.date || '');
+      formData.append('time', data.time || '');
+      formData.append('description', data.description || '');
+      formData.append('benificiary', data.benificiary || '');
+      formData.append('campaigns', data.campaigns || '');
+      formData.append('engagement', data.engagement || '');
+      formData.append('eventAttanded', data.eventAttanded || '');
+      formData.append('fundingInterest', data.fundingInterest || '');
+      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      formData.append('serviceId', serviceId || '');
 
       if (data.file) {
-        formData.append('file', data.file);
+        formData.append('file', data.file || '');
+      }
+      if (session?._id) {
+        response = await updateApi(urls.session.update.replace(':id', session._id), formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Session updated successfully');
+      } else {
+        response = await postApi(urls.session.create, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Session added successfully');
       }
 
-      const response = await postApi(urls.session.create, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      toast.success('Session added successfully');
       navigate('/services');
-      setIsLoading(false);
     } catch (error) {
-      toast.error('Error submitting session');
+      console.error('Error submitting form:', error);
+      toast.error(error.response?.data?.message || 'Error submitting session');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -327,7 +358,7 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="time"
                         control={control}
-                         rules={{ required: 'Time is required' }}
+                        rules={{ required: 'Time is required' }}
                         render={({ field }) => (
                           <TextField
                             label="Time"

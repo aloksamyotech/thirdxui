@@ -143,7 +143,7 @@ const ReferralTable = () => {
           setFormNameFilter={setFormName}
           dateAddedFilters={dateAddedFilters}
           setDateAddedFilter={setDateAddedFilter}
-          selectedFilters={['dateAddedFilter', 'formType', 'formNameFilter']}
+          selectedFilters={['formType', 'formNameFilter', 'dateAddedFilter']}
         />
         <Grid item xs={9}>
           <TableStyle>
@@ -152,7 +152,7 @@ const ReferralTable = () => {
                 <DataGrid
                   rows={referralData}
                   columns={columns}
-                  onRowClick={handleOpenDialog} 
+                  onRowClick={handleOpenDialog}
                   getRowId={(row) => row.id}
                   components={{
                     Toolbar: () => <CustomHeader />

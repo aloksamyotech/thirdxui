@@ -169,7 +169,6 @@ const UserProfile = () => {
               {sessionData?.map((session, index) => (
                 <Box
                   key={index}
-                  onClick={() => navigate('/view-session')}
                   sx={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -211,6 +210,7 @@ const UserProfile = () => {
                         px: 0.5,
                         maxHeight: '50px'
                       }}
+                      onClick={() => navigate('/add-session', { state: { session } })}
                     >
                       Edit Session
                     </Button>
@@ -225,11 +225,12 @@ const UserProfile = () => {
                         px: 0.5,
                         maxHeight: '50px'
                       }}
+                      onClick={() => navigate('/attendees')}
                     >
                       Add Attendee
                     </Button>
                     <IconButton size="small">
-                      <InfoIcon fontSize="small" />
+                      <InfoIcon fontSize="small" onClick={() => navigate('/view-session')} />
                     </IconButton>
                   </Box>
                 </Box>

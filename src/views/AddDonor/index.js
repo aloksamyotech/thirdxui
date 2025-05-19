@@ -123,44 +123,43 @@ const AddDonorForm = () => {
       fd.append('file', data.file);
     }
 
-    fd.append('personalInfo[title]', data.title);
-    fd.append('personalInfo[firstName]', data.firstname);
-    fd.append('personalInfo[lastName]', data.lastname);
-    fd.append('personalInfo[gender]', data.gender);
-    fd.append('personalInfo[dateOfBirth]', data.dob);
+    fd.append('personalInfo[title]', data.title || '');
+    fd.append('personalInfo[firstName]', data.firstname || '');
+    fd.append('personalInfo[lastName]', data.lastname || '');
+    fd.append('personalInfo[gender]', data.gender || '');
+    fd.append('personalInfo[dateOfBirth]', data.dob || '');
 
-    fd.append('contactInfo[phone]', data.phone);
-    fd.append('contactInfo[homePhone]', data.mobilePhone);
-    fd.append('contactInfo[email]', data.email);
-    fd.append('contactInfo[addressLine1]', data.address);
-    fd.append('contactInfo[addressLine2]', data.address2);
-    fd.append('contactInfo[district]', data.district);
-    fd.append('contactInfo[postcode]', data.pinCode);
-    fd.append('contactInfo[country]', data.country);
+    fd.append('contactInfo[phone]', data.phone || '');
+    fd.append('contactInfo[homePhone]', data.mobilePhone || '');
+    fd.append('contactInfo[email]', data.email || '');
+    fd.append('contactInfo[addressLine1]', data.address || '');
+    fd.append('contactInfo[addressLine2]', data.address2 || '');
+    fd.append('contactInfo[district]', data.district || '');
+    fd.append('contactInfo[postcode]', data.pinCode || '');
+    fd.append('contactInfo[country]', data.country || '');
+    fd.append('otherInfo[description]', data.riskNotes || '');
+    fd.append('otherInfo[benificiary]', data.Beneficiary || '');
+    fd.append('otherInfo[campaigns]', data.campaigns || '');
+    fd.append('otherInfo[engagement]', data.engagement || '');
+    fd.append('otherInfo[eventAttanded]', data.eventsAttended || '');
+    fd.append('otherInfo[fundingInterest]', data.fundingInterests || '');
+    fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
+    fd.append('otherInfo[restrictAccess]', restrictAccess || '');
 
-    fd.append('otherInfo[description]', data.riskNotes);
-    fd.append('otherInfo[benificiary]', data.Beneficiary);
-    fd.append('otherInfo[campaigns]', data.campaigns);
-    fd.append('otherInfo[engagement]', data.engagement);
-    fd.append('otherInfo[eventAttanded]', data.eventsAttended);
-    fd.append('otherInfo[fundingInterest]', data.fundingInterests);
-    fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities);
-    fd.append('otherInfo[restrictAccess]', restrictAccess);
+    fd.append('contactPreferences[preferredMethod]', data.preferredContact || '');
+    fd.append('contactPreferences[contactPurposes]', data.contactPurpose || '');
+    fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
+    fd.append('contactPreferences[reason]', data.reason || '');
+    fd.append('contactPreferences[email]', data.contactemail || '');
+    fd.append('contactPreferences[phone]', data.contactNo || '');
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent || '');
+    fd.append('contactPreferences[contactMethods][donor]', data.donortag || '');
+    fd.append('contactPreferences[contactMethods][sms]', data.sms || '');
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp || '');
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone || '');
 
-    fd.append('contactPreferences[preferredMethod]', data.preferredContact);
-    fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
-    fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate);
-    fd.append('contactPreferences[reason]', data.reason);
-    fd.append('contactPreferences[email]', data.contactemail);
-    fd.append('contactPreferences[phone]', data.contactNo);
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent);
-    fd.append('contactPreferences[contactMethods][donor]', data.donortag);
-    fd.append('contactPreferences[contactMethods][sms]', data.sms);
-    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp);
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone);
-
-    fd.append('companyInformation[socialMediaLinks]', data.socialmedia);
-    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+    fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
+    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign || '');
 
     fd.append('role', 'donor');
     fd.append('subRole', 'donar_individual');
@@ -196,37 +195,40 @@ const AddDonorForm = () => {
     { label: 'Basildon Borough', value: 'basildon_borough' }
   ];
 
-  const handleTabChange = async (newValue) => {
-    if (newValue > tabIndex) {
-      const firstTabFields = [
-        'title',
-        'firstname',
-        'lastname',
-        'phone',
-        'email',
-        'gender',
-        'dob',
-        'address',
-        'country',
-        'pinCode',
-        'riskNotes',
-        'socialmedia',
-        'district'
-      ];
+  // const handleTabChange = async (newValue) => {
+  //   if (newValue > tabIndex) {
+  //     const firstTabFields = [
+  //       'title',
+  //       'firstname',
+  //       'lastname',
+  //       'phone',
+  //       'email',
+  //       'gender',
+  //       'dob',
+  //       'address',
+  //       'country',
+  //       'pinCode',
+  //       'riskNotes',
+  //       'socialmedia',
+  //       'district'
+  //     ];
 
-      try {
-        const isValid = await trigger(firstTabFields);
-        if (isValid) {
-          setTabIndex(newValue);
-        } else {
-          toast.error('Please fill all required fields before proceeding');
-        }
-      } catch (error) {
-        toast.error('Error validating form fields');
-      }
-    } else {
-      setTabIndex(newValue);
-    }
+  //     try {
+  //       const isValid = await trigger(firstTabFields);
+  //       if (isValid) {
+  //         setTabIndex(newValue);
+  //       } else {
+  //         toast.error('Please fill all required fields before proceeding');
+  //       }
+  //     } catch (error) {
+  //       toast.error('Error validating form fields');
+  //     }
+  //   } else {
+  //     setTabIndex(newValue);
+  //   }
+  // };
+  const handleTabChange = (newIndex) => {
+    setTabIndex(newIndex);
   };
 
   return (
@@ -661,20 +663,21 @@ const AddDonorForm = () => {
                                 name="district"
                                 control={control}
                                 rules={{ required: 'District is required' }}
-                                render={({ field }) => (
+                                render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
-                                    {...field}
                                     options={districts}
-                                    getOptionLabel={(option) => option.label || ''}
+                                    getOptionLabel={(option) => option?.label || ''}
+                                    isOptionEqualToValue={(option, value) => option.value === value}
+                                    value={districts.find((d) => d.value === field.value) || null}
+                                    onChange={(_, selectedOption) => field.onChange(selectedOption?.value || '')}
                                     loading={loading}
-                                    onChange={(_, value) => field.onChange(value)}
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
                                         label="Select District"
                                         size="small"
-                                        error={!!errors.district}
-                                        helperText={errors.district?.message}
+                                        error={!!error}
+                                        helperText={error?.message}
                                         InputProps={{
                                           ...params.InputProps,
                                           endAdornment: (
@@ -736,8 +739,8 @@ const AddDonorForm = () => {
                                     options={countryList}
                                     getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) => option.code === value.code}
-                                    onChange={(_, value) => field.onChange(value)}
-                                    value={field.value || null}
+                                    onChange={(_, value) => field.onChange(value?.name || '')}
+                                    value={countryList.find((c) => c.name === field.value) || null}
                                     renderOption={(props, option) => (
                                       <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
                                         <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />

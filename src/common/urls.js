@@ -59,5 +59,8 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
     update: `${baseUrl}/session/editSession/:id`
+  },
+  casenote: {
+    create: `${baseUrl}/caseNote/add`
   }
 });

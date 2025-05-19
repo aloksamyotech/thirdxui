@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
 const serviceTypeFilter = [
   { value: 'Education', label: 'Education' },
@@ -58,13 +59,13 @@ const CustomHeader = () => {
 };
 
 const Lead = () => {
+  const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
   const [rows, setRows] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
@@ -123,7 +124,6 @@ const Lead = () => {
         );
       }
     },
-
     {
       field: 'more',
       headerName: 'More',
@@ -149,22 +149,24 @@ const Lead = () => {
     try {
       const queryParams = new URLSearchParams();
 
-      if (serviceType && serviceType !== '') {
-        queryParams.append('type', serviceType);
-      }
-      if (status && status !== '') {
-        const isActive = status === 'active';
-        queryParams.append('isActive', isActive);
+      if (serviceType) queryParams.append('type', serviceType);
+      if (status) queryParams.append('status', status === 'active');
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
       }
 
-      const queryString = queryParams.toString();
-      const url = `${urls.service.filterType}${queryString ? `?${queryString}` : ''}`;
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+
+      const url = `${urls.service.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
 
-      if (response?.data) {
-        setRows(response.data.services || []);
-        setIsFiltered(true);
-      }
+      const serviceList = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setRows(serviceList);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
     } catch (error) {
       console.error('Failed to fetch filtered services:', error);
     }
@@ -180,13 +182,15 @@ const Lead = () => {
   const fetchServices = async () => {
     setLoading(true);
     try {
-      const response = await getApi(`${urls.service.fetch}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const response = await getApi(
+        `${urls.service.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
+      );
 
       const serviceList = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
       setRows(serviceList);
-      setTotalRows(pagination.total);
+      setTotalRows(pagination?.total);
     } catch (error) {
       toast.error('Error fetching data');
     } finally {
@@ -241,6 +245,8 @@ const Lead = () => {
           <TextField
             size="small"
             placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
             InputProps={{
               endAdornment: <SearchIcon />
             }}

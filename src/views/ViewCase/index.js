@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
 import dayjs from 'dayjs';
+import { imageUrl } from 'common/urls';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -187,7 +188,9 @@ const CaseDetailsPage = () => {
     }
   ];
 
-  const caseNotes = [
+const userProfile =serviceuserDetails?.otherInfo?.file
+const fullImageUrl = userProfile ? `${imageUrl}${userProfile }` : '';
+const caseNotes = [
     {
       id: 1,
       date: '08/25/2017',
@@ -376,7 +379,7 @@ const CaseDetailsPage = () => {
       </Box>
 
       <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
-      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} />
+      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userProfile={ fullImageUrl } />
     </>
   );
 };

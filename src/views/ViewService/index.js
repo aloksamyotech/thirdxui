@@ -114,8 +114,15 @@ const UserProfile = () => {
               <Grid item xs={12} md={4}>
                 <Box
                   component="img"
-                  src={loading ? Background : serviceData.file ? `${imageUrl}${serviceData.file}` : Background}
+                  // src={loading ? Background : serviceData.file ? `${imageUrl}${serviceData.file}` : Background}
+                   src={
+                      loading ? Background :
+  serviceData.file
+    ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+    : Background
+}
                   alt="Service"
+                   
                   sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
                 />
               </Grid>

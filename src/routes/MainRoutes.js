@@ -27,6 +27,7 @@ const User = Loadable(lazy(() => import('views/User')));
 const ViewService = Loadable(lazy(() => import('views/ViewService')));
 const ViewServiceUser = Loadable(lazy(() => import('views/ViewServiceUser')));
 const AddServiceUser = Loadable(lazy(() => import('views/AddServiceUser')));
+const AddUser = Loadable(lazy(() => import('views/AddUser')));
 const AddVolunteer = Loadable(lazy(() => import('views/AddVolunteer')));
 const AddService = Loadable(lazy(() => import('views/AddService')));
 const AddCase = Loadable(lazy(() => import('views/AddCase')));
@@ -69,6 +70,10 @@ const MainRoutes = {
     {
       path: 'add-serviceuser',
       element: <AddServiceUser />
+    },
+     {
+      path: 'add-user',
+      element: <AddUser />
     },
     {
       path: 'add-volunteer',

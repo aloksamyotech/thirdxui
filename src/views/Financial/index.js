@@ -8,24 +8,24 @@ import { useNavigate } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
- 
+
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
   { value: 'campaign2', label: 'Campaign 2' }
 ];
- 
+
 const dateAddedFilters = [
   { value: 'today', label: 'Today' },
   { value: 'week', label: 'Last 7 Days' },
   { value: 'month', label: 'Last 30 Days' },
   { value: 'year', label: 'Last 1 Year' }
 ];
- 
+
 const nameFilter = [
   { value: 'name1', label: 'Name 1' },
   { value: 'name2', label: 'Name 2' }
 ];
- 
+
 const CustomHeader = () => {
   return (
     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -58,7 +58,7 @@ const CustomHeader = () => {
     </Box>
   );
 };
- 
+
 const Lead = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
@@ -67,6 +67,9 @@ const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [user, setUser] = useState([]);
   const navigate = useNavigate();
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [rows, setRows] = useState([]);
+
   const [isFiltered, setIsFiltered] = useState(false);
   const [rows, setRows] = useState([]);
  
@@ -187,7 +190,7 @@ const Lead = () => {
         console.error('Failed to fetch data:', err);
       }
     };
- 
+
     fetchData();
   }, []);
  
@@ -220,7 +223,7 @@ const Lead = () => {
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
- 
+
           <TextField
             size="small"
             placeholder="Search..."
@@ -230,7 +233,7 @@ const Lead = () => {
             sx={{ width: '350px' }}
           />
         </Stack>
- 
+
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
@@ -275,5 +278,5 @@ const Lead = () => {
     </Card>
   );
 };
- 
+
 export default Lead;

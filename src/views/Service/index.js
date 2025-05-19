@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -73,21 +74,35 @@ const Lead = () => {
   });
 
   const columns = [
-    {
-      field: 'name',
-      headerName: 'Service Name',
-      flex: 1.5,
-      renderCell: (params) => (
-        <Stack>
-          <Typography variant="body1" sx={{ textTransform: 'uppercase', fontWeight: 'normal' }}>
-            {params.row.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {new Date(params.row.updatedAt).toDateString()}
-          </Typography>
-        </Stack>
-      )
-    },
+{
+  field: 'name',
+  headerName: 'Service Name',
+  flex: 1.5,
+  renderCell: (params) => (
+    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+      <Typography
+        variant="body1"
+        sx={{
+          textTransform: 'uppercase',
+          fontWeight: 'normal',
+          whiteSpace: 'normal',         
+          wordBreak: 'break-word',      
+          overflowWrap: 'break-word',
+        }}
+      >
+        {params.row.name}
+      </Typography>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{ whiteSpace: 'nowrap' }}  
+      >
+        {new Date(params.row.updatedAt).toDateString()}
+      </Typography>
+    </Stack>
+  )
+}
+,
 
     {
       field: 'type',

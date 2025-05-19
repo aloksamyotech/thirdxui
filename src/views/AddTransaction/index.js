@@ -38,8 +38,6 @@ const AddCaseForm = ({ onCancel }) => {
         transactionId: data.transactionId || ''
       };
 
-      console.log(payload);
-
       const res = await postApi(urls.transaction.create, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
@@ -57,7 +55,6 @@ const AddCaseForm = ({ onCancel }) => {
         const response = await getApi(urls.configuration.fetch);
 
         const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
-        console.log(servicetypeoption);
         setServiceType(servicetypeoption);
       } catch (error) {
         console.error('Error fetching config:', error);

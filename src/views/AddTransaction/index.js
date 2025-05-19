@@ -7,11 +7,13 @@ import { useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { urls } from 'common/urls';
-import { postApi } from 'common/apiClient';
+import { postApi, getApi } from 'common/apiClient';
+
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const fileInputRef = useRef(null);
+  const [serviceType, setServiceType] = useState([]);
 
   const {
     handleSubmit,
@@ -46,6 +48,20 @@ const AddCaseForm = ({ onCancel }) => {
       toast.error('Submission failed!');
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
+        setServiceType(servicetypeoption);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <Grid>
@@ -189,22 +205,24 @@ const AddCaseForm = ({ onCancel }) => {
                           <Controller
                             name="paymentMethod"
                             control={control}
-                            rules={{ required: 'Payment Method is required' }}
+                            rules={{
+                              required: 'Payment Method is required'
+                            }}
                             render={({ field }) => (
                               <TextField
+                                {...field}
                                 select
                                 fullWidth
-                                size="small"
                                 label="Payment Method"
-                                {...field}
-                                error={!!errors.paymentMethod}
-                                helperText={errors.paymentMethod?.message}
+                                size="small"
+                                error={!!errors.serviceType}
+                                helperText={errors.serviceType?.message}
                               >
-                                <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
-                                <MenuItem value="cash">Cash</MenuItem>
-                                <MenuItem value="credit_card">Credit Card</MenuItem>
-                                <MenuItem value="cheque">Cheque</MenuItem>
-                                <MenuItem value="online">Online</MenuItem>
+                                {serviceType?.map((option) => (
+                                  <MenuItem key={option._id} value={option._id}>
+                                    {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                  </MenuItem>
+                                ))}
                               </TextField>
                             )}
                           />
@@ -221,13 +239,10 @@ const AddCaseForm = ({ onCancel }) => {
                                 message: 'Only alphanumeric characters allowed'
                               },
                               maxLength: {
-                                value: 12,
-                                message: 'Maximum 12 characters allowed'
+                                value: 40,
+                                message: 'Maximum 40 characters allowed'
                               }
                             })}
-                            onInput={(e) => {
-                              e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12);
-                            }}
                             error={!!errors.receiptNumber}
                             helperText={errors.receiptNumber?.message}
                           />
@@ -244,13 +259,10 @@ const AddCaseForm = ({ onCancel }) => {
                                 message: 'Only alphanumeric characters allowed'
                               },
                               maxLength: {
-                                value: 12,
-                                message: 'Maximum 12 characters allowed'
+                                value: 40,
+                                message: 'Maximum 40 characters allowed'
                               }
                             })}
-                            onInput={(e) => {
-                              e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 12);
-                            }}
                             error={!!errors.transactionId}
                             helperText={errors.transactionId?.message}
                           />

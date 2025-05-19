@@ -3,8 +3,7 @@ import { Button, Card, Grid, IconButton, TextField, Tooltip, Typography } from '
 import { Box, Stack } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import CallMergeIcon from '@mui/icons-material/CallMerge';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { IconTrash } from '@tabler/icons';
 import PersonIcon from '@mui/icons-material/Person';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import InfoIcon from '@mui/icons-material/Info';
@@ -106,10 +105,11 @@ const BulkDelete = () => {
           <Button
             size="small"
             variant="outlined"
-            endIcon={<DeleteIcon />}
+            endIcon={<IconTrash  size={16}/>}
             sx={{
               color: '#ff4d4d',
               borderColor: '#ff4d4d',
+              borderRadius: '8px',
               '&:hover': {
                 backgroundColor: '#fff0f0',
                 borderColor: '#ff4d4d'

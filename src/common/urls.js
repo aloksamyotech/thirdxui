@@ -4,9 +4,6 @@ export const imageUrl = 'https://thirdex.samyotech.in/';
 // const baseUrl = 'http://localhost:7200/api/v1';
 // export const imageUrl = 'http://localhost:7200/';
 
-
-
-
 export const urls = Object.freeze({
   baseUrl,
   configuration: {
@@ -14,24 +11,25 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/config/getallconfiguration`,
     filterType: `${baseUrl}/config/filter`,
     updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`,
-    delete :`${baseUrl}/config/deleteconfiguration/:configId`,
-    updatedData :`${baseUrl}/config/updateConfigurationData/:configId`,
+    delete: `${baseUrl}/config/deleteconfiguration/:configId`,
+    updatedData: `${baseUrl}/config/updateConfigurationData/:configId`
   },
   serviceuser: {
     create: `${baseUrl}/user/adduser`,
-   fetch: `${baseUrl}/user/getallServiceUser`,
+    fetch: `${baseUrl}/user/getallServiceUser`,
     getAllUser: `${baseUrl}/user/getalluser`,
     getById: `${baseUrl}/user/getUserById/:userId`,
     getAllServices: `${baseUrl}/user/getAllServices`,
     getAllVolunteer: `${baseUrl}/user/getAllVolunteer`,
     getalldonor: `${baseUrl}/user/getalldonor`,
     getDistrict: `${baseUrl}/user/getAllUsDistricts`,
-    editUser:  `${baseUrl}/user/edituser`,
-    deleteUser:  `${baseUrl}/user/deleteuser`
+    editUser: `${baseUrl}/user/edituser`,
+    deleteUser: `${baseUrl}/user/deleteuser/:userId`
   },
   service: {
     create: `${baseUrl}/services/addServices`,
-    fetch: `${baseUrl}/services/getAllServices`,
+    fetch: `${baseUrl}/services/all`,
+    fetchWithPagination: `${baseUrl}/services/allwithpagination`,
     getById: `${baseUrl}/services/getServiceById/:id`,
     filterType: `${baseUrl}/services/search`
   },

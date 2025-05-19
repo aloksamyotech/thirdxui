@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Box, Paper, Button, MenuItem, InputAdornment, Card, Typography } from '@mui/material';
+import { Grid, TextField, Box, Paper,Autocomplete, Button, MenuItem, InputAdornment, Card, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useForm, Controller } from 'react-hook-form';
@@ -169,23 +169,54 @@ const AddCaseForm = ({ onCancel }) => {
                     name="countryOfOrigin"
                     control={control}
                     rules={{ required: 'Country is required' }}
-                    render={({ field }) => (
-                      <TextField
-                        select
-                        fullWidth
-                        label="Select a location"
-                        size="small"
-                        error={!!errors.countryOfOrigin}
-                        helperText={errors.countryOfOrigin?.message}
-                        {...field}
-                      >
-                        {countryList.map((country) => (
-                          <MenuItem key={country.code} value={country.name}>
-                            <img src={country.flag} alt={country.code} style={{ width: 20, height: 14, marginRight: 8 }} />
-                            {country.name}
-                          </MenuItem>
-                        ))}
-                      </TextField>
+                    render={({ field, fieldState: { error } }) => (
+                      <Autocomplete
+                        options={countryList}
+                        getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) => option.code === value.code}
+                        onChange={(_, value) => field.onChange(value?.name || '')}
+                        value={countryList.find((c) => c.name === field.value) || null}
+                        renderOption={(props, option) => (
+                          <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
+                            <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
+                            {option.name}
+                          </Box>
+                        )}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Select Location"
+                            size="small"
+                            error={!!error}
+                            helperText={error ? error.message : ''}
+                          />
+                        )}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'preventOverflow',
+                              options: {
+                                altBoundary: true,
+                                rootBoundary: 'viewport',
+                                tether: false
+                              }
+                            },
+                            {
+                              name: 'flip',
+                              options: {
+                                fallbackPlacements: ['bottom-start']
+                              }
+                            }
+                          ],
+                          placement: 'bottom-start'
+                        }}
+                        ListboxProps={{
+                          style: {
+                            maxHeight: 200,
+                            overflowY: 'auto'
+                          }
+                        }}
+                      />
                     )}
                   />
                 </Grid>

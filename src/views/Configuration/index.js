@@ -7,8 +7,7 @@ import AntSwitch from 'components/AntSwitch';
 import { postApi, getApi, updateApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { IconTrash, IconPencil } from '@tabler/icons';
 
 const defaultTabTypes = [
   'Contact Types',
@@ -43,9 +42,7 @@ const TabbedDataGrid = () => {
     setToggleValue(item.status);
     setEditMode(true);
     setEditId(item.id);
-    const sectionName = Object.entries(tabData).find(([_, items]) => 
-      items.some(configItem => configItem.id === item.id)
-    )?.[0];
+    const sectionName = Object.entries(tabData).find(([_, items]) => items.some((configItem) => configItem.id === item.id))?.[0];
     setModalSection(sectionName);
     setOpenModal(true);
   };
@@ -141,7 +138,9 @@ const TabbedDataGrid = () => {
       const filteredData = res?.data || [];
 
       const filteredByStatus =
-        statusFilterVal !== '' ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false')) : filteredData;
+        statusFilterVal !== ''
+          ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false'))
+          : filteredData;
 
       const grouped = {
         [type]: filteredByStatus.map((item) => ({
@@ -358,28 +357,12 @@ const TabbedDataGrid = () => {
                           </Typography>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
-                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
-                            <IconButton
-                              onClick={() => handleEdit(item)}
-                              sx={{
-                                backgroundColor: 'transparent',
-                                color: '#FF5C5C',
-                                width: 28,
-                                height: 28
-                              }}
-                            >
-                              <EditIcon sx={{ fontSize: 18 }} />
+                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />&nbsp;
+                            <IconButton onClick={() => handleEdit(item)}>
+                              <IconPencil color="orangered" size={18} />
                             </IconButton>
-                            <IconButton
-                              onClick={() => handleDelete(item.id)}
-                              sx={{
-                                backgroundColor: 'transparent',
-                                color: '#FF5C5C',
-                                width: 28,
-                                height: 28
-                              }}
-                            >
-                              <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
+                            <IconButton onClick={() => handleDelete(item.id)}>
+                              <IconTrash color="orangered" size={18} />
                             </IconButton>
                           </Box>
                         </Box>
@@ -422,9 +405,9 @@ const TabbedDataGrid = () => {
               error={!!inputError}
               helperText={inputError}
               sx={{ mb: 2 }}
-              inputProps={{ 
+              inputProps={{
                 maxLength: 25,
-                style: { 
+                style: {
                   whiteSpace: 'pre-wrap',
                   wordWrap: 'break-word'
                 }

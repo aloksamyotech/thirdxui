@@ -379,7 +379,7 @@ const TabbedDataGrid = () => {
           </Grid>
         </Grid>
 
-        <Modal open={openModal} onClose={handleCloseModal}>
+        {/* <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{
               position: 'absolute',
@@ -429,7 +429,112 @@ const TabbedDataGrid = () => {
               </Button>
             </Box>
           </Box>
-        </Modal>
+        </Modal> */}
+
+
+<Modal open={openModal} onClose={handleCloseModal}>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: '#fff',
+      p: 3,
+      borderRadius: '12px',
+      boxShadow: 24,
+    }}
+  >
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+     <TextField
+  placeholder="New item"
+  value={inputValue}
+  onChange={handleInputChange}
+  error={!!inputError}
+  helperText={inputError}
+  inputProps={{
+    maxLength: 25,
+    style: {
+      fontSize: '14px',
+      padding: '10px 12px',
+    },
+  }}
+  sx={{
+    width: '65%',
+    '& .MuiInputBase-root': {
+      height: '40px', // Adjusted height
+      fontSize: '14px',
+    },
+    '& .MuiOutlinedInput-input': {
+      padding: '0 12px',
+    },
+  }}
+  variant="outlined"
+/>
+
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
+        <Typography sx={{ fontSize: '14px', mb: 0.5 }}>Active Or Inactive?</Typography>
+        <AntSwitch
+          checked={toggleValue}
+          onChange={(e) => setToggleValue(e.target.checked)}
+        />
+      </Box>
+    </Box>
+
+   <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+  <Button
+    variant="contained"
+    sx={{
+      backgroundColor: '#053146',
+      borderRadius: '8px',
+      width: '50%',
+      height: '45px',
+      fontWeight: 'bold',
+      fontSize: '14px',
+      textTransform: 'none',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      '&:hover': {
+        backgroundColor: '#031e2a',
+      },
+    }}
+    onClick={handleSaveConfiguration}
+  >
+    {editMode ? 'UPDATE' : 'SAVE CHANGES'}
+  </Button>
+
+  <Button
+    variant="outlined"
+    sx={{
+      borderColor: '#c0aaff',
+      color: '#7e57c2',
+      borderRadius: '8px',
+      width: '50%',
+      height: '45px',
+      fontWeight: 'bold',
+      fontSize: '14px',
+      textTransform: 'none',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      '&:hover': {
+        borderColor: '#b39ddb',
+        backgroundColor: '#f3e5f5',
+      },
+    }}
+    onClick={handleCloseModal}
+  >
+    CANCEL
+  </Button>
+</Box>
+
+  </Box>
+</Modal>
+
+        
       </Grid>
     </>
   );

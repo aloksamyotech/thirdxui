@@ -60,6 +60,6 @@ export const urls = Object.freeze({
     filter: `${baseUrl}/session/search`,
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
-    update: `${baseUrl}/session/updateSession/:id`
+    update: `${baseUrl}/session/editSession/:id`
   }
 });

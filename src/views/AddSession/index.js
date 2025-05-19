@@ -7,7 +7,7 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { postApi, updateApiPatch } from 'common/apiClient';
+import { postApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -90,7 +90,7 @@ const AddCaseForm = ({ onCancel }) => {
         formData.append('file', data.file || '');
       }
       if (session?._id) {
-        response = await updateApiPatch(urls.session.update.replace(':id', session._id), formData, {
+        response = await updateApi(urls.session.update.replace(':id', session._id), formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         toast.success('Session updated successfully');

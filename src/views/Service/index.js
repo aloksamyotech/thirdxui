@@ -63,8 +63,14 @@ const Lead = () => {
   const [status, setStatus] = useState('');
   const [rows, setRows] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const columns = [
     {
@@ -172,20 +178,25 @@ const Lead = () => {
   };
 
   const fetchServices = async () => {
+    setLoading(true);
     try {
-      const response = await getApi(urls.service.fetch);
-      console.log('All Services:', response.data.allService);
-      if (response?.data) {
-        setRows(response.data.allService || []);
-      }
+      const response = await getApi(`${urls.service.fetch}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+
+      const serviceList = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setRows(serviceList);
+      setTotalRows(pagination.total);
     } catch (error) {
-      console.error('Failed to fetch services:', error);
+      toast.error('Error fetching data');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [paginationModel]);
 
   useEffect(() => {
     if (serviceType || status || searchQuery || isFiltered) {
@@ -259,12 +270,24 @@ const Lead = () => {
               <Box width="100%">
                 <Card style={{ height: 'auto' }}>
                   <DataGrid
-                    rows={rows}
+                    rows={
+                      loading
+                        ? []
+                        : rows.map((row, index) => ({
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
+                    }
                     columns={columns}
+                    rowCount={totalRows}
+                    loading={loading}
+                    pagination
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    pageSizeOptions={[10]}
                     rowHeight={65}
                     getRowId={(row) => row._id}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10]}
                     components={{
                       Toolbar: () => <CustomHeader />
                     }}

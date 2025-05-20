@@ -21,14 +21,27 @@ import { urls } from 'common/urls';
 import { updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 
-const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
+const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
 
   const handleOptionClick = (label) => {
     if (label === 'Edit') {
-      navigate('/add-serviceuser', { state: data });
+      switch (data?.subRole) {
+        case 'donar_individual':
+          navigate('/add-donor', { state: data });
+          break;
+        case 'donar_company':
+          navigate('/add-donorCompany', { state: data });
+          break;
+        case 'donar_group':
+          navigate('/add-donorCompany', { state: data });
+          break;
+        default:
+          toast.error('Unknown donor type');
+          return;
+      }
       onClose();
     } else if (label === 'Delete') {
       setConfirmOpen(true);
@@ -42,10 +55,10 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const handleConfirmDelete = async () => {
     try {
       await updateApi(`${urls.serviceuser.deleteUser}/${data?._id}`);
-      toast.success('Service user deleted successfully!');
+      toast.success('Donor user deleted successfully!');
       setConfirmOpen(false);
       onClose();
-      navigate('/people');
+      navigate('/donor');
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error('Failed to delete the user.');
@@ -55,10 +68,10 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const handleConfirmArchive = async () => {
     try {
       await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
-      toast.success('Service user archived successfully!');
+      toast.success('Donor user archived successfully!');
       setConfirmArchiveOpen(false);
       onClose();
-      navigate('/people');
+      navigate('/donor');
     } catch (error) {
       console.error('Error archiving user:', error);
       toast.error('Failed to archive the user.');
@@ -68,7 +81,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const options = [
     { label: 'Edit', icon: <EditIcon /> },
     { label: 'Archive', icon: <ArchiveIcon /> },
-    { label: 'Merge', icon: <MergeTypeIcon /> },
+    { label: 'Merge', icon: <MergeTypeIcon /> }, 
     { label: 'Delete', icon: <DeleteIcon /> }
   ];
 
@@ -95,7 +108,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this user?
+          Are you sure you want to delete ?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} variant="outlined">
@@ -111,7 +124,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
         <DialogContent>
-          Are you sure you want to archive?
+          Are you sure you want to archive this user?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmArchiveOpen(false)} variant="outlined">
@@ -126,4 +139,4 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   );
 };
 
-export default OptionsPopover;
+export default OptionsPopoverDonor;

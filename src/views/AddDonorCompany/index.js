@@ -39,6 +39,7 @@ const AddCaseForm = ({ onCancel }) => {
   const fileInputRef = React.useRef(null);
   const location = useLocation();
   const subRole = location.state?.subRole;
+  const editdata = location.state;
 
   const {
     register,
@@ -52,38 +53,52 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-      title: '',
-      firstname: '',
-      lastname: '',
-      phone: '',
-      email: '',
-      gender: '',
-      dob: null,
-      address: '',
-      town: '',
-      country: '',
-      pinCode: '',
-      riskNotes: '',
-      keyIndicators: '',
-      service: '',
-      fromDate: null,
-      toDate: null,
-      referDate: null,
-      referrerName: '',
-      referrerJob: '',
-      referrerAddress: '',
-      referrerEmail: '',
-      referrerPhone: '',
-      referralType: '',
-      telephone: true,
-      emailConsent: true,
-      sms: true,
-      donortag: true,
-      whatsapp: true,
-      preferredContact: '',
-      reason: '',
-      contactPurpose: '',
-      confirmationDate: null
+         title: editdata?.personalInfo?.title || '',
+      firstname: editdata?.personalInfo?.firstName || '',
+      lastname: editdata?.personalInfo?.lastName || '',
+      phone: editdata?.contactInfo?.phone || '',
+      mobilePhone: editdata?.contactInfo?.homePhone || '',
+      email: editdata?.contactInfo?.email || '',
+      gender: editdata?.personalInfo?.gender || '',
+      dob: editdata?.personalInfo?.dob ? dayjs(editdata.personalInfo.dob) : null,
+      address: editdata?.contactInfo?.address || '',
+      town: editdata?.contactInfo?.town || '',
+      country: editdata?.contactInfo?.country || '',
+      pinCode: editdata?.contactInfo?.pinCode || '',
+      riskNotes: editdata?.otherInfo?.description || '',
+      keyIndicators: editdata?.otherInfo?.keyIndicators || '',
+      service: editdata?.otherInfo?.service || '',
+      fromDate: editdata?.otherInfo?.fromDate ? dayjs(editdata.otherInfo.fromDate) : null,
+      toDate: editdata?.otherInfo?.toDate ? dayjs(editdata.otherInfo.toDate) : null,
+      referDate: editdata?.otherInfo?.referDate ? dayjs(editdata.otherInfo.referDate) : null,
+      referrerName: editdata?.referrer?.name || '',
+      referrerJob: editdata?.referrer?.job || '',
+      referrerAddress: editdata?.referrer?.address || '',
+      referrerEmail: editdata?.referrer?.email || '',
+      referrerPhone: editdata?.referrer?.phone || '',
+      referralType: editdata?.referrer?.referralType || '',
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
+      donortag: editdata?.contactPreferences?.contactMethods?.donortag ?? true,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
+      reason: editdata?.contactPreferences?.reason || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation
+        ? dayjs(editdata.contactPreferences.dateOfConfirmation)
+        : null,
+      companyname: editdata?.companyInformation?.companyName || '',
+      contactname: editdata?.companyInformation?.mainContactName || '',
+      otherId: editdata?.companyInformation?.otherId || '',
+      socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      Beneficiary: editdata?.otherInfo?.benificiary || '',
+      Campaigns: editdata?.otherInfo?.campaigns || '',
+      engagement: editdata?.otherInfo?.engagement || '',
+      eventsAttended: editdata?.otherInfo?.eventAttanded || '',
+      fundingInterests: editdata?.otherInfo?.fundingInterest || '',
+      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || ''
     }
   });
 
@@ -158,12 +173,19 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('role', 'donor');
     fd.append('subRole', subRole);
 
-    try {
-      const response = await postApi(urls.serviceuser.create, fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+
+      try {
+       if (editdata) {
+      // ✅ EDIT user
+      await postApi(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
+    } else {
+      // ✅ CREATE user
+      await postApi(urls.serviceuser.create, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    }
       toast.success(
         subRole === 'donar_group'
           ? 'Donor group added successfully!'
@@ -220,9 +242,26 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">
-            {subRole === 'donar_company' ? 'Add Donor Company' : subRole === 'donar_group' ? 'Add Donor Group' : 'Add Donor'}
-          </Typography>
+    {/* <Typography variant="h4">
+  {editdata
+    ? subRole === 'donar_company'
+      ? 'Edit Donor Company'
+      : subRole === 'donar_group'
+      ? 'Edit Donor Group'
+      : 'Edit Donor'
+    : subRole === 'donar_company'
+    ? 'Add Donor Company'
+    : subRole === 'donar_group'
+    ? 'Add Donor Group'
+    : 'Add Donor'}
+</Typography> */}
+
+  <Typography variant="h4">
+  {editdata ? 'Edit Donor' : 'Add Donor'}
+</Typography>
+
+
+
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />

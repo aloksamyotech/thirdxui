@@ -18,6 +18,8 @@ import OptionsPopover from 'components/AddFilter';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import OptionsPopoverDonor from 'components/PopoverDoner';
+
 import { imageUrl } from 'common/urls';
 
 const UserProfileCard = () => {
@@ -536,7 +538,7 @@ const UserProfileCard = () => {
         </Grid>
       </Card>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} />
+      <OptionsPopoverDonor open={open} anchorEl={anchorEl} onClose={handleClose} data={userData}/>
     </>
   );
 };

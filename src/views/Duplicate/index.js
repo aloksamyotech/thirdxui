@@ -4,7 +4,7 @@ import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { IconTrash } from '@tabler/icons';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -153,10 +153,28 @@ const Duplicate = () => {
                 }}
               />
               <Stack direction="row" justifyContent="flex-end" spacing={2} p={2}>
-                <Button size="small" variant="outlined" endIcon={<CallMergeIcon />} sx={{ color: '#fdc250', borderColor: '#fdc250' }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  endIcon={<CallMergeIcon />}
+                  sx={{
+                    color: 'black',
+                    borderColor: 'black',
+                    borderRadius: '8px'
+                  }}
+                >
                   Merge
                 </Button>
-                <Button size="small" variant="outlined" endIcon={<DeleteIcon />} sx={{ color: '#ff918d', borderColor: '#ff918d' }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  endIcon={<IconTrash size={16} />}
+                  sx={{
+                    color: 'red',
+                    borderColor: 'red',
+                    borderRadius: '8px'
+                  }}
+                >
                   Delete
                 </Button>
               </Stack>

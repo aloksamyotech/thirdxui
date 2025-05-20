@@ -7,8 +7,7 @@ import AntSwitch from 'components/AntSwitch';
 import { postApi, getApi, updateApi, deleteApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { IconTrash, IconPencil } from '@tabler/icons';
 
 const defaultTabTypes = [
   'Contact Types',
@@ -43,9 +42,7 @@ const TabbedDataGrid = () => {
     setToggleValue(item.status);
     setEditMode(true);
     setEditId(item.id);
-    const sectionName = Object.entries(tabData).find(([_, items]) => 
-      items.some(configItem => configItem.id === item.id)
-    )?.[0];
+    const sectionName = Object.entries(tabData).find(([_, items]) => items.some((configItem) => configItem.id === item.id))?.[0];
     setModalSection(sectionName);
     setOpenModal(true);
   };
@@ -141,7 +138,9 @@ const TabbedDataGrid = () => {
       const filteredData = res?.data || [];
 
       const filteredByStatus =
-        statusFilterVal !== '' ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false')) : filteredData;
+        statusFilterVal !== ''
+          ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false'))
+          : filteredData;
 
       const grouped = {
         [type]: filteredByStatus.map((item) => ({
@@ -358,28 +357,12 @@ const TabbedDataGrid = () => {
                           </Typography>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
-                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
-                            <IconButton
-                              onClick={() => handleEdit(item)}
-                              sx={{
-                                backgroundColor: 'transparent',
-                                color: '#FF5C5C',
-                                width: 28,
-                                height: 28
-                              }}
-                            >
-                              <EditIcon sx={{ fontSize: 18 }} />
+                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />&nbsp;
+                            <IconButton onClick={() => handleEdit(item)}>
+                              <IconPencil color="orangered" size={18} />
                             </IconButton>
-                            <IconButton
-                              onClick={() => handleDelete(item.id)}
-                              sx={{
-                                backgroundColor: 'transparent',
-                                color: '#FF5C5C',
-                                width: 28,
-                                height: 28
-                              }}
-                            >
-                              <DeleteOutlineOutlinedIcon sx={{ fontSize: 18 }} />
+                            <IconButton onClick={() => handleDelete(item.id)}>
+                              <IconTrash color="orangered" size={18} />
                             </IconButton>
                           </Box>
                         </Box>
@@ -396,7 +379,7 @@ const TabbedDataGrid = () => {
           </Grid>
         </Grid>
 
-        <Modal open={openModal} onClose={handleCloseModal}>
+        {/* <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{
               position: 'absolute',
@@ -422,9 +405,9 @@ const TabbedDataGrid = () => {
               error={!!inputError}
               helperText={inputError}
               sx={{ mb: 2 }}
-              inputProps={{ 
+              inputProps={{
                 maxLength: 25,
-                style: { 
+                style: {
                   whiteSpace: 'pre-wrap',
                   wordWrap: 'break-word'
                 }
@@ -446,7 +429,112 @@ const TabbedDataGrid = () => {
               </Button>
             </Box>
           </Box>
-        </Modal>
+        </Modal> */}
+
+
+<Modal open={openModal} onClose={handleCloseModal}>
+  <Box
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: '#fff',
+      p: 3,
+      borderRadius: '12px',
+      boxShadow: 24,
+    }}
+  >
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+     <TextField
+  placeholder="New item"
+  value={inputValue}
+  onChange={handleInputChange}
+  error={!!inputError}
+  helperText={inputError}
+  inputProps={{
+    maxLength: 25,
+    style: {
+      fontSize: '14px',
+      padding: '10px 12px',
+    },
+  }}
+  sx={{
+    width: '65%',
+    '& .MuiInputBase-root': {
+      height: '40px', // Adjusted height
+      fontSize: '14px',
+    },
+    '& .MuiOutlinedInput-input': {
+      padding: '0 12px',
+    },
+  }}
+  variant="outlined"
+/>
+
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
+        <Typography sx={{ fontSize: '14px', mb: 0.5 }}>Active Or Inactive?</Typography>
+        <AntSwitch
+          checked={toggleValue}
+          onChange={(e) => setToggleValue(e.target.checked)}
+        />
+      </Box>
+    </Box>
+
+   <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+  <Button
+    variant="contained"
+    sx={{
+      backgroundColor: '#053146',
+      borderRadius: '8px',
+      width: '50%',
+      height: '45px',
+      fontWeight: 'bold',
+      fontSize: '14px',
+      textTransform: 'none',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      '&:hover': {
+        backgroundColor: '#031e2a',
+      },
+    }}
+    onClick={handleSaveConfiguration}
+  >
+    {editMode ? 'UPDATE' : 'SAVE CHANGES'}
+  </Button>
+
+  <Button
+    variant="outlined"
+    sx={{
+      borderColor: '#c0aaff',
+      color: '#7e57c2',
+      borderRadius: '8px',
+      width: '50%',
+      height: '45px',
+      fontWeight: 'bold',
+      fontSize: '14px',
+      textTransform: 'none',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      '&:hover': {
+        borderColor: '#b39ddb',
+        backgroundColor: '#f3e5f5',
+      },
+    }}
+    onClick={handleCloseModal}
+  >
+    CANCEL
+  </Button>
+</Box>
+
+  </Box>
+</Modal>
+
+        
       </Grid>
     </>
   );

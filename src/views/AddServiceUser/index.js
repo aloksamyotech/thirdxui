@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
   MenuItem,
-  IconButton,
   Card,
   CardHeader,
   CardContent,
@@ -45,90 +44,89 @@ const AddCaseForm = ({ onCancel }) => {
   const location = useLocation();
   const editdata = location.state;
 
- const {
-  register,
-  handleSubmit,
-  control,
-  setValue,
-  watch,
-  reset,
-  trigger,
-  formState: { errors }
-} = useForm({
-  mode: 'all',
-  defaultValues: {
-    personalInfo: {
-      title: editdata?.personalInfo?.title || '',
-      firstName: editdata?.personalInfo?.firstName || '',
-      lastName: editdata?.personalInfo?.lastName || '',
-      nickName: editdata?.personalInfo?.nickName || '',
-      gender: editdata?.personalInfo?.gender || '',
-      dateOfBirth: editdata?.personalInfo?.dateOfBirth || null,
-      ethnicity: editdata?.personalInfo?.ethnicity || ''
-    },
-    phone: editdata?.contactInfo?.homePhone || '',
-    mobilePhone: editdata?.contactInfo?.phone || '',
-    email: editdata?.contactInfo?.email || '',
-    address: editdata?.contactInfo?.addressLine1 || '',
-    address2: editdata?.contactInfo?.addressLine2 || '',
-    town: editdata?.contactInfo?.town || '',
-    district: editdata?.contactInfo?.district || '',
-    pinCode: editdata?.contactInfo?.postcode || '',
-    country: editdata?.contactInfo?.country || '',
-    language: editdata?.contactInfo?.firstLanguage || '',
-    otherId: editdata?.contactInfo?.otherId || '',
-    riskNotes: editdata?.otherInfo?.description || '',
-    Beneficiary: editdata?.otherInfo?.benificiary || '',
-    Campaigns: editdata?.otherInfo?.campaigns || '',
-    engagement: editdata?.otherInfo?.engagement || '',
-    eventsAttended: editdata?.otherInfo?.eventAttanded || '',
-    fundingInterests: editdata?.otherInfo?.fundingInterest || '',
-    fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
-    restrictAccess: editdata?.otherInfo?.restrictAccess || false,
-      title: editdata?.emergencyContact?.title || '', 
-      gender:editdata?.emergencyContact?.gender || '', 
-    firstname: editdata?.emergencyContact?.firstName || '',
-    lastname: editdata?.emergencyContact?.lastName || '',
-    preferred: editdata?.emergencyContact?.relationshipToUser || '',
-    emergencyhomePhone: editdata?.emergencyContact?.homePhone || '',
-    emergencyphone: editdata?.emergencyContact?.phone || '',
-    emergencyemail: editdata?.emergencyContact?.email || '',
-    emergencyaddress: editdata?.emergencyContact?.addressLine1 || '',
-    emergencyaddress2: editdata?.emergencyContact?.addressLine2 || '',
-    emergencytown: editdata?.emergencyContact?.town || '',
-    emergencypinCode: editdata?.emergencyContact?.postcode || '',
-    emergencycountry: editdata?.emergencyContact?.country || '',
-    preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-    reason: editdata?.contactPreferences?.reason || '',
-    contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
-    confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-    telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
-    emailConsent: editdata?.contactPreferences?.contactMethods?.email || true,
-    sms: editdata?.contactPreferences?.contactMethods?.sms || true,
-    whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp || true
-  }
-});
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    reset,
+    trigger,
+    formState: { errors }
+  } = useForm({
+    mode: 'all',
+    defaultValues: {
+      personalInfo: {
+        title: editdata?.personalInfo?.title || '',
+        firstName: editdata?.personalInfo?.firstName || '',
+        lastName: editdata?.personalInfo?.lastName || '',
+        nickName: editdata?.personalInfo?.nickName || '',
+        gender: editdata?.personalInfo?.gender || '',
+        dateOfBirth: editdata?.personalInfo?.dateOfBirth || null,
+        ethnicity: editdata?.personalInfo?.ethnicity || ''
+      },
+      phone: editdata?.contactInfo?.homePhone || '',
+      mobilePhone: editdata?.contactInfo?.phone || '',
+      email: editdata?.contactInfo?.email || '',
+      address: editdata?.contactInfo?.addressLine1 || '',
+      address2: editdata?.contactInfo?.addressLine2 || '',
+      town: editdata?.contactInfo?.town || '',
+      district: editdata?.contactInfo?.district || '',
+      pinCode: editdata?.contactInfo?.postcode || '',
+      country: editdata?.contactInfo?.country || '',
+      language: editdata?.contactInfo?.firstLanguage || '',
+      otherId: editdata?.contactInfo?.otherId || '',
+      riskNotes: editdata?.otherInfo?.description || '',
+      Beneficiary: editdata?.otherInfo?.benificiary || '',
+      Campaigns: editdata?.otherInfo?.campaigns || '',
+      engagement: editdata?.otherInfo?.engagement || '',
+      eventsAttended: editdata?.otherInfo?.eventAttanded || '',
+      fundingInterests: editdata?.otherInfo?.fundingInterest || '',
+      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
+      restrictAccess: editdata?.otherInfo?.restrictAccess || false,
+      title: editdata?.emergencyContact?.title || '',
+      gender: editdata?.emergencyContact?.gender || '',
+      firstname: editdata?.emergencyContact?.firstName || '',
+      lastname: editdata?.emergencyContact?.lastName || '',
+      preferred: editdata?.emergencyContact?.relationshipToUser || '',
+      emergencyhomePhone: editdata?.emergencyContact?.homePhone || '',
+      emergencyphone: editdata?.emergencyContact?.phone || '',
+      emergencyemail: editdata?.emergencyContact?.email || '',
+      emergencyaddress: editdata?.emergencyContact?.addressLine1 || '',
+      emergencyaddress2: editdata?.emergencyContact?.addressLine2 || '',
+      emergencytown: editdata?.emergencyContact?.town || '',
+      emergencypinCode: editdata?.emergencyContact?.postcode || '',
+      emergencycountry: editdata?.emergencyContact?.country || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
+      reason: editdata?.contactPreferences?.reason || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email || true,
+      sms: editdata?.contactPreferences?.contactMethods?.sms || true,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp || true
+    }
+  });
 
-const ethnicityOptions = [
-  'Arabic or North African',
-  'Asian or Asian British – Indian',
-  'Asian – Pakistani',
-  'Asian – Bangladeshi',
-  'Asian – Any other Asian background',
-  'Black – Caribbean',
-  'Black – African',
-  'Black – Any other Black background',
-  'Mixed – White and Black Caribbean',
-  'Mixed – White and Black African',
-  'Mixed – White and Asian',
-  'Mixed – Other',
-  'Chinese',
-  'White – British',
-  'White – Irish',
-  'White – Other',
-  'Unknown'
-];
-
+  const ethnicityOptions = [
+    'Arabic or North African',
+    'Asian or Asian British – Indian',
+    'Asian – Pakistani',
+    'Asian – Bangladeshi',
+    'Asian – Any other Asian background',
+    'Black – Caribbean',
+    'Black – African',
+    'Black – Any other Black background',
+    'Mixed – White and Black Caribbean',
+    'Mixed – White and Black African',
+    'Mixed – White and Asian',
+    'Mixed – Other',
+    'Chinese',
+    'White – British',
+    'White – Irish',
+    'White – Other',
+    'Unknown'
+  ];
 
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
@@ -232,24 +230,22 @@ const ethnicityOptions = [
     fd.append('isActive', true);
 
     if (formData.file) {
-      fd.append('file', formData.file || '');
+  fd.append('file', formData.file || '');
     }
 
     try {
-       if (editdata) {
-      // ✅ EDIT user
-      await postApi(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success('Service user updated successfully!');
-    } else {
-      // ✅ CREATE user
-      await postApi(urls.serviceuser.create, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success('Service user added successfully!');
-    }
-  
+      if (editdata) {
+        await postApi(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service user updated successfully!');
+      } else {
+        await postApi(urls.serviceuser.create, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service user added successfully!');
+      }
+
       setIsloading(false);
       navigate('/people');
     } catch (error) {
@@ -337,10 +333,7 @@ const ethnicityOptions = [
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-         <Typography variant="h4">
-  {editdata ? 'Edit Service User' : 'Add New Service User'}
-</Typography>
-
+          <Typography variant="h4">{editdata ? 'Edit Service User' : 'Add New Service User'}</Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/people')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />
@@ -573,57 +566,56 @@ const ethnicityOptions = [
                               />
                             </Grid>
 
-                        <Grid item xs={12}>
-  <Controller
-    name="personalInfo.ethnicity"
-    control={control}
-    rules={{ required: 'Ethnicity is required' }}
-    render={({ field, fieldState: { error } }) => (
-      <Autocomplete
-        options={ethnicityOptions}
-        getOptionLabel={(option) => option}
-        onChange={(_, value) => field.onChange(value)}
-        value={field.value || null}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Ethnicity"
-            size="small"
-            error={!!error}
-            helperText={error ? error.message : ''}
-            fullWidth
-          />
-        )}
-        PopperProps={{
-          modifiers: [
-            {
-              name: 'preventOverflow',
-              options: {
-                altBoundary: true,
-                rootBoundary: 'viewport',
-                tether: false
-              }
-            },
-            {
-              name: 'flip',
-              options: {
-                fallbackPlacements: ['bottom-start']
-              }
-            }
-          ],
-          placement: 'bottom-start'
-        }}
-        ListboxProps={{
-          style: {
-            maxHeight: 200,
-            overflowY: 'auto'
-          }
-        }}
-      />
-    )}
-  />
-</Grid>
-
+                            <Grid item xs={12}>
+                              <Controller
+                                name="personalInfo.ethnicity"
+                                control={control}
+                                rules={{ required: 'Ethnicity is required' }}
+                                render={({ field, fieldState: { error } }) => (
+                                  <Autocomplete
+                                    options={ethnicityOptions}
+                                    getOptionLabel={(option) => option}
+                                    onChange={(_, value) => field.onChange(value)}
+                                    value={field.value || null}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Ethnicity"
+                                        size="small"
+                                        error={!!error}
+                                        helperText={error ? error.message : ''}
+                                        fullWidth
+                                      />
+                                    )}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'preventOverflow',
+                                          options: {
+                                            altBoundary: true,
+                                            rootBoundary: 'viewport',
+                                            tether: false
+                                          }
+                                        },
+                                        {
+                                          name: 'flip',
+                                          options: {
+                                            fallbackPlacements: ['bottom-start']
+                                          }
+                                        }
+                                      ],
+                                      placement: 'bottom-start'
+                                    }}
+                                    ListboxProps={{
+                                      style: {
+                                        maxHeight: 200,
+                                        overflowY: 'auto'
+                                      }
+                                    }}
+                                  />
+                                )}
+                              />
+                            </Grid>
                           </Grid>
                         </CardContent>
                       </Card>

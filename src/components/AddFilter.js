@@ -21,10 +21,10 @@ import { urls } from 'common/urls';
 import { updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 
-
 const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
 
   const handleOptionClick = (label) => {
     if (label === 'Edit') {
@@ -32,31 +32,43 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       onClose();
     } else if (label === 'Delete') {
       setConfirmOpen(true);
+    } else if (label === 'Archive') {
+      setConfirmArchiveOpen(true);
     } else {
       onClose();
     }
   };
 
+  const handleConfirmDelete = async () => {
+    try {
+      await updateApi(`${urls.serviceuser.deleteUser}/${data?._id}`);
+      toast.success('Service user deleted successfully!');
+      setConfirmOpen(false);
+      onClose();
+      navigate('/people');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete the user.');
+    }
+  };
 
-const handleConfirmDelete = async () => {
-  // try {
-    await updateApi(`${urls.serviceuser.deleteUser}/${data._id}`);
-    toast.success('Service user deleted successfully!');
-    setConfirmOpen(false);
-    onClose();
-    navigate('/people'); 
-  // } catch (error) {
-  //   console.error('Error deleting user:', error);
-  //   toast.error('Failed to delete the user.');
-  // }
-};
-
-
+  const handleConfirmArchive = async () => {
+    try {
+      await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
+      toast.success('Service user archived successfully!');
+      setConfirmArchiveOpen(false);
+      onClose();
+      navigate('/people');
+    } catch (error) {
+      console.error('Error archiving user:', error);
+      toast.error('Failed to archive the user.');
+    }
+  };
 
   const options = [
     { label: 'Edit', icon: <EditIcon /> },
     { label: 'Archive', icon: <ArchiveIcon /> },
-    { label: 'Merge', icon: <MergeTypeIcon /> },
+    { label: 'Merge', icon: <MergeTypeIcon /> }, // Reserved for future
     { label: 'Delete', icon: <DeleteIcon /> }
   ];
 
@@ -66,14 +78,8 @@ const handleConfirmDelete = async () => {
         open={open}
         anchorEl={anchorEl}
         onClose={onClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'center'
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center'
-        }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <List>
           {options.map((option) => (
@@ -85,10 +91,11 @@ const handleConfirmDelete = async () => {
         </List>
       </Popover>
 
+      {/* Delete Confirmation Dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this user? 
+          Are you sure you want to delete this user?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} variant="outlined">
@@ -96,6 +103,22 @@ const handleConfirmDelete = async () => {
           </Button>
           <Button onClick={handleConfirmDelete} color="error" variant="contained">
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Archive Confirmation Dialog */}
+      <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
+        <DialogContent>
+          Are you sure you want to archive this user?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmArchiveOpen(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmArchive} color="warning" variant="contained">
+            Archive
           </Button>
         </DialogActions>
       </Dialog>

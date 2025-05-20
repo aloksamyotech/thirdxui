@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider } from '@mui/material';
-import { Add as AddIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -35,13 +36,13 @@ const UserProfileCard = () => {
   const location = useLocation();
   const id = location.state.id;
   const uniqueid = location.state.serialNumber;
- 
+
   useEffect(() => {
     const fetchUserById = async () => {
       try {
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
         const user = response?.data;
-      
+
         if (user) {
           setUserData(user);
         }
@@ -111,19 +112,18 @@ const UserProfileCard = () => {
     setCaseNoteOpen(false);
   };
 
-
   const imagePath = userData?.otherInfo?.file;
-const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
+  const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
 
   return (
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
-          <Typography variant="h4" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/people')} sx={{ ml: 1 }}>
-              <ArrowBackIcon />
+          <Typography fontWeight="bold" display="flex" alignItems="center">
+            <IconButton onClick={() => navigate('/people')}>
+              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
-            PROFILE
+            Profile
           </Typography>
         </Stack>
       </Grid>
@@ -156,37 +156,39 @@ const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  p: 1
+                  p: 2
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
                   <img
-                   src={fullImageUrl}
+                    src={fullImageUrl}
                     alt={personalInfo?.firstName || 'User'}
                     style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
                   />
                   <Grid item xs>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant="body1" fontWeight={700}>
                       {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {contactInfo?.email ?? ''}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {uniqueid ?? ''} | Individual | {formattedDate ?? ''}
+                    <Typography variant="body2">{contactInfo?.email ?? ''}</Typography>
+                    <Typography variant="body2">
+                      {uniqueid ?? ''} | Individual | Added {formattedDate ?? ''}
                     </Typography>
                   </Grid>
                 </Grid>
 
                 <Box textAlign="right" sx={{ pr: 2 }}>
-                  <Button variant="contained" onClick={handleClick} sx={{ mb: 1, backgroundColor: '#00AEEF' }}>
-                    Manage
+                  <Button
+                    variant="contained"
+                    onClick={handleClick}
+                    sx={{ mb: 1, borderRadius: '6px', width: '50%', height: 'auto', fontSize: '12px', backgroundColor: '#009fc7' }}
+                  >
+                    MANAGE
                   </Button>
                   <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    Address : {contactInfo?.addressLine1 ?? ''}
+                    Address
                   </Typography>
                   <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    {`${contactInfo?.town ?? ''} ${contactInfo?.country ?? ''}`}
+                    {`${contactInfo?.addressLine1 ?? ''} ${contactInfo?.country ?? ''}`}
                   </Typography>
                 </Box>
               </CardContent>
@@ -227,8 +229,8 @@ const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
                 <Grid item xs={12} sm={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
                     <CardContent>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        About
+                      <Typography variant="h5" fontWeight="bold" gutterBottom>
+                        ABOUT
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
@@ -588,7 +590,7 @@ const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
         </Grid>
       </Card>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData}/>
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData} />
     </>
   );
 };

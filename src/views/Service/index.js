@@ -99,9 +99,10 @@ const Lead = () => {
 ,
 
     {
-      field: 'type',
+      field: 'serviceType',
       headerName: 'Service Type',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => params.row.serviceType?.name || '-'
     },
     {
       field: 'code',
@@ -176,7 +177,7 @@ const Lead = () => {
     try {
       const queryParams = new URLSearchParams();
 
-      if (serviceType) queryParams.append('type', serviceType);
+      if (serviceType) queryParams.append('serviceType', serviceType);
       if (status) queryParams.append('status', status === 'active');
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());

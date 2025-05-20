@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -44,7 +43,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const userdata = location.state;
-  const editdata = userdata?.[0] || {};
+  const editdata = userdata?.[0] || null;
 
   const {
     register,
@@ -312,21 +311,6 @@ const AddCaseForm = ({ onCancel }) => {
     2: ['preferredContact', 'reason', 'contactPurpose', 'confirmDate', 'telephone', 'emailConsent', 'sms', 'letter', 'whatsapp']
   };
 
-  // const handleTabChange = async (newIndex) => {
-  //   if (newIndex < tabIndex) {
-  //     setTabIndex(newIndex);
-  //     return;
-  //   }
-
-  //   const currentFields = tabFieldMap[tabIndex];
-  //   const isValid = await trigger(currentFields);
-
-  //   if (isValid) {
-  //     setTabIndex(newIndex);
-  //   } else {
-  //     toast.error('Please fix validation errors before continuing.');
-  //   }
-  // };
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
@@ -572,7 +556,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.ethnicity"
                                 control={control}
-                                rules={{ required: 'Ethnicity is required' }}
+                                // rules={{ required: 'Ethnicity is required' }}
                                 render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={ethnicityOptions}
@@ -634,7 +618,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="phone"
                                 control={control}
                                 rules={{
-                                  required: 'Phone number is required',
+                                  // required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -667,7 +651,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="mobilePhone"
                                 control={control}
                                 rules={{
-                                  required: 'Phone number is required',
+                                  // required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -781,7 +765,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="town"
                                 control={control}
                                 rules={{
-                                  required: 'Town is required',
+                                  // required: 'Town is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Town must be at least 2 characters'
@@ -914,7 +898,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="pinCode"
                                 control={control}
                                 rules={{
-                                  required: 'Postcode is required',
+                                  // required: 'Postcode is required',
                                   minLength: {
                                     value: 5,
                                     message: 'Postcode must be at least 5 characters'
@@ -949,7 +933,6 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="language"
                                 control={control}
                                 rules={{
-                                  required: 'This is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Last name must be at least 2 characters'
@@ -989,7 +972,6 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="otherId"
                                 control={control}
                                 rules={{
-                                  required: 'Other Id is required',
                                   minLength: {
                                     value: 3,
                                     message: 'Other Id must be at least 3 characters'
@@ -1311,7 +1293,7 @@ const AddCaseForm = ({ onCancel }) => {
                               name="riskNotes"
                               control={control}
                               rules={{
-                                required: 'Notes are required',
+                                // required: 'Notes are required',
                                 minLength: {
                                   value: 10,
                                   message: 'Notes must be at least 10 characters long'
@@ -1394,7 +1376,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="title"
                                 control={control}
-                                rules={{ required: 'Title is required' }}
+                                // rules={{ required: 'Title is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -1419,7 +1401,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="gender"
                                 control={control}
-                                rules={{ required: 'Gender is required' }}
+                                // rules={{ required: 'Gender is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -1443,7 +1425,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="firstname"
                                 control={control}
                                 rules={{
-                                  required: 'First name is required',
+                                  // required: 'First name is required',
                                   minLength: {
                                     value: 2,
                                     message: 'First name must be at least 2 characters'
@@ -1482,7 +1464,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="lastname"
                                 control={control}
                                 rules={{
-                                  required: 'Last name is required',
+                                  // required: 'Last name is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Last name must be at least 2 characters'
@@ -1521,7 +1503,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="preferred"
                                 control={control}
                                 rules={{
-                                  required: 'Relationship to service user is required',
+                                  // required: 'Relationship to service user is required',
                                   maxLength: {
                                     value: 30,
                                     message: 'Preferred known as cannot exceed 30 characters'
@@ -1556,7 +1538,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyhomePhone"
                                 control={control}
                                 rules={{
-                                  required: 'Phone number is required',
+                                  // required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -1589,7 +1571,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyphone"
                                 control={control}
                                 rules={{
-                                  required: 'Phone number is required',
+                                  // required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -1622,7 +1604,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyemail"
                                 control={control}
                                 rules={{
-                                  required: 'Email is required',
+                                  // required: 'Email is required',
                                   pattern: {
                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: 'Invalid email address'
@@ -1646,7 +1628,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyaddress"
                                 control={control}
                                 rules={{
-                                  required: 'Address is required',
+                                  // required: 'Address is required',
                                   minLength: {
                                     value: 5,
                                     message: 'Address must be at least 5 characters'
@@ -1714,9 +1696,9 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="emergencycountry"
                                 control={control}
-                                rules={{
-                                  required: 'Country is required'
-                                }}
+                                // rules={{
+                                //   required: 'Country is required'
+                                // }}
                                 render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={countryList}
@@ -1774,7 +1756,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencytown"
                                 control={control}
                                 rules={{
-                                  required: 'Town is required',
+                                  // required: 'Town is required',
                                   pattern: {
                                     value: onlyLetters,
                                     message: 'Town can only contain letters'
@@ -1806,7 +1788,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencypinCode"
                                 control={control}
                                 rules={{
-                                  required: 'Postcode is required',
+                                  // required: 'Postcode is required',
                                   minLength: {
                                     value: 5,
                                     message: 'Postcode must be at least 5 characters'
@@ -1857,9 +1839,9 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="preferredContact"
                       control={control}
-                      rules={{
-                        required: 'Preferred method of contact is required'
-                      }}
+                      // rules={{
+                      //   required: 'Preferred method of contact is required'
+                      // }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1884,9 +1866,9 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="contactPurpose"
                       control={control}
-                      rules={{
-                        required: 'Contact purpose is required'
-                      }}
+                      // rules={{
+                      //   required: 'Contact purpose is required'
+                      // }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1907,9 +1889,9 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="confirmationDate"
                       control={control}
-                      rules={{
-                        required: 'Confirmation Date is required'
-                      }}
+                      // rules={{
+                      //   required: 'Confirmation Date is required'
+                      // }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
@@ -1934,9 +1916,9 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="reason"
                       control={control}
-                      rules={{
-                        required: 'Reason is required'
-                      }}
+                      // rules={{
+                      //   required: 'Reason is required'
+                      // }}
                       render={({ field }) => (
                         <TextField
                           fullWidth

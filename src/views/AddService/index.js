@@ -15,7 +15,9 @@ const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
-  const [sevicetype, setServiceType] = useState([]);
+  const [servicetype, setServiceType] = useState([]);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -38,13 +40,13 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLetters = /^[A-Za-z\s]*$/;
 
   const handleToggle = () => setRestrictAccess(!restrictAccess);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getApi(urls.configuration.fetch);
 
         const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Service Types');
-        console.log(servicetypeoption);
         setServiceType(servicetypeoption);
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -79,22 +81,22 @@ const AddCaseForm = ({ onCancel }) => {
 
     try {
       const formData = new FormData();
-
+console.log("data::::",data);
       formData.append('name', data.homePhone || '');
       formData.append('code', data.code || '');
-      formData.append('type', data.serviceType || '');
+      formData.append('serviceType', data.serviceType || '');
       formData.append('benificiary', data.beneficiaryInformation || '');
       formData.append('campaigns', data.campaignsSupported || '');
       formData.append('engagement', data.engagement || '');
       formData.append('eventAttanded', data.eventsAttended || '');
       formData.append('fundingInterest', data.fundingInterests || '');
       formData.append('fundraisingActivities', data.fundraisingActivities || '');
-      formData.append('description', data.notes || '');
-      formData.append('restrictAccess', restrictAccess || '');
+      formData.append('description', data.notes || ''); 
+      formData.append('isActive', restrictAccess || '');
       if (data.file) {
         formData.append('file', data.file || '');
       }
-
+      console.log(formData);
       const response = await postApi(urls.service.create, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -105,7 +107,6 @@ const AddCaseForm = ({ onCancel }) => {
       navigate('/services');
       setIsloading(false);
     } catch (error) {
-      console.error('Submission error:', error);
       toast.error('Error submitting service');
       setIsloading(false);
     }
@@ -192,8 +193,8 @@ const AddCaseForm = ({ onCancel }) => {
                         error={!!errors.serviceType}
                         helperText={errors.serviceType?.message}
                       >
-                        {sevicetype?.map((option) => (
-                          <MenuItem key={option._id} value={option.name}>
+                        {servicetype?.map((option) => (
+                          <MenuItem key={option._id} value={option._id}>
                             {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
                           </MenuItem>
                         ))}
@@ -225,7 +226,6 @@ const AddCaseForm = ({ onCancel }) => {
                           name={field}
                           control={control}
                           rules={{
-                            required: `${field.replace(/([A-Z])/g, ' $1')} is required`,
                             minLength: { value: 2, message: 'Minimum 2 characters' },
                             maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
                             pattern: { value: textOnlyRegex, message: 'Only letters allowed' }

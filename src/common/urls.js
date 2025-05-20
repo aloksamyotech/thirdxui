@@ -1,4 +1,5 @@
-const baseUrl = 'https://thirdex.samyotech.in/api/v1';
+// const baseUrl = 'https://thirdex.samyotech.in/api/v1';
+const baseUrl = 'http://139.59.19.212:81/api/v1/';
 export const imageUrl = 'https://thirdex.samyotech.in/';
 
 // const baseUrl = 'http://localhost:7200/api/v1';

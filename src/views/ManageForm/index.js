@@ -123,7 +123,8 @@ const Lead = () => {
       flex: 1,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {params.value}
+          {/* {params.value} */}
+          -
         </Typography>
       )
     },
@@ -152,7 +153,7 @@ const Lead = () => {
   return (
     <>
       <Grid>
-        <AddFormModal open={openAdd} onClose={handleCloseAdd} />
+        <AddFormModal open={openAdd} onClose={handleCloseAdd} getAllForms={getAllForms} />
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
             <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>

@@ -483,11 +483,6 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                             "label": "Hindi",
                             "value": "hindi",
                             "selected": false
-                        },
-                        {
-                            "label": "Marathi",
-                            "value": "Marathi",
-                            "selected": false
                         }
                     ]
                 },
@@ -498,9 +493,24 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "name": "checkbox-group-1747390664112-0",
                     "values": [
                         {
-                            "label": "Yes",
-                            "value": "Yes",
-                            "selected": true
+                            "label": "Yes -Physical disability",
+                            "value": "Yes -Physical disability",
+                            "selected": false
+                        },
+                        {
+                            "label": "Yes - Mental Health need",
+                            "value": "Yes - Mental Health need",
+                            "selected": false
+                        },
+                        {
+                            "label": "Yes - Learning difficulties",
+                            "value": "Yes - Learning difficulties",
+                            "selected": false
+                        },
+                        {
+                            "label": "Yes - Other",
+                            "value": "Yes - Other",
+                            "selected": false
                         },
                         {
                             "label": "Prefer Not to Answer",
@@ -568,11 +578,304 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                             "selected": false
                         }
                     ]
+                },
+                {
+                    "type": "paragraph",
+                    "subtype": "p",
+                    "label": "Please let us know if we may contact you through the following channels for the purposes outlined below. You can choose your preferences by selecting the appropriate options"
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "Phone",
+                    "name": "radio-group-1747732324317-0",
+                    "values": [
+                        {
+                            "label": "News Letter",
+                            "value": "newsLetter",
+                            "selected": false
+                        },
+                        {
+                            "label": "Upcoming Event",
+                            "value": "upcomingEvent",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "Email",
+                    "name": "radio-group-1747732676617-0",
+                    "values": [
+                        {
+                            "label": "News Letter",
+                            "value": "newsLetter",
+                            "selected": false
+                        },
+                        {
+                            "label": "Upcoming Event",
+                            "value": "upcomingEvent",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "SMS",
+                    "name": "radio-group-1747732678352-0",
+                    "values": [
+                        {
+                            "label": "News Letter",
+                            "value": "newsLetter",
+                            "selected": false
+                        },
+                        {
+                            "label": "Upcoming Event",
+                            "value": "upcomingEvent",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "Letter",
+                    "name": "radio-group-1747732679740-0",
+                    "values": [
+                        {
+                            "label": "News Letter",
+                            "value": "newsLetter",
+                            "selected": false
+                        },
+                        {
+                            "label": "Upcoming Event",
+                            "value": "upcomingEvent",
+                            "selected": false
+                        }
+                    ]
                 }
             ]
         },
         {
             id: 4,
+            name: 'Satisfaction Survey',
+            data: [
+                {
+                    "type": "header",
+                    "subtype": "h1",
+                    "label": "Satisfaction Survey"
+                },
+                {
+                    "type": "text",
+                    "required": false,
+                    "label": "Name",
+                    "className": "form-control",
+                    "name": "text-1747390638003-0",
+                    "subtype": "text"
+                },
+                {
+                    "type": "text",
+                    "required": false,
+                    "label": "Email",
+                    "className": "form-control",
+                    "name": "text-1747390648300-0",
+                    "subtype": "text"
+                },
+                {
+                    "type": "text",
+                    "required": false,
+                    "label": "Contact Number",
+                    "className": "form-control",
+                    "name": "text-1747390643179-0",
+                    "subtype": "text"
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "I think your organisation have helped me to achieve my goals: (1 -Strongly Disagree, 5 -Strongly Disagree)",
+                    "name": "radio-group-1747730913543-0",
+                    "values": [
+                        {
+                            "label": "1",
+                            "value": "1",
+                            "selected": false
+                        },
+                        {
+                            "label": "2",
+                            "value": "2",
+                            "selected": false
+                        },
+                        {
+                            "label": "3",
+                            "value": "3",
+                            "selected": false
+                        },
+                        {
+                            "label": "4",
+                            "value": "4",
+                            "selected": false
+                        },
+                        {
+                            "label": "5",
+                            "value": "5",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "The staff/Mentor at your organisation have treated me fairly and with respect: (1 -Strongly Disagree, 5 -Strongly Disagree)",
+                    "name": "radio-group-1747731020035-0",
+                    "values": [
+                        {
+                            "label": "1",
+                            "value": "1",
+                            "selected": false
+                        },
+                        {
+                            "label": "2",
+                            "value": "2",
+                            "selected": false
+                        },
+                        {
+                            "label": "3",
+                            "value": "3",
+                            "selected": false
+                        },
+                        {
+                            "label": "4",
+                            "value": "4",
+                            "selected": false
+                        },
+                        {
+                            "label": "5",
+                            "value": "5",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "I am now more able to deal with issues and problems in my life than I was before: (1 -Strongly Disagree, 5 -Strongly Disagree)",
+                    "name": "radio-group-1747731049575-0",
+                    "values": [
+                        {
+                            "label": "1",
+                            "value": "1",
+                            "selected": false
+                        },
+                        {
+                            "label": "2",
+                            "value": "2",
+                            "selected": false
+                        },
+                        {
+                            "label": "3",
+                            "value": "3",
+                            "selected": false
+                        },
+                        {
+                            "label": "4",
+                            "value": "4",
+                            "selected": false
+                        },
+                        {
+                            "label": "5",
+                            "value": "5",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "I now feel more positive about my future: (1 -Strongly Disagree, 5 -Strongly Disagree)",
+                    "name": "radio-group-1747731068376-0",
+                    "values": [
+                        {
+                            "label": "1",
+                            "value": "1",
+                            "selected": false
+                        },
+                        {
+                            "label": "2",
+                            "value": "2",
+                            "selected": false
+                        },
+                        {
+                            "label": "3",
+                            "value": "3",
+                            "selected": false
+                        },
+                        {
+                            "label": "4",
+                            "value": "4",
+                            "selected": false
+                        },
+                        {
+                            "label": "5",
+                            "value": "5",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "radio-group",
+                    "required": false,
+                    "label": "I am satisfied with the service I received from your organisation: (1 -Strongly Disagree, 5 -Strongly Disagree)",
+                    "name": "radio-group-1747731098042-0",
+                    "values": [
+                        {
+                            "label": "1",
+                            "value": "1",
+                            "selected": false
+                        },
+                        {
+                            "label": "2",
+                            "value": "2",
+                            "selected": false
+                        },
+                        {
+                            "label": "3",
+                            "value": "3",
+                            "selected": false
+                        },
+                        {
+                            "label": "4",
+                            "value": "4",
+                            "selected": false
+                        },
+                        {
+                            "label": "5",
+                            "value": "5",
+                            "selected": false
+                        }
+                    ]
+                },
+                {
+                    "type": "text",
+                    "required": false,
+                    "label": "In what way/s could the service/s provided to me by your organisation be improved?",
+                    "className": "form-control",
+                    "name": "text-1747394178686-0",
+                    "subtype": "text"
+                },
+                {
+                    "type": "textarea",
+                    "required": false,
+                    "label": "I'd also like to add... ",
+                    "className": "form-control",
+                    "name": "textarea-1747731154988-0",
+                    "subtype": "textarea"
+                }
+            ]
+        },
+        {
+            id: 5,
             name: 'New Form',
             data: [
                 {
@@ -602,9 +905,13 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
 
     const containerStyle = {
         display: 'flex',
+        flexWrap: 'wrap',
         gap: '20px',
         margin: '20px 0',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        maxWidth: '540px',
+        marginLeft: 'auto',
+        marginRight: 'auto'
     };
 
     const boxStyle = (isSelected) => ({

@@ -8,13 +8,13 @@ import TemplateThree from 'formBuilder/TemplateThree';
 import { useEffect } from 'react';
 import DefaultFields from 'formBuilder/DefaultFields';
 
-const AddFormModal = ({ open = false, onClose = () => { } }) => {
+const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
 
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("formData");
     return savedData ? JSON.parse(savedData) : [];
   });
-  
+
   useEffect(() => {
     localStorage.setItem("formData", JSON.stringify(formData));
   }, [formData]);
@@ -59,7 +59,8 @@ const AddFormModal = ({ open = false, onClose = () => { } }) => {
           setFormData={setFormData}
           setSelectedTemplate={setSelectedTemplate}
           setPreview={setPreview}
-          onClose={onClose} />}
+          onClose={onClose}
+          getAllForms={getAllForms} />}
       {
         selectedTemplate === 2 &&
         <TemplateTwo

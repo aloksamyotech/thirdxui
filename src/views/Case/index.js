@@ -90,8 +90,7 @@ const Lead = () => {
       )
     },
     { field: 'service', headerName: 'Service', width: 120 },
-    { field: 'dateOpened', headerName: 'Date Opened', width: 150 },
-    { field: 'dateClosed', headerName: 'Date Closed', width: 150 }
+    { field: 'dateOpened', headerName: 'Date Opened', width: 150 }
   ];
 
   const handleFilter = async () => {

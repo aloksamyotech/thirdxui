@@ -11,15 +11,6 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 
-const serviceTypeFilter = [
-  { value: 'Education', label: 'Education' },
-  { value: 'Health', label: 'Health' },
-  { value: 'Mentoring', label: 'Mentoring' },
-  { value: 'Group Work', label: 'Group Work' },
-  { value: 'Sports', label: 'Sports' },
-  { value: 'Social Programs', label: 'Social Programs' },
-  { value: 'Arts and Culture', label: 'Arts and Culture' }
-];
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -69,6 +60,8 @@ const Lead = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -159,6 +152,25 @@ const Lead = () => {
       )
     }
   ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Service Types')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+
+        setServiceTypeOptions(options);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleFilter = async () => {
     try {
@@ -272,16 +284,12 @@ const Lead = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            serviceTypes={serviceTypeFilter}
+            serviceTypes={serviceTypeOptions}
             serviceTypeFilter={serviceType}
-            setServiceTypeFilter={(val) => {
-              setServiceType(val);
-            }}
+            setServiceTypeFilter={setServiceType}
             statuses={statusFilter}
             statusFilter={status}
-            setStatusFilter={(val) => {
-              setStatus(val);
-            }}
+            setStatusFilter={setStatus}
             selectedFilters={['statusFilter', 'serviceTypeFilter']}
             onReset={handleReset}
           />

@@ -230,7 +230,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('isActive', true);
 
     if (formData.file) {
-      fd.append('file', formData.file || '');
+  fd.append('file', formData.file || '');
     }
 
     try {

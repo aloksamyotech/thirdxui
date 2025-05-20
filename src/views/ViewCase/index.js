@@ -142,9 +142,9 @@ const CaseDetailsPage = () => {
       valueGetter: () => formatDate(caseData?.caseOpened || '')
     },
 
-    // { field: 'attachments', headerName: 'Attachments', width: 100 },
+    { field: 'attachments', headerName: 'Attachments', width: 100 },
 
-    // { field: 'totalHours', headerName: 'Total Hours', width: 100 },
+    { field: 'totalHours', headerName: 'Total Hours', width: 100 },
 
     {
       field: 'serviceStatus',
@@ -154,16 +154,16 @@ const CaseDetailsPage = () => {
         const status = caseData?.serviceStatus;
 
         return (
+         
           <Chip
-            label={status || 'N/A'}
-            icon={status === 'Active' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-            variant="outlined"
-            sx={{
-              borderColor: status === 'Active' ? 'green' : 'gray',
-              color: status === 'Active' ? 'green' : 'gray'
-            }}
-          />
-        );
+  label={status === 'Active' ? 'Open' : 'Close'}
+  icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+  sx={{
+    borderColor: status === 'Active' ? 'gray' : 'gray',
+    color: status === 'Active' ? 'gray' : 'gray'
+  }}
+/>
+ );
       }
     }
   ];

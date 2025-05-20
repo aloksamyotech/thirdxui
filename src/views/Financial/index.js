@@ -66,9 +66,19 @@ const Lead = () => {
   const [nameFilters, setNameFilters] = useState([]);
   const [campaign, setCampaignFilter] = useState('');
   const [user, setUser] = useState([]);
+  const [assignedTo, setAssignedTo] = useState('');
+  const [campaignName, setCampaignName] = useState('');
   const navigate = useNavigate();
   const [isFiltered, setIsFiltered] = useState(false);
   const [rows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const [loading, setLoading] = useState(false);
+  const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const columns = [
     {
@@ -94,7 +104,8 @@ const Lead = () => {
             wordBreak: 'break-word',
             overflowWrap: 'break-word'
           }}
-          >{params.value}
+        >
+          {params.value}
         </Typography>
       )
     },
@@ -126,35 +137,47 @@ const Lead = () => {
     }
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
 
-      if (name && name !== '') {
-        queryParams.append('name', name);
-      }
-      if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (assignedTo) queryParams.append('assignedTo', assignedTo);
+      if (campaignName) queryParams.append('campaign', campaignName);
+
+ if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
-        queryParams.append('date', formattedDate);
+        queryParams.append('createdAt', formattedDate);
       }
 
-      const queryString = queryParams.toString();
-      const url = `${urls.transaction.filterType}${queryString ? `?${queryString}` : ''}`;
+
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+
+      const url = `${urls.transaction.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
 
-      const filteredtransactions = response?.data || [];
+    const allTransaction = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
-      const formattedUsers = filteredtransactions.map((item, index) => {
-        return {
-          id: item._id || index,
-          title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-          type: item.assignedTo || '',
-          code: item.campaign || '',
-          status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
-          more: item.transactionId || ''
-        };
-      });
+      const formattedUsers = allTransaction.map((item, index) => ({
+        id: item._id || index,
+        title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+        type: item.assignedTo || '',
+        code: item.campaign.name || '',
+        status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
+        more: item.transactionId || ''
+      }));
 
+      setTotalRows(pagination?.total);
       setRows(formattedUsers);
       setIsFiltered(true);
     } catch (error) {
@@ -163,31 +186,41 @@ const Lead = () => {
   };
 
   const handleReset = () => {
+    setCampaignName('');
+    setCampaignFilter('');
     setNameFilter('');
     setDateOpenedFilter('');
     setIsFiltered(false);
+    fetchData();
   };
 
   useEffect(() => {
-    if (name || dateOpenedFilter || isFiltered) {
+    if (assignedTo || dateOpenedFilter || isFiltered || searchQuery || campaignName) {
       handleFilter();
     }
-  }, [name, dateOpenedFilter]);
+  }, [assignedTo, dateOpenedFilter, searchQuery, campaignName]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getApi(urls.transaction.fetch);
-        const allTransaction = res?.data?.allTransaction || [];
+        const response = await getApi(
+          `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
+        );
+        const allTransaction = response?.data?.data || [];
+        const pagination = response?.data?.meta || { total: 0 };
+
         const formattedTransactions = allTransaction?.map((item, index) => ({
           id: item._id || index,
           title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
           type: item.assignedTo || '',
-          code: item.campaign || '',
+          code: item.campaign?.name || item.campaign || '',
           status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
           more: item.transactionId || ''
         }));
+
         setRows(formattedTransactions);
+
+        setTotalRows(pagination?.total);
         const uniqueList = [...new Set(allTransaction.map((item) => item.assignedTo).filter(Boolean))].map((value) => ({
           value,
           label: value
@@ -200,6 +233,26 @@ const Lead = () => {
     };
 
     fetchData();
+  }, [paginationModel]);
+
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Campaign')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+
+        setCampaignTypeOptions(options);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchCampaign();
   }, []);
 
   return (
@@ -235,6 +288,8 @@ const Lead = () => {
           <TextField
             size="small"
             placeholder="Search..."
+            onChange={handleSearchChange}
+            value={searchQuery}
             InputProps={{
               endAdornment: <SearchIcon />
             }}
@@ -249,24 +304,39 @@ const Lead = () => {
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             names={nameFilters}
-            nameFilter={name}
-            setNameFilter={(value) => setNameFilter(value)}
-            campaigns={campaignFilter}
-            setCampaignFilter={setCampaignFilter}
+            nameFilter={assignedTo}
+            setNameFilter={(value) => setAssignedTo(value)}
+            campaigns={campaignTypeOptions}
+            campaignFilter={campaignName}
+            setCampaignFilter=
+            {(value) => setCampaignName(value)}
             selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
             onReset={handleReset}
           />
+
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
                 <Card style={{ height: 'auto' }}>
                   <DataGrid
-                    rows={rows}
+                    rows={
+                      loading
+                        ? []
+                        : rows.map((row, index) => ({
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
+                    }
                     columns={columns}
+                    rowCount={totalRows}
                     rowHeight={65}
+                    loading={loading}
                     getRowId={(row) => row.id}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10]}
+                    pagination
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    pageSizeOptions={[10]}
                     components={{
                       Toolbar: () => <CustomHeader />
                     }}

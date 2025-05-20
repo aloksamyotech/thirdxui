@@ -47,7 +47,10 @@ export const urls = Object.freeze({
   transaction: {
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
-    filterType: `${baseUrl}/transaction/filter`
+    filterType: `${baseUrl}/transaction/filter`,
+     fetchWithPagination:`${baseUrl}/transaction/allwithpagination`,
+
+
   },
   tag: {
     create: `${baseUrl}/tag/addtag`
@@ -60,6 +63,8 @@ export const urls = Object.freeze({
     update: `${baseUrl}/session/editSession/:id`
   },
   casenote: {
-    create: `${baseUrl}/caseNote/add`
+    create: `${baseUrl}/caseNote/add`,
+    fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+
   }
 });

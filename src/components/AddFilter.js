@@ -68,7 +68,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const options = [
     { label: 'Edit', icon: <EditIcon /> },
     { label: 'Archive', icon: <ArchiveIcon /> },
-    { label: 'Merge', icon: <MergeTypeIcon /> }, // Reserved for future
+    { label: 'Merge', icon: <MergeTypeIcon /> },
     { label: 'Delete', icon: <DeleteIcon /> }
   ];
 
@@ -111,7 +111,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
         <DialogContent>
-          Are you sure you want to archive this user?
+          Are you sure you want to archive?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmArchiveOpen(false)} variant="outlined">

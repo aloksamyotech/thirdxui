@@ -245,7 +245,9 @@ const AddDonorForm = () => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">Add Donor</Typography>
+       <Typography variant="h4">
+  {editdata ? 'Add Donor' : 'Edit Donor'}
+</Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />

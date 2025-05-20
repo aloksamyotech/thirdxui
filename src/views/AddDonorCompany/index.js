@@ -40,7 +40,6 @@ const AddCaseForm = ({ onCancel }) => {
   const location = useLocation();
   const subRole = location.state?.subRole;
   const editdata = location.state;
-  console.log(editdata,"editdataeditdataeditdata")
 
   const {
     register,
@@ -243,9 +242,26 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">
-            {subRole === 'donar_company' ? 'Add Donor Company' : subRole === 'donar_group' ? 'Add Donor Group' : 'Add Donor'}
-          </Typography>
+    {/* <Typography variant="h4">
+  {editdata
+    ? subRole === 'donar_company'
+      ? 'Edit Donor Company'
+      : subRole === 'donar_group'
+      ? 'Edit Donor Group'
+      : 'Edit Donor'
+    : subRole === 'donar_company'
+    ? 'Add Donor Company'
+    : subRole === 'donar_group'
+    ? 'Add Donor Group'
+    : 'Add Donor'}
+</Typography> */}
+
+  <Typography variant="h4">
+  {editdata ? 'Edit Donor' : 'Add Donor'}
+</Typography>
+
+
+
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />

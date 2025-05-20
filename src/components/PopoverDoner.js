@@ -108,7 +108,7 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this user?
+          Are you sure you want to delete ?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} variant="outlined">

@@ -14,6 +14,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const fileInputRef = useRef(null);
   const [serviceType, setServiceType] = useState([]);
+  const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
 
   const {
     handleSubmit,
@@ -63,6 +64,30 @@ const AddCaseForm = ({ onCancel }) => {
     fetchData();
   }, []);
 
+
+   useEffect(() => {
+      const fetchCampaign = async () => {
+        try {
+          const response = await getApi(urls.configuration.fetch);
+  
+          const options = response?.data?.allConfiguration
+            ?.filter((item) => item.configurationType === 'Campaign')
+            ?.map((item) => ({
+              value: item._id,
+              label: item.name
+            }));
+  
+          setCampaignTypeOptions(options);
+        } catch (error) {
+          console.error('Error fetching config:', error);
+        }
+      };
+      fetchCampaign();
+    }, []);
+  
+
+    
+
   return (
     <Grid>
       <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -109,27 +134,31 @@ const AddCaseForm = ({ onCancel }) => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                          <Controller
-                            name="campaign"
-                            control={control}
-                            rules={{ required: 'Campaign is required' }}
-                            render={({ field }) => (
-                              <TextField
-                                select
-                                fullWidth
-                                size="small"
-                                label="Campaign"
-                                {...field}
-                                error={!!errors.campaign}
-                                helperText={errors.campaign?.message}
-                              >
-                                <MenuItem value="Campaign A">Campaign A</MenuItem>
-                                <MenuItem value="Campaign B">Campaign B</MenuItem>
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
+                       <Grid item xs={12} sm={6}>
+  <Controller
+    name="campaign"
+    control={control}
+    rules={{ required: 'Campaign is required' }}
+    render={({ field }) => (
+      <TextField
+        select
+        fullWidth
+        size="small"
+        label="Campaign"
+        {...field}
+        error={!!errors.campaign}
+        helperText={errors.campaign?.message}
+      >
+        {campaignTypeOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </TextField>
+    )}
+  />
+</Grid>
+
 
                         <Grid item xs={12} sm={6}>
                           <TextField

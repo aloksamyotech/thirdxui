@@ -61,7 +61,6 @@ const Lead = () => {
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
-
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -78,7 +77,7 @@ const Lead = () => {
         variant="body1"
         sx={{
           textTransform: 'uppercase',
-          fontWeight: 'normal',
+          fontWeight: 'bold',
           whiteSpace: 'normal',         
           wordBreak: 'break-word',      
           overflowWrap: 'break-word',
@@ -164,6 +163,8 @@ const Lead = () => {
             label: item.name
           }));
 
+         
+
         setServiceTypeOptions(options);
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -178,6 +179,7 @@ const Lead = () => {
 
       if (serviceType) queryParams.append('type', serviceType);
       if (status) queryParams.append('status', status === 'active');
+
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());
       }

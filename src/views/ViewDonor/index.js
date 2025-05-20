@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider } from '@mui/material';
-import { Add as AddIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -42,7 +43,7 @@ const UserProfileCard = () => {
     const fetchUserById = async () => {
       try {
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
-      const user = response?.data;
+        const user = response?.data;
 
         if (user) {
           setUserData(user);
@@ -78,7 +79,6 @@ const UserProfileCard = () => {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -119,16 +119,15 @@ const UserProfileCard = () => {
     setCaseNoteOpen(false);
   };
 
-
   return (
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
-          <Typography variant="h4" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/donor')} sx={{ ml: 1 }}>
-              <ArrowBackIcon />
+          <Typography fontWeight="bold" display="flex" alignItems="center">
+            <IconButton onClick={() => navigate('/donor')}>
+              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
-            PROFILE
+            Profile
           </Typography>
         </Stack>
       </Grid>
@@ -161,7 +160,7 @@ const UserProfileCard = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  p: 1
+                  p: 2
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
@@ -196,8 +195,12 @@ const UserProfileCard = () => {
                 </Grid>
 
                 <Box textAlign="right" sx={{ pr: 2 }}>
-                  <Button variant="contained" onClick={handleClick} sx={{ mb: 1, backgroundColor: '#00AEEF' }}>
-                    Edit
+                  <Button
+                    variant="contained"
+                    onClick={handleClick}
+                    sx={{ mb: 1, borderRadius: '6px', width: '20%', height: 'auto', fontSize: '12px', backgroundColor: '#009fc7' }}
+                  >
+                    EDIT
                   </Button>
                   {sub_role === 'donar_individual' && (
                     <>

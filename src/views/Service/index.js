@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -67,26 +68,41 @@ const Lead = () => {
   });
 
   const columns = [
-    {
-      field: 'name',
-      headerName: 'Service Name',
-      flex: 1.5,
-      renderCell: (params) => (
-        <Stack>
-          <Typography variant="body1" sx={{ textTransform: 'uppercase', fontWeight: 'normal' }}>
-            {params.row.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {new Date(params.row.updatedAt).toDateString()}
-          </Typography>
-        </Stack>
-      )
-    },
+{
+  field: 'name',
+  headerName: 'Service Name',
+  flex: 1.5,
+  renderCell: (params) => (
+    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+      <Typography
+        variant="body1"
+        sx={{
+          textTransform: 'uppercase',
+          fontWeight: 'normal',
+          whiteSpace: 'normal',         
+          wordBreak: 'break-word',      
+          overflowWrap: 'break-word',
+        }}
+      >
+        {params.row.name}
+      </Typography>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{ whiteSpace: 'nowrap' }}  
+      >
+        {new Date(params.row.updatedAt).toDateString()}
+      </Typography>
+    </Stack>
+  )
+}
+,
 
     {
-      field: 'type',
+      field: 'serviceType',
       headerName: 'Service Type',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => params.row.serviceType?.name || '-'
     },
     {
       field: 'code',
@@ -161,7 +177,7 @@ const Lead = () => {
     try {
       const queryParams = new URLSearchParams();
 
-      if (serviceType) queryParams.append('type', serviceType);
+      if (serviceType) queryParams.append('serviceType', serviceType);
       if (status) queryParams.append('status', status === 'active');
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());

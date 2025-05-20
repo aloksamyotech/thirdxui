@@ -20,8 +20,14 @@ const User = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
-  const [allData , setAllData] = useState([]);
+  const [allData, setAllData] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
   const navigate = useNavigate();
 
   const columns = [
@@ -71,9 +77,9 @@ const User = () => {
       headerName: 'Manage',
       flex: 1,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', width: '100%',  gap: 1 }}>
+        <Box sx={{ display: 'flex', width: '100%', gap: 1 }}>
           <IconButton color="error" size="small" onClick={() => handleDelete(params.row.id)}>
-           <IconTrash color="orangered" size={18} />
+            <IconTrash color="orangered" size={18} />
           </IconButton>
           <IconButton color="error" size="small" onClick={() => navigate('/add-user', { state: allData })}>
             <IconPencil color="orangered" size={18} />
@@ -144,12 +150,23 @@ const User = () => {
         setCountriesWithFlags(countries);
       });
   }, []);
+
   const fetchUser = async () => {
     if (countriesWithFlags.length === 0) return;
 
     try {
-      const response = await getApi(urls?.serviceuser?.getAllUser);
-      const allUser = response?.data?.allVolunteer || [];
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'user'
+      });
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
       setAllData(allUser);
 
@@ -183,14 +200,17 @@ const User = () => {
       });
 
       setRows(formattedUsers);
+      setTotalRows(pagination?.total);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchUser();
-  }, [countriesWithFlags]);
+  }, [countriesWithFlags, paginationModel]);
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
@@ -262,17 +282,26 @@ const User = () => {
                 <Box width="100%">
                   <Card style={{ height: 'auto' }}>
                     <DataGrid
-                      rows={rows}
+                      rows={
+                        loading
+                          ? []
+                          : rows.map((row, index) => ({
+                              ...row,
+                              sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                            }))
+                      }
                       columns={columns}
-                      rowHeight={65}
-                      getRowId={(row) => row.id}
-                      pageSize={5}
-                      rowsPerPageOptions={[5, 10]}
+                      rowCount={totalRows}
+                      loading={loading}
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      onPaginationModelChange={setPaginationModel}
+                      pageSizeOptions={[10]}
                       components={{
                         Toolbar: () => <CustomHeader />
                       }}
                       getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                      // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
                       sx={{
                         '& .MuiDataGrid-row': {
                           borderBottom: '1px solid #ccc'
@@ -286,7 +315,7 @@ const User = () => {
           </Grid>
         </Grid>
       </Card>
-      <Modal open={showForm} onClose={() => setShowForm(false)}>
+      {/* <Modal open={showForm} onClose={() => setShowForm(false)}>
         <Box
           sx={{
             position: 'absolute',
@@ -317,7 +346,7 @@ const User = () => {
             </Button>
           </Stack>
         </Box>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

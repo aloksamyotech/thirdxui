@@ -357,7 +357,8 @@ const TabbedDataGrid = () => {
                           </Typography>
 
                           <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
-                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />&nbsp;
+                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
+                            &nbsp;
                             <IconButton onClick={() => handleEdit(item)}>
                               <IconPencil color="orangered" size={18} />
                             </IconButton>
@@ -379,162 +380,108 @@ const TabbedDataGrid = () => {
           </Grid>
         </Grid>
 
-        {/* <Modal open={openModal} onClose={handleCloseModal}>
+        <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: 500,
-              bgcolor: 'white',
-              p: 3,
-              borderRadius: 2,
-              boxShadow: 24
+              width: 420,
+              height: 160,
+              bgcolor: '#fff',
+              p: 2,
+              borderRadius: '8px',
+              boxShadow: 24,
             }}
           >
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              {editMode ? `Edit ${modalSection}` : `Add to ${modalSection}`}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt:1 }}>
+              <TextField
+                placeholder="New item"
+                value={inputValue}
+                onChange={handleInputChange}
+                error={!!inputError}
+                helperText={inputError}
+                inputProps={{
+                  maxLength: 25,
+                  style: {
+                    fontSize: '14px',
+                    padding: '10px 12px'
+                  }
+                }}
+                sx={{
+                  width: '65%',
+                  '& .MuiInputBase-root': {
+                    height: '40px',
+                    fontSize: '14px'
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    padding: '0 12px'
+                  }
+                }}
+                variant="outlined"
+              />
 
-            <TextField
-              fullWidth
-              label="New Item"
-              value={inputValue}
-              onChange={handleInputChange}
-              error={!!inputError}
-              helperText={inputError}
-              sx={{ mb: 2 }}
-              inputProps={{
-                maxLength: 25,
-                style: {
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word'
-                }
-              }}
-              multiline
-              rows={2}
-            />
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Typography variant="body1">Active?</Typography>&nbsp;&nbsp;&nbsp;
-              <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} />
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
+                <Typography sx={{ fontSize: '14px', mb: 0.5, ml: 2 }}>Active Or Inactive?</Typography>
+                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ml:-8}}/>
+              </Box>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSaveConfiguration}>
-                {editMode ? 'Update' : 'Save Changes'}
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 2,
+                mt: 4
+              }}
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#053146',
+                  borderRadius: '8px',
+                  width: '35%',
+                  height: '30px',
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  '&:hover': {
+                    backgroundColor: '#031e2a'
+                  }
+                }}
+                onClick={handleSaveConfiguration}
+              >
+                {editMode ? 'UPDATE' : 'SAVE CHANGES'}
               </Button>
 
-              <Button variant="outlined" color="error" onClick={handleCloseModal}>
-                Cancel
+              <Button
+                variant="outlined"
+                sx={{
+                  borderColor: '#178df9',
+                  color: '#178df9',
+                  borderRadius: '8px',
+                  width: '25%',
+                  height: '30px',
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  '&:hover': {
+                    borderColor: '#b39ddb',
+                    backgroundColor: '#f3e5f5'
+                  }
+                }}
+                onClick={handleCloseModal}
+              >
+                CANCEL
               </Button>
             </Box>
           </Box>
-        </Modal> */}
-
-
-<Modal open={openModal} onClose={handleCloseModal}>
-  <Box
-    sx={{
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: 400,
-      bgcolor: '#fff',
-      p: 3,
-      borderRadius: '12px',
-      boxShadow: 24,
-    }}
-  >
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-     <TextField
-  placeholder="New item"
-  value={inputValue}
-  onChange={handleInputChange}
-  error={!!inputError}
-  helperText={inputError}
-  inputProps={{
-    maxLength: 25,
-    style: {
-      fontSize: '14px',
-      padding: '10px 12px',
-    },
-  }}
-  sx={{
-    width: '65%',
-    '& .MuiInputBase-root': {
-      height: '40px', // Adjusted height
-      fontSize: '14px',
-    },
-    '& .MuiOutlinedInput-input': {
-      padding: '0 12px',
-    },
-  }}
-  variant="outlined"
-/>
-
-
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
-        <Typography sx={{ fontSize: '14px', mb: 0.5 }}>Active Or Inactive?</Typography>
-        <AntSwitch
-          checked={toggleValue}
-          onChange={(e) => setToggleValue(e.target.checked)}
-        />
-      </Box>
-    </Box>
-
-   <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-  <Button
-    variant="contained"
-    sx={{
-      backgroundColor: '#053146',
-      borderRadius: '8px',
-      width: '50%',
-      height: '45px',
-      fontWeight: 'bold',
-      fontSize: '14px',
-      textTransform: 'none',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      '&:hover': {
-        backgroundColor: '#031e2a',
-      },
-    }}
-    onClick={handleSaveConfiguration}
-  >
-    {editMode ? 'UPDATE' : 'SAVE CHANGES'}
-  </Button>
-
-  <Button
-    variant="outlined"
-    sx={{
-      borderColor: '#c0aaff',
-      color: '#7e57c2',
-      borderRadius: '8px',
-      width: '50%',
-      height: '45px',
-      fontWeight: 'bold',
-      fontSize: '14px',
-      textTransform: 'none',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      '&:hover': {
-        borderColor: '#b39ddb',
-        backgroundColor: '#f3e5f5',
-      },
-    }}
-    onClick={handleCloseModal}
-  >
-    CANCEL
-  </Button>
-</Box>
-
-  </Box>
-</Modal>
-
-        
+        </Modal>
       </Grid>
     </>
   );

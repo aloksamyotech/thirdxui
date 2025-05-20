@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -6,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
@@ -39,10 +38,32 @@ const genders = [
 const Lead = () => {
   const navigate = useNavigate();
   const [districtFilter, setDistrictFilter] = useState('');
-  const [dateAddedFilter, setDateAddedFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+
+  const district = useMemo(() => {
+    return districts.map((type) => ({
+      value: type.value,
+      label: type.label
+    }));
+  }, []);
+
+  const gender = useMemo(() => {
+    return genders.map((type) => ({
+      value: type.value,
+      label: type.label
+    }));
+  }, []);
 
   const CustomHeader = () => {
     return (
@@ -86,7 +107,6 @@ const Lead = () => {
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {/* {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />} */}
             <PersonIcon />
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
@@ -108,31 +128,102 @@ const Lead = () => {
     }
   ];
 
-  useEffect(() => {
-    const fetchpeople = async () => {
-      try {
-        const response = await getApi(urls.serviceuser.fetch);
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
 
-        const allUser = response?.data?.allUser || [];
-
-        const formattedUsers = allUser.map((user, index) => ({
-          id: user._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-          firstName: user.personalInfo?.firstName || '',
-          lastName: user.personalInfo?.lastName || '',
-          address: user.contactInfo?.addressLine1 || '',
-          country: user.contactInfo?.country || '',
-          postcode: user.contactInfo?.postcode || ''
-        }));
-
-        setRows(formattedUsers);
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
+      if (districtFilter) queryParams.append('district', districtFilter);
+      if (genderFilter) queryParams.append('gender', genderFilter);
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
       }
-    };
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
 
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('archive', 'false');
+      queryParams.append('role', 'service_user');
+
+      const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
+      const response = await getApi(url);
+
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+      const formattedUsers = allUser?.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        firstName: user.personalInfo?.firstName || '',
+        lastName: user.personalInfo?.lastName || '',
+        address: user.contactInfo?.addressLine1 || '',
+        country: user.contactInfo?.country || '',
+        postcode: user.contactInfo?.postcode || ''
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered services:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (districtFilter || genderFilter || dateOpenedFilter || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [districtFilter, genderFilter, dateOpenedFilter || searchQuery]);
+
+  const handleReset = () => {
+    setDistrictFilter('');
+    setGenderFilter('');
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
     fetchpeople();
-  }, []);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const fetchpeople = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'service_user'
+      });
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+      const formattedUsers = allUser?.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        firstName: user.personalInfo?.firstName || '',
+        lastName: user.personalInfo?.lastName || '',
+        address: user.contactInfo?.addressLine1 || '',
+        country: user.contactInfo?.country || '',
+        postcode: user.contactInfo?.postcode || ''
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchpeople();
+  }, [paginationModel]);
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -166,6 +257,8 @@ const Lead = () => {
           <TextField
             size="small"
             placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
             InputProps={{
               endAdornment: <SearchIcon />
             }}
@@ -175,20 +268,40 @@ const Lead = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            districts={districts}
-            setDistrictFilter={setDistrictFilter}
-            genders={genders}
+            districts={district}
+            districtFilter={districtFilter}
+            setDistrictFilter={(val) => {
+              setDistrictFilter(val);
+            }}
+            genders={gender}
+            genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
             dateAddedFilters={dateAddedFilters}
-            setDateAddedFilter={setDateAddedFilter}
-            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter']}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter']}
+            onReset={handleReset}
           />
 
           <Grid item xs={9}>
             <Card style={{ height: 'auto' }}>
               <DataGrid
-                rows={rows}
+                rows={
+                  loading
+                    ? []
+                    : rows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}

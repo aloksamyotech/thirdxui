@@ -6,7 +6,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { postApi } from 'common/apiClient';
+import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
@@ -15,6 +15,7 @@ const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
+  const [sevicetype, setServiceType] = useState([]);
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -37,7 +38,20 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLetters = /^[A-Za-z\s]*$/;
 
   const handleToggle = () => setRestrictAccess(!restrictAccess);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
 
+        const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Service Types');
+        console.log(servicetypeoption);
+        setServiceType(servicetypeoption);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
   const {
     control,
     handleSubmit,
@@ -178,13 +192,11 @@ const AddCaseForm = ({ onCancel }) => {
                         error={!!errors.serviceType}
                         helperText={errors.serviceType?.message}
                       >
-                        <MenuItem value="Education">Education</MenuItem>
-                        <MenuItem value="Health">Health</MenuItem>
-                        <MenuItem value="Mentoring">Mentoring</MenuItem>
-                        <MenuItem value="Group Work">Group Work</MenuItem>
-                        <MenuItem value="Sports">Sports</MenuItem>
-                        <MenuItem value="Social Programs">Social Programs</MenuItem>
-                        <MenuItem value="Arts and Culture">Arts and Culture</MenuItem>
+                        {sevicetype?.map((option) => (
+                          <MenuItem key={option._id} value={option.name}>
+                            {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                          </MenuItem>
+                        ))}
                       </TextField>
                     )}
                   />

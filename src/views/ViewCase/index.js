@@ -13,23 +13,8 @@ import UserProfileDialog from './userProfile.js';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
-
-const sampleUser = {
-  name: 'Aidan Ayonaudu',
-  email: 'aidan.@example.com',
-  phone: '(123) 456-7890',
-  address: '5033 Transit Road, Clarence NY 14031',
-  country: 'USA',
-  userId: '01231',
-  gender: 'Male',
-  ethnicity: 'American',
-  dob: 'USA',
-  age: '49',
-  altUserId: '12365479+',
-  service: 'Communication',
-  referredDate: '02/02/2020',
-  image: 'https://via.placeholder.com/64'
-};
+import dayjs from 'dayjs';
+import { imageUrl } from 'common/urls';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -38,7 +23,8 @@ const CaseDetailsPage = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [caseData, setCaseData] = useState(null);
-  const [serviceName, setServiceName] = useState('');
+  const [serviceDetails, setServiceDetails] = useState('');
+  const [serviceuserDetails, setServiceuserDetails] = useState('');
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -85,9 +71,27 @@ const CaseDetailsPage = () => {
       </Box>
     );
   };
-
+  const dobRaw = serviceuserDetails?.personalInfo?.dateOfBirth;
+  const dobFormatted = dobRaw ? dayjs(dobRaw).format('DD/MM/YYYY') : '';
+  const age = dobRaw ? dayjs().diff(dayjs(dobRaw), 'year') : '';
+  const UserDetails = {
+    name: serviceuserDetails?.personalInfo?.firstName || '',
+    lastname: serviceuserDetails?.personalInfo?.lastName || '',
+    email: serviceuserDetails?.contactInfo?.email || '',
+    phone: serviceuserDetails?.contactInfo?.phone || '',
+    address: serviceuserDetails?.contactInfo?.addressLine1 || '',
+    country: serviceuserDetails?.contactInfo?.country || '',
+    userId: '01231',
+    gender: serviceuserDetails?.personalInfo?.gender || '',
+    ethnicity: serviceuserDetails?.personalInfo?.ethnicity || '',
+    dob: dobFormatted || '',
+    age: age || '',
+    altUserId: serviceuserDetails?.contactInfo?.otherId,
+    service: serviceDetails.name || '',
+    referredDate: '02/02/2020',
+    image: 'https://via.placeholder.com/64'
+  };
   const handleSave = (data) => {
-    console.log('Case note submitted:', data);
     setOpenDialog(false);
   };
 
@@ -99,46 +103,76 @@ const CaseDetailsPage = () => {
   ];
 
   const columnsCase = [
-    { field: 'caseId', headerName: 'Case Id', width: 70 },
+    { field: 'caseId', headerName: 'Case Id', width: 100 },
+
     {
       field: 'serviceUser',
       headerName: 'Service User',
-      width: 100,
-      renderCell: (params) => (
+      width: 160,
+      renderCell: () => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {params.value}
+          {serviceDetails?.name || ''}
         </Typography>
       )
     },
+
     {
       field: 'owner',
       headerName: 'Owner',
-      width: 80,
-      renderCell: (params) => (
+      width: 110,
+      valueGetter: (params) => params.row?.owner || '',
+      renderCell: () => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {params.value}
+          {caseData?.serviceType || ''}
         </Typography>
       )
     },
-    { field: 'dateOpened', headerName: 'Date Opened', width: 100 },
-    { field: 'dateClosed', headerName: 'Date Closed', width: 100 },
-    { field: 'attachments', headerName: 'Attachments', width: 80 },
-    { field: 'totalHours', headerName: 'Total hours', width: 80 },
+
     {
-      field: 'status',
+      field: 'dateOpened',
+      headerName: 'Date Opened',
+      width: 110,
+      valueGetter: () => formatDate(caseData?.caseOpened || '')
+    },
+
+    {
+      field: 'dateClosed',
+      headerName: 'Date Closed',
+      width: 110,
+      valueGetter: () => formatDate(caseData?.caseOpened || '')
+    },
+
+    // { field: 'attachments', headerName: 'Attachments', width: 100 },
+
+    // { field: 'totalHours', headerName: 'Total Hours', width: 100 },
+
+    {
+      field: 'serviceStatus',
       headerName: 'Status',
-      width: 100,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-          sx={{
-            borderColor: params.value === 'Open' ? 'green' : 'gray'
-          }}
-        />
-      )
+      width: 120,
+      renderCell: () => {
+        const status = caseData?.serviceStatus;
+
+        return (
+          <Chip
+            label={status || 'N/A'}
+            icon={status === 'Active' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+            variant="outlined"
+            sx={{
+              borderColor: status === 'Active' ? 'green' : 'gray',
+              color: status === 'Active' ? 'green' : 'gray'
+            }}
+          />
+        );
+      }
     }
   ];
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return isNaN(date) ? '' : date.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+  };
 
   const rows = [
     {
@@ -154,7 +188,9 @@ const CaseDetailsPage = () => {
     }
   ];
 
-  const caseNotes = [
+const userProfile =serviceuserDetails?.otherInfo?.file
+const fullImageUrl = userProfile ? `${imageUrl}${userProfile }` : '';
+const caseNotes = [
     {
       id: 1,
       date: '08/25/2017',
@@ -217,12 +253,10 @@ const CaseDetailsPage = () => {
     const fetchData = async () => {
       try {
         const response = await getApi(urls.case.getById.replace(':id', id));
-
-        const caseData = response?.data?.caseData;
-        setCaseData(caseData);
-
-        const name = caseData?.serviceDetails?.name || '';
-        setServiceName(name);
+        const Data = response?.data?.caseData;
+        setCaseData(Data);
+        setServiceDetails(Data?.serviceDetails);
+        setServiceuserDetails(Data?.userServiceDetails);
       } catch (error) {
         console.error('Error fetching case data:', error);
       }
@@ -242,7 +276,7 @@ const CaseDetailsPage = () => {
                   <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h5" gutterBottom>
-                  {serviceName}
+                  {serviceDetails.name}
                 </Typography>
               </Stack>
 
@@ -279,11 +313,21 @@ const CaseDetailsPage = () => {
                     }}
                   />
                 </Box>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Name: Aidan Ayonaudu</Typography>
+                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                  Name: {serviceuserDetails?.personalInfo?.firstName || ''} {serviceuserDetails?.personalInfo?.lastName || ''}
+                </Typography>
+
                 <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>User ID: 01231</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Gender: Male</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Contact: (123) 456-7890</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>DOB: 27-10-1999</Typography>
+                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                  Gender: {serviceuserDetails?.personalInfo?.gender || ''}
+                </Typography>
+                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Contact: {serviceuserDetails?.contactInfo?.phone || ''}</Typography>
+                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                  DOB:{' '}
+                  {serviceuserDetails?.personalInfo?.dateOfBirth
+                    ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD/MM/YYYY')
+                    : ''}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -334,8 +378,8 @@ const CaseDetailsPage = () => {
         </Grid>
       </Box>
 
-      <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" />
-      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={sampleUser} />
+      <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
+      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userProfile={ fullImageUrl } />
     </>
   );
 };

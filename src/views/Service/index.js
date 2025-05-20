@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -8,16 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
-const serviceTypeFilter = [
-  { value: 'Education', label: 'Education' },
-  { value: 'Health', label: 'Health' },
-  { value: 'Mentoring', label: 'Mentoring' },
-  { value: 'Group Work', label: 'Group Work' },
-  { value: 'Sports', label: 'Sports' },
-  { value: 'Social Programs', label: 'Social Programs' },
-  { value: 'Arts and Culture', label: 'Arts and Culture' }
-];
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -58,36 +51,52 @@ const CustomHeader = () => {
 };
 
 const Lead = () => {
+  const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
   const [rows, setRows] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
   });
 
   const columns = [
-    {
-      field: 'name',
-      headerName: 'Service Name',
-      flex: 1.5,
-      renderCell: (params) => (
-        <Stack>
-          <Typography variant="body1" sx={{ textTransform: 'uppercase', fontWeight: 'normal' }}>
-            {params.row.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {new Date(params.row.updatedAt).toDateString()}
-          </Typography>
-        </Stack>
-      )
-    },
+{
+  field: 'name',
+  headerName: 'Service Name',
+  flex: 1.5,
+  renderCell: (params) => (
+    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+      <Typography
+        variant="body1"
+        sx={{
+          textTransform: 'uppercase',
+          fontWeight: 'normal',
+          whiteSpace: 'normal',         
+          wordBreak: 'break-word',      
+          overflowWrap: 'break-word',
+        }}
+      >
+        {params.row.name}
+      </Typography>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{ whiteSpace: 'nowrap' }}  
+      >
+        {new Date(params.row.updatedAt).toDateString()}
+      </Typography>
+    </Stack>
+  )
+}
+,
 
     {
       field: 'type',
@@ -123,7 +132,6 @@ const Lead = () => {
         );
       }
     },
-
     {
       field: 'more',
       headerName: 'More',
@@ -144,27 +152,48 @@ const Lead = () => {
       )
     }
   ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Service Types')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+
+        setServiceTypeOptions(options);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
 
-      if (serviceType && serviceType !== '') {
-        queryParams.append('type', serviceType);
-      }
-      if (status && status !== '') {
-        const isActive = status === 'active';
-        queryParams.append('isActive', isActive);
+      if (serviceType) queryParams.append('type', serviceType);
+      if (status) queryParams.append('status', status === 'active');
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
       }
 
-      const queryString = queryParams.toString();
-      const url = `${urls.service.filterType}${queryString ? `?${queryString}` : ''}`;
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+
+      const url = `${urls.service.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
 
-      if (response?.data) {
-        setRows(response.data.services || []);
-        setIsFiltered(true);
-      }
+      const serviceList = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setRows(serviceList);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
     } catch (error) {
       console.error('Failed to fetch filtered services:', error);
     }
@@ -180,13 +209,15 @@ const Lead = () => {
   const fetchServices = async () => {
     setLoading(true);
     try {
-      const response = await getApi(`${urls.service.fetch}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const response = await getApi(
+        `${urls.service.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
+      );
 
       const serviceList = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
       setRows(serviceList);
-      setTotalRows(pagination.total);
+      setTotalRows(pagination?.total);
     } catch (error) {
       toast.error('Error fetching data');
     } finally {
@@ -241,6 +272,8 @@ const Lead = () => {
           <TextField
             size="small"
             placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
             InputProps={{
               endAdornment: <SearchIcon />
             }}
@@ -251,16 +284,12 @@ const Lead = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            serviceTypes={serviceTypeFilter}
+            serviceTypes={serviceTypeOptions}
             serviceTypeFilter={serviceType}
-            setServiceTypeFilter={(val) => {
-              setServiceType(val);
-            }}
+            setServiceTypeFilter={setServiceType}
             statuses={statusFilter}
             statusFilter={status}
-            setStatusFilter={(val) => {
-              setStatus(val);
-            }}
+            setStatusFilter={setStatus}
             selectedFilters={['statusFilter', 'serviceTypeFilter']}
             onReset={handleReset}
           />

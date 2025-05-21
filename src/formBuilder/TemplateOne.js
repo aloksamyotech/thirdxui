@@ -21,7 +21,7 @@ import { postApi } from 'common/apiClient';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { toast } from 'react-toastify';
 
-const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, onClose, getAllForms }) => {
+const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, onClose, getAllForms, setPreset }) => {
 
     const initialValues = {}
     const validationSchema = {}
@@ -33,6 +33,7 @@ const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, o
             formik.resetForm();
             onClose()
             setPreview(false)
+            setPreset(true)
             setSelectedTemplate(null)
             toast.success('Form Added Successfully')
             localStorage.removeItem('formData')

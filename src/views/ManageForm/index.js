@@ -96,7 +96,8 @@ const Lead = () => {
         index: index + 1,
         description: item?.title,
         campaign: item?.template,
-        title: "help"
+        title: "help",
+        link: item?.publicId
       }
       return data
     })
@@ -143,7 +144,7 @@ const Lead = () => {
       sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <OpenInNewIcon color='primary' fontSize='small' sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.id)} />
+          <OpenInNewIcon color='primary' fontSize='small' sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.link)} />
           <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
         </Box>
       )

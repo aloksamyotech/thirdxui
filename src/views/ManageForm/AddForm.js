@@ -59,6 +59,7 @@ const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
           setFormData={setFormData}
           setSelectedTemplate={setSelectedTemplate}
           setPreview={setPreview}
+          setPreset={setPreset}
           onClose={onClose}
           getAllForms={getAllForms} />}
       {

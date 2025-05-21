@@ -161,7 +161,7 @@ const UserProfileCard = () => {
               >
                 <Grid container alignItems="center" spacing={2}>
                   <img
-                    src={fullImageUrl}
+                   src={fullImageUrl || ServiceUser}
                     alt={personalInfo?.firstName || 'User'}
                     style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
                   />

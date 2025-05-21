@@ -166,7 +166,7 @@ const UserProfileCard = () => {
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
-                  <img src={fullImageUrl} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
+                  <img src={fullImageUrl || ServiceUser} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
                   <Grid item xs>
                     <Typography component="span">
                       {personalInfo.firstName || personalInfo.lastName

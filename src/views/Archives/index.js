@@ -1,22 +1,52 @@
 import React from 'react';
-import {  Card, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import { 
+  Card, 
+  Grid, 
+  IconButton, 
+  TextField, 
+  Tooltip, 
+  Typography,  
+  Popover,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button 
+} from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import CallMergeIcon from '@mui/icons-material/CallMerge';
-import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import dayjs from 'dayjs';
+import { getApi, updateApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const BulkDelete = () => {
+  const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [activityType, setActivityTypeFilter] = useState('');
   const [sessionName, setSessionNameFilter] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [confirmUnarchiveOpen, setConfirmUnarchiveOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [rows, setRows] = useState([]);
   const [dateAddedFilter, setDateAddedFilter] = useState(dayjs());
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const activityTypes = [
     { value: 'outreach', label: 'Outreach' },
@@ -27,6 +57,62 @@ const BulkDelete = () => {
     { value: 'sessionA', label: 'Session A' },
     { value: 'sessionB', label: 'Session B' }
   ];
+
+  const handleConfirmUnarchive = async () => {
+    try {
+      await updateApi(`${urls.serviceuser.unarchive}/${selectedUser.id}`, { archive: false });
+      toast.success('User unarchived successfully!');
+      setConfirmUnarchiveOpen(false);
+      fetchpeople(); // Refresh the list
+    } catch (error) {
+      console.error('Error unarchiving user:', error);
+      toast.error('Failed to unarchive the user.');
+    }
+  };
+
+  const handleUnarchiveClick = (user) => {
+    setSelectedUser(user);
+    setConfirmUnarchiveOpen(true);
+  };
+
+  const fetchpeople = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'true',
+        role: 'service_user'
+      });
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+      const formattedUsers = allUser?.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`,
+        firstName: user.personalInfo?.firstName || '',
+        lastName: user.personalInfo?.lastName || '',
+        address: user.contactInfo?.addressLine1 || '',
+        country: user.contactInfo?.country || '',
+        postcode: user.contactInfo?.postcode || '',
+        type: 'person' // Added type for icon display
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+      toast.error('Failed to fetch archived users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchpeople();
+  }, [paginationModel]);
 
   const CustomHeader = () => {
     return (
@@ -53,7 +139,7 @@ const BulkDelete = () => {
               lineHeight: '36px'
             }}
           >
-            PEOPLE LIST
+            ARCHIVED PEOPLE LIST
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -72,41 +158,37 @@ const BulkDelete = () => {
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
             {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
-
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
+                {params.row.name} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.address}, {params.row.postcode}, {params.row.country}
               </Typography>
             </Box>
           </Stack>
 
-          <Tooltip title="Info" arrow>
-            <IconButton>
-              <InfoIcon color="action" />
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Unarchive" arrow>
+              <IconButton onClick={() => handleUnarchiveClick(params.row)}>
+                <ArchiveIcon color="action" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Info" arrow>
+              <IconButton>
+                <InfoIcon color="action" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Stack>
       )
     }
-  ];
-
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
-    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' },
-    { id: 'C-004', name: 'Emily Davis', address: '321 Pine Avenue, Houston, TX 77001', type: 'apartment' },
-    { id: 'C-005', name: 'David Brown', address: '654 Maple Drive, Miami, FL 33101', type: 'person' },
-    { id: 'C-006', name: 'Sophia Wilson', address: '987 Cedar Lane, San Francisco, CA 94101', type: 'apartment' }
   ];
 
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
         <Typography variant="h4">Archives</Typography>
-
         <Stack direction="row" spacing={2} alignItems="center">
           <TextField
             size="small"
@@ -136,9 +218,15 @@ const BulkDelete = () => {
               <DataGrid
                 rows={rows}
                 columns={columns}
+                loading={loading}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 components={{ Toolbar: CustomHeader }}
+                paginationMode="server"
+                rowCount={totalRows}
+                pageSizeOptions={[10, 25, 50]}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
                     display: 'none'
@@ -154,6 +242,23 @@ const BulkDelete = () => {
           </Box>
         </Grid>
       </Grid>
+
+      <Dialog open={confirmUnarchiveOpen} onClose={() => setConfirmUnarchiveOpen(false)}>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>
+         📦  Unarchive User
+        </DialogTitle>
+        <DialogContent>
+          Are you sure you want to unarchive {selectedUser?.name}?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmUnarchiveOpen(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmUnarchive} color="primary" variant="contained">
+            Confirm Unarchive
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

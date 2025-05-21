@@ -11,7 +11,6 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 
-
 const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
@@ -164,8 +163,6 @@ const Lead = () => {
             label: item.name
           }));
 
-         
-
         setServiceTypeOptions(options);
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -252,9 +249,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -293,7 +289,7 @@ const Lead = () => {
             statuses={statusFilter}
             statusFilter={status}
             setStatusFilter={setStatus}
-            selectedFilters={['statusFilter', 'serviceTypeFilter']}
+            selectedFilters={['serviceTypeFilter', 'statusFilter']}
             onReset={handleReset}
           />
 

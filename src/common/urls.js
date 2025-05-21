@@ -1,4 +1,4 @@
-const baseUrl = 'https://thirdex.samyotech.in/api/v1' ;
+const baseUrl = 'https://thirdex.samyotech.in/api/v1';
 export const imageUrl = 'https://thirdex.samyotech.in/';
 
 export const urls = Object.freeze({
@@ -23,7 +23,7 @@ export const urls = Object.freeze({
     editUser: `${baseUrl}/user/edituser`,
     deleteUser: `${baseUrl}/user/deleteuser`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
-    archive:`${baseUrl}/user/archive`,
+    archive: `${baseUrl}/user/archive`
   },
   service: {
     create: `${baseUrl}/services/addServices`,
@@ -37,7 +37,8 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/cases/getAllCases`,
     delete: `${baseUrl}/cases/deleteCase/:id`,
     filterType: `${baseUrl}/cases/search`,
-    getById: `${baseUrl}/cases/getCaseById/:id`
+    getById: `${baseUrl}/cases/getCaseById/:id`,
+    fetchWithPagination: `${baseUrl}/cases/allwithpagination`
   },
   mail: {
     create: `${baseUrl}/mail/addmail`,

@@ -422,9 +422,9 @@ const TabbedDataGrid = () => {
                 variant="outlined"
               />
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '40%' }}>
                 <Typography sx={{ fontSize: '14px', mb: 0.5, ml: 2 }}>Active Or Inactive?</Typography>
-                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ml:-8}}/>
+                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ml:-10}}/>
               </Box>
             </Box>
 

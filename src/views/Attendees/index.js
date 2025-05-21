@@ -18,16 +18,24 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { urls } from 'common/urls';
-import { getApi } from 'common/apiClient';
+import { getApi, postApi } from 'common/apiClient';
+import { useLocation } from 'react-router-dom';
 
 export default function SessionRegisterPage() {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
+
+  const location = useLocation();
+  const session = location.state.session;
+
+  const sessionId = session._id;
 
   useEffect(() => {
     const fetchpeople = async () => {
       const response = await getApi(urls.serviceuser.fetch);
       const allUser = response?.data?.allUser || [];
+
       const formattedUsers = allUser.map((user) => ({
         id: user._id,
         name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
@@ -36,6 +44,26 @@ export default function SessionRegisterPage() {
     };
     fetchpeople();
   }, []);
+
+  const handleSubmit = async () => {
+    if (!selectedUserId) {
+      toast.error('Please select a user!');
+      return;
+    }
+
+    try {
+      const payload = {
+        sessionId: sessionId,
+        userId: selectedUserId
+      };
+
+      const response = await postApi(urls.attendees.create, payload);
+      toast.success('Attendees added successfully');
+    } catch (error) {
+      console.error('Error while add attendee:', error);
+      toast.error('Error while add attendee');
+    }
+  };
 
   return (
     <>
@@ -98,7 +126,7 @@ export default function SessionRegisterPage() {
                 <Grid item xs={12} sm={8}>
                   <FormControl fullWidth>
                     <InputLabel>Select Attendee</InputLabel>
-                    <Select defaultValue="">
+                    <Select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
                       {rows.map((user) => (
                         <MenuItem key={user.id} value={user.id}>
                           {user.name}
@@ -117,6 +145,7 @@ export default function SessionRegisterPage() {
                         py: 1,
                         borderRadius: 2
                       }}
+                      onClick={handleSubmit}
                     >
                       SUBMIT
                     </Button>

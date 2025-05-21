@@ -244,7 +244,7 @@ const UserProfile = () => {
                         px: 0.5,
                         maxHeight: '50px'
                       }}
-                      onClick={() => navigate('/attendees')}
+                      onClick={() => navigate('/attendees', { state: { session }} )}
                     >
                       Add Attendee
                     </Button>

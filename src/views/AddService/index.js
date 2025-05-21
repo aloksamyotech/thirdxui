@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { Grid, TextField, Box, Paper, Button, MenuItem, InputAdornment, FormControlLabel, Card, Typography } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,6 @@ const AddCaseForm = ({ onCancel }) => {
   const [isLoading, setIsloading] = useState(false);
   const [servicetype, setServiceType] = useState([]);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
-
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -114,12 +113,21 @@ const AddCaseForm = ({ onCancel }) => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Add New Service</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/services')}>
-          <ArrowBackIcon sx={{ color: 'grey' }} />
-          <Typography variant="h6" sx={{ mr: 1 }}>
-            Back
-          </Typography>
+        <Typography variant="h4">Adding New Service</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/services')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
       </Box>
 
@@ -327,12 +335,12 @@ const AddCaseForm = ({ onCancel }) => {
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
               <Grid item>
                 <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
+                  {isLoading ? 'Saving...' : 'SAVE CHANGES'}
                 </Button>
               </Grid>
               <Grid item>
                 <Button variant="outlined" color="error" onClick={onCancel}>
-                  Cancel
+                  CANCEL
                 </Button>
               </Grid>
             </Grid>

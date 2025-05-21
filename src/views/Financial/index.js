@@ -148,12 +148,10 @@ const Lead = () => {
       if (assignedTo) queryParams.append('assignedTo', assignedTo);
       if (campaignName) queryParams.append('campaign', campaignName);
 
- if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
-
-
 
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());
@@ -165,7 +163,7 @@ const Lead = () => {
       const url = `${urls.transaction.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
 
-    const allTransaction = response?.data?.data || [];
+      const allTransaction = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
       const formattedUsers = allTransaction.map((item, index) => ({
@@ -265,9 +263,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -308,8 +305,7 @@ const Lead = () => {
             setNameFilter={(value) => setAssignedTo(value)}
             campaigns={campaignTypeOptions}
             campaignFilter={campaignName}
-            setCampaignFilter=
-            {(value) => setCampaignName(value)}
+            setCampaignFilter={(value) => setCampaignName(value)}
             selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
             onReset={handleReset}
           />

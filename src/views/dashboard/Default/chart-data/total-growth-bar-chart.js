@@ -39,7 +39,7 @@ const chartData = {
     legend: {
       show: true,
       fontSize: '14px',
-      fontFamily: `'poppins', sans-serif`,
+      fontFamily: 'Poppins',
       position: 'bottom',
       offsetX: 20,
       labels: {

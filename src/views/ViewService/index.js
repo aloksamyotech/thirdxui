@@ -15,7 +15,7 @@ import {
   Tooltip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import InfoIcon from '@mui/icons-material/Info';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Background from 'assets/images/groupWork.jpg';
@@ -82,15 +82,17 @@ const UserProfile = () => {
   }, [serviceData._id]);
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-        <IconButton onClick={() => navigate('/services')}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h6" fontWeight="bold">
-          Service Details
-        </Typography>
-      </Stack>
+    <>
+      <Grid item xs={12} mb={2}>
+        <Stack direction="row" alignItems="center">
+          <Typography fontWeight="bold" display="flex" alignItems="center">
+            <IconButton onClick={() => navigate('/services')}>
+              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+            </IconButton>
+            Service Details
+          </Typography>
+        </Stack>
+      </Grid>
 
       <Grid container spacing={2}>
         <FilterPanel
@@ -114,59 +116,56 @@ const UserProfile = () => {
               <Grid item xs={12} md={4}>
                 <Box
                   component="img"
-                  // src={loading ? Background : serviceData.file ? `${imageUrl}${serviceData.file}` : Background}
-                   src={
-                      loading ? Background :
-  serviceData.file
-    ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-    : Background
-}
+                  src={
+                    loading
+                      ? Background
+                      : serviceData.file
+                      ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                      : Background
+                  }
                   alt="Service"
-                   
                   sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
                 />
               </Grid>
 
               <Grid item xs={12} md={8}>
                 <Stack>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-  <Tooltip title={(serviceData?.name || '').toUpperCase()}>
-    <Typography
-      variant="h5"
-      fontWeight="bold"
-      sx={{
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        maxWidth: '60%' // adjust based on layout
-      }}
-    >
-      {(serviceData?.name || '').toUpperCase()}
-    </Typography>
-  </Tooltip>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Tooltip title={(serviceData?.name || '').toUpperCase()}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '60%' 
+                        }}
+                      >
+                        {(serviceData?.name || '').toUpperCase()}
+                      </Typography>
+                    </Tooltip>
 
-  <Button
-    variant="contained"
-    startIcon={<AddIcon />}
-    sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
-    onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
-  >
-    Add New Session
-  </Button>
-</Box>
-
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
+                      onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
+                    >
+                      Add New Session
+                    </Button>
+                  </Box>
 
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green' }} />
-                    <Typography variant="body2" color="green" fontWeight="bold">
+                    <Typography variant="body2" color="green">
                       {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
                     </Typography>
                   </Stack>
 
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary" mb={1}>
                     Service Code - {serviceData?.code}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary" mb={1}>
                     Start Date - {formatDate(serviceData?.createdAt)}
                   </Typography>
                   <Typography variant="body2">
@@ -179,7 +178,7 @@ const UserProfile = () => {
           </Card>
 
           <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff' }}>
-            <Typography variant="h6" fontWeight="bold" mb={1}>
+            <Typography variant="h5" mb={1}>
               Session List
             </Typography>
             <Divider />
@@ -258,7 +257,7 @@ const UserProfile = () => {
           </Card>
         </Grid>
       </Grid>
-    </Box>
+    </>
   );
 };
 

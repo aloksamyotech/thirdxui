@@ -22,7 +22,7 @@ import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import Link from '@mui/material/Link';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -253,12 +253,21 @@ const AddDonorForm = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">{location.state?.isEdit ? 'Edit Donor' : 'Add Donor'}</Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
-            <ArrowBackIcon sx={{ color: 'grey' }} />
-            <Typography variant="h6" sx={{ mr: 1 }}>
-              Back
-            </Typography>
-          </Box>
+           <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/donor')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
+        </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -1415,12 +1424,12 @@ const AddDonorForm = () => {
                           onSubmit(data);
                         })}
                       >
-                        {isLoading ? 'Saving...' : 'Save Changes'}
+                        {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
                       </Button>
                     </Grid>
                     <Grid item>
                       <Button variant="outlined" color="error" onClick={() => navigate('/donor')}>
-                        Cancel
+                        CANCEL
                       </Button>
                     </Grid>
                   </Grid>

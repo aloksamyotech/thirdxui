@@ -25,7 +25,7 @@ import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import Link from '@mui/material/Link';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -321,11 +321,20 @@ const AddCaseForm = ({ onCancel }) => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">{editdata ? 'Edit User' : 'Add New User'}</Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/users')}>
-            <ArrowBackIcon sx={{ color: 'grey' }} />
-            <Typography variant="h6" sx={{ mr: 1 }}>
-              Back
-            </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'grey',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/users')}
+          >
+            <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
@@ -1996,12 +2005,12 @@ const AddCaseForm = ({ onCancel }) => {
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
                       <Button variant="outlined" color="error" onClick={onCancel}>
-                        Cancel
+                        CANCEL
                       </Button>
                     </Grid>
                     <Grid item>
                       <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-                        {isLoading ? 'Saving...' : 'Save Changes'}
+                        {isLoading ? 'Saving...' : 'SAVE CHANGES'}
                       </Button>
                     </Grid>
                   </Grid>{' '}

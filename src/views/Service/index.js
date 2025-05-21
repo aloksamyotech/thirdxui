@@ -11,7 +11,6 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 
-
 const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
@@ -67,36 +66,30 @@ const Lead = () => {
   });
 
   const columns = [
-{
-  field: 'name',
-  headerName: 'Service Name',
-  flex: 1.5,
-  renderCell: (params) => (
-    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
-      <Typography
-        variant="body1"
-        sx={{
-          textTransform: 'uppercase',
-          fontWeight: 'bold',
-          whiteSpace: 'normal',         
-          wordBreak: 'break-word',      
-          overflowWrap: 'break-word',
-        }}
-      >
-        {params.row.name}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="textSecondary"
-        sx={{ whiteSpace: 'nowrap' }}  
-      >
-        {new Date(params.row.updatedAt).toDateString()}
-      </Typography>
-    </Stack>
-  )
-}
-,
-
+    {
+      field: 'name',
+      headerName: 'Service Name',
+      flex: 1.5,
+      renderCell: (params) => (
+        <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: 'uppercase',
+              fontWeight: 'bold',
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word'
+            }}
+          >
+            {params.row.name}
+          </Typography>
+          <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap' }}>
+            {new Date(params.row.updatedAt).toDateString()}
+          </Typography>
+        </Stack>
+      )
+    },
     {
       field: 'serviceType',
       headerName: 'Service Type',
@@ -163,8 +156,6 @@ const Lead = () => {
             value: item._id,
             label: item.name
           }));
-
-         
 
         setServiceTypeOptions(options);
       } catch (error) {
@@ -252,9 +243,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -293,7 +283,7 @@ const Lead = () => {
             statuses={statusFilter}
             statusFilter={status}
             setStatusFilter={setStatus}
-            selectedFilters={['statusFilter', 'serviceTypeFilter']}
+            selectedFilters={['serviceTypeFilter', 'statusFilter']}
             onReset={handleReset}
           />
 

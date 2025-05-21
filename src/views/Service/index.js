@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { Stack, Button,InputBase, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase,Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -10,7 +11,6 @@ import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -34,7 +34,8 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-          color: '#333',
+            fontWeight: '',
+            color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
@@ -76,6 +77,7 @@ const Lead = () => {
         variant="body1"
         sx={{
           textTransform: 'uppercase',
+          fontWeight: 450,
           whiteSpace: 'normal',         
           wordBreak: 'break-word',      
           overflowWrap: 'break-word',
@@ -166,8 +168,6 @@ const Lead = () => {
             label: item.name
           }));
 
-         
-
         setServiceTypeOptions(options);
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -254,9 +254,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -273,85 +272,45 @@ const Lead = () => {
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-
-          {/* <TextField
-            size="small"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            InputProps={{
-              endAdornment: <SearchIcon />
+            <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
             }}
-            sx={{ width: '350px' }}
-          /> */}
-
-          <Box
-
-  sx={{
-
-    display: 'flex',
-
-    alignItems: 'center',
-
-    backgroundColor: '#f8f9fa',
-
-    borderRadius: '30px',
-
-    paddingLeft: '16px',
-
-    width: '350px',
-
-    height: '40px'
-
-  }}
->
-<InputBase
-
-    placeholder="Search..."
-
-    value={searchQuery}
-
-    onChange={handleSearchChange}
-
-    onKeyPress={(e) => {
-
-      if (e.key === 'Enter') {
-
-        handleFilter();
-
-      }
-
-    }}
-
-    sx={{
-
-      flex: 1,
-
-      color: 'text.primary'
-
-    }}
-
-  />
-<IconButton
-
-    onClick={handleFilter}
-
-    sx={{
-
-      marginRight: '8px',
-
-      width: 32,
-
-      height: 32,
-
-      cursor: 'pointer'
-
-    }}
->
-<SearchIcon />
-</IconButton>
-</Box>
- 
+          >
+          <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+          <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+          >
+          <SearchIcon />
+          </IconButton>
+          </Box>
+     
         </Stack>
 
         <Grid container spacing={2}>
@@ -363,7 +322,7 @@ const Lead = () => {
             statuses={statusFilter}
             statusFilter={status}
             setStatusFilter={setStatus}
-            selectedFilters={['statusFilter', 'serviceTypeFilter']}
+            selectedFilters={['serviceTypeFilter', 'statusFilter']}
             onReset={handleReset}
           />
 

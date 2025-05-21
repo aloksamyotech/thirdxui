@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip ,InputBase} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -88,13 +88,13 @@ const Lead = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          MAILING LIST
+          Mailing List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -113,7 +113,7 @@ const Lead = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: 450 }}>
                 {params.row.name} #{params.row.id}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -137,14 +137,45 @@ const Lead = () => {
       <Grid>
         <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
           <Typography variant="h4">Mailing List</Typography>
-          <TextField
-            size="small"
-            placeholder="Search..."
-            InputProps={{
-              endAdornment: <SearchIcon />
-            }}
-            sx={{ width: '350px' }}
-          />
+                   <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  backgroundColor: '#f8f9fa',
+                                  borderRadius: '30px',
+                                  paddingLeft: '16px',
+                                  border: '1px solid #e0e0e0',
+                                  width: '350px',
+                                  height: '40px'
+                                }}
+                              >
+                                <InputBase
+                                  placeholder="Search..."
+                                  // value={searchQuery}
+                                  // onChange={handleSearchChange}
+                                  // onKeyPress={(e) => {
+                                  //   if (e.key === 'Enter') {
+                                  //     handleFilter();
+                                  //   }
+                                  // }}
+                                  sx={{
+                                    flex: 1,
+                                    color: 'text.primary'
+                                  }}
+                                />
+                                <IconButton
+                                  // onClick={handleFilter}
+                                  sx={{
+                                    marginRight: '8px',
+                                    width: 32,
+                                    height: 32,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  <SearchIcon />
+                                </IconButton>
+                              </Box>
+      
         </Stack>
 
         <Grid container spacing={2}>

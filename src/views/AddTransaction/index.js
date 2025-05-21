@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Grid, TextField, Card, CardContent, CardHeader, Tabs, Tab, Box, Typography, MenuItem, Button } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
@@ -64,40 +64,45 @@ const AddCaseForm = ({ onCancel }) => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
 
-   useEffect(() => {
-      const fetchCampaign = async () => {
-        try {
-          const response = await getApi(urls.configuration.fetch);
-  
-          const options = response?.data?.allConfiguration
-            ?.filter((item) => item.configurationType === 'Campaign')
-            ?.map((item) => ({
-              value: item._id,
-              label: item.name
-            }));
-  
-          setCampaignTypeOptions(options);
-        } catch (error) {
-          console.error('Error fetching config:', error);
-        }
-      };
-      fetchCampaign();
-    }, []);
-  
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Campaign')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
 
-    
+        setCampaignTypeOptions(options);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchCampaign();
+  }, []);
 
   return (
     <Grid>
       <Card sx={{ backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">Add Transaction</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/financial')}>
-            <ArrowBackIcon sx={{ color: 'grey' }} />
-            <Typography variant="h6" sx={{ mr: 1 }}>
-              Back
-            </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'grey',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/financial')}
+          >
+            <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
         </Box>
 
@@ -134,31 +139,30 @@ const AddCaseForm = ({ onCancel }) => {
                           />
                         </Grid>
 
-                       <Grid item xs={12} sm={6}>
-  <Controller
-    name="campaign"
-    control={control}
-    rules={{ required: 'Campaign is required' }}
-    render={({ field }) => (
-      <TextField
-        select
-        fullWidth
-        size="small"
-        label="Campaign"
-        {...field}
-        error={!!errors.campaign}
-        helperText={errors.campaign?.message}
-      >
-        {campaignTypeOptions.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </TextField>
-    )}
-  />
-</Grid>
-
+                        <Grid item xs={12} sm={6}>
+                          <Controller
+                            name="campaign"
+                            control={control}
+                            rules={{ required: 'Campaign is required' }}
+                            render={({ field }) => (
+                              <TextField
+                                select
+                                fullWidth
+                                size="small"
+                                label="Campaign"
+                                {...field}
+                                error={!!errors.campaign}
+                                helperText={errors.campaign?.message}
+                              >
+                                {campaignTypeOptions.map((option) => (
+                                  <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </MenuItem>
+                                ))}
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
 
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -366,12 +370,12 @@ const AddCaseForm = ({ onCancel }) => {
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
               <Grid item>
                 <Button type="submit" variant="contained" sx={{ background: '#053146' }}>
-                  Save Changes
+                  SAVE CHANGES
                 </Button>
               </Grid>
               <Grid item>
                 <Button variant="outlined" color="error" onClick={onCancel}>
-                  Cancel
+                  CANCEL
                 </Button>
               </Grid>
             </Grid>

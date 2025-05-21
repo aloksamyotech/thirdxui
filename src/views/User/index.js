@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button,InputBase } from '@mui/material';
 import TableStyle from '../../ui-component/TableStyle';
 import { Close } from '@mui/icons-material';
 import { IconTrash, IconPencil } from '@tabler/icons';
@@ -112,7 +112,7 @@ const User = () => {
               lineHeight: '36px'
             }}
           >
-            USER LIST
+            User List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -235,9 +235,8 @@ const User = () => {
                 sx={{
                   backgroundColor: '#009fc7',
                   borderRadius: '4px',
-                  width: 'auto',
+                  width: '220px',
                   height: '35px',
-                  px: 2,
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -254,15 +253,44 @@ const User = () => {
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '350px' }}
-            />
+  <Box
+                                                             sx={{
+                                                               display: 'flex',
+                                                               alignItems: 'center',
+                                                               backgroundColor: '#f8f9fa',
+                                                               borderRadius: '30px',
+                                                               paddingLeft: '16px',
+                                                               border: '1px solid #e0e0e0',
+                                                               width: '350px',
+                                                               height: '40px'
+                                                             }}
+                                                           >
+                                                             <InputBase
+                                                               placeholder="Search..."
+                                                               // value={searchQuery}
+                                                               // onChange={handleSearchChange}
+                                                               // onKeyPress={(e) => {
+                                                               //   if (e.key === 'Enter') {
+                                                               //     handleFilter();
+                                                               //   }
+                                                               // }}
+                                                               sx={{
+                                                                 flex: 1,
+                                                                 color: 'text.primary'
+                                                               }}
+                                                             />
+                                                             <IconButton
+                                                               // onClick={handleFilter}
+                                                               sx={{
+                                                                 marginRight: '8px',
+                                                                 width: 32,
+                                                                 height: 32,
+                                                                 cursor: 'pointer'
+                                                               }}
+                                                             >
+                                                               <SearchIcon />
+                                                             </IconButton>
+                                                           </Box>
           </Stack>
 
           <Grid container spacing={2}>

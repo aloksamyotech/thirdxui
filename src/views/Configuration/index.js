@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button } from '@mui/material';
+import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button,InputBase } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
@@ -252,8 +252,45 @@ const TabbedDataGrid = () => {
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
         <Typography variant="h4">Configurations</Typography>
-        <TextField size="small" placeholder="Search..." InputProps={{ endAdornment: <SearchIcon /> }} sx={{ width: '350px' }} />
-      </Stack>
+    <Box
+                                                        sx={{
+                                                          display: 'flex',
+                                                          alignItems: 'center',
+                                                          backgroundColor: '#f8f9fa',
+                                                          borderRadius: '30px',
+                                                          paddingLeft: '16px',
+                                                          border: '1px solid #e0e0e0',
+                                                          width: '350px',
+                                                          height: '40px'
+                                                        }}
+                                                      >
+                                                        <InputBase
+                                                          placeholder="Search..."
+                                                          // value={searchQuery}
+                                                          // onChange={handleSearchChange}
+                                                          // onKeyPress={(e) => {
+                                                          //   if (e.key === 'Enter') {
+                                                          //     handleFilter();
+                                                          //   }
+                                                          // }}
+                                                          sx={{
+                                                            flex: 1,
+                                                            color: 'text.primary'
+                                                          }}
+                                                        />
+                                                        <IconButton
+                                                          // onClick={handleFilter}
+                                                          sx={{
+                                                            marginRight: '8px',
+                                                            width: 32,
+                                                            height: 32,
+                                                            cursor: 'pointer'
+                                                          }}
+                                                        >
+                                                          <SearchIcon />
+                                                        </IconButton>
+                                                      </Box>
+                </Stack>
 
       <Grid container spacing={2}>
         <FilterPanel
@@ -422,9 +459,9 @@ const TabbedDataGrid = () => {
                 variant="outlined"
               />
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '40%' }}>
                 <Typography sx={{ fontSize: '14px', mb: 0.5, ml: 2 }}>Active Or Inactive?</Typography>
-                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ml:-8}}/>
+                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ml:-10}}/>
               </Box>
             </Box>
 

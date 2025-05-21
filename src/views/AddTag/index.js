@@ -17,13 +17,14 @@ import {
   InputLabel,
   Select,
   OutlinedInput,
+  InputBase,
   Chip,
   MenuItem
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SearchIcon from '@mui/icons-material/Search';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import AntSwitch from 'components/AntSwitch.js';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -160,17 +161,47 @@ const TagForm = () => {
               lineHeight: '36px'
             }}
           >
-            TAG LIST
+            Tag List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '250px' }}
-            />
+         <Box
+                                                             sx={{
+                                                               display: 'flex',
+                                                               alignItems: 'center',
+                                                               backgroundColor: '#f8f9fa',
+                                                               borderRadius: '30px',
+                                                               paddingLeft: '16px',
+                                                               border: '1px solid #e0e0e0',
+                                                               width: '350px',
+                                                               height: '40px'
+                                                             }}
+                                                           >
+                                                             <InputBase
+                                                               placeholder="Search..."
+                                                               // value={searchQuery}
+                                                               // onChange={handleSearchChange}
+                                                               // onKeyPress={(e) => {
+                                                               //   if (e.key === 'Enter') {
+                                                               //     handleFilter();
+                                                               //   }
+                                                               // }}
+                                                               sx={{
+                                                                 flex: 1,
+                                                                 color: 'text.primary'
+                                                               }}
+                                                             />
+                                                             <IconButton
+                                                               // onClick={handleFilter}
+                                                               sx={{
+                                                                 marginRight: '8px',
+                                                                 width: 32,
+                                                                 height: 32,
+                                                                 cursor: 'pointer'
+                                                               }}
+                                                             >
+                                                               <SearchIcon />
+                                                             </IconButton>
+                                                           </Box>
           </Box>
         </GridToolbarContainer>
       </Box>
@@ -183,11 +214,20 @@ const TagForm = () => {
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
           Add Tag Category
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/tags')}>
-          <ArrowBackIcon sx={{ color: 'grey' }} />
-          <Typography variant="h6" sx={{ mr: 1 }}>
-            Back
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/tags')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
       </Box>
 
@@ -311,12 +351,12 @@ const TagForm = () => {
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
               <Button variant="contained" sx={{ background: '#053146' }}>
-                Save Changes
+                SAVE CHANGES
               </Button>
             </Grid>
             <Grid item>
               <Button variant="outlined" color="error">
-                Cancel
+                CANCEL
               </Button>
             </Grid>
           </Grid>

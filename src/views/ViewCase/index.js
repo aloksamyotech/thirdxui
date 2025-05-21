@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Grid, Typography, Stack, Button, IconButton, Chip, TextField } from '@mui/material';
+import { Box, Card, CardContent, Grid, Typography, InputBase, Stack, Button, IconButton, Chip, TextField } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import { Add, Visibility, VisibilityOff } from '@mui/icons-material';
@@ -117,7 +117,7 @@ const CaseDetailsPage = () => {
       width: 160,
       renderCell: () => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {serviceDetails?.name || ''}
+          {`${serviceuserDetails?.personalInfo?.firstName || ''} ${serviceuserDetails?.personalInfo?.lastName || ''}`}
         </Typography>
       )
     },
@@ -160,16 +160,17 @@ const CaseDetailsPage = () => {
         const status = caseData?.serviceStatus;
 
         return (
-         
           <Chip
-  label={status === 'Active' ? 'Open' : 'Close'}
-  icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-  sx={{
-    borderColor: status === 'Active' ? 'gray' : 'gray',
-    color: status === 'Active' ? 'gray' : 'gray'
-  }}
-/>
- );
+            label={status === 'Active' ? 'Open' : 'Close'}
+            icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+            variant="outlined" 
+            sx={{
+              borderColor: 'gray',
+              color: 'gray',
+              backgroundColor: 'transparent'
+            }}
+          />
+        );
       }
     }
   ];
@@ -177,7 +178,7 @@ const CaseDetailsPage = () => {
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return isNaN(date) ? '' : date.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+    return isNaN(date) ? '' : date.toLocaleDateString('en-GB');
   };
 
   const rows = [
@@ -194,9 +195,9 @@ const CaseDetailsPage = () => {
     }
   ];
 
-const userProfile =serviceuserDetails?.otherInfo?.file
-const fullImageUrl = userProfile ? `${imageUrl}${userProfile }` : '';
-const caseNotes = [
+  const userProfile = serviceuserDetails?.otherInfo?.file;
+  const fullImageUrl = userProfile ? `${imageUrl}${userProfile}` : '';
+  const caseNotes = [
     {
       id: 1,
       date: '08/25/2017',
@@ -306,34 +307,63 @@ const caseNotes = [
       <Box>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Stack direction="row" alignItems="center">
-                <IconButton onClick={() => navigate('/case')}>
-                  <ArrowBackIcon />
-                </IconButton>
-                <Typography variant="h5" gutterBottom>
-                  {serviceDetails?.name}
+                <Typography fontWeight="bold" display="flex" alignItems="center">
+                  <IconButton onClick={() => navigate('/case')}>
+                    <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+                  </IconButton>
+                  {serviceDetails.name}
                 </Typography>
               </Stack>
 
-              <TextField
-                size="small"
-                placeholder="Search..."
-                InputProps={{
-                  endAdornment: <SearchIcon />
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '30px',
+                  paddingLeft: '16px',
+                  width: '350px',
+                  height: '40px'
                 }}
-                sx={{ width: '350px' }}
-              />
+              >
+                <InputBase
+                  placeholder="Search..."
+                  sx={{
+                    flex: 1,
+                    color: 'text.primary'
+                  }}
+                />
+                <IconButton
+                  sx={{
+                    marginRight: '8px',
+                    width: 32,
+                    height: 32
+                  }}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </Box>
             </Stack>
           </Grid>
 
           <Grid item xs={12} md={3}>
             <Card sx={{ mb: 2, backgroundColor: '#042E4C', color: 'white' }}>
               <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="subtitle1" sx={{ color: 'white' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    padding: '4px 0'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 500 }}>
                     Service User Summary
                   </Typography>
+
                   <Chip
                     label="View"
                     size="small"
@@ -341,7 +371,7 @@ const caseNotes = [
                     sx={{
                       backgroundColor: 'white',
                       color: '#042E4C',
-                      fontWeight: 400,
+                      fontWeight: 300,
                       '&:hover': {
                         backgroundColor: 'white',
                         color: '#042E4C'
@@ -349,21 +379,33 @@ const caseNotes = [
                     }}
                   />
                 </Box>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                  Name: {serviceuserDetails?.personalInfo?.firstName || ''} {serviceuserDetails?.personalInfo?.lastName || ''}
-                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                    <strong>Name:</strong> {serviceuserDetails?.personalInfo?.firstName || ''}{' '}
+                    {serviceuserDetails?.personalInfo?.lastName || ''}
+                  </Typography>
 
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>User ID: 01231</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                  Gender: {serviceuserDetails?.personalInfo?.gender || ''}
-                </Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Contact: {serviceuserDetails?.contactInfo?.phone || ''}</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                  DOB:{' '}
-                  {serviceuserDetails?.personalInfo?.dateOfBirth
-                    ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD/MM/YYYY')
-                    : ''}
-                </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>User ID :</strong> 01231
+                    </Typography>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>Gender:</strong> {serviceuserDetails?.personalInfo?.gender || ''}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>Contact:</strong> {serviceuserDetails?.contactInfo?.phone || ''}
+                    </Typography>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>DOB:</strong>{' '}
+                      {serviceuserDetails?.personalInfo?.dateOfBirth
+                        ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
+                        : ''}
+                    </Typography>
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -415,7 +457,7 @@ const caseNotes = [
       </Box>
 
       <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
-      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={ fullImageUrl } />
+      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>
   );
 };

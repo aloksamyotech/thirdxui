@@ -156,21 +156,21 @@ const FilterPanel = ({
     },
     statusFilter: {
       data: statuses,
-      label: 'By Status',
+      label: 'Select Status',
       onChange: setStatusFilter,
       value: statusFilter,
       type: 'select'
     },
     serviceTypeFilter: {
       data: serviceTypes,
-      label: 'By Service Type',
+      label: 'Select Service Type',
       onChange: setServiceTypeFilter,
       value: serviceTypeFilter,
       type: 'select'
     },
     dateOpenedFilter: {
       data: dateOpenedFilters,
-      label: 'By Date Opened',
+      label: 'Date Opened',
       onChange: setDateOpenedFilter,
       value: dateOpenedFilter,
       type: 'date'
@@ -190,7 +190,7 @@ const FilterPanel = ({
     },
     listNameFilter: {
       data: listNames,
-      label: 'By List Name',
+      label: 'List Name',
       onChange: setListNameFilter,
       value: listNameFilter,
       type: 'select'
@@ -211,7 +211,7 @@ const FilterPanel = ({
     },
     nameFilter: {
       data: names,
-      label: 'By Name',
+      label: 'Name',
       onChange: setNameFilter,
       value: nameFilter,
       type: 'select'
@@ -232,14 +232,14 @@ const FilterPanel = ({
     },
     caseIdFilter: {
       data: caseIds,
-      label: 'By Case ID',
+      label: 'Case ID',
       onChange: setCaseIdFilter,
       value: caseIdFilter,
       type: 'select'
     },
     countryOfOriginFilter: {
       data: countriesWithFlags,
-      label: 'By Country of Origin',
+      label: 'Select country of origin',
       onChange: setCountryOfOriginFilter,
       value: countryOfOriginFilter,
       type: 'select'

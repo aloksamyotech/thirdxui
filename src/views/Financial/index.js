@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField,InputBase, IconButton, Tooltip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -43,13 +43,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          DONATION TRANSACTIONS
+          Donation Transactions
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -148,12 +148,10 @@ const Lead = () => {
       if (assignedTo) queryParams.append('assignedTo', assignedTo);
       if (campaignName) queryParams.append('campaign', campaignName);
 
- if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
-
-
 
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());
@@ -165,7 +163,7 @@ const Lead = () => {
       const url = `${urls.transaction.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
 
-    const allTransaction = response?.data?.data || [];
+      const allTransaction = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
       const formattedUsers = allTransaction.map((item, index) => ({
@@ -265,9 +263,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -285,16 +282,45 @@ const Lead = () => {
             </IconButton>
           </Tooltip>
 
-          <TextField
-            size="small"
-            placeholder="Search..."
-            onChange={handleSearchChange}
-            value={searchQuery}
-            InputProps={{
-              endAdornment: <SearchIcon />
-            }}
-            sx={{ width: '350px' }}
-          />
+                    <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                  border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
+              }}
+            >
+            <InputBase
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilter();
+                  }
+                }}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+            <IconButton
+                onClick={handleFilter}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+            >
+            <SearchIcon />
+            </IconButton>
+            </Box>
+
         </Stack>
 
         <Grid container spacing={2}>
@@ -308,8 +334,7 @@ const Lead = () => {
             setNameFilter={(value) => setAssignedTo(value)}
             campaigns={campaignTypeOptions}
             campaignFilter={campaignName}
-            setCampaignFilter=
-            {(value) => setCampaignName(value)}
+            setCampaignFilter={(value) => setCampaignName(value)}
             selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
             onReset={handleReset}
           />

@@ -27,7 +27,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi } from 'common/apiClient';
+import { postApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -39,7 +39,9 @@ const AddCaseForm = ({ onCancel }) => {
   const fileInputRef = React.useRef(null);
   const location = useLocation();
   const subRole = location.state?.subRole;
-  const editdata = location.state;
+  console.log(subRole);
+  const editdata = location.state || {};
+  console.log(editdata);
 
   const {
     register,
@@ -53,7 +55,7 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-         title: editdata?.personalInfo?.title || '',
+      title: editdata?.personalInfo?.title || '',
       firstname: editdata?.personalInfo?.firstName || '',
       lastname: editdata?.personalInfo?.lastName || '',
       phone: editdata?.contactInfo?.phone || '',
@@ -85,9 +87,7 @@ const AddCaseForm = ({ onCancel }) => {
       preferredContact: editdata?.contactPreferences?.preferredMethod || '',
       reason: editdata?.contactPreferences?.reason || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
-      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation
-        ? dayjs(editdata.contactPreferences.dateOfConfirmation)
-        : null,
+      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
       companyname: editdata?.companyInformation?.companyName || '',
       contactname: editdata?.companyInformation?.mainContactName || '',
       otherId: editdata?.companyInformation?.otherId || '',
@@ -173,26 +173,30 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('role', 'donor');
     fd.append('subRole', subRole);
 
-
-      try {
-       if (editdata) {
-      // ✅ EDIT user
-      await postApi(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    } else {
-      // ✅ CREATE user
-      await postApi(urls.serviceuser.create, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    }
-      toast.success(
-        subRole === 'donar_group'
-          ? 'Donor group added successfully!'
-          : subRole === 'donar_company'
-          ? 'Donor company added successfully!'
-          : 'Donor added successfully!'
-      );
+    try {
+      if (location.state?.isEdit) {
+        await updateApiPatch(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success(
+          subRole === 'donar_group'
+            ? 'Donor group updated successfully!'
+            : subRole === 'donar_company'
+            ? 'Donor company updated successfully!'
+            : 'Donor updated successfully!'
+        );
+      } else {
+        await postApi(urls.serviceuser.create, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success(
+          subRole === 'donar_group'
+            ? 'Donor group added successfully!'
+            : subRole === 'donar_company'
+            ? 'Donor company added successfully!'
+            : 'Donor added successfully!'
+        );
+      }
 
       setIsloading(false);
       navigate('/donor');
@@ -242,26 +246,19 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    {/* <Typography variant="h4">
-  {editdata
-    ? subRole === 'donar_company'
-      ? 'Edit Donor Company'
-      : subRole === 'donar_group'
-      ? 'Edit Donor Group'
-      : 'Edit Donor'
-    : subRole === 'donar_company'
-    ? 'Add Donor Company'
-    : subRole === 'donar_group'
-    ? 'Add Donor Group'
-    : 'Add Donor'}
-</Typography> */}
-
-  <Typography variant="h4">
-  {editdata ? 'Edit Donor' : 'Add Donor'}
-</Typography>
-
-
-
+          <Typography variant="h4">
+            {location.state?.isEdit
+              ? subRole === 'donar_company'
+                ? 'Edit Donor Company'
+                : subRole === 'donar_group'
+                ? 'Edit Donor Group'
+                : 'Edit Donor'
+              : subRole === 'donar_company'
+              ? 'Add Donor Company'
+              : subRole === 'donar_group'
+              ? 'Add Donor Group'
+              : 'Add Donor'}
+          </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />
@@ -431,7 +428,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="otherId"
                                 control={control}
                                 rules={{
-                                  required: 'Other Id is required',
+                                //   required: 'Other Id is required',
                                   minLength: {
                                     value: 3,
                                     message: 'Other Id must be at least 3 characters'
@@ -462,7 +459,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="Recruitmentcampaign"
                                 control={control}
-                                rules={{ required: 'Recruitment Campaign is required' }}
+                                // rules={{ required: 'Recruitment Campaign is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -764,7 +761,7 @@ const AddCaseForm = ({ onCancel }) => {
                               name="riskNotes"
                               control={control}
                               rules={{
-                                required: 'Notes are required',
+                                // required: 'Notes are required',
                                 minLength: {
                                   value: 10,
                                   message: 'Notes must be at least 10 characters long'
@@ -829,9 +826,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="preferredContact"
                         control={control}
-                        rules={{
-                          required: 'Preferred method of contact is required'
-                        }}
+                        // rules={{
+                        //   required: 'Preferred method of contact is required'
+                        // }}
                         render={({ field }) => (
                           <TextField
                             fullWidth
@@ -857,9 +854,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="contactPurpose"
                         control={control}
-                        rules={{
-                          required: 'Contact purpose is required'
-                        }}
+                        // rules={{
+                        //   required: 'Contact purpose is required'
+                        // }}
                         render={({ field }) => (
                           <TextField
                             fullWidth
@@ -881,9 +878,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="confirmationDate"
                         control={control}
-                        rules={{
-                          required: 'Date is required'
-                        }}
+                        // rules={{
+                        //   required: 'Date is required'
+                        // }}
                         render={({ field }) => (
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
@@ -909,9 +906,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="reason"
                         control={control}
-                        rules={{
-                          required: 'Reason is required'
-                        }}
+                        // rules={{
+                        //   required: 'Reason is required'
+                        // }}
                         render={({ field }) => (
                           <TextField
                             fullWidth
@@ -936,7 +933,7 @@ const AddCaseForm = ({ onCancel }) => {
                         name="mobilePhone"
                         control={control}
                         rules={{
-                          required: 'Reason is required',
+                          // required: 'Phone number is required',
                           pattern: {
                             value: onlyNumbers,
                             message: 'Phone number must contain only numbers'
@@ -973,7 +970,7 @@ const AddCaseForm = ({ onCancel }) => {
                         name="email"
                         control={control}
                         rules={{
-                          required: 'Email is required',
+                          // required: 'Email is required',
                           pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message: 'Invalid email address'

@@ -297,7 +297,7 @@ const AddCaseForm = ({ onCancel }) => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">Add New Volunteer</Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/people')}>
+          <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/volunteer')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />
             <Typography variant="h6" sx={{ mr: 1 }}>
               Back

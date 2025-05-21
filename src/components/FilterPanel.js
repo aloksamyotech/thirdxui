@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Grid, Card, Typography, Box, MenuItem, Chip, TextField, Button, Autocomplete } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { LocalizationProvider, DatePicker, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -320,8 +321,8 @@ const FilterPanel = ({
       >
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Box display="flex" alignItems="center">
-            <FilterListIcon sx={{ color: '#4ba1f8', mr: 1 }} />
-            <Typography variant="subtitle1" fontWeight="bold">
+            <FilterAltOutlinedIcon sx={{ color: '#808191' }} />
+            <Typography variant="subtitle1"  color="#808191">
               Filters
             </Typography>
           </Box>

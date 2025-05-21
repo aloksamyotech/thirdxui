@@ -276,6 +276,7 @@ const Lead = () => {
               backgroundColor: '#f8f9fa',
               borderRadius: '30px',
               paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
               width: '350px',
               height: '40px'
             }}

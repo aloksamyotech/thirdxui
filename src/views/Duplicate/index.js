@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, Button, Grid, Stack, Box, TextField, Typography } from '@mui/material';
+import { Avatar, Button, Grid, Stack, Box, TextField, Typography,InputBase ,IconButton} from '@mui/material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -108,14 +108,45 @@ const Duplicate = () => {
       <Box>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography variant="h4">Duplicates</Typography>
-          <TextField
-            size="small"
-            placeholder="Search..."
-            InputProps={{
-              endAdornment: <SearchIcon />
-            }}
-            sx={{ width: 350 }}
-          />
+        <Box
+                                                   sx={{
+                                                     display: 'flex',
+                                                     alignItems: 'center',
+                                                     backgroundColor: '#f8f9fa',
+                                                     borderRadius: '30px',
+                                                     paddingLeft: '16px',
+                                                     border: '1px solid #e0e0e0',
+                                                     width: '350px',
+                                                     height: '40px'
+                                                   }}
+                                                 >
+                                                   <InputBase
+                                                     placeholder="Search..."
+                                                     // value={searchQuery}
+                                                     // onChange={handleSearchChange}
+                                                     // onKeyPress={(e) => {
+                                                     //   if (e.key === 'Enter') {
+                                                     //     handleFilter();
+                                                     //   }
+                                                     // }}
+                                                     sx={{
+                                                       flex: 1,
+                                                       color: 'text.primary'
+                                                     }}
+                                                   />
+                                                   <IconButton
+                                                     // onClick={handleFilter}
+                                                     sx={{
+                                                       marginRight: '8px',
+                                                       width: 32,
+                                                       height: 32,
+                                                       cursor: 'pointer'
+                                                     }}
+                                                   >
+                                                     <SearchIcon />
+                                                   </IconButton>
+                                                 </Box>
+     
         </Stack>
 
         <Grid container spacing={2}>

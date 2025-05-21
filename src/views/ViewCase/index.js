@@ -25,6 +25,12 @@ const CaseDetailsPage = () => {
   const [caseData, setCaseData] = useState(null);
   const [serviceDetails, setServiceDetails] = useState('');
   const [serviceuserDetails, setServiceuserDetails] = useState('');
+  const [row, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+   const [paginationModel, setPaginationModel] = useState({
+      page: 0,
+      pageSize: 10
+    });
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -87,7 +93,7 @@ const CaseDetailsPage = () => {
     dob: dobFormatted || '',
     age: age || '',
     altUserId: serviceuserDetails?.contactInfo?.otherId,
-    service: serviceDetails.name || '',
+    service: serviceDetails?.name || '',
     referredDate: '02/02/2020',
     image: 'https://via.placeholder.com/64'
   };
@@ -265,6 +271,36 @@ const caseNotes = [
     fetchData();
   }, [id]);
 
+   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(
+          `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
+        );
+        const allCasesNotes = response?.data?.data || [];
+        const pagination = response?.data?.meta || { total: 0 };
+
+        const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
+          id: item._id || index,
+          date: item.date ? new Date(item.date).toLocaleDateString() : '',
+          subject: item?.subject || '',
+          contactType: item?.configurationId?.name || '',
+          
+        }));
+
+        setRows(formattedCasesNotes);
+
+        setTotalRows(pagination?.total);
+        
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+      }
+    };
+
+    fetchData();
+  }, [paginationModel]);
+
+
   return (
     <>
       <Box>
@@ -276,7 +312,7 @@ const caseNotes = [
                   <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h5" gutterBottom>
-                  {serviceDetails.name}
+                  {serviceDetails?.name}
                 </Typography>
               </Stack>
 
@@ -360,7 +396,7 @@ const caseNotes = [
           <Grid item xs={12} md={9}>
             <Box sx={{ height: 'auto', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
-                rows={caseNotes}
+                rows={row}
                 columns={columns}
                 components={{
                   Toolbar: () => <CustomHeader />

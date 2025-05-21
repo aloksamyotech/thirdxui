@@ -49,7 +49,7 @@ const Lead = () => {
               lineHeight: '36px'
             }}
           >
-            MAILING LIST
+            Mailing List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -69,7 +69,7 @@ const Lead = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             <PersonIcon />
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: '' }}>
                 {params.row.name} {params.row.serialNumber}
               </Typography>
             </Box>

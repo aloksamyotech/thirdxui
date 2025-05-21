@@ -12,7 +12,13 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
+  Chip,
+  MenuItem
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -24,21 +30,23 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { postApi } from 'common/apiClient';
+import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import moment from 'moment';
 
 const TagForm = () => {
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState([]);
   const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsloading] = useState(false);
 
-
-  const { control, handleSubmit, setValue } = useForm({
+  const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
+      tagDescription: '',
+      tagCategoryName: '',
       name: '',
       startDate: null,
       endDate: null,
@@ -50,7 +58,9 @@ const TagForm = () => {
     try {
       const response = await postApi(urls.tag.create, data);
       toast.success('Tag created successfully');
+
       setIsModalOpen(false);
+      reset();
     } catch (error) {
       console.error('Error creating tag:', error);
     } finally {
@@ -58,25 +68,71 @@ const TagForm = () => {
     }
   };
 
-  const handleTagChange = (e) => {
-    setTagData({ ...tagData, [e.target.name]: e.target.value });
+  const handleTagChange = async (selectedTagCategory) => {
+    try {
+      setIsloading(true);
+      const response = await getApi(urls.tag.getAllTags);
+
+      const filteredTags = response?.data?.allTags?.filter((item) => item.tagCategoryName === selectedTagCategory);
+
+      setTags(filteredTags);
+    } catch (error) {
+      console.error('Error fetching tags for selected category:', error);
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  const handleStatusChange = async (tagId, newStatus) => {
+    try {
+      await updateApi(`${urls.tag.updateStatus}/${tagId}`, {
+        isActive: newStatus
+      });
+      toast.success('Tag update successfully');
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Configuration', flex: 1 },
+    { field: 'tagCategoryName', headerName: 'Tag Category Name', flex: 1 },
+    { field: 'name', headerName: 'Tag Name', flex: 1 },
+    { field: 'tagDescription', headerName: 'Tag Description', flex: 1 },
     {
-      field: 'status',
+      field: 'startDate',
+      headerName: 'Start Date',
+      flex: 1,
+      valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
+    },
+    {
+      field: 'endDate',
+      headerName: 'End Date',
+      flex: 1,
+      valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
+    },
+
+    {
+      field: 'isActive',
       headerName: 'Status',
-      renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        const handleToggle = (event) => {
+          const newStatus = event.target.checked;
+          handleStatusChange(params.row._id, newStatus);
+        };
+
+        return <AntSwitch defaultChecked={params.value} color="primary" onChange={handleToggle} />;
+      }
     }
   ];
 
-  const rows = [
-    { id: 1, name: 'Adoption Enquirer', status: true },
-    { id: 2, name: 'Adoption Gift Recipients', status: true },
-    { id: 3, name: 'Past Adopters', status: true },
-    { id: 4, name: 'Current Adopters', status: true }
+  const categoryOptions = [
+    'Beneficiary Information',
+    'Campaigns Supported',
+    'Engagement',
+    'Event Attended',
+    'Funding Interests',
+    'Fundraising Activities'
   ];
 
   const CustomHeader = () => {
@@ -138,8 +194,14 @@ const TagForm = () => {
       <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
         <Grid container spacing={2} alignItems="center" mt={1}>
           <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" />
+            {/* <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" /> */}
+            <Controller
+              name="tagDescription"
+              control={control}
+              render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+            />
           </Grid>
+
           <Grid item xs={12} sm={3}>
             <FormControlLabel
               control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />}
@@ -147,8 +209,52 @@ const TagForm = () => {
               labelPlacement="start"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Tags can be applied to" value={tags} onChange={(e) => setTags(e.target.value)} size="small" />
+          </Grid> */}
+
+          <Grid item xs={12} sm={6}>
+            {/* <Controller
+              name="tagCategoryName"
+              control={control}
+              rules={{
+                required: 'Tag Category is required'
+              }}
+              render={({ field }) => (
+                <TextField {...field} select fullWidth label="Tags can be applied to" size="small">
+                  {categoryOptions?.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            /> */}
+
+            <Controller
+              name="tagCategoryName"
+              control={control}
+              rules={{ required: 'Tag Category is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  fullWidth
+                  label="Tags can be applied to"
+                  size="small"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleTagChange(e.target.value);
+                  }}
+                >
+                  {categoryOptions?.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
           </Grid>
         </Grid>
 
@@ -186,9 +292,9 @@ const TagForm = () => {
         <Box width="100%" sx={{ mt: 2 }}>
           <Card>
             <DataGrid
-              rows={rows}
+              rows={tags}
               columns={columns}
-              getRowId={(row) => row.id}
+              getRowId={(row) => row._id}
               components={{ Toolbar: CustomHeader }}
               pagination={false}
               hideFooter

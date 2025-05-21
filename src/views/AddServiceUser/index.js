@@ -31,7 +31,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, getApi } from 'common/apiClient';
+import { postApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -235,7 +235,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     try {
       if (editdata) {
-        await postApi(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+        await updateApiPatch(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         toast.success('Service user updated successfully!');

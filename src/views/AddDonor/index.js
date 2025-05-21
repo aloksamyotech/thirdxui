@@ -28,7 +28,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, getApi } from 'common/apiClient';
+import { postApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddDonorForm = () => {
@@ -87,7 +87,7 @@ const AddDonorForm = () => {
       telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
-      role: 'donor',
+      role: 'donor'
     }
   });
 
@@ -175,12 +175,18 @@ const AddDonorForm = () => {
     fd.append('subRole', 'donar_individual');
 
     try {
-      const response = await postApi(urls.serviceuser.create, fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      toast.success('Donor added successfully!');
+      if (location.state?.isEdit) {
+        await updateApiPatch(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Donor updated successfully!');
+      } else {
+        await postApi(urls.serviceuser.create, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Donor added successfully!');
+      }
+
       setIsloading(false);
       navigate('/donor');
     } catch (error) {
@@ -245,9 +251,7 @@ const AddDonorForm = () => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-       <Typography variant="h4">
-  {editdata ? 'Add Donor' : 'Edit Donor'}
-</Typography>
+          <Typography variant="h4">{location.state?.isEdit ? 'Edit Donor' : 'Add Donor'}</Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />

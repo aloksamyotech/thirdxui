@@ -30,13 +30,13 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
     if (label === 'Edit') {
       switch (data?.subRole) {
         case 'donar_individual':
-          navigate('/add-donor', { state: data });
+          navigate('/add-donor', { state: { ...data, isEdit: true } });
           break;
         case 'donar_company':
-          navigate('/add-donorCompany', { state: data });
+          navigate('/add-donorCompany', { state: { ...data, isEdit: true } });
           break;
         case 'donar_group':
-          navigate('/add-donorCompany', { state: data });
+          navigate('/add-donorCompany', { state: { ...data, isEdit: true } });
           break;
         default:
           toast.error('Unknown donor type');
@@ -104,7 +104,6 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
         </List>
       </Popover>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
         <DialogContent>
@@ -120,7 +119,6 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Archive Confirmation Dialog */}
       <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
         <DialogContent>

@@ -62,7 +62,7 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-      homePhone: '',
+      name: '',
       code: '',
       serviceType: '',
       beneficiaryInformation: '',
@@ -72,7 +72,8 @@ const AddCaseForm = ({ onCancel }) => {
       fundingInterests: '',
       fundraisingActivities: '',
       notes: '',
-      file: null
+      file: null,
+      restrictAccess: false
     }
   });
 
@@ -81,8 +82,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     try {
       const formData = new FormData();
-console.log("data::::",data);
-      formData.append('name', data.homePhone || '');
+      formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
       formData.append('benificiary', data.beneficiaryInformation || '');
@@ -91,12 +91,11 @@ console.log("data::::",data);
       formData.append('eventAttanded', data.eventsAttended || '');
       formData.append('fundingInterest', data.fundingInterests || '');
       formData.append('fundraisingActivities', data.fundraisingActivities || '');
-      formData.append('description', data.notes || ''); 
-      formData.append('isActive', restrictAccess || '');
+      formData.append('description', data.notes || '');
+      formData.append('isActive', restrictAccess || false);
       if (data.file) {
         formData.append('file', data.file || '');
       }
-      console.log(formData);
       const response = await postApi(urls.service.create, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -131,7 +130,7 @@ console.log("data::::",data);
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="homePhone"
+                    name="name"
                     control={control}
                     rules={{
                       required: 'Service Name is required',
@@ -146,8 +145,8 @@ console.log("data::::",data);
                         label="Service Name"
                         size="small"
                         onKeyDown={allowOnlyText}
-                        error={!!errors.homePhone}
-                        helperText={errors.homePhone?.message}
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
                       />
                     )}
                   />

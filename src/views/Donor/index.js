@@ -11,6 +11,7 @@ import FilterPanel from 'components/FilterPanel';
 import DonorTypeDialog from './donorType.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+
 const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
@@ -23,21 +24,6 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const nameFilter = [
-  { value: 'name1', label: 'Name 1' },
-  { value: 'name2', label: 'Name 2' }
-];
-
-const receiptIdFilter = [
-  { value: '#675', label: '#675' },
-  { value: '#775', label: '#775' }
-];
-
-const campaignFilter = [
-  { value: 'campaign1', label: 'Campaign 1' },
-  { value: 'campaign2', label: 'Campaign 2' }
-];
-
 const Lead = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
@@ -45,9 +31,18 @@ const Lead = () => {
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
-  const [receiptId, setReceiptIdFilter] = useState('');
   const [campaign, setCampaignFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [nameFilterOptions, setNameFilterOptions] = useState([]);
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const CustomHeader = () => {
     return (
@@ -117,26 +112,141 @@ const Lead = () => {
       )
     }
   ];
-  useEffect(() => {
-    const fetchDonor = async () => {
-      try {
-        const response = await getApi(urls.serviceuser.getalldonor);
 
-        if (response?.data) {
-          const donorsWithSerialNumber = response.data.allDonor.map((donor, index) => ({
-            ...donor,
-            serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    if (!event.target.value.trim()) {
+      fetchDonor();
+    }
+  };
+
+  const handleFilter = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
+
+      if (status) queryParams.append('status', status === 'active');
+      if (name) queryParams.append('name', name);
+      if (campaign) queryParams.append('campaigns', campaign);
+
+      if (dateOpenedFilter) {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('archive', 'false');
+      queryParams.append('role', 'donor');
+
+      const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
+      const response = await getApi(url);
+
+      const allDonor = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formattedUsers = allDonor?.map((donor, index) => ({
+        ...donor,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered donors:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setStatus('');
+    setCampaignFilter('');
+    setNameFilter('');
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    setPaginationModel({
+      page: 0,
+      pageSize: 10
+    });
+  };
+
+  useEffect(() => {
+    if (status || dateOpenedFilter || name || campaign || searchQuery) {
+      handleFilter();
+    } else {
+      fetchDonor();
+    }
+  }, [status, dateOpenedFilter, name, campaign, searchQuery, paginationModel, isFiltered]);
+
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Campaign')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
           }));
 
-          setRows(donorsWithSerialNumber);
-        }
+        setCampaignTypeOptions(options);
       } catch (error) {
-        console.error('Failed to fetch services:', error);
+        console.error('Error fetching config:', error);
       }
     };
-
-    fetchDonor();
+    fetchCampaign();
   }, []);
+
+  const fetchDonor = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'donor'
+      });
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allDonor = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const nameOptions = allDonor.map(donor => {
+        if (donor.subRole === 'donar_individual') {
+          return {
+            value: `${donor.personalInfo?.firstName} ${donor.personalInfo?.lastName}`,
+            label: `${donor.personalInfo?.firstName} ${donor.personalInfo?.lastName}`
+          };
+        } else {
+          return {
+            value: donor.companyInformation?.companyName || '',
+            label: donor.companyInformation?.companyName || ''
+          };
+        }
+      }).filter(option => option.value && option.value.trim() !== '');
+
+      setNameFilterOptions(nameOptions);
+
+      const formattedUsers = allDonor?.map((donor, index) => ({
+        ...donor,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -171,6 +281,8 @@ const Lead = () => {
             <TextField
               size="small"
               placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
               InputProps={{
                 endAdornment: <SearchIcon />
               }}
@@ -181,22 +293,40 @@ const Lead = () => {
             <FilterPanel
               showFilter={showFilter}
               statuses={statusFilter}
+              statusFilter={status}
               setStatusFilter={setStatus}
               dateAddedFilters={dateAddedFilters}
-              setDateAddedFilter={setDateOpenedFilter}
-              names={nameFilter}
+              dateOpenedFilter={dateOpenedFilter}
+              setDateOpenedFilter={setDateOpenedFilter}
+              names={nameFilterOptions}
+              nameFilter={name}
               setNameFilter={setNameFilter}
-              receipts={receiptIdFilter}
-              setReceiptIdFilter={setReceiptIdFilter}
-              campaigns={campaignFilter}
+              campaigns={campaignTypeOptions}
+              campaignFilter={campaign}
               setCampaignFilter={setCampaignFilter}
-              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'receiptIdFilter', 'campaignFilter']}
+              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'campaignFilter']}
+              onReset={handleReset}
             />
+
             <Grid item xs={9}>
               <Card style={{ height: 'auto' }}>
                 <DataGrid
-                  rows={rows}
+                  rows={
+                    loading
+                      ? []
+                      : rows.map((row, index) => ({
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
+                  }
                   columns={columns}
+                  rowCount={totalRows}
+                  loading={loading}
+                  pagination
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  pageSizeOptions={[10]}
                   rowHeight={65}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}

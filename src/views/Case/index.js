@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, InputBase,IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -87,9 +87,11 @@ const Lead = () => {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          variant="outlined"
+          icon={params.value === 'Open' ? <CheckIcon /> : <LoopIcon />}
           sx={{
-            borderColor: params.value === 'Open' ? 'green' : 'gray'
+            borderColor: params.value === 'gray',
+            backgroundColor: 'transparent'
           }}
         />
       )
@@ -138,7 +140,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
@@ -191,7 +193,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',

@@ -25,8 +25,9 @@ export const urls = Object.freeze({
     getalldonor: `${baseUrl}/user/getalldonor`,
     getDistrict: `${baseUrl}/user/getAllUsDistricts`,
     editUser: `${baseUrl}/user/edituser`,
-    deleteUser: `${baseUrl}/user/deleteuser/:userId`,
+    deleteUser: `${baseUrl}/user/deleteuser`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
+    archive:`${baseUrl}/user/archive`,
   },
   service: {
     create: `${baseUrl}/services/addServices`,
@@ -50,7 +51,10 @@ export const urls = Object.freeze({
   transaction: {
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
-    filterType: `${baseUrl}/transaction/filter`
+    filterType: `${baseUrl}/transaction/filter`,
+     fetchWithPagination:`${baseUrl}/transaction/allwithpagination`,
+
+
   },
   tag: {
     create: `${baseUrl}/tag/addtag`
@@ -63,7 +67,9 @@ export const urls = Object.freeze({
     update: `${baseUrl}/session/editSession/:id`
   },
   casenote: {
-    create: `${baseUrl}/caseNote/add`
+    create: `${baseUrl}/caseNote/add`,
+    fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+
   },
   forms: {
     add: `${baseUrl}/forms`,

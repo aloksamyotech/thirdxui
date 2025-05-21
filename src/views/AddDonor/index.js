@@ -19,6 +19,7 @@ import {
   FormControlLabel
 } from '@mui/material';
 import toast from 'react-hot-toast';
+import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -37,7 +38,8 @@ const AddDonorForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const location = useLocation();
+  const editdata = location.state;
   const fileInputRef = React.useRef(null);
 
   const {
@@ -52,32 +54,40 @@ const AddDonorForm = () => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-      title: '',
-      firstname: '',
-      lastname: '',
-      phone: '',
-      mobilePhone: '',
-      email: '',
-      gender: '',
-      dob: null,
-      address: '',
-      country: '',
-      pinCode: '',
-      riskNotes: '',
-      keyIndicators: '',
-      service: '',
-      socialmedia: '',
-      donortag: true,
-      emailConsent: true,
-      sms: true,
-      telephone: true,
-      whatsapp: true,
-      preferredContact: '',
-      reason: '',
-      contactPurpose: '',
-      confirmationDate: null,
-      attachments: null,
-      role: 'donor'
+      title: editdata?.personalInfo?.title || '',
+      firstname: editdata?.personalInfo?.firstName || '',
+      lastname: editdata?.personalInfo?.lastName || '',
+      phone: editdata?.contactInfo?.phone || '',
+      mobilePhone: editdata?.contactInfo?.homePhone || '',
+      email: editdata?.contactInfo?.email || '',
+      gender: editdata?.personalInfo?.gender || '',
+      dob: editdata?.personalInfo?.dateOfBirth ? dayjs(editdata.personalInfo.dateOfBirth) : null,
+      address: editdata?.contactInfo?.addressLine1 || '',
+      address2: editdata?.contactInfo?.addressLine2 || '',
+      district: editdata?.contactInfo?.district || '',
+      pinCode: editdata?.contactInfo?.postcode || '',
+      country: editdata?.contactInfo?.country || '',
+      riskNotes: editdata?.otherInfo?.description || '',
+      Beneficiary: editdata?.otherInfo?.benificiary || '',
+      campaigns: editdata?.otherInfo?.campaigns || '',
+      engagement: editdata?.otherInfo?.engagement || '',
+      eventsAttended: editdata?.otherInfo?.eventAttanded || '',
+      fundingInterests: editdata?.otherInfo?.fundingInterest || '',
+      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
+      reason: editdata?.contactPreferences?.reason || '',
+      contactemail: editdata?.contactPreferences?.email || '',
+      contactNo: editdata?.contactPreferences?.phone || '',
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
+      donortag: editdata?.contactPreferences?.contactMethods?.donor ?? true,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
+      socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      role: 'donor',
     }
   });
 
@@ -235,7 +245,9 @@ const AddDonorForm = () => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">Add Donor</Typography>
+       <Typography variant="h4">
+  {editdata ? 'Add Donor' : 'Edit Donor'}
+</Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
             <ArrowBackIcon sx={{ color: 'grey' }} />

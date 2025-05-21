@@ -39,9 +39,7 @@ const AddCaseForm = ({ onCancel }) => {
   const fileInputRef = React.useRef(null);
   const location = useLocation();
   const subRole = location.state?.subRole;
-  console.log(subRole);
   const editdata = location.state || {};
-  console.log(editdata);
 
   const {
     register,

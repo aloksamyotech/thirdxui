@@ -20,6 +20,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { urls } from 'common/urls';
 import { getApi, postApi } from 'common/apiClient';
 import { useLocation } from 'react-router-dom';
+import moment from 'moment';
 
 export default function SessionRegisterPage() {
   const navigate = useNavigate();
@@ -86,12 +87,13 @@ export default function SessionRegisterPage() {
             <Card sx={{ p: 2 }}>
               <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                 <Box>
-                  <Typography fontWeight="bold">16 Jan 2023 12:00 - 1h</Typography>
+                  {/* <Typography fontWeight="bold">16 Jan 2023 12:00 - 1h</Typography> */}
+                  <Typography fontWeight="bold"> {moment(session?.date).format('D MMM YYYY HH:mm')}</Typography>
                   <Typography mt={1}>Lunch Club</Typography>
                   <Box display="flex" alignItems="center" mt={1}>
                     <LocationOnIcon fontSize="small" color="action" />
                     <Typography ml={0.5} color="text.secondary">
-                      Kyson Primary
+                      {session?.country}
                     </Typography>
                   </Box>
                 </Box>
@@ -100,7 +102,7 @@ export default function SessionRegisterPage() {
                   <Typography fontSize={14} mb={1} color="text.secondary">
                     Session Registrar
                   </Typography>
-                  <Typography>Alfie James</Typography>
+                  <Typography>{session?.name}</Typography>
                 </Box>
               </Box>
 

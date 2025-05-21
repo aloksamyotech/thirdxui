@@ -94,9 +94,8 @@ const Tag = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',

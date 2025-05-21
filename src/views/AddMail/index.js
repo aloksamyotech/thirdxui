@@ -13,7 +13,7 @@ import {
   Box,
   Paper
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import { Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import AntSwitch from 'components/AntSwitch.js';
@@ -78,11 +78,20 @@ const MailingListForm = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4">Create list of Service User</Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/mail')}>
-          <ArrowBackIcon sx={{ color: 'grey' }} />
-          <Typography variant="h6" sx={{ mr: 1 }}>
-            Back
-          </Typography>
+      <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/mail')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
       </Box>
 
@@ -215,12 +224,12 @@ const MailingListForm = () => {
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
               <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'Save Changes'}
+                {isLoading ? 'Saving...' : 'SAVE CHANGES'}
               </Button>
             </Grid>
             <Grid item>
               <Button variant="outlined" color="error">
-                Cancel
+                CANCEL
               </Button>
             </Grid>
           </Grid>

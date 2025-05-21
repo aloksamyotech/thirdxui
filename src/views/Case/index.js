@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, InputBase,IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -251,9 +251,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',

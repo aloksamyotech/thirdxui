@@ -1,8 +1,8 @@
 // const baseUrl = 'https://thirdex.samyotech.in/api/v1';
-// const baseUrl = 'http://139.59.19.212:81/api/v1';
+const baseUrl = 'http://139.59.19.212:81/api/v1';
 export const imageUrl = 'https://thirdex.samyotech.in/';
 
-const baseUrl = 'http://localhost:7201/api/v1';
+// const baseUrl = 'http://localhost:7201/api/v1';
 // export const imageUrl = 'http://localhost:7200/';
 
 export const urls = Object.freeze({

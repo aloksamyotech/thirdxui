@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Button,InputBase, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -34,13 +34,12 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
-            color: '#333',
+          color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          SERIVCE LIST
+        Service List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -77,7 +76,6 @@ const Lead = () => {
         variant="body1"
         sx={{
           textTransform: 'uppercase',
-          fontWeight: 'bold',
           whiteSpace: 'normal',         
           wordBreak: 'break-word',      
           overflowWrap: 'break-word',
@@ -132,25 +130,29 @@ const Lead = () => {
         );
       }
     },
-    {
-      field: 'more',
-      headerName: 'More',
-      flex: 0.8,
-      headerAlign: 'center',
-      align: 'center',
-      renderCell: () => (
-        <Box
-          sx={{
-            backgroundColor: '#f0f0f0',
-            padding: '4px 8px',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
-          <Typography color="black">View More</Typography>
-        </Box>
-      )
-    }
+   {
+  field: 'more',
+  headerName: 'More',
+  flex: 0.8,
+  headerAlign: 'center',
+  align: 'center',
+  renderCell: () => (
+    <Box
+      sx={{
+        backgroundColor: '#f5f5f5',    
+        padding: '4px 10px',
+        borderRadius: '16px',            
+        cursor: 'pointer',
+        display: 'inline-block',
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        View More
+      </Typography>
+    </Box>
+  )
+}
+
   ];
   useEffect(() => {
     const fetchData = async () => {
@@ -272,7 +274,7 @@ const Lead = () => {
             </IconButton>
           </Tooltip>
 
-          <TextField
+          {/* <TextField
             size="small"
             placeholder="Search..."
             value={searchQuery}
@@ -281,7 +283,75 @@ const Lead = () => {
               endAdornment: <SearchIcon />
             }}
             sx={{ width: '350px' }}
-          />
+          /> */}
+
+          <Box
+
+  sx={{
+
+    display: 'flex',
+
+    alignItems: 'center',
+
+    backgroundColor: '#f8f9fa',
+
+    borderRadius: '30px',
+
+    paddingLeft: '16px',
+
+    width: '350px',
+
+    height: '40px'
+
+  }}
+>
+<InputBase
+
+    placeholder="Search..."
+
+    value={searchQuery}
+
+    onChange={handleSearchChange}
+
+    onKeyPress={(e) => {
+
+      if (e.key === 'Enter') {
+
+        handleFilter();
+
+      }
+
+    }}
+
+    sx={{
+
+      flex: 1,
+
+      color: 'text.primary'
+
+    }}
+
+  />
+<IconButton
+
+    onClick={handleFilter}
+
+    sx={{
+
+      marginRight: '8px',
+
+      width: 32,
+
+      height: 32,
+
+      cursor: 'pointer'
+
+    }}
+>
+<SearchIcon />
+</IconButton>
+</Box>
+ 
         </Stack>
 
         <Grid container spacing={2}>

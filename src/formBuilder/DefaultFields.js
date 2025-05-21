@@ -17,7 +17,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Name",
                     "className": "form-control",
                     "name": "text-1747390638003-0",
@@ -25,7 +25,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
@@ -33,7 +33,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
@@ -41,7 +41,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Job Role",
                     "className": "form-control",
                     "name": "text-1747390640020-0",
@@ -49,7 +49,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "select",
-                    "required": false,
+                    "required": true,
                     "label": "What is you relationship to the person you are referring?",
                     "className": "form-control",
                     "name": "select-1747393619538-0",
@@ -78,8 +78,16 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
-                    "label": "Name",
+                    "required": true,
+                    "label": "First Name",
+                    "className": "form-control",
+                    "name": "text-1747393699662-0",
+                    "subtype": "text"
+                },
+                {
+                    "type": "text",
+                    "required": true,
+                    "label": "Last Name",
                     "className": "form-control",
                     "name": "text-1747393699662-0",
                     "subtype": "text"
@@ -94,7 +102,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "textarea",
-                    "required": false,
+                    "required": true,
                     "label": "Address",
                     "className": "form-control",
                     "name": "textarea-1747392000535-0",
@@ -102,7 +110,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747393741211-0",
@@ -118,7 +126,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "select",
-                    "required": false,
+                    "required": true,
                     "label": "Which service are you referring yourself to?",
                     "className": "form-control",
                     "name": "select-1747393860748-0",
@@ -275,7 +283,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "First Name",
                     "className": "form-control",
                     "name": "text-1747390638003-0",
@@ -283,7 +291,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Last Name",
                     "className": "form-control",
                     "name": "text-1747390640020-0",
@@ -291,7 +299,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
@@ -299,7 +307,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
@@ -307,7 +315,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "textarea",
-                    "required": false,
+                    "required": true,
                     "label": "Address",
                     "className": "form-control",
                     "name": "textarea-1747392000535-0",
@@ -315,7 +323,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "date",
-                    "required": false,
+                    "required": true,
                     "label": "Date Of Birth",
                     "className": "form-control",
                     "name": "date-1747390651030-0",
@@ -323,7 +331,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "radio-group",
-                    "required": false,
+                    "required": true,
                     "label": "When are you available?",
                     "name": "radio-group-1747392026637-0",
                     "values": [
@@ -351,7 +359,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "checkbox-group",
-                    "required": false,
+                    "required": true,
                     "label": "Do you any past experience in volunteer work ?",
                     "name": "checkbox-group-1747392385352-0",
                     "values": [
@@ -429,7 +437,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "First Name",
                     "className": "form-control",
                     "name": "text-1747390638003-0",
@@ -437,7 +445,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Last Name",
                     "className": "form-control",
                     "name": "text-1747390640020-0",
@@ -445,7 +453,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
@@ -453,7 +461,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
@@ -461,7 +469,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "date",
-                    "required": false,
+                    "required": true,
                     "label": "Date Of Birth",
                     "className": "form-control",
                     "name": "date-1747390651030-0",
@@ -529,7 +537,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "select",
-                    "required": false,
+                    "required": true,
                     "label": "Please choose which session you will be attending.",
                     "className": "form-control",
                     "name": "select-1747390674293-0",
@@ -553,7 +561,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "radio-group",
-                    "required": false,
+                    "required": true,
                     "label": "Dietary restrictions",
                     "name": "radio-group-1747390677832-0",
                     "values": [
@@ -858,7 +866,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "text",
-                    "required": false,
+                    "required": true,
                     "label": "In what way/s could the service/s provided to me by your organisation be improved?",
                     "className": "form-control",
                     "name": "text-1747394178686-0",
@@ -866,7 +874,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "textarea",
-                    "required": false,
+                    "required": true,
                     "label": "I'd also like to add... ",
                     "className": "form-control",
                     "name": "textarea-1747731154988-0",
@@ -905,13 +913,13 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
 
     const containerStyle = {
         display: 'flex',
-        flexWrap: 'wrap',
+        // flexWrap: 'wrap',
         gap: '20px',
         margin: '20px 0',
         justifyContent: 'center',
-        maxWidth: '540px',
-        marginLeft: 'auto',
-        marginRight: 'auto'
+        // maxWidth: '540px',
+        // marginLeft: 'auto',
+        // marginRight: 'auto'
     };
 
     const boxStyle = (isSelected) => ({

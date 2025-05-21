@@ -1,4 +1,4 @@
-import { Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, FormLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography } from '@mui/material';
+import { Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { getApi, postApi } from 'common/apiClient';
 import { urls } from 'common/urls'
@@ -9,12 +9,14 @@ import { useParams } from 'react-router';
 import { Formik, useFormik } from "formik";
 import DescriptionIcon from '@mui/icons-material/Description';
 import { toast } from 'react-toastify';
+import * as Yup from 'yup';
 
 const GetFormById = () => {
 
   const { formid } = useParams();
   const [res, setRes] = useState(null)
   const [initialValues, setInitialValues] = useState({});
+  const [validationSchema, setValidationSchema] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
   const getForm = async () => {
@@ -22,19 +24,29 @@ const GetFormById = () => {
     const response = await getApi(formUrl)
     setRes(response?.data)
     const values = {};
-    response?.fields?.forEach(field => {
-      values[field.label] = '';
-    });
+    const validations = {};
 
+    response?.data?.fields?.forEach(field => {
+      values[field.label] = '';
+      if (field.required) {
+        validations[field.label] = Yup.string().required('This is a required field');
+      }
+    });
     setInitialValues(values);
+    setValidationSchema(Yup.object(validations));
   }
   useEffect(() => {
     getForm()
   }, [])
 
-  const validationSchema = {}
+  // const validationSchema = Yup.object({
+  //   Name: Yup.string().required('This is a required field.'),
+  //   Email: Yup.string().required('This is a required field.'),
+  // });
+
   const formik = useFormik({
     initialValues,
+    validationSchema,
     onSubmit: async (values) => {
       const formUrl = `${urls?.responses?.submit}/${formid}`
       await postApi(formUrl, values)
@@ -61,7 +73,7 @@ const GetFormById = () => {
               <FormControl sx={{
                 minWidth: { xs: '100%', sm: '50%' }
               }}>
-                <FormLabel>{field?.label}</FormLabel>
+                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
                 <TextField
                   variant='outlined'
                   multiline
@@ -69,7 +81,9 @@ const GetFormById = () => {
                   placeholder={field?.placeholder}
                   name={field?.label}
                   value={formik?.values[field?.label]}
-                  onChange={formik?.handleChange} />
+                  onChange={formik?.handleChange}
+                />
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
             </Box>
           );
@@ -83,7 +97,7 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: 250 }}>
-                <FormLabel htmlFor={field?.name}>{field?.label}</FormLabel>
+                <FormLabel htmlFor={field?.name}>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
                 <Select
                   name={field?.label}
                   value={formik?.values[field?.label]}
@@ -96,6 +110,7 @@ const GetFormById = () => {
                       <MenuItem key={index} value={option?.value}>{option?.label}</MenuItem>))
                   }
                 </Select>
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
             </Box>
           );
@@ -109,7 +124,7 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl>
-                <FormLabel>{field?.label}</FormLabel>
+                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
                 <RadioGroup
                   // row
                   name={field?.label}
@@ -120,6 +135,7 @@ const GetFormById = () => {
                       <FormControlLabel key={index} control={<Radio />} label={checkbox?.label} value={checkbox?.label} />
                     ))}
                 </RadioGroup>
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
             </Box>
           );
@@ -133,7 +149,7 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: '50%' }}>
-                <FormLabel>{field?.label}</FormLabel>
+                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
                 <TextField
                   variant='standard'
                   type='number'
@@ -141,6 +157,7 @@ const GetFormById = () => {
                   name={field?.label}
                   value={formik?.values[field?.label]}
                   onChange={formik?.handleChange} />
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
             </Box>
           );
@@ -154,7 +171,7 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: '50%' }}>
-                <FormLabel>{field?.label}</FormLabel>
+                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
                 <TextField
                   variant='standard'
                   type='file'
@@ -162,6 +179,7 @@ const GetFormById = () => {
                   name={field?.label}
                   value={formik?.values[field?.label]}
                   onChange={formik?.handleChange} />
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
             </Box>
           );
@@ -175,7 +193,7 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: '50%' }}>
-                <FormLabel>{field?.label}</FormLabel>
+                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
                 <TextField
                   variant='standard'
                   type='date'
@@ -183,6 +201,7 @@ const GetFormById = () => {
                   placeholder={field?.placeholder}
                   value={formik?.values[field?.label]}
                   onChange={formik?.handleChange} />
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
             </Box>
           );
@@ -195,11 +214,12 @@ const GetFormById = () => {
               p: '20px',
               borderRadius: '10px'
             }}>
-              <FormLabel>{field?.label}</FormLabel>
+              <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
               <FormGroup>
                 {field?.values && field?.values?.map((checkbox, index) => (
                   <FormControlLabel key={index} control={<Checkbox name={checkbox?.label} value={formik?.values[field?.label]} onChange={formik?.handleChange} />} label={checkbox?.label} />))}
               </FormGroup>
+              <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
             </FormControl>
           );
           break;
@@ -232,15 +252,17 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: { xs: '100%', sm: '50%' } }}>
-                <FormLabel>{field?.label}</FormLabel>
+                <FormLabel>{field?.label}{field?.required && <span style={{ color: '#d93227' }}> *</span>}</FormLabel>
                 <TextField
                   variant='standard'
                   name={field?.label}
                   placeholder={field?.placeholder}
                   value={formik?.values[field?.label]}
-                  onChange={formik?.handleChange} />
+                  onChange={formik?.handleChange}
+                />
+                <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
               </FormControl>
-            </Box>
+            </Box >
           );
           break;
 

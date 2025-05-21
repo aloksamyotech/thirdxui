@@ -23,7 +23,8 @@ export const urls = Object.freeze({
     editUser: `${baseUrl}/user/edituser`,
     deleteUser: `${baseUrl}/user/deleteuser`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
-    archive: `${baseUrl}/user/archive`
+    archive:`${baseUrl}/user/archive`,
+    unarchive:`${baseUrl}/user/unarchive`
   },
   service: {
     create: `${baseUrl}/services/addServices`,

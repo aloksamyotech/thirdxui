@@ -33,13 +33,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          SERIVCE LIST
+          Service List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -66,30 +66,36 @@ const Lead = () => {
   });
 
   const columns = [
-    {
-      field: 'name',
-      headerName: 'Service Name',
-      flex: 1.5,
-      renderCell: (params) => (
-        <Stack sx={{ overflow: 'hidden', width: '100%' }}>
-          <Typography
-            variant="body1"
-            sx={{
-              textTransform: 'uppercase',
-              fontWeight: 'bold',
-              whiteSpace: 'normal',
-              wordBreak: 'break-word',
-              overflowWrap: 'break-word'
-            }}
-          >
-            {params.row.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap' }}>
-            {new Date(params.row.updatedAt).toDateString()}
-          </Typography>
-        </Stack>
-      )
-    },
+{
+  field: 'name',
+  headerName: 'Service Name',
+  flex: 1.5,
+  renderCell: (params) => (
+    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+      <Typography
+        variant="body1"
+        sx={{
+          textTransform: 'uppercase',
+          fontWeight: 450,
+          whiteSpace: 'normal',         
+          wordBreak: 'break-word',      
+          overflowWrap: 'break-word',
+        }}
+      >
+        {params.row.name}
+      </Typography>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{ whiteSpace: 'nowrap' }}  
+      >
+        {new Date(params.row.updatedAt).toDateString()}
+      </Typography>
+    </Stack>
+  )
+}
+,
+
     {
       field: 'serviceType',
       headerName: 'Service Type',

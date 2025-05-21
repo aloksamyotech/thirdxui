@@ -43,7 +43,7 @@ const Lead = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
@@ -69,7 +69,7 @@ const Lead = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             <PersonIcon />
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: '' }}>
+              <Typography variant="body1" sx={{ fontWeight: 450 }}>
                 {params.row.name} {params.row.serialNumber}
               </Typography>
             </Box>

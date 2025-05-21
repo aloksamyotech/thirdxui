@@ -79,13 +79,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          REFERRAL LIST
+          Referral List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />

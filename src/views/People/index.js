@@ -83,13 +83,13 @@ const Lead = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            PEOPLE LIST
+            People List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -109,7 +109,7 @@ const Lead = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             <PersonIcon />
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: 450 }}>
                 {params.row.firstName} {params.row.lastName} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">

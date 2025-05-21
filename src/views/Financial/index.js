@@ -43,13 +43,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          DONATION TRANSACTIONS
+          Donation Transactions
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />

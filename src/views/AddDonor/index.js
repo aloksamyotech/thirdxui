@@ -137,8 +137,7 @@ const AddDonorForm = () => {
     fd.append('personalInfo[firstName]', data.firstname || '');
     fd.append('personalInfo[lastName]', data.lastname || '');
     fd.append('personalInfo[gender]', data.gender || '');
-    fd.append('personalInfo[dateOfBirth]', data.dob || '');
-
+    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : null);
     fd.append('contactInfo[phone]', data.phone || '');
     fd.append('contactInfo[homePhone]', data.mobilePhone || '');
     fd.append('contactInfo[email]', data.email || '');
@@ -162,11 +161,11 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[reason]', data.reason || '');
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent || '');
-    fd.append('contactPreferences[contactMethods][donor]', data.donortag || '');
-    fd.append('contactPreferences[contactMethods][sms]', data.sms || '');
-    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp || '');
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone || '');
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ?? true);
+    fd.append('contactPreferences[contactMethods][donor]', data.donortag ?? true);
+    fd.append('contactPreferences[contactMethods][sms]', data.sms ?? true);
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ?? true);
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ?? true);
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
     fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign || '');

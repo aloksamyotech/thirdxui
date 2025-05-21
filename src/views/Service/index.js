@@ -76,11 +76,12 @@ const Lead = () => {
         variant="body1"
         sx={{
           textTransform: 'uppercase',
-          fontWeight: 450,
+          fontWeight: 400,
           whiteSpace: 'normal',         
           wordBreak: 'break-word',      
           overflowWrap: 'break-word',
         }}
+        mb={1}
       >
         {params.row.name}
       </Typography>
@@ -124,8 +125,7 @@ const Lead = () => {
             sx={{
               color: isActive ? '#79dbfb' : '#ff6a67',
               backgroundColor: isActive ? '#e5f8fe' : '#ffeae9',
-              fontWeight: 'bold',
-              minWidth: '80px'
+              maxWidth: '80px'
             }}
           />
         );
@@ -142,11 +142,11 @@ const Lead = () => {
           sx={{
             backgroundColor: '#f0f0f0',
             padding: '4px 8px',
-            borderRadius: '8px',
+            borderRadius: '12px',
             cursor: 'pointer'
           }}
         >
-          <Typography color="black">View More</Typography>
+          <Typography color="grey">View More</Typography>
         </Box>
       )
     }
@@ -342,7 +342,7 @@ const Lead = () => {
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
                     pageSizeOptions={[10]}
-                    rowHeight={65}
+                    rowHeight={70}
                     getRowId={(row) => row._id}
                     components={{
                       Toolbar: () => <CustomHeader />

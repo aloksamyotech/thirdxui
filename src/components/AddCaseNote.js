@@ -214,20 +214,26 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
           error={formData.subject.length > 50}
         />
 
-        <FormControlLabel
-          control={<AntSwitch checked={formData.toggle} onChange={handleToggle} />}
-          label="Restrict Access?"
-          labelPlacement="start"
-          sx={{ mb: 2 }}
-        />
+        <Box mt={1} display="flex" justifyContent="space-between" alignItems="center">
+          <FormControlLabel
+            control={<AntSwitch checked={formData.toggle} onChange={handleToggle} />}
+            label="Restrict Access?"
+            labelPlacement="start"
+            sx={{
+              '.MuiFormControlLabel-label': {
+                mr: 1
+              }
+            }}
+          />
 
-        <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-          <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit}>
-            Save Case
-          </Button>
-          <Button variant="outlined" color="error" onClick={handleClose}>
-            Cancel
-          </Button>
+          <Box display="flex" gap={2}>
+            <Button variant="outlined" color="error" onClick={handleClose}>
+              CANCEL
+            </Button>
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit}>
+              SAVE CASE
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Modal>

@@ -97,7 +97,7 @@ const EmployeeDetails = () => {
   return (
     <>
       <Grid container spacing={2} p={2}>
-        <Typography variant="h4">User Account</Typography>
+        <Typography variant="h5">User Account</Typography>
         <Box sx={{ width: '100%', mt: '15px' }}>
           <Tabs
             value={tabValue}

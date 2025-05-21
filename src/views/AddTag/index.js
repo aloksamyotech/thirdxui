@@ -154,7 +154,7 @@ const TagForm = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '450',
               color: '#333',
               ml: 2,
               fontSize: '14px',
@@ -164,44 +164,44 @@ const TagForm = () => {
             Tag List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-         <Box
-                                                             sx={{
-                                                               display: 'flex',
-                                                               alignItems: 'center',
-                                                               backgroundColor: '#f8f9fa',
-                                                               borderRadius: '30px',
-                                                               paddingLeft: '16px',
-                                                               border: '1px solid #e0e0e0',
-                                                               width: '350px',
-                                                               height: '40px'
-                                                             }}
-                                                           >
-                                                             <InputBase
-                                                               placeholder="Search..."
-                                                               // value={searchQuery}
-                                                               // onChange={handleSearchChange}
-                                                               // onKeyPress={(e) => {
-                                                               //   if (e.key === 'Enter') {
-                                                               //     handleFilter();
-                                                               //   }
-                                                               // }}
-                                                               sx={{
-                                                                 flex: 1,
-                                                                 color: 'text.primary'
-                                                               }}
-                                                             />
-                                                             <IconButton
-                                                               // onClick={handleFilter}
-                                                               sx={{
-                                                                 marginRight: '8px',
-                                                                 width: 32,
-                                                                 height: 32,
-                                                                 cursor: 'pointer'
-                                                               }}
-                                                             >
-                                                               <SearchIcon />
-                                                             </IconButton>
-                                                           </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
+              }}
+            >
+              <InputBase
+                placeholder="Search..."
+                // value={searchQuery}
+                // onChange={handleSearchChange}
+                // onKeyPress={(e) => {
+                //   if (e.key === 'Enter') {
+                //     handleFilter();
+                //   }
+                // }}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                // onClick={handleFilter}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
           </Box>
         </GridToolbarContainer>
       </Box>
@@ -211,7 +211,7 @@ const TagForm = () => {
   return (
     <Grid>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
+        <Typography variant="h5" sx={{ fontWeight: '450', color: '#333' }}>
           Add Tag Category
         </Typography>
         <Box
@@ -232,7 +232,7 @@ const TagForm = () => {
       </Box>
 
       <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
-        <Grid container spacing={2} alignItems="center" mt={1}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={6}>
             {/* <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" /> */}
             <Controller
@@ -247,6 +247,11 @@ const TagForm = () => {
               control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />}
               label="Active?"
               labelPlacement="start"
+              sx={{
+                '.MuiFormControlLabel-label': {
+                  mr: 1
+                }
+              }}
             />
           </Grid>
           {/* <Grid item xs={12} sm={6}>
@@ -300,7 +305,7 @@ const TagForm = () => {
 
         <Grid item xs={12} mt={2}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2} spacing={2} sx={{ width: '100%' }}>
-            <Typography sx={{ fontWeight: 'bold' }}>Tags in this Category</Typography>
+            <Typography sx={{ fontWeight: '450' }}>Tags in this Category</Typography>
 
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography>Add Tags</Typography>
@@ -329,7 +334,7 @@ const TagForm = () => {
           </Stack>
         </Grid>
 
-        <Box width="100%" sx={{ mt: 2 }}>
+        <Box width="100%" sx={{ mt: 1 }}>
           <Card>
             <DataGrid
               rows={tags}

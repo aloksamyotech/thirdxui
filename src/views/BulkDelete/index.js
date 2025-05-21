@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import { Button, Card, Grid, IconButton, TextField, Tooltip, Typography,InputBase } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -50,7 +50,7 @@ const BulkDelete = () => {
             lineHeight: '36px'
           }}
         >
-          PEOPLE LIST
+          People List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -119,14 +119,45 @@ const BulkDelete = () => {
             Delete All
           </Button>
 
-          <TextField
-            size="small"
-            placeholder="Search..."
-            InputProps={{
-              endAdornment: <SearchIcon />
-            }}
-            sx={{ width: '350px' }}
-          />
+        <Box
+                                                      sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        backgroundColor: '#f8f9fa',
+                                                        borderRadius: '30px',
+                                                        paddingLeft: '16px',
+                                                        border: '1px solid #e0e0e0',
+                                                        width: '350px',
+                                                        height: '40px'
+                                                      }}
+                                                    >
+                                                      <InputBase
+                                                        placeholder="Search..."
+                                                        // value={searchQuery}
+                                                        // onChange={handleSearchChange}
+                                                        // onKeyPress={(e) => {
+                                                        //   if (e.key === 'Enter') {
+                                                        //     handleFilter();
+                                                        //   }
+                                                        // }}
+                                                        sx={{
+                                                          flex: 1,
+                                                          color: 'text.primary'
+                                                        }}
+                                                      />
+                                                      <IconButton
+                                                        // onClick={handleFilter}
+                                                        sx={{
+                                                          marginRight: '8px',
+                                                          width: 32,
+                                                          height: 32,
+                                                          cursor: 'pointer'
+                                                        }}
+                                                      >
+                                                        <SearchIcon />
+                                                      </IconButton>
+                                                    </Box>
+        
         </Stack>
       </Stack>
 

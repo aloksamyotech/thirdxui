@@ -379,7 +379,7 @@ const caseNotes = [
       </Box>
 
       <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
-      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userProfile={ fullImageUrl } />
+      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={ fullImageUrl } />
     </>
   );
 };

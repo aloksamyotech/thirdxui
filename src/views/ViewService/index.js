@@ -131,36 +131,65 @@ const UserProfile = () => {
               <Grid item xs={12} md={8}>
                 <Stack>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Tooltip title={(serviceData?.name || '').toUpperCase()}>
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          maxWidth: '60%' 
-                        }}
-                      >
-                        {(serviceData?.name || '').toUpperCase()}
-                      </Typography>
-                    </Tooltip>
+                    <Box>
+                      <Tooltip title={(serviceData?.name || '').toUpperCase()}>
+                        <Typography
+                          variant="h4"
+                          sx={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%',
+                            color: '#808191'
+                          }}
+                          fontSize={18}
+                          fontWeight={500}
+                        >
+                          {(serviceData?.name || '').toUpperCase()}
+                        </Typography>
+                      </Tooltip>
+
+                      <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
+                        <Box sx={{ position: 'relative', width: 16, height: 16 }}>
+                          <Box
+                            sx={{
+                              width: 16,
+                              height: 16,
+                              borderRadius: '50%',
+                              border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
+                              position: 'absolute',
+                              top: 0,
+                              left: 0
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              backgroundColor: serviceData?.isActive ? 'green' : 'red',
+                              position: 'absolute',
+                              top: '4px',
+                              left: '4px'
+                            }}
+                          />
+                        </Box>
+
+                        <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
+                          {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
+                        </Typography>
+                      </Stack>
+                    </Box>
 
                     <Button
                       variant="contained"
                       startIcon={<AddIcon />}
-                      sx={{ backgroundColor: '#007BBA', textTransform: 'none', m: 2 }}
+                      sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2 }}
                       onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                     >
                       Add New Session
                     </Button>
                   </Box>
-
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'green' }} />
-                    <Typography variant="body2" color="green">
-                      {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
-                    </Typography>
-                  </Stack>
 
                   <Typography variant="body2" color="textSecondary" mb={1}>
                     Service Code - {serviceData?.code}
@@ -205,7 +234,7 @@ const UserProfile = () => {
                         year: 'numeric'
                       })}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="subtitle2" color="text.secondary">
                       {session.time}
                     </Typography>
                   </Box>
@@ -239,16 +268,16 @@ const UserProfile = () => {
                         textTransform: 'none',
                         color: '#1B4B66',
                         fontSize: '10px',
-                        py: 0.5,
+                        py: 0.48,
                         px: 0.5,
                         maxHeight: '50px'
                       }}
-                      onClick={() => navigate('/attendees', { state: { session }} )}
+                      onClick={() => navigate('/attendees', { state: { session } })}
                     >
                       Add Attendee
                     </Button>
                     <IconButton size="small">
-                      <InfoIcon fontSize="small" onClick={() => navigate('/view-session')} />
+                      <InfoIcon sx={{ color: '#49494c' }} fontSize="small" onClick={() => navigate('/view-session')} />
                     </IconButton>
                   </Box>
                 </Box>

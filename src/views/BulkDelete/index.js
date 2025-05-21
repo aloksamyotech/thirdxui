@@ -43,7 +43,7 @@ const BulkDelete = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '450',
             color: '#333',
             ml: 2,
             fontSize: '14px',
@@ -69,7 +69,7 @@ const BulkDelete = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: '450' }}>
                 {params.row.name} #{params.row.id}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -79,7 +79,7 @@ const BulkDelete = () => {
           </Stack>
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon color="action" />
+              <InfoIcon sx={{ color: '#49494c' }}  />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -99,7 +99,7 @@ const BulkDelete = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">Bulk Delete</Typography>
+        <Typography variant="h5">Bulk Delete</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
           <Button

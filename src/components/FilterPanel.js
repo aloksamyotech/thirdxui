@@ -128,7 +128,7 @@ const FilterPanel = ({
   const filterMapping = {
     formType: {
       data: formTypes,
-      label: 'Form Type',
+      label: 'By Form Type',
       onChange: setFormType,
       value: formType,
       type: 'select'

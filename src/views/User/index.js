@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button,InputBase } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button, InputBase } from '@mui/material';
 import TableStyle from '../../ui-component/TableStyle';
 import { Close } from '@mui/icons-material';
 import { IconTrash, IconPencil } from '@tabler/icons';
@@ -37,7 +37,9 @@ const User = () => {
       flex: 2,
       renderCell: (params) => (
         <Box>
-          <Typography sx={{ fontWeight: 'bold' }}>{params.row.name}</Typography>
+          <Typography sx={{ fontWeight: '450' }} mb={1}>
+            {params.row.name}
+          </Typography>
           <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
         </Box>
       )
@@ -50,9 +52,12 @@ const User = () => {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          variant="outlined"
           sx={{
-            borderColor: params.value === 'Open' ? 'green' : 'gray'
+            borderColor: params.value === 'Open' ? '#808080' : '#808080',
+            backgroundColor: 'transparent',
+            color: params.value === 'Open' ? '#808080' : '#808080'
           }}
         />
       )
@@ -106,7 +111,7 @@ const User = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '450',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
@@ -253,44 +258,44 @@ const User = () => {
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-  <Box
-                                                             sx={{
-                                                               display: 'flex',
-                                                               alignItems: 'center',
-                                                               backgroundColor: '#f8f9fa',
-                                                               borderRadius: '30px',
-                                                               paddingLeft: '16px',
-                                                               border: '1px solid #e0e0e0',
-                                                               width: '350px',
-                                                               height: '40px'
-                                                             }}
-                                                           >
-                                                             <InputBase
-                                                               placeholder="Search..."
-                                                               // value={searchQuery}
-                                                               // onChange={handleSearchChange}
-                                                               // onKeyPress={(e) => {
-                                                               //   if (e.key === 'Enter') {
-                                                               //     handleFilter();
-                                                               //   }
-                                                               // }}
-                                                               sx={{
-                                                                 flex: 1,
-                                                                 color: 'text.primary'
-                                                               }}
-                                                             />
-                                                             <IconButton
-                                                               // onClick={handleFilter}
-                                                               sx={{
-                                                                 marginRight: '8px',
-                                                                 width: 32,
-                                                                 height: 32,
-                                                                 cursor: 'pointer'
-                                                               }}
-                                                             >
-                                                               <SearchIcon />
-                                                             </IconButton>
-                                                           </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
+              }}
+            >
+              <InputBase
+                placeholder="Search..."
+                // value={searchQuery}
+                // onChange={handleSearchChange}
+                // onKeyPress={(e) => {
+                //   if (e.key === 'Enter') {
+                //     handleFilter();
+                //   }
+                // }}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                // onClick={handleFilter}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
           </Stack>
 
           <Grid container spacing={2}>
@@ -303,7 +308,7 @@ const User = () => {
               names={nameFilter}
               setNameFilter={setNameFilter}
               countriesWithFlags={countriesWithFlags}
-              selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter']}
+              selectedFilters={['nameFilter','countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
             />
             <Grid item xs={9}>
               <TableStyle>
@@ -326,6 +331,8 @@ const User = () => {
                       paginationModel={paginationModel}
                       onPaginationModelChange={setPaginationModel}
                       pageSizeOptions={[10]}
+                      checkboxSelection
+                      rowHeight={65}
                       components={{
                         Toolbar: () => <CustomHeader />
                       }}

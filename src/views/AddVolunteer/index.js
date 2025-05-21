@@ -148,7 +148,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[title]', formData.personalInfo.title || '');
     fd.append('personalInfo[gender]', formData.personalInfo.gender || '');
     const dob = formData.personalInfo.dateOfBirth;
-    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
+    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : null);
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
     fd.append('contactInfo[homePhone]', formData.phone || '');

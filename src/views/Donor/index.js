@@ -89,7 +89,7 @@ const Lead = () => {
             {params.row.subRole === 'donar_individual' ? <PersonIcon /> : <ApartmentIcon />}
 
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 450 }}>
+              <Typography variant="body1" sx={{ fontWeight: 450 }} mb={1}>
                 {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
@@ -105,7 +105,7 @@ const Lead = () => {
 
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon color="action" />
+              <InfoIcon sx={{ color: '#49494c' }}  />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -364,7 +364,7 @@ const Lead = () => {
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
                   pageSizeOptions={[10]}
-                  rowHeight={65}
+                  rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
                   components={{ Toolbar: () => <CustomHeader /> }}

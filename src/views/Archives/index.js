@@ -1,11 +1,11 @@
 import React from 'react';
-import { 
-  Card, 
-  Grid, 
-  IconButton, 
-  TextField, 
-  Tooltip, 
-  Typography,  
+import {
+  Card,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
   Popover,
   List,
   ListItem,
@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button 
+  Button
 } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
@@ -64,7 +64,7 @@ const BulkDelete = () => {
       await updateApi(`${urls.serviceuser.unarchive}/${selectedUser.id}`, { archive: false });
       toast.success('User unarchived successfully!');
       setConfirmUnarchiveOpen(false);
-      fetchpeople(); // Refresh the list
+      fetchpeople();
     } catch (error) {
       console.error('Error unarchiving user:', error);
       toast.error('Failed to unarchive the user.');
@@ -98,7 +98,7 @@ const BulkDelete = () => {
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
         postcode: user.contactInfo?.postcode || '',
-        type: 'person' // Added type for icon display
+        type: 'person'
       }));
 
       setRows(formattedUsers);
@@ -133,7 +133,7 @@ const BulkDelete = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '450',
               color: '#333',
               ml: 2,
               fontSize: '14px',
@@ -160,7 +160,7 @@ const BulkDelete = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: '450' }}>
                 {params.row.name} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -172,12 +172,12 @@ const BulkDelete = () => {
           <Stack direction="row" spacing={1}>
             <Tooltip title="Unarchive" arrow>
               <IconButton onClick={() => handleUnarchiveClick(params.row)}>
-                <ArchiveIcon color="action" />
+                  <ArchiveIcon sx={{ color: '#49494c' }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Info" arrow>
               <IconButton>
-                <InfoIcon color="action" />
+                <InfoIcon sx={{ color: '#49494c' }}  />
               </IconButton>
             </Tooltip>
           </Stack>
@@ -189,47 +189,47 @@ const BulkDelete = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">Archives</Typography>
+        <Typography variant="h5">Archives</Typography>
         <Stack direction="row" spacing={2} alignItems="center">
-        <Box
-                                                        sx={{
-                                                          display: 'flex',
-                                                          alignItems: 'center',
-                                                          backgroundColor: '#f8f9fa',
-                                                          borderRadius: '30px',
-                                                          paddingLeft: '16px',
-                                                          border: '1px solid #e0e0e0',
-                                                          width: '350px',
-                                                          height: '40px'
-                                                        }}
-                                                      >
-                                                        <InputBase
-                                                          placeholder="Search..."
-                                                          // value={searchQuery}
-                                                          // onChange={handleSearchChange}
-                                                          // onKeyPress={(e) => {
-                                                          //   if (e.key === 'Enter') {
-                                                          //     handleFilter();
-                                                          //   }
-                                                          // }}
-                                                          sx={{
-                                                            flex: 1,
-                                                            color: 'text.primary'
-                                                          }}
-                                                        />
-                                                        <IconButton
-                                                          // onClick={handleFilter}
-                                                          sx={{
-                                                            marginRight: '8px',
-                                                            width: 32,
-                                                            height: 32,
-                                                            cursor: 'pointer'
-                                                          }}
-                                                        >
-                                                          <SearchIcon />
-                                                        </IconButton>
-                                                      </Box>
-          
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
+            }}
+          >
+            <InputBase
+              placeholder="Search..."
+              // value={searchQuery}
+              // onChange={handleSearchChange}
+              // onKeyPress={(e) => {
+              //   if (e.key === 'Enter') {
+              //     handleFilter();
+              //   }
+              // }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              // onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
+
         </Stack>
       </Stack>
 
@@ -277,7 +277,7 @@ const BulkDelete = () => {
 
       <Dialog open={confirmUnarchiveOpen} onClose={() => setConfirmUnarchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>
-         📦  Unarchive User
+          📦  Unarchive User
         </DialogTitle>
         <DialogContent>
           Are you sure you want to unarchive {selectedUser?.name}?

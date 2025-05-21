@@ -34,13 +34,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          SERIVCE LIST
+          Service List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -77,7 +77,7 @@ const Lead = () => {
         variant="body1"
         sx={{
           textTransform: 'uppercase',
-          fontWeight: 'bold',
+          fontWeight: 450,
           whiteSpace: 'normal',         
           wordBreak: 'break-word',      
           overflowWrap: 'break-word',

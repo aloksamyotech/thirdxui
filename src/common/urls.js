@@ -74,5 +74,9 @@ export const urls = Object.freeze({
   casenote: {
     create: `${baseUrl}/caseNote/add`,
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+  },
+  attendees: {
+    create: `${baseUrl}/attendees/addAttendee`,
+   
   }
 });

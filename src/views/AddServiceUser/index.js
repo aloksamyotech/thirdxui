@@ -31,7 +31,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, updateApiPatch } from 'common/apiClient';
+import { postApi, updateApiPatch ,getApi} from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -41,6 +41,9 @@ const AddCaseForm = ({ onCancel }) => {
   const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [contactpurpose, setContactpurpose] = useState([]);
+  const [reason, setReason] = useState([]);
+  const [contactmethod, setContactmethod] = useState([]);
   const location = useLocation();
   const editdata = location.state;
 
@@ -97,9 +100,9 @@ const AddCaseForm = ({ onCancel }) => {
       emergencytown: editdata?.emergencyContact?.town || '',
       emergencypinCode: editdata?.emergencyContact?.postcode || '',
       emergencycountry: editdata?.emergencyContact?.country || '',
-      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-      reason: editdata?.contactPreferences?.reason || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      reason: editdata?.contactPreferences?.reason?._id|| '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
       telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
       emailConsent: editdata?.contactPreferences?.contactMethods?.email || true,
@@ -160,7 +163,22 @@ const AddCaseForm = ({ onCancel }) => {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
   };
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -176,7 +194,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[title]', formData.personalInfo.title || '');
     fd.append('personalInfo[gender]', formData.personalInfo.gender || '');
     const dob = formData.personalInfo.dateOfBirth;
-    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : null);
+    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
 
@@ -1850,7 +1868,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="contained" sx={{ background: '#053146' }}  onClick={() => handleTabChange(tabIndex + 1)}>
+                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
                         Next
                       </Button>
                     </Grid>
@@ -1877,12 +1895,11 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.preferredContact}
                           helperText={errors.preferredContact?.message}
                         >
-                          <MenuItem value="email">Email</MenuItem>
-                          <MenuItem value="phone">Phone</MenuItem>
-                          <MenuItem value="text">Text</MenuItem>
-                          <MenuItem value="letter">Letter</MenuItem>
-                          <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                          <MenuItem value="doNotContact">Do not contact</MenuItem>
+                          {contactmethod?.map((option) => (
+                            <MenuItem key={option._id} value={option._id}>
+                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />
@@ -1904,8 +1921,11 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.contactPurpose}
                           helperText={errors.contactPurpose?.message}
                         >
-                          <MenuItem value="newsletter">Newsletter</MenuItem>
-                          <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                          {contactpurpose?.map((option) => (
+                            <MenuItem key={option._id} value={option._id}>
+                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />
@@ -1954,10 +1974,11 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.reason}
                           helperText={errors.reason?.message}
                         >
-                          <MenuItem value="interest">Legitimate Interest</MenuItem>
-                          <MenuItem value="byRequest">By Request</MenuItem>
-                          <MenuItem value="deceased">Deceased</MenuItem>
-                          <MenuItem value="goneAway">Gone Away</MenuItem>
+                          {reason?.map((option) => (
+                            <MenuItem key={option._id} value={option._id}>
+                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />

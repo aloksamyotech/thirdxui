@@ -234,16 +234,16 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[country]', formData.emergencycountry || '');
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
-    if (data.preferredContact) {
-      fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    if (formData.preferredContact) {
+      fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
     }
 
-    if (data.contactPurpose) {
-      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    if (formData.contactPurpose) {
+      fd.append('contactPreferences[contactPurposes]', formData.contactPurpose);
     }
 
-    if (data.reason) {
-      fd.append('contactPreferences[reason]', data.reason);
+    if (formData.reason) {
+      fd.append('contactPreferences[reason]', formData.reason);
     }
 
     const confirmDate = formData.confirmationDate;

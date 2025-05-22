@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip ,InputBase} from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -18,7 +18,15 @@ const Lead = () => {
   const [tag, setTag] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const tags = [
     { value: 'urgent', label: 'Urgent' },
@@ -92,16 +100,23 @@ const Lead = () => {
       if (listName && listName !== '') {
         queryParams.append('name', listName);
       }
-      const queryString = queryParams.toString();
-      const url = `${urls.mail.filterType}${queryString ? `?${queryString}` : ''}`;
-      
-      
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
+
+      const url = `${urls.mail.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
 
-      const filteredMails = response?.data || [];
-      
+      const allMail = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
-      const formattedUsers = filteredMails.map((user, index) => {
+      const formattedUsers = allMail?.map((user, index) => {
         return {
           id: user._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
@@ -110,51 +125,76 @@ const Lead = () => {
       });
 
       setRows(formattedUsers);
+      setTotalRows(pagination?.total);
       setIsFiltered(true);
     } catch (error) {
-      console.error('Failed to fetch filtered cases:', error);
+      console.error('Failed to fetch filtered mails:', error);
     }
   };
+
+  useEffect(() => {
+    handleFilter();
+  }, [includeArchives]);
 
   const handleReset = () => {
     setListName('');
     setIsFiltered(false);
+    setIncludeArchives(false);
+    fetchMails();
   };
 
   useEffect(() => {
-    if (listName || isFiltered) {
+    if (listName || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [listName]);
+  }, [listName || searchQuery]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const fetchMails = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize
+      });
+
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
+
+      const response = await getApi(`${urls.mail.fetchWithPagination}?${queryParams.toString()}`);
+      const allMail = response?.data?.data || [];
+      const pagination = response?.data?.meta || {};
+
+      const formattedUsers = allMail.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        name: user.name || ''
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+
+      const uniqueList = [...new Set(allMail.map((item) => item.name).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+
+      setListFilters(uniqueList);
+    } catch (error) {
+      console.error('Failed to fetch mails:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await getApi(urls.mail.fetch);
+    fetchMails();
+  }, [paginationModel]);
 
-        const allmail = response?.data?.allMail || [];
-
-        const formattedUsers = allmail.map((user, index) => ({
-          id: user._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-          name: user.name || ''
-        }));
-        setRows(formattedUsers);
-
-        const uniqueList = [...new Set(allmail.map((item) => item.name).filter(Boolean))].map((value) => ({
-          value,
-          label: value
-        }));
-        
-        setListFilters(uniqueList);
-      } catch (error) {
-        console.error('Failed to fetch services:', error);
-      }
-    };
-
-    fetchServices();
-  }, []);
-  
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
@@ -183,64 +223,78 @@ const Lead = () => {
             </IconButton>
           </Tooltip>
 
-               <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '30px',
-                        paddingLeft: '16px',
-                        border: '1px solid #e0e0e0',
-                        width: '350px',
-                        height: '40px'
-                      }}
-                    >
-                      <InputBase
-                        placeholder="Search..."
-                        // value={searchQuery}
-                        // onChange={handleSearchChange}
-                        // onKeyPress={(e) => {
-                        //   if (e.key === 'Enter') {
-                        //     handleFilter();
-                        //   }
-                        // }}
-                        sx={{
-                          flex: 1,
-                          color: 'text.primary'
-                        }}
-                      />
-                      <IconButton
-                        // onClick={handleFilter}
-                        sx={{
-                          marginRight: '8px',
-                          width: 32,
-                          height: 32,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <SearchIcon />
-                      </IconButton>
-                    </Box>
-
-        
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
+            }}
+          >
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
         </Stack>
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
             listNames={listFilters}
             listNameFilter={listName}
-            setListNameFilter={(value)=>setListName(value)}
+            setListNameFilter={(value) => setListName(value)}
             tags={tags}
             setTagFilter={setTag}
-            selectedFilters={['listNameFilter', 'tagFilter']}
+            includeArchives={includeArchives}
+            setIncludeArchives={setIncludeArchives}
+            selectedFilters={['listNameFilter', 'tagFilter', 'includeArchives']}
             onReset={handleReset}
           />
 
           <Grid item xs={9}>
             <Card style={{ height: 'auto' }}>
               <DataGrid
-                rows={rows}
+                rows={
+                  loading
+                    ? []
+                    : rows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 components={{

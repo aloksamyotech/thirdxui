@@ -1,7 +1,5 @@
 const baseUrl = 'https://thirdex.samyotech.in/api/v1';
 export const imageUrl = 'https://thirdex.samyotech.in/';
-// const baseUrl = 'http://localhost:7200/api/v1' ;
-// export const imageUrl = 'http://localhost:7200/';
 
 // const baseUrl = 'http://localhost:7200/api/v1';
 // export const imageUrl = 'http://localhost:7200';
@@ -28,8 +26,8 @@ export const urls = Object.freeze({
     editUser: `${baseUrl}/user/edituser`,
     deleteUser: `${baseUrl}/user/deleteuser`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
-    archive:`${baseUrl}/user/archive`,
-    unarchive:`${baseUrl}/user/unarchive`
+    archive: `${baseUrl}/user/archive`,
+    unarchive: `${baseUrl}/user/unarchive`
   },
   service: {
     create: `${baseUrl}/services/addServices`,
@@ -49,20 +47,19 @@ export const urls = Object.freeze({
   mail: {
     create: `${baseUrl}/mail/addmail`,
     fetch: `${baseUrl}/mail/getallmail`,
-    filterType: `${baseUrl}/mail/filter`
+    filterType: `${baseUrl}/mail/filter`,
+    fetchWithPagination: `${baseUrl}/mail/allwithpagination`,
   },
   transaction: {
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
     filterType: `${baseUrl}/transaction/filter`,
-     fetchWithPagination:`${baseUrl}/transaction/allwithpagination`,
-
-
+    fetchWithPagination: `${baseUrl}/transaction/allwithpagination`
   },
   tag: {
     create: `${baseUrl}/tag/`,
     getAllTags: `${baseUrl}/tag/getalltag`,
-    updateStatus: `${baseUrl}/tag/updateStatus`,
+    updateStatus: `${baseUrl}/tag/updateStatus`
   },
   session: {
     create: `${baseUrl}/session/addSession`,
@@ -76,7 +73,6 @@ export const urls = Object.freeze({
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
   },
   attendees: {
-    create: `${baseUrl}/attendees/addAttendee`,
-   
+    create: `${baseUrl}/attendees/addAttendee`
   }
 });

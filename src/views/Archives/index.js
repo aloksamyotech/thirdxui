@@ -32,6 +32,7 @@ import { urls } from 'common/urls';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const BulkDelete = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const BulkDelete = () => {
   const [activityType, setActivityTypeFilter] = useState('');
   const [sessionName, setSessionNameFilter] = useState('');
   const [totalRows, setTotalRows] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [confirmUnarchiveOpen, setConfirmUnarchiveOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -248,14 +249,36 @@ const BulkDelete = () => {
         />
         <Grid item xs={9}>
           <Box width="100%">
-            <Card style={{ height: 'auto' }}>
+            <Card style={{ height: '100vh' }}>
               <DataGrid
                 rows={rows}
                 columns={columns}
                 loading={loading}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                components={{ Toolbar: CustomHeader }}
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (
+                    loading ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                  ),
+                }}
                 paginationMode="server"
                 rowCount={totalRows}
                 pageSizeOptions={[10, 25, 50]}

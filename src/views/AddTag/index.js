@@ -34,6 +34,7 @@ import { toast } from 'react-toastify';
 import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import moment from 'moment';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const TagForm = () => {
   const navigate = useNavigate();
@@ -335,12 +336,34 @@ const TagForm = () => {
         </Grid>
 
         <Box width="100%" sx={{ mt: 1 }}>
-          <Card>
+          <Card style={{ height: '100%', minHeight: '200' }}>
             <DataGrid
               rows={tags}
               columns={columns}
               getRowId={(row) => row._id}
-              components={{ Toolbar: CustomHeader }}
+              slots={{
+                toolbar: () => <CustomHeader />,
+                loadingOverlay: () => (
+                  <Box
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'self-start',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    }}
+                  >
+                    <SingleRowLoader />
+                  </Box>
+                ),
+                noRowsOverlay: () => (
+                  isLoading ? null : (
+                    <Box sx={{ padding: 2, textAlign: 'center' }}>
+                      No data available.
+                    </Box>
+                  )
+                ),
+              }}
               pagination={false}
               hideFooter
               sx={{

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase,Chip } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -10,6 +10,7 @@ import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -57,7 +58,7 @@ const Lead = () => {
   const [rows, setRows] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [totalRows, setTotalRows] = useState(0);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
@@ -66,36 +67,36 @@ const Lead = () => {
   });
 
   const columns = [
-{
-  field: 'name',
-  headerName: 'Service Name',
-  flex: 1.5,
-  renderCell: (params) => (
-    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
-      <Typography
-        variant="body1"
-        sx={{
-          textTransform: 'uppercase',
-          fontWeight: 400,
-          whiteSpace: 'normal',         
-          wordBreak: 'break-word',      
-          overflowWrap: 'break-word',
-        }}
-        mb={1}
-      >
-        {params.row.name}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="textSecondary"
-        sx={{ whiteSpace: 'nowrap' }}  
-      >
-        {new Date(params.row.updatedAt).toDateString()}
-      </Typography>
-    </Stack>
-  )
-}
-,
+    {
+      field: 'name',
+      headerName: 'Service Name',
+      flex: 1.5,
+      renderCell: (params) => (
+        <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: 'uppercase',
+              fontWeight: 400,
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
+            }}
+            mb={1}
+          >
+            {params.row.name}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            {new Date(params.row.updatedAt).toDateString()}
+          </Typography>
+        </Stack>
+      )
+    }
+    ,
 
     {
       field: 'serviceType',
@@ -267,19 +268,19 @@ const Lead = () => {
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-            <Box
+          <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               backgroundColor: '#f8f9fa',
               borderRadius: '30px',
               paddingLeft: '16px',
-                border: '1px solid #e0e0e0',
+              border: '1px solid #e0e0e0',
               width: '350px',
               height: '40px'
             }}
           >
-          <InputBase
+            <InputBase
               placeholder="Search..."
               value={searchQuery}
               onChange={handleSearchChange}
@@ -293,7 +294,7 @@ const Lead = () => {
                 color: 'text.primary'
               }}
             />
-          <IconButton
+            <IconButton
               onClick={handleFilter}
               sx={{
                 marginRight: '8px',
@@ -301,11 +302,11 @@ const Lead = () => {
                 height: 32,
                 cursor: 'pointer'
               }}
-          >
-          <SearchIcon />
-          </IconButton>
+            >
+              <SearchIcon />
+            </IconButton>
           </Box>
-     
+
         </Stack>
 
         <Grid container spacing={2}>
@@ -324,15 +325,15 @@ const Lead = () => {
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
                     rows={
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -344,14 +345,34 @@ const Lead = () => {
                     pageSizeOptions={[10]}
                     rowHeight={70}
                     getRowId={(row) => row._id}
-                    components={{
-                      Toolbar: () => <CustomHeader />
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (
+                        loading ? null : (
+                          <Box sx={{ padding: 2, textAlign: 'center' }}>
+                            No data available.
+                          </Box>
+                        )
+                      ),
                     }}
                     onRowClick={(params) => navigate('/view-service', { state: { row: params.row } })}
                     sx={{
                       '& .MuiDataGrid-row': {
                         borderBottom: '1px solid #ccc',
-                        cursor:'pointer'
+                        cursor: 'pointer'
                       }
                     }}
                   />

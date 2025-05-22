@@ -9,6 +9,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const districts = [
   { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
@@ -43,7 +44,7 @@ const Lead = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
@@ -324,7 +325,7 @@ const Lead = () => {
           />
 
           <Grid item xs={9}>
-            <Card style={{ height: 'auto' }}>
+            <Card style={{ height: '100vh' }}>
               <DataGrid
                 rows={
                   loading
@@ -345,8 +346,28 @@ const Lead = () => {
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (
+                    loading ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                  ),
                 }}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {

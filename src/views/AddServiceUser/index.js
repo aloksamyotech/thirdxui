@@ -31,7 +31,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, updateApiPatch ,getApi} from 'common/apiClient';
+import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -101,7 +101,7 @@ const AddCaseForm = ({ onCancel }) => {
       emergencypinCode: editdata?.emergencyContact?.postcode || '',
       emergencycountry: editdata?.emergencyContact?.country || '',
       preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
-      reason: editdata?.contactPreferences?.reason?._id|| '',
+      reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
       telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
@@ -233,9 +233,17 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
 
-    fd.append('contactPreferences[preferredMethod]', formData.preferredContact || '');
-    fd.append('contactPreferences[reason]', formData.reason || '');
-    fd.append('contactPreferences[contactPurposes]', formData.contactPurpose || '');
+    if (data.preferredContact) {
+      fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    }
+
+    if (data.contactPurpose) {
+      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    }
+
+    if (data.reason) {
+      fd.append('contactPreferences[reason]', data.reason);
+    }
     const confirmDate = formData.confirmationDate;
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 

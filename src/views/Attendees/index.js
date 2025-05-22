@@ -28,18 +28,19 @@ export default function SessionRegisterPage() {
   const [selectedUserId, setSelectedUserId] = useState('');
 
   const location = useLocation();
-  const session = location.state.session;
 
-  const sessionId = session._id;
+  const session = location?.state?.session || {};
+
+  const sessionId = session?._id;
 
   useEffect(() => {
     const fetchpeople = async () => {
-      const response = await getApi(urls.serviceuser.fetch);
+      const response = await getApi(urls?.serviceuser?.fetch);
       const allUser = response?.data?.allUser || [];
 
       const formattedUsers = allUser.map((user) => ({
-        id: user._id,
-        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        id: user?._id,
+        name: `${user?.personalInfo?.firstName || ''} ${user?.personalInfo?.lastName || ''}`
       }));
       setRows(formattedUsers);
     };
@@ -121,7 +122,7 @@ export default function SessionRegisterPage() {
             <Card sx={{ p: 2, height: '250px' }}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Typography fontWeight="bold">Add An Attendee</Typography>
-                <AddCircleIcon sx={{ color: 'green' }} onClick={() => navigate('/add-serviceuser')} />
+                <AddCircleIcon sx={{ color: 'green', cursor: 'pointer' }} onClick={() => navigate('/add-serviceuser')} />
               </Box>
 
               <Grid container spacing={2} alignItems="center">

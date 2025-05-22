@@ -27,6 +27,7 @@ const Lead = () => {
     page: 0,
     pageSize: 10
   });
+  const [tagOptions, setTagOptions] = useState([]);
 
   const tags = [
     { value: 'urgent', label: 'Urgent' },
@@ -100,6 +101,11 @@ const Lead = () => {
       if (listName && listName !== '') {
         queryParams.append('name', listName);
       }
+
+      if (tag && tag !== '') {
+        queryParams.append('tag', tag);
+      }
+
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());
       }
@@ -111,6 +117,7 @@ const Lead = () => {
       }
 
       const url = `${urls.mail.fetchWithPagination}?${queryParams.toString()}`;
+
       const response = await getApi(url);
 
       const allMail = response?.data?.data || [];
@@ -144,10 +151,10 @@ const Lead = () => {
   };
 
   useEffect(() => {
-    if (listName || searchQuery || isFiltered) {
+    if (listName || searchQuery || isFiltered || tag) {
       handleFilter();
     }
-  }, [listName || searchQuery]);
+  }, [listName || searchQuery || tag]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -191,8 +198,23 @@ const Lead = () => {
     }
   };
 
+  const fetchtTagData = async () => {
+    try {
+      const response = await getApi(urls.tag.getAllTags);
+
+      const options = response?.data?.allTags?.map((item) => ({
+        value: item._id,
+        label: item.name
+      }));
+      setTagOptions(options);
+    } catch (error) {
+      console.error('Error fetching config:', error);
+    }
+  };
+
   useEffect(() => {
     fetchMails();
+    fetchtTagData();
   }, [paginationModel]);
 
   return (
@@ -268,8 +290,8 @@ const Lead = () => {
             listNames={listFilters}
             listNameFilter={listName}
             setListNameFilter={(value) => setListName(value)}
-            tags={tags}
-            setTagFilter={setTag}
+            tags={tagOptions}
+            setTagFilter={(value) => setTag(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
             selectedFilters={['listNameFilter', 'tagFilter', 'includeArchives']}

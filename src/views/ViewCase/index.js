@@ -22,15 +22,16 @@ const CaseDetailsPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [caseData, setCaseData] = useState(null);
   const [serviceDetails, setServiceDetails] = useState('');
   const [serviceuserDetails, setServiceuserDetails] = useState('');
   const [row, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
-   const [paginationModel, setPaginationModel] = useState({
-      page: 0,
-      pageSize: 10
-    });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -101,12 +102,12 @@ const CaseDetailsPage = () => {
     setOpenDialog(false);
   };
 
-  const dateAddedFilters = [
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'Last 7 Days' },
-    { value: 'month', label: 'Last 30 Days' },
-    { value: 'year', label: 'Last 1 Year' }
-  ];
+  // const dateAddedFilters = [
+  //   { value: 'today', label: 'Today' },
+  //   { value: 'week', label: 'Last 7 Days' },
+  //   { value: 'month', label: 'Last 30 Days' },
+  //   { value: 'year', label: 'Last 1 Year' }
+  // ];
 
   const columnsCase = [
     { field: 'caseId', headerName: 'Case Id', width: 100 },
@@ -162,7 +163,7 @@ const CaseDetailsPage = () => {
           <Chip
             label={status === 'Active' ? 'Open' : 'Close'}
             icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-            variant="outlined" 
+            variant="outlined"
             sx={{
               borderColor: 'gray',
               color: 'gray',
@@ -253,9 +254,64 @@ const CaseDetailsPage = () => {
       renderCell: (params) => <IconButton>{params.value ? <VisibilityOff /> : <Visibility />}</IconButton>
     }
   ];
+
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      queryParams.append('caseId', id);
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('date', formattedDate);
+      }
+      if (searchQuery && searchQuery !== '') {
+        queryParams.append('search', searchQuery);
+      }
+
+      const queryString = queryParams.toString();
+      const url = `${urls.casenote?.fetchWithPagination}?${queryParams.toString()}`;
+
+      const response = await getApi(url);
+
+      const filteredCases = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      };
+
+      const formattedUsers = filteredCases.map((user, index) => {
+        return {
+          id: user?._id,
+          date: formatDate(user?.date),
+          subject: user?.subject || '',
+          contactType: user?.configurationId?.name || '',
+        };
+      });
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered cases:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setDateOpenedFilter('');
+    setSearchQuery('');
+  };
+
+  useEffect(() => {
+    if (dateOpenedFilter) {
+      handleFilter();
+    }
+  }, [dateOpenedFilter]);
+
   useEffect(() => {
     if (!id) return;
-
     const fetchData = async () => {
       try {
         const response = await getApi(urls.case.getById.replace(':id', id));
@@ -267,40 +323,41 @@ const CaseDetailsPage = () => {
         console.error('Error fetching case data:', error);
       }
     };
-
     fetchData();
   }, [id]);
 
-   const fetchdata = async () => {
-      try {
-        const response = await getApi(
-          `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
-        );
-        const allCasesNotes = response?.data?.data || [];
-        const pagination = response?.data?.meta || { total: 0 };
+  const fetchdata = async () => {
+    try {
+      const response = await getApi(
+        `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
+      );
+      const allCasesNotes = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
-        const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
-          id: item._id || index,
-          date: item.date ? new Date(item.date).toLocaleDateString() : '',
-          subject: item?.subject || '',
-          contactType: item?.configurationId?.name || '',
-          
-        }));
+      const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
+        id: item._id || index,
+        date: item.date ? new Date(item.date).toLocaleDateString() : '',
+        subject: item?.subject || '',
+        contactType: item?.configurationId?.name || '',
 
-        setRows(formattedCasesNotes);
+      }));
 
-        setTotalRows(pagination?.total);
-        
-      } catch (err) {
-        console.error('Failed to fetch data:', err);
-      }
-    };
+      setRows(formattedCasesNotes);
 
-   useEffect(() => {
-   
+      setTotalRows(pagination?.total);
+
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+    }
+  };
+
+  useEffect(() => {
     fetchdata();
   }, [paginationModel]);
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <>
@@ -334,6 +391,8 @@ const CaseDetailsPage = () => {
                     flex: 1,
                     color: 'text.primary'
                   }}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                 />
                 <IconButton
                   sx={{
@@ -341,6 +400,7 @@ const CaseDetailsPage = () => {
                     width: 32,
                     height: 32
                   }}
+                  onClick={handleFilter}
                 >
                   <SearchIcon />
                 </IconButton>
@@ -430,9 +490,10 @@ const CaseDetailsPage = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            dateAddedFilters={dateAddedFilters}
-            setDateAddedFilter={setDateOpenedFilter}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             selectedFilters={['dateOpenedFilter']}
+            onReset={handleReset}
           />
 
           <Grid item xs={12} md={9}>

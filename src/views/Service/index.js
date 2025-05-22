@@ -350,7 +350,8 @@ const Lead = () => {
                     onRowClick={(params) => navigate('/view-service', { state: { row: params.row } })}
                     sx={{
                       '& .MuiDataGrid-row': {
-                        borderBottom: '1px solid #ccc'
+                        borderBottom: '1px solid #ccc',
+                        cursor:'pointer'
                       }
                     }}
                   />

@@ -30,6 +30,7 @@ const UserProfileCard = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -552,7 +553,9 @@ const UserProfileCard = () => {
                   setSessionNameFilter={setSessionName}
                   dateAddedFilters={dateAddedFilters}
                   setDateAddedFilter={setDateOpenedFilter}
-                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter']}
+                  includeArchives={includeArchives}
+                  setIncludeArchives={setIncludeArchives}
+                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
                 />
 
                 <Grid item xs={9}>

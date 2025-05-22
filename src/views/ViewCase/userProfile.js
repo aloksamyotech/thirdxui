@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography, Avatar, Grid, Box } from '@mui/material';
-import Userprofile from 'assets/images/profile(2).png'
+import userProfile from 'assets/images/profile(2).png'
 
 export default function UserProfileDialog({ open, handleClose, user ,userView}) {
  return (
@@ -13,7 +13,7 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
     >
       <DialogTitle>
         <Grid container alignItems="center" spacing={2}>
-          <img src={userView || Userprofile} alt={user.name} style={{ width: 64, height: 64, borderRadius: '50%' }} />
+          <img src={userView || userProfile} alt={user.name} style={{ width: 64, height: 64, borderRadius: '50%' }} />
 
           <Grid item xs>
             <Typography mb={1} variant="h5">

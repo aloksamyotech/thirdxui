@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useEffect } from 'react';
 import { Grid, Card, Typography, Box, MenuItem, Chip, TextField, Button, Autocomplete } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -451,17 +452,26 @@ const FilterPanel = ({
 
             if (filter.type === 'time') {
               return (
-                <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
-                  <DesktopTimePicker
-                    label={filter.label}
-                    ampm={true}
-                    value={filter.value || null}
-                    onChange={(newValue) => filter.onChange(newValue)}
-                    minutesStep={1}
-                    views={['hours', 'minutes', 'seconds']}
-                    renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                  />
+               <><LocalizationProvider dateAdapter={AdapterDayjs}>
+                 <TextField
+       label={filter.label}
+      type="time"
+      variant="outlined"
+      size="small"
+      fullWidth
+      InputLabelProps={{ shrink: true }}
+      inputProps={{ step: 300 }} 
+      onChange={(newValue) => filter.onChange(newValue)}
+      format="hh:mm A"
+      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+      sx={{
+        '& .MuiInputBase-root.Mui-focused': {
+          backgroundColor: '#e0e0e0',  
+        },
+      }}
+    />
                 </LocalizationProvider>
+</>
               );
             }
 

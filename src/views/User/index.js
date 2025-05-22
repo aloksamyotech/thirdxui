@@ -20,6 +20,7 @@ const User = () => {
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
+  const [countryOfOriginFilter, setCountryOfOriginFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
@@ -169,20 +170,25 @@ const User = () => {
         archive: 'false',
         role: 'user'
       });
- 
+
       if (searchQuery) {
         queryParams.append('search', searchQuery);
       }
       if (status) queryParams.append('status', status === 'active');
-       if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
-   
+      if (countryOfOriginFilter) {
+        const selectedCountry = countriesWithFlags.find(country => country.value === countryOfOriginFilter);
+        if (selectedCountry) {
+          queryParams.append('country', selectedCountry.label);
+        }
+      }
       if (name) {
         queryParams.append('name', name);
       }
- 
+
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
  
       const allUser = response?.data?.data || [];
@@ -229,8 +235,8 @@ const User = () => {
  
   useEffect(() => {
     fetchUser();
-  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, name, searchQuery]);
- 
+  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, name, searchQuery, countryOfOriginFilter]);
+
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
@@ -242,19 +248,20 @@ const User = () => {
       console.error('Error deleting user:', error);
     }
   };
- 
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
- 
+
   const handleReset = () => {
     setStatus('');
     setDateOpenedFilter('');
     setNameFilter('');
     setSearchQuery('');
+    setCountryOfOriginFilter('');
     fetchUser();
   };
- 
+
   return (
     <>
       <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -331,6 +338,8 @@ const User = () => {
               names={nameFilter}
               setNameFilter={setNameFilter}
               countriesWithFlags={countriesWithFlags}
+              countryOfOriginFilter={countryOfOriginFilter}
+              setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
               selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
               onReset={handleReset}
               onApply={fetchUser}

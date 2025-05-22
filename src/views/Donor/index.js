@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField,InputBase, IconButton, Tooltip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -93,8 +93,8 @@ const Lead = () => {
                 {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
-                  ? params.row.companyInformation.companyName
-                  : ''}
+                    ? params.row.companyInformation.companyName
+                    : ''}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -105,7 +105,7 @@ const Lead = () => {
 
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon sx={{ color: '#49494c' }}  />
+              <InfoIcon sx={{ color: '#49494c' }} />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -276,19 +276,19 @@ const Lead = () => {
                 Add New Donor <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-                      <Box
+            <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: '#f8f9fa',
                 borderRadius: '30px',
                 paddingLeft: '16px',
-                  border: '1px solid #e0e0e0',
+                border: '1px solid #e0e0e0',
                 width: '350px',
                 height: '40px'
               }}
             >
-            <InputBase
+              <InputBase
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -302,7 +302,7 @@ const Lead = () => {
                   color: 'text.primary'
                 }}
               />
-            <IconButton
+              <IconButton
                 onClick={handleFilter}
                 sx={{
                   marginRight: '8px',
@@ -310,9 +310,9 @@ const Lead = () => {
                   height: 32,
                   cursor: 'pointer'
                 }}
-            >
-            <SearchIcon />
-            </IconButton>
+              >
+                <SearchIcon />
+              </IconButton>
             </Box>
 
             {/* <TextField
@@ -352,9 +352,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                   }
                   columns={columns}
                   rowCount={totalRows}
@@ -370,7 +370,10 @@ const Lead = () => {
                   components={{ Toolbar: () => <CustomHeader /> }}
                   sx={{
                     '& .MuiDataGrid-columnHeaders': { display: 'none' },
-                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' }
+                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' },
+                    '& .MuiDataGrid-row': {
+                      cursor: 'pointer'
+                    }
                   }}
                   disableSelectionOnClick
                 />

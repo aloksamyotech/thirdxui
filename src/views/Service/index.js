@@ -77,11 +77,12 @@ const Lead = () => {
         variant="body1"
         sx={{
           textTransform: 'uppercase',
-          fontWeight: 450,
+          fontWeight: 400,
           whiteSpace: 'normal',         
           wordBreak: 'break-word',      
           overflowWrap: 'break-word',
         }}
+        mb={1}
       >
         {params.row.name}
       </Typography>
@@ -125,36 +126,31 @@ const Lead = () => {
             sx={{
               color: isActive ? '#79dbfb' : '#ff6a67',
               backgroundColor: isActive ? '#e5f8fe' : '#ffeae9',
-              fontWeight: 'bold',
-              minWidth: '80px'
+              maxWidth: '80px'
             }}
           />
         );
       }
     },
-   {
-  field: 'more',
-  headerName: 'More',
-  flex: 0.8,
-  headerAlign: 'center',
-  align: 'center',
-  renderCell: () => (
-    <Box
-      sx={{
-        backgroundColor: '#f5f5f5',    
-        padding: '4px 10px',
-        borderRadius: '16px',            
-        cursor: 'pointer',
-        display: 'inline-block',
-      }}
-    >
-      <Typography variant="body2" color="text.secondary">
-        View More
-      </Typography>
-    </Box>
-  )
-}
-
+    {
+      field: 'more',
+      headerName: 'More',
+      flex: 0.8,
+      headerAlign: 'center',
+      align: 'center',
+      renderCell: () => (
+        <Box
+          sx={{
+            backgroundColor: '#f0f0f0',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          <Typography color="grey">View More</Typography>
+        </Box>
+      )
+    }
   ];
   useEffect(() => {
     const fetchData = async () => {
@@ -347,7 +343,7 @@ const Lead = () => {
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
                     pageSizeOptions={[10]}
-                    rowHeight={65}
+                    rowHeight={70}
                     getRowId={(row) => row._id}
                     components={{
                       Toolbar: () => <CustomHeader />

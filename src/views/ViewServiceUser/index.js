@@ -115,12 +115,20 @@ const UserProfileCard = () => {
   const imagePath = userData?.otherInfo?.file;
   const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
 
+  const handleBackClick = () => {
+    if (userData?.role === 'volunteer') {
+      navigate('/volunteer');
+    } else {
+      navigate('/people');
+    }
+  };
+
   return (
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
           <Typography fontWeight="bold" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/people')}>
+            <IconButton onClick={handleBackClick}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
             Profile
@@ -161,15 +169,17 @@ const UserProfileCard = () => {
               >
                 <Grid container alignItems="center" spacing={2}>
                   <img
-                   src={fullImageUrl || ServiceUser}
+                    src={fullImageUrl || ServiceUser}
                     alt={personalInfo?.firstName || 'User'}
-                    style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
+                    style={{ width: 84, height: 84, borderRadius: '50%', marginLeft: '16px' }}
                   />
                   <Grid item xs>
-                    <Typography variant="body1" fontWeight={700}>
+                    <Typography variant="body1" fontSize={16} fontWeight={500} mb={1}>
                       {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
                     </Typography>
-                    <Typography variant="body2">{contactInfo?.email ?? ''}</Typography>
+                    <Typography variant="body2" mb={1}>
+                      {contactInfo?.email ?? ''}
+                    </Typography>
                     <Typography variant="body2">
                       {uniqueid ?? ''} | Individual | Added {formattedDate ?? ''}
                     </Typography>
@@ -180,7 +190,7 @@ const UserProfileCard = () => {
                   <Button
                     variant="contained"
                     onClick={handleClick}
-                    sx={{ mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '12px', backgroundColor: '#009fc7' }}
+                    sx={{ mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
                   >
                     MANAGE
                   </Button>

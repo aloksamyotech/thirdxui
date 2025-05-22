@@ -65,7 +65,7 @@ const Card = () => {
           </Stack>
 
           <Stack>
-            <InfoIcon />
+            <InfoIcon sx={{ color: '#49494c' }}/>
           </Stack>
         </Stack>
 
@@ -98,7 +98,7 @@ const Card = () => {
           </Stack>
 
           <Stack>
-            <InfoIcon />
+            <InfoIcon sx={{ color: '#49494c' }} />
           </Stack>
         </Stack>
 
@@ -131,7 +131,7 @@ const Card = () => {
           </Stack>
 
           <Stack>
-            <InfoIcon />
+            <InfoIcon  sx={{ color: '#49494c' }}/>
           </Stack>
         </Stack>
 

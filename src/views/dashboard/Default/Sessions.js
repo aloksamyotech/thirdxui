@@ -65,7 +65,7 @@ const SessionItem = ({ date, time, title, description, summary, presenter }) => 
               textTransform: 'none',
               fontSize: 8,
               px: 0.5,
-              py: 0.5,
+              py: 0.6,
               maxWidth: 90,
               borderRadius: 1.5,
               boxShadow: 'none',
@@ -81,10 +81,11 @@ const SessionItem = ({ date, time, title, description, summary, presenter }) => 
             size="small"
             sx={{
               textTransform: 'none',
-              fontSize: 8,
-              px: 0.5,
-              py: 0.4,
-              maxWidth: 80,
+              fontSize: 8, 
+              px: 1.2,
+              py: 0.5,
+              maxWidth: 120,
+              whiteSpace: 'nowrap',
               borderRadius: 1.5,
               color: '#1B4B66',
               borderColor: '#1B4B66',
@@ -96,8 +97,9 @@ const SessionItem = ({ date, time, title, description, summary, presenter }) => 
           >
             Add Attendees
           </Button>
+
           <IconButton size="small">
-            <InfoIcon fontSize="small" sx={{ color: '#403b3b' }} />
+            <InfoIcon fontSize="small" sx={{ color: '#49494c' }}/>
           </IconButton>
         </Stack>
       </Grid>

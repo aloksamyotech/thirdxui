@@ -46,16 +46,16 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Active Service User" num1="145 M" num2="62" />
+            <DashboardCard title="Active Service Users" num1="145 M" num2="62" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
             <DashboardCard title="Open Cases" num1="145 M" num2="62" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Sessions Deliver" num1="145 M" num2="62" />
+            <DashboardCard title="Sessions Delivered" num1="145 M" num2="62" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Total Donation" num1="145 M" num2="62" />
+            <DashboardCard title="Total Donations" num1="145 M" num2="62" />
           </Grid>
         </Grid>
       </Grid>
@@ -69,7 +69,7 @@ const Dashboard = () => {
             <Shortcut2 icon={2} title="Add New Case" path="/add-case" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <Shortcut2 icon={3} title="Add Session Attendies" path="/add-session" />
+            <Shortcut2 icon={3} title="Add Session Attendies" path="/services" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
             <Shortcut2 icon={4} title="Add Donor" path="/add-donor" />

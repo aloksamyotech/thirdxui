@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Stack, Grid, Card, Box, Typography, TextField,IconButton ,InputBase} from '@mui/material';
+import { Stack, Grid, Card, Box, Typography, TextField, IconButton, InputBase } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
 import TableStyle from '../../ui-component/TableStyle';
@@ -111,58 +111,56 @@ const ReferralTable = () => {
   };
 
   const handleAccept = () => {
-    console.log('Accepted!');
     setDialogOpen(false);
   };
 
   const handleDecline = () => {
-    console.log('Declined!');
     setDialogOpen(false);
   };
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">New Referral</Typography>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Typography variant="h5">New Referrals</Typography>
 
-                <Box
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '30px',
+            paddingLeft: '16px',
+            border: '1px solid #e0e0e0',
+            width: '350px',
+            height: '40px'
+          }}
+        >
+          <InputBase
+            placeholder="Search..."
+            // value={searchQuery}
+            // onChange={handleSearchChange}
+            // onKeyPress={(e) => {
+            //   if (e.key === 'Enter') {
+            //     handleFilter();
+            //   }
+            // }}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '30px',
-              paddingLeft: '16px',
-                border: '1px solid #e0e0e0',
-              width: '350px',
-              height: '40px'
+              flex: 1,
+              color: 'text.primary'
+            }}
+          />
+          <IconButton
+            // onClick={handleFilter}
+            sx={{
+              marginRight: '8px',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
             }}
           >
-          <InputBase
-              placeholder="Search..."
-              // value={searchQuery}
-              // onChange={handleSearchChange}
-              // onKeyPress={(e) => {
-              //   if (e.key === 'Enter') {
-              //     handleFilter();
-              //   }
-              // }}
-              sx={{
-                flex: 1,
-                color: 'text.primary'
-              }}
-            />
-          <IconButton
-              // onClick={handleFilter}
-              sx={{
-                marginRight: '8px',
-                width: 32,
-                height: 32,
-                cursor: 'pointer'
-              }}
-          >
-          <SearchIcon />
+            <SearchIcon />
           </IconButton>
-          </Box>
+        </Box>
       </Stack>
       <Grid container spacing={2}>
         <FilterPanel

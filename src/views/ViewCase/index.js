@@ -110,11 +110,10 @@ const CaseDetailsPage = () => {
 
   const columnsCase = [
     { field: 'caseId', headerName: 'Case Id', width: 100 },
-
     {
       field: 'serviceUser',
       headerName: 'Service User',
-      width: 160,
+      width: 120,
       renderCell: () => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
           {`${serviceuserDetails?.personalInfo?.firstName || ''} ${serviceuserDetails?.personalInfo?.lastName || ''}`}
@@ -148,7 +147,7 @@ const CaseDetailsPage = () => {
       valueGetter: () => formatDate(caseData?.caseOpened || '')
     },
 
-    { field: 'attachments', headerName: 'Attachments', width: 100 },
+    { field: 'attachments', headerName: 'Attachments', width: 110 },
 
     { field: 'totalHours', headerName: 'Total Hours', width: 100 },
 
@@ -313,7 +312,7 @@ const CaseDetailsPage = () => {
                   <IconButton onClick={() => navigate('/case')}>
                     <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
                   </IconButton>
-                  {serviceDetails.name}
+                  {serviceDetails?.name}
                 </Typography>
               </Stack>
 

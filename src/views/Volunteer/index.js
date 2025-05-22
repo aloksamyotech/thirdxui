@@ -120,7 +120,7 @@ const Lead = () => {
 
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon color="action" />
+              <InfoIcon sx={{ color: '#49494c' }} />
             </IconButton>
           </Tooltip>
         </Stack>

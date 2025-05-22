@@ -11,6 +11,7 @@ import FilterPanel from 'components/FilterPanel';
 import DonorTypeDialog from './donorType.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -37,7 +38,7 @@ const Lead = () => {
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [nameFilterOptions, setNameFilterOptions] = useState([]);
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -351,7 +352,7 @@ const Lead = () => {
             />
 
             <Grid item xs={9}>
-              <Card style={{ height: 'auto' }}>
+              <Card style={{ height: '100vh' }}>
                 <DataGrid
                   rows={
                     loading
@@ -372,7 +373,29 @@ const Lead = () => {
                   rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
-                  components={{ Toolbar: () => <CustomHeader /> }}
+                  slots={{
+                    toolbar: () => <CustomHeader />,
+                    loadingOverlay: () => (
+                      <Box
+                        sx={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'self-start',
+                          justifyContent: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        }}
+                      >
+                        <SingleRowLoader />
+                      </Box>
+                    ),
+                    noRowsOverlay: () => (
+                      loading ? null : (
+                        <Box sx={{ padding: 2, textAlign: 'center' }}>
+                          No data available.
+                        </Box>
+                      )
+                    ),
+                  }}
                   sx={{
                     '& .MuiDataGrid-columnHeaders': { display: 'none' },
                     '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' },

@@ -10,6 +10,7 @@ import FilterPanel from 'components/FilterPanel';
 import { useNavigate } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const Lead = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Lead = () => {
     page: 0,
     pageSize: 10
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [totalRows, setTotalRows] = useState(0);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
@@ -331,7 +332,7 @@ const Lead = () => {
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
                     rows={
                       loading
@@ -351,8 +352,28 @@ const Lead = () => {
                     pageSizeOptions={[10]}
                     rowHeight={65}
                     getRowId={(row) => row.id}
-                    components={{
-                      Toolbar: () => <CustomHeader />
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (
+                        loading ? null : (
+                          <Box sx={{ padding: 2, textAlign: 'center' }}>
+                            No data available.
+                          </Box>
+                        )
+                      ),
                     }}
                     checkboxSelection
                     onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}

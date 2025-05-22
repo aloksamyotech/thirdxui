@@ -10,6 +10,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const Lead = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Lead = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [isFiltered, setIsFiltered] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
@@ -300,7 +301,7 @@ const Lead = () => {
           />
 
           <Grid item xs={9}>
-            <Card style={{ height: 'auto' }}>
+            <Card style={{ height: '100vh' }}>
               <DataGrid
                 rows={
                   loading
@@ -320,8 +321,28 @@ const Lead = () => {
                 pageSizeOptions={[10]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (
+                    loading ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                  ),
                 }}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {

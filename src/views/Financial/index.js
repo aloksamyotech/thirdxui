@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
@@ -76,7 +77,7 @@ const Lead = () => {
     page: 0,
     pageSize: 10
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -143,6 +144,7 @@ const Lead = () => {
 
   const handleFilter = async () => {
     try {
+      setLoading(true)
       const queryParams = new URLSearchParams();
 
       if (assignedTo) queryParams.append('assignedTo', assignedTo);
@@ -180,6 +182,8 @@ const Lead = () => {
       setIsFiltered(true);
     } catch (error) {
       console.error('Failed to fetch filtered cases:', error);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -201,6 +205,7 @@ const Lead = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
         const response = await getApi(
           `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
         );
@@ -227,6 +232,8 @@ const Lead = () => {
         setNameFilters(uniqueList);
       } catch (err) {
         console.error('Failed to fetch data:', err);
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -342,7 +349,7 @@ const Lead = () => {
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
                     rows={
                       loading
@@ -362,8 +369,28 @@ const Lead = () => {
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
                     pageSizeOptions={[10]}
-                    components={{
-                      Toolbar: () => <CustomHeader />
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (
+                        loading ? null : (
+                          <Box sx={{ padding: 2, textAlign: 'center' }}>
+                            No data available.
+                          </Box>
+                        )
+                      ),
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{

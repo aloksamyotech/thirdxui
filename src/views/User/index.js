@@ -12,7 +12,7 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
 import { getApi, updateApi } from 'common/apiClient';
-
+ 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
@@ -23,13 +23,14 @@ const User = () => {
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
   const [allData, setAllData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
   });
   const navigate = useNavigate();
-
+ 
   const columns = [
     {
       field: 'name',
@@ -76,7 +77,7 @@ const User = () => {
       )
     },
     { field: 'age', headerName: 'Age', flex: 1 },
-
+ 
     {
       field: 'actions',
       headerName: 'Manage',
@@ -93,7 +94,7 @@ const User = () => {
       )
     }
   ];
-
+ 
   const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -130,19 +131,19 @@ const User = () => {
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' }
   ];
-
+ 
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
     { value: 'week', label: 'Last 7 Days' },
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
   ];
-
+ 
   const nameFilter = [
     { value: 'name1', label: 'Name 1' },
     { value: 'name2', label: 'Name 2' }
   ];
-
+ 
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -155,10 +156,10 @@ const User = () => {
         setCountriesWithFlags(countries);
       });
   }, []);
-
+ 
   const fetchUser = async () => {
     if (countriesWithFlags.length === 0) return;
-
+ 
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
@@ -167,18 +168,30 @@ const User = () => {
         archive: 'false',
         role: 'user'
       });
-
+ 
+      if (searchQuery) {
+        queryParams.append('search', searchQuery);
+      }
+      if (status) queryParams.append('status', status === 'active');
+       if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+   
+      if (name) {
+        queryParams.append('name', name);
+      }
+ 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
-
+ 
       const allUser = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-
+ 
       setAllData(allUser);
-
       const formattedUsers = allUser?.map((user, index) => {
         const dob = new Date(user.personalInfo?.dateOfBirth);
         const today = new Date();
-
+ 
         let age = '';
         if (!isNaN(dob)) {
           age = today.getFullYear() - dob.getFullYear();
@@ -187,10 +200,10 @@ const User = () => {
             age--;
           }
         }
-
+ 
         const countryName = user?.contactInfo?.country || '';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
-
+ 
         return {
           id: user?._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
@@ -203,24 +216,24 @@ const User = () => {
           status: user?.isActive === 'Active' ? 'Open' : 'Closed'
         };
       });
-
+ 
       setRows(formattedUsers);
       setTotalRows(pagination?.total);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
   };
-
+ 
   useEffect(() => {
     fetchUser();
-  }, [countriesWithFlags, paginationModel]);
-
+  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, name, searchQuery]);
+ 
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
-
+ 
     try {
       const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
       fetchUser();
@@ -228,7 +241,19 @@ const User = () => {
       console.error('Error deleting user:', error);
     }
   };
-
+ 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+ 
+  const handleReset = () => {
+    setStatus('');
+    setDateOpenedFilter('');
+    setNameFilter('');
+    setSearchQuery('');
+    fetchUser();
+  };
+ 
   return (
     <>
       <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -272,20 +297,15 @@ const User = () => {
             >
               <InputBase
                 placeholder="Search..."
-                // value={searchQuery}
-                // onChange={handleSearchChange}
-                // onKeyPress={(e) => {
-                //   if (e.key === 'Enter') {
-                //     handleFilter();
-                //   }
-                // }}
+                value={searchQuery}
+                onChange={handleSearchChange}
                 sx={{
                   flex: 1,
                   color: 'text.primary'
                 }}
               />
               <IconButton
-                // onClick={handleFilter}
+                onClick={fetchUser}
                 sx={{
                   marginRight: '8px',
                   width: 32,
@@ -297,18 +317,22 @@ const User = () => {
               </IconButton>
             </Box>
           </Stack>
-
+ 
           <Grid container spacing={2}>
             <FilterPanel
               showFilter={showFilter}
               statuses={statusFilter}
-              setStatusFilter={setStatus}
+              statusFilter={status}
+              setStatusFilter={(value) => setStatus(value)}
               dateAddedFilters={dateAddedFilters}
-              setDateAddedFilter={setDateOpenedFilter}
+              dateOpenedFilter={dateOpenedFilter}
+              setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
               names={nameFilter}
               setNameFilter={setNameFilter}
               countriesWithFlags={countriesWithFlags}
-              selectedFilters={['nameFilter','countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
+              selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
+              onReset={handleReset}
+              onApply={fetchUser}
             />
             <Grid item xs={9}>
               <TableStyle>
@@ -370,7 +394,7 @@ const User = () => {
               <Close />
             </IconButton>
           </Stack>
-
+ 
           <TextField fullWidth label="Invite user via their email" variant="outlined" sx={{ mb: 2 }} />
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button variant="contained" sx={{ backgroundColor: '#053146' }}>
@@ -385,5 +409,5 @@ const User = () => {
     </>
   );
 };
-
+ 
 export default User;

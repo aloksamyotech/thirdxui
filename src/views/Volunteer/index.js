@@ -45,6 +45,7 @@ const Lead = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -144,7 +145,9 @@ const Lead = () => {
 
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-      queryParams.append('archive', 'false');
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
       queryParams.append('role', 'volunteer');
 
       const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
@@ -176,11 +179,16 @@ const Lead = () => {
     }
   }, [districtFilter, genderFilter, dateOpenedFilter || searchQuery]);
 
+  useEffect(() => {
+    handleFilter();
+  }, [includeArchives]);
+
   const handleReset = () => {
     setDistrictFilter('');
     setGenderFilter('');
     setDateOpenedFilter('');
     setSearchQuery('');
+    setIncludeArchives(false);
     setIsFiltered(false);
     fetchpeople();
   };
@@ -195,9 +203,12 @@ const Lead = () => {
       const queryParams = new URLSearchParams({
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
-        archive: 'false',
         role: 'volunteer'
       });
+
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
@@ -306,7 +317,9 @@ const Lead = () => {
             dateAddedFilters={dateAddedFilters}
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter']}
+            includeArchives={includeArchives}
+            setIncludeArchives={setIncludeArchives}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
           />
 

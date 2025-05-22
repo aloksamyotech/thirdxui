@@ -2004,7 +2004,7 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={onCancel}>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/users')}>
                         CANCEL
                       </Button>
                     </Grid>

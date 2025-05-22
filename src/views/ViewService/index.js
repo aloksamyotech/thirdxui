@@ -183,11 +183,10 @@ const UserProfile = () => {
 
                     <Button
                       variant="contained"
-                      startIcon={<AddIcon />}
                       sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2 }}
                       onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                     >
-                      Add New Session
+                      Add New Session {<AddIcon />}
                     </Button>
                   </Box>
 

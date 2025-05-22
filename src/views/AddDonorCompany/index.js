@@ -27,7 +27,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, updateApiPatch } from 'common/apiClient';
+import { postApi, updateApiPatch,getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -37,6 +37,11 @@ const AddCaseForm = ({ onCancel }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const fileInputRef = React.useRef(null);
+  const [campaigns, setCampaigns] = useState([]);
+  const [contactpurpose, setContactpurpose] = useState([]);
+  const [reason, setReason] = useState([]);
+  const [contactmethod, setContactmethod] = useState([]);
+
   const location = useLocation();
   const subRole = location.state?.subRole;
   const editdata = location.state || {};
@@ -115,7 +120,24 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filtercampaigns = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Campaign');
+        setCampaigns(filtercampaigns);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
   const handleChange = (e) => {
     setCaseData({ ...caseData, [e.target.name]: e.target.value });
   };
@@ -435,7 +457,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="otherId"
                                 control={control}
                                 rules={{
-                                //   required: 'Other Id is required',
+                                  //   required: 'Other Id is required',
                                   minLength: {
                                     value: 3,
                                     message: 'Other Id must be at least 3 characters'
@@ -477,8 +499,11 @@ const AddCaseForm = ({ onCancel }) => {
                                     helperText={errors.Recruitmentcampaign?.message}
                                     {...field}
                                   >
-                                    <MenuItem value="Campaign 1">Campaign 1</MenuItem>
-                                    <MenuItem value="Campaign 2">Campaign 2</MenuItem>
+                                    {campaigns?.map((option) => (
+                                      <MenuItem key={option._id} value={option._id}>
+                                        {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                      </MenuItem>
+                                    ))}
                                   </TextField>
                                 )}
                               />
@@ -846,12 +871,11 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.preferredContact}
                             helperText={errors.preferredContact?.message}
                           >
-                            <MenuItem value="email">Email</MenuItem>
-                            <MenuItem value="phone">Phone</MenuItem>
-                            <MenuItem value="text">Text</MenuItem>
-                            <MenuItem value="letter">Letter</MenuItem>
-                            <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                            <MenuItem value="doNotContact">Do not contact</MenuItem>
+                            {contactmethod?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -874,8 +898,11 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.contactPurpose}
                             helperText={errors.contactPurpose?.message}
                           >
-                            <MenuItem value="newsletter">Newsletter</MenuItem>
-                            <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                            {contactpurpose?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -926,10 +953,11 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.reason}
                             helperText={errors.reason?.message}
                           >
-                            <MenuItem value="interest">Legitimate Interest</MenuItem>
-                            <MenuItem value="byRequest">By Request</MenuItem>
-                            <MenuItem value="deceased">Deceased</MenuItem>
-                            <MenuItem value="goneAway">Gone Away</MenuItem>
+                            {reason?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />

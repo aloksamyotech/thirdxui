@@ -122,7 +122,7 @@ export default function SessionRegisterPage() {
             <Card sx={{ p: 2, height: '250px' }}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Typography fontWeight="bold">Add An Attendee</Typography>
-                <AddCircleIcon sx={{ color: 'green' }} onClick={() => navigate('/add-serviceuser')} />
+                <AddCircleIcon sx={{ color: 'green', cursor: 'pointer' }} onClick={() => navigate('/add-serviceuser')} />
               </Box>
 
               <Grid container spacing={2} alignItems="center">

@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 
 import dayjs from 'dayjs';
 
-const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', initialData = null, caseid }) => {
+const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add Case Note', initialData = null, caseid }) => {
   const [formData, setFormData] = useState({
     date: dayjs(),
     time: '',
@@ -90,6 +90,7 @@ const CaseNoteDialog = ({ open, handleClose, onSubmit, title = 'Add Case Note', 
       });
 
       onSubmit(response.data);
+      fetchdata();
       toast.success('Successfully added caseNote');
 
       setFormData({

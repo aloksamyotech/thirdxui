@@ -317,9 +317,9 @@ const Lead = () => {
                   loading
                     ? []
                     : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                      ...row,
+                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                    }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -342,6 +342,9 @@ const Lead = () => {
                   '& .MuiDataGrid-cell': {
                     textAlign: 'left',
                     fontSize: '14px'
+                  },
+                  '& .MuiDataGrid-row': {
+                    cursor: 'pointer'
                   }
                 }}
                 disableSelectionOnClick

@@ -38,7 +38,7 @@ const BulkUpload = () => {
           >
             <PictureAsPdfIcon sx={{ fontSize: 20 }} />
             <Typography textAlign="center">
-              Drag or <span style={{ textDecoration: 'underline', color: '#0c8ce9' }}>Upload a file</span>
+              Drag or <span style={{ textDecoration: 'underline', color: '#0c8ce9', cursor: 'pointer' }}>Upload a file</span>
             </Typography>
           </Box>
         ))}
@@ -73,7 +73,7 @@ const BulkUpload = () => {
                 <Typography sx={{ fontSize: '10px', mt: '10px' }}>
                   Download this template to use when preparing your data for upload
                 </Typography>
-                <Typography color="secondary" sx={{ mt: '15px' }}>
+                <Typography color="secondary" sx={{ mt: '15px', cursor: 'pointer' }}>
                   Download
                 </Typography>
               </Stack>
@@ -107,7 +107,7 @@ const BulkUpload = () => {
                 <Typography sx={{ fontSize: '10px', mt: '10px' }}>
                   Download this template to use when preparing your data for upload
                 </Typography>
-                <Typography color="secondary" sx={{ mt: '15px' }}>
+                <Typography color="secondary" sx={{ mt: '15px', cursor: 'pointer' }}>
                   Download
                 </Typography>
               </Stack>

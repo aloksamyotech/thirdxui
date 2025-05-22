@@ -93,8 +93,8 @@ const Lead = () => {
                 {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
-                  ? params.row.companyInformation.companyName
-                  : ''}
+                    ? params.row.companyInformation.companyName
+                    : ''}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -357,9 +357,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                   }
                   columns={columns}
                   rowCount={totalRows}
@@ -375,7 +375,10 @@ const Lead = () => {
                   components={{ Toolbar: () => <CustomHeader /> }}
                   sx={{
                     '& .MuiDataGrid-columnHeaders': { display: 'none' },
-                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' }
+                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' },
+                    '& .MuiDataGrid-row': {
+                      cursor: 'pointer'
+                    }
                   }}
                   disableSelectionOnClick
                 />

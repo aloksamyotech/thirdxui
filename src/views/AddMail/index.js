@@ -18,13 +18,15 @@ import { Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import AntSwitch from 'components/AntSwitch.js';
 import { useForm, Controller } from 'react-hook-form';
-import { postApi } from 'common/apiClient';
+import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
+import { useEffect } from 'react';
 
 const MailingListForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsloading] = useState(false);
+  const [tagOptions, setTagOptions] = useState([]);
 
   const { handleSubmit, control, setValue } = useForm({
     mode: 'all',
@@ -51,6 +53,20 @@ const MailingListForm = () => {
     setFilters(filters.filter((f) => f.id !== id));
   };
 
+  const fetchtTagData = async () => {
+    try {
+      const response = await getApi(urls.tag.getAllTags);
+
+      setTagOptions(response?.data?.allTags);
+    } catch (error) {
+      console.error('Error fetching config:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchtTagData();
+  }, []);
+
   const onSubmit = async (data) => {
     setIsloading(true);
     try {
@@ -62,6 +78,7 @@ const MailingListForm = () => {
         purposeSettings: data.purposeSettings || '',
         filters
       };
+
       const response = await postApi(urls.mail.create, formData);
       toast.success('Mail added successfully');
       navigate('/mail');
@@ -78,7 +95,7 @@ const MailingListForm = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4">Create list of Service User</Typography>
 
-      <Box
+        <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -109,7 +126,21 @@ const MailingListForm = () => {
             <Controller
               name="tags"
               control={control}
-              render={({ field }) => <TextField {...field} fullWidth label="Include People with these Tags" size="small" />}
+              // render={({ field }) =>
+              // <TextField
+              // {...field}
+              // fullWidth
+              // label="Include People with these Tags"
+              // size="small" />}
+              render={({ field }) => (
+                <TextField {...field} select fullWidth label="Include People with these Tags" size="small">
+                  {tagOptions?.map((option) => (
+                    <MenuItem key={option._id} value={option._id}>
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
             />
           </Grid>
 

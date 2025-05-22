@@ -1,8 +1,8 @@
-const baseUrl = 'https://thirdex.samyotech.in/api/v1';
+// const baseUrl = 'https://thirdex.samyotech.in/api/v1';
 
-export const imageUrl = 'https://thirdex.samyotech.in';
-// const baseUrl = 'http://localhost:7200/api/v1' ;
-// export const imageUrl = 'http://localhost:7200';
+// export const imageUrl = 'https://thirdex.samyotech.in';
+const baseUrl = 'http://localhost:7200/api/v1' ;
+export const imageUrl = 'http://localhost:7200';
 
 // const baseUrl = 'http://localhost:7200/api/v1';
 // export const imageUrl = 'http://localhost:7200';

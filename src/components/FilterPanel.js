@@ -332,7 +332,7 @@ const FilterPanel = ({
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
           <Box display="flex" alignItems="center">
             <FilterAltOutlinedIcon sx={{ color: '#808191' }} />
-            <Typography variant="subtitle1"  color="#808191">
+            <Typography variant="subtitle1" color="#808191">
               Filters
             </Typography>
           </Box>
@@ -461,26 +461,27 @@ const FilterPanel = ({
 
             if (filter.type === 'time') {
               return (
-               <><LocalizationProvider dateAdapter={AdapterDayjs}>
-                 <TextField
-       label={filter.label}
-      type="time"
-      variant="outlined"
-      size="small"
-      fullWidth
-      InputLabelProps={{ shrink: true }}
-      inputProps={{ step: 300 }} 
-      onChange={(newValue) => filter.onChange(newValue)}
-      format="hh:mm A"
-      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-      sx={{
-        '& .MuiInputBase-root.Mui-focused': {
-          backgroundColor: '#e0e0e0',  
-        },
-      }}
-    />
-                </LocalizationProvider>
-</>
+                <>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <TextField
+                      label={filter.label}
+                      type="time"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      InputLabelProps={{ shrink: true }}
+                      inputProps={{ step: 300 }}
+                      onChange={(newValue) => filter.onChange(newValue)}
+                      format="hh:mm A"
+                      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                      sx={{
+                        '& .MuiInputBase-root.Mui-focused': {
+                          backgroundColor: '#e0e0e0'
+                        }
+                      }}
+                    />
+                  </LocalizationProvider>
+                </>
               );
             }
 

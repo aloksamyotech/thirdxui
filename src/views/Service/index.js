@@ -1,295 +1,365 @@
-import { useState } from 'react';
-import {
-  Stack,
-  Button,
-  Grid,
-  Typography,
-  Box,
-  Card,
-  TextField,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  MenuItem,
-  IconButton,
-  Tooltip,
-  Chip,
-  InputAdornment
-} from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+/* eslint-disable prettier/prettier */
+import { useState, useEffect } from 'react';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase,Chip } from '@mui/material';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import TableStyle from '../../ui-component/TableStyle';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-import AddService from './AddService.js';
 import FilterPanel from 'components/FilterPanel.js';
-import { use } from 'react';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
 
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+const statusFilter = [
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' }
 ];
 
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
-];
+const CustomHeader = () => {
+  return (
+    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+      <GridToolbarContainer
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #ddd',
+          width: '100%',
+          height: '100%',
+          padding: '0 12px'
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: '',
+            color: '#333',
+            fontSize: '14px',
+            lineHeight: '36px'
+          }}
+        >
+          Service List
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <GridToolbarExport />
+        </Box>
+      </GridToolbarContainer>
+    </Box>
+  );
+};
 
 const Lead = () => {
-  const [district, setDistrict] = useState('');
-  const [status, setStatus] = useState('');
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-  const [showFilter , setShowFilter] = useState(true);
   const navigate = useNavigate();
-
-  const handleFilterApply = () => {
-    console.log('Filters Applied:', { district, status, fromDate, toDate });
-  };
+  const [showFilter, setShowFilter] = useState(true);
+  const [serviceType, setServiceType] = useState('');
+  const [status, setStatus] = useState('');
+  const [rows, setRows] = useState([]);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [totalRows, setTotalRows] = useState(0);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const columns = [
-    {
-      field: 'details',
-      headerName: 'SERVICE LIST',
-      flex: 2,
-      headerAlign: 'left',
-      align: 'left',
-      renderCell: (params) => (
-        <Stack>
-          <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-            {params.value.title}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {params.value.date}
-          </Typography>
-        </Stack>
-      )
-    },
-    {
-      field: 'status',
-      headerName: 'STATUS',
-      flex: 1,
-      headerAlign: 'right',
-      align: 'right',
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          sx={{
-            color: params.value === 'Active' ? '#79dbfb' : '#ff6a67',
-            backgroundColor: params.value === 'Active' ? '#e5f8fe' : '#ffeae9'
-          }}
-        />
-      )
-    }
-  ];
+{
+  field: 'name',
+  headerName: 'Service Name',
+  flex: 1.5,
+  renderCell: (params) => (
+    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+      <Typography
+        variant="body1"
+        sx={{
+          textTransform: 'uppercase',
+          fontWeight: 400,
+          whiteSpace: 'normal',         
+          wordBreak: 'break-word',      
+          overflowWrap: 'break-word',
+        }}
+        mb={1}
+      >
+        {params.row.name}
+      </Typography>
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        sx={{ whiteSpace: 'nowrap' }}  
+      >
+        {new Date(params.row.updatedAt).toDateString()}
+      </Typography>
+    </Stack>
+  )
+}
+,
 
-  const rows = [
     {
-      id: '1',
-      details: { title: 'JACS: Communication  #127553', date: 'Sat May 25 2024' },
-      status: 'Active'
+      field: 'serviceType',
+      headerName: 'Service Type',
+      flex: 1,
+      renderCell: (params) => params.row.serviceType?.name || '-'
     },
     {
-      id: '2',
-      details: { title: 'JACS: Counseling  #127554', date: 'Sat May 25 2024' },
-      status: 'Inactive'
+      field: 'code',
+      headerName: 'Service Code',
+      flex: 0.8,
+      renderCell: (params) => `#${params.value}`
+    },
+
+    {
+      field: 'isActive',
+      headerName: 'Status',
+      flex: 0.8,
+      headerAlign: 'center',
+      align: 'center',
+      renderCell: (params) => {
+        const isActive = typeof params.value === 'boolean' ? params.value : params.value === 'active';
+        const label = isActive ? 'Active' : 'Inactive';
+        return (
+          <Chip
+            label={label}
+            sx={{
+              color: isActive ? '#79dbfb' : '#ff6a67',
+              backgroundColor: isActive ? '#e5f8fe' : '#ffeae9',
+              maxWidth: '80px'
+            }}
+          />
+        );
+      }
     },
     {
-      id: '3',
-      details: { title: 'JACS: Therapy Session  #127555', date: 'Sat May 25 2024' },
-      status: 'Active'
-    },
-    {
-      id: '4',
-      details: { title: 'JACS: Rehabilitation  #127556', date: 'Sat May 25 2024' },
-      status: 'Inactive'
-    },
-    {
-      id: '5',
-      details: { title: 'JACS: Vaccination  #127557', date: 'Sat May 25 2024' },
-      status: 'Active'
+      field: 'more',
+      headerName: 'More',
+      flex: 0.8,
+      headerAlign: 'center',
+      align: 'center',
+      renderCell: () => (
+        <Box
+          sx={{
+            backgroundColor: '#f0f0f0',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          <Typography color="grey">View More</Typography>
+        </Box>
+      )
     }
   ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Service Types')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+
+        setServiceTypeOptions(options);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (serviceType) queryParams.append('serviceType', serviceType);
+      if (status) queryParams.append('status', status === 'active');
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+
+      const url = `${urls.service.fetchWithPagination}?${queryParams.toString()}`;
+      const response = await getApi(url);
+
+      const serviceList = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setRows(serviceList);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered services:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setServiceType('');
+    setStatus('');
+    setIsFiltered(false);
+    fetchServices();
+  };
+
+  const fetchServices = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(
+        `${urls.service.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
+      );
+
+      const serviceList = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setRows(serviceList);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      toast.error('Error fetching data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, [paginationModel]);
+
+  useEffect(() => {
+    if (serviceType || status || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [serviceType, status, searchQuery]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
-      {showForm ? (
-        <AddService onCancel={() => setShowForm(false)} />
-      ) : (
-        <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4">Add Services</Typography>
-            <Tooltip title="Add Services" arrow>
-              <IconButton
-                onClick={() => setShowForm(true)}
-                sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#41C048',
-                    color: '#ffffff'
-                  }
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          {/* <Card sx={{ marginBottom: 3, backgroundColor: '#eef2f6' }}>
-            <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-              <FilterAltOutlinedIcon color="grey" />
-              <Typography variant="h6">Filter</Typography>
-            </Stack>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ whiteSpace: 'nowrap' }}>
-                <TextField
-                  select
-                  label="Select District"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="District 1">District 1</MenuItem>
-                  <MenuItem value="District 2">District 2</MenuItem>
-                </TextField>
-
-                <TextField
-                  select
-                  label="Select Status"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  sx={{ width: 150 }}
-                >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
-                </TextField>
-
-                <Box sx={{ width: 150 }}>
-                  <DatePicker
-                    label="From"
-                    value={fromDate}
-                    onChange={(newValue) => setFromDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        InputLabelProps: { shrink: true },
-                        sx: {
-                          width: '100%',
-                          '& .MuiInputBase-input': {
-                            fontSize: '12px',
-                            padding: '6px 8px',
-                            textAlign: 'center'
-                          }
-                        }
-                      }
-                    }}
-                  />
-                </Box>
-
-                <Box sx={{ width: 150 }}>
-                  <DatePicker
-                    label="To"
-                    value={toDate}
-                    onChange={(newValue) => setToDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        size: 'small',
-                        InputLabelProps: { shrink: true },
-                        sx: {
-                          width: '100%',
-                          '& .MuiInputBase-input': {
-                            fontSize: '12px',
-                            padding: '6px 8px',
-                            textAlign: 'center'
-                          }
-                        }
-                      }
-                    }}
-                  />
-                </Box>
-                <Button variant="contained" color="secondary" sx={{ height: 40, borderRadius: '12px' }}>
-                  Apply
-                </Button>
-
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  placeholder="Search People..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  sx={{ width: 200 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon color="action" />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Stack>
-            </LocalizationProvider>
-          </Card> */}
-          <Grid container spacing={3}>
-            <FilterPanel
-              showFilter={showFilter}
-              formTypes={formTypes}
-              setFormType={setFormType}
-              dateFilters={dateFilters}
-              setDateFilter={setDateFilter}
+      <Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-service')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: '220px',
+                height: '35px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add New Service
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+            <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
+            }}
+          >
+          <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
             />
-            <Grid item xs={9}>
-              <TableStyle>
-                <Box width="100%">
-                  <Card style={{ height: '500px' }}>
-                    <DataGrid
-                      rows={rows}
-                      columns={columns}
-                      rowHeight={65}
-                      getRowId={(row) => row.id}
-                      pageSize={5}
-                      rowsPerPageOptions={[5, 10]}
-                      getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                      // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
-                      onRowClick={() => navigate('/dashboard/view-service')}
-                      sx={{
-                        '& .even-row': { backgroundColor: '#ffffff' },
-                        '& .odd-row': { backgroundColor: '#f5f5f5' },
-                        '& .MuiDataGrid-row': {
-                          borderBottom: '1px solid #ccc'
-                        }
-                      }}
-                    />
-                  </Card>
-                </Box>
-              </TableStyle>
-            </Grid>
+          <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+          >
+          <SearchIcon />
+          </IconButton>
+          </Box>
+     
+        </Stack>
+
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            serviceTypes={serviceTypeOptions}
+            serviceTypeFilter={serviceType}
+            setServiceTypeFilter={setServiceType}
+            statuses={statusFilter}
+            statusFilter={status}
+            setStatusFilter={setStatus}
+            selectedFilters={['serviceTypeFilter', 'statusFilter']}
+            onReset={handleReset}
+          />
+
+          <Grid item xs={9}>
+            <TableStyle>
+              <Box width="100%">
+                <Card style={{ height: 'auto' }}>
+                  <DataGrid
+                    rows={
+                      loading
+                        ? []
+                        : rows.map((row, index) => ({
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
+                    }
+                    columns={columns}
+                    rowCount={totalRows}
+                    loading={loading}
+                    pagination
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    pageSizeOptions={[10]}
+                    rowHeight={70}
+                    getRowId={(row) => row._id}
+                    components={{
+                      Toolbar: () => <CustomHeader />
+                    }}
+                    onRowClick={(params) => navigate('/view-service', { state: { row: params.row } })}
+                    sx={{
+                      '& .MuiDataGrid-row': {
+                        borderBottom: '1px solid #ccc'
+                      }
+                    }}
+                  />
+                </Card>
+              </Box>
+            </TableStyle>
           </Grid>
         </Grid>
-      )}
+      </Grid>
     </Card>
   );
 };

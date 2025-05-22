@@ -1,183 +1,184 @@
-import { Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
-import { Box, Stack } from '@mui/system'
-import { DataGrid } from '@mui/x-data-grid'
-import React from 'react'
-import DoneIcon from '@mui/icons-material/Done';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import DownloadIcon from '@mui/icons-material/Download';
-import PrintIcon from '@mui/icons-material/Print';
-import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
-import flag from '../../../assets/images/Flag_of_India.svg'
-import { useState } from 'react';
+import { Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/system';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import React from 'react';
+import SearchIcon from '@mui/icons-material/Search';
+import flag from '../../../assets/images/Flag_of_India.svg';
 
 const ServiceList = () => {
-    const [one, setOne] = useState('');
-    const [two, setTwo] = useState('');
-    const [three, setThree] = useState('');
-    const [four, setFour] = useState('');
-    const [filter, setFilter] = useState(false);
-    const rows = [
-        { id: 1, userid: 'D-123', name: 'Snow', dob: '27-03-04', age: '20', country: 'India', gender: 'Male', ethicity: 'Black', no: '1234561234' },
-    ];
-    const columns = [
-        {
-            field: 'userid',
-            headerName: 'User ID',
-            flex: 1,
-            renderCell: (params) =>
-                <Typography >{params?.value}</Typography>
-        },
-        {
-            field: 'name',
-            headerName: 'Name',
-            flex: 1,
-            renderCell: (params) =>
-                <Typography >{params?.value}</Typography>
-        },
-        {
-            field: 'dob',
-            headerName: 'Date of Birth',
-            flex: 1,
-            renderCell: (params) =>
-                <Typography color='secondary' sx={{ textDecoration: 'underline' }}>{params?.value}</Typography>
-        },
-        {
-            field: 'age',
-            headerName: 'Age',
-            flex: 1,
-            renderCell: (params) =>
-                <Button size='small' variant="outlined" startIcon={<DoneIcon />} sx={{ p: 0, m: 0, borderRadius: '10px', color: '#adadad', border: '1px solid #d4d4d4' }}>
-                    {params.value}
-                </Button>
-        },
-        {
-            field: 'country',
-            headerName: 'Country',
-            flex: 1,
-            renderCell: (params) =>
-                <Stack direction='row'>
-                    <img
-                        src={flag}
-                        alt="flag"
-                        style={{ width: 20, height: 20, objectFit: 'contain' }}
-                    />
-                    <Typography sx={{ ml: '5px' }}>{params?.value}</Typography>
-                </Stack>
-        },
-        {
-            field: 'gender',
-            headerName: 'Gender',
-            flex: 1,
-            renderCell: (params) =>
-                <Typography >{params?.value}</Typography>
-        },
-        {
-            field: 'ethicity',
-            headerName: 'Ethicity',
-            flex: 1,
-            renderCell: (params) =>
-                <Typography >{params?.value}</Typography>
-        },
-        {
-            field: 'no',
-            headerName: 'Contact No.',
-            flex: 1,
-            renderCell: (params) =>
-                <Typography >{params?.value}</Typography>
-        },
-    ];
+  const rows = [
+    {
+      id: 1,
+      userid: 'D-123',
+      name: 'John Doe',
+      dob: '27-03-04',
+      age: '20',
+      country: 'India',
+      gender: 'Male',
+      ethicity: 'Black',
+      no: '9875646643'
+    },
+    {
+      id: 2,
+      userid: 'D-123',
+      name: 'John Doe',
+      dob: '27-03-04',
+      age: '20',
+      country: 'India',
+      gender: 'Male',
+      ethicity: 'Black',
+      no: '9875646643'
+    },
+    {
+      id: 3,
+      userid: 'D-123',
+      name: 'Snow',
+      dob: '27-03-04',
+      age: '20',
+      country: 'India',
+      gender: 'Male',
+      ethicity: 'Black',
+      no: '9875646643'
+    }
+  ];
 
+  const columns = [
+    {
+      field: 'userid',
+      headerName: 'Case ID',
+      flex: 1,
+      renderCell: (params) => <Typography>{params?.value}</Typography>
+    },
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 1.5,
+      renderCell: (params) => <Typography>{params?.value}</Typography>
+    },
+    {
+      field: 'dob',
+      headerName: 'DOB',
+      flex: 1,
+      renderCell: (params) => <Typography>{params?.value}</Typography>
+    },
+    {
+      field: 'age',
+      headerName: 'Age',
+      flex: 1,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            width: 35,
+            height: 30,
+            borderRadius: '40%',
+            backgroundColor: '#f0f0f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#555',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            border: '1px solid #d4d4d4'
+          }}
+        >
+          {params.value}
+        </Box>
+      )
+    },
+    {
+      field: 'country',
+      headerName: 'Country',
+      flex: 1.5,
+      renderCell: (params) => (
+        <Stack direction="row">
+          <img src={flag} alt="flag" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+          <Typography sx={{ ml: '5px' }}>{params?.value}</Typography>
+        </Stack>
+      )
+    },
+    {
+      field: 'gender',
+      headerName: 'Gender',
+      flex: 1,
+      renderCell: (params) => <Typography>{params?.value}</Typography>
+    },
+    {
+      field: 'ethicity',
+      headerName: 'Ethicity',
+      flex: 1,
+      renderCell: (params) => <Typography>{params?.value}</Typography>
+    },
+    {
+      field: 'no',
+      headerName: 'ContactNo.',
+      flex: 1,
+      renderCell: (params) => <Typography>{params?.value}</Typography>
+    }
+  ];
+
+  const CustomHeader = () => {
     return (
-        <>
-            {!filter &&
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: '20px' }}>
-                    <Box>
-                        <FilterAltIcon fontSize='small' sx={{ marginX: '4px', cursor: 'pointer' }} onClick={() => setFilter(true)} />
-                        <DownloadIcon fontSize='small' sx={{ marginX: '4px' }} />
-                        <PrintIcon fontSize='small' sx={{ marginX: '4px' }} />
-                        <SystemUpdateAltIcon fontSize='small' sx={{ marginX: '4px' }} />
-                    </Box>
-                </Box>
-            }
-            {filter &&
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', p: '20px' }}>
-                    <TextField
-                        select
-                        label="Chooose Your Field"
-                        value={one}
-                        onChange={(e) => setOne(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                        sx={{ width: 200 }}
-                    >
-                        <MenuItem value="District 1">District 1</MenuItem>
-                        <MenuItem value="District 2">District 2</MenuItem>
-                    </TextField>
-                    <TextField
-                        select
-                        label="Service Date"
-                        value={two}
-                        onChange={(e) => setTwo(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                        sx={{ width: 100 }}
-                    >
-                        <MenuItem value="District 1">District 1</MenuItem>
-                        <MenuItem value="District 2">District 2</MenuItem>
-                    </TextField>
-                    <TextField
-                        select
-                        label="Referral Date"
-                        value={three}
-                        onChange={(e) => setThree(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                        sx={{ width: 120 }}
-                    >
-                        <MenuItem value="District 1">District 1</MenuItem>
-                        <MenuItem value="District 2">District 2</MenuItem>
-                    </TextField>
-                    <TextField
-                        select
-                        label="Age"
-                        value={four}
-                        onChange={(e) => setFour(e.target.value)}
-                        variant="outlined"
-                        size="small"
-                        sx={{ width: 150 }}
-                    >
-                        <MenuItem value="District 1">District 1</MenuItem>
-                        <MenuItem value="District 2">District 2</MenuItem>
-                    </TextField>
-                    <Button color='secondary' variant='contained'>Apply</Button>
-                    <Stack sx={{ p: '5px', boxShadow: '1px 1px 5px #d4d4d4', borderRadius: '100%' }}>
-                        <FilterAltIcon
-                            fontSize='medium'
-                            sx={{ m: '4px', cursor: 'pointer' }}
-                            onClick={() => setFilter(false)} />
-                    </Stack>
-                    <Stack direction='row' sx={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
-                        <DownloadIcon fontSize='small' sx={{ marginX: '4px' }} />
-                        <PrintIcon fontSize='small' sx={{ marginX: '4px' }} />
-                        <SystemUpdateAltIcon fontSize='small' sx={{ marginX: '4px' }} />
-                    </Stack>
-                </Box >
-            }
-            <Box height='500px' width='100%'>
-                <DataGrid
-                    rows={rows ? rows : []}
-                    columns={columns}
-                    getRowId={(rows) => rows?.id}
-                    checkboxSelection
-                    sx={{
-                        '& .MuiDataGrid-columnHeaders': {
-                            backgroundColor: '#eeeeee',
-                        },
-                    }}
-                />
-            </Box>
-        </>
-    )
-}
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            SERVICE USER REPORT LIST
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TextField
+              size="small"
+              placeholder="Search..."
+              InputProps={{
+                endAdornment: <SearchIcon />
+              }}
+              sx={{ width: '200px' }}
+            />
+            <GridToolbarExport />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
+  };
 
-export default ServiceList
+  return (
+    <>
+      <Grid container>
+        <Box  sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="auto" width="100%">
+          <DataGrid
+            rows={rows ? rows : []}
+            columns={columns}
+            getRowId={(rows) => rows?.id}
+            checkboxSelection
+            components={{
+              Toolbar: () => <CustomHeader />
+            }}
+            sx={{
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: '#eeeeee'
+              }
+            }}
+          />
+        </Box>
+      </Grid>
+    </>
+  );
+};
+
+export default ServiceList;

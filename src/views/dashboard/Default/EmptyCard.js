@@ -5,8 +5,8 @@ import AddIcon from '@mui/icons-material/Add';
 
 const EmptyCard = () => {
   return (
-    <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '350px', bgcolor: '#fff', borderRadius: '10px' }}>
-      <Typography sx={{ fontSize: '18px',display:'flex',alignItems:'center' }}><AddIcon /> Add New Widget</Typography>
+    <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px', bgcolor: '#fff', borderRadius: '10px' }}>
+      <Typography sx={{ fontSize: '16px',fontWeight:'500',display:'flex',alignItems:'center' }}><AddIcon /> Add New Widget</Typography>
     </Container>
   )
 }

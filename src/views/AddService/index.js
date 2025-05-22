@@ -1,0 +1,354 @@
+import React from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Grid, TextField, Box, Paper, Button, MenuItem, InputAdornment, FormControlLabel, Card, Typography } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import Link from '@mui/material/Link';
+import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { postApi, getApi } from 'common/apiClient';
+import toast from 'react-hot-toast';
+import { urls } from 'common/urls';
+import AntSwitch from 'components/AntSwitch';
+
+const AddCaseForm = ({ onCancel }) => {
+  const navigate = useNavigate();
+  const [restrictAccess, setRestrictAccess] = useState(true);
+  const [isLoading, setIsloading] = useState(false);
+  const [servicetype, setServiceType] = useState([]);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+
+  const textOnlyRegex = /^[A-Za-z\s]+$/;
+  const numberOnlyRegex = /^[0-9]+$/;
+
+  const allowOnlyText = (e) => {
+    const regex = /^[A-Za-z\s]$/;
+    if (!regex.test(e.key) && e.key !== 'Backspace') {
+      e.preventDefault();
+    }
+  };
+
+  const allowOnlyNumber = (e) => {
+    const regex = /^[0-9]$/;
+    if (!regex.test(e.key) && e.key !== 'Backspace') {
+      e.preventDefault();
+    }
+  };
+
+  const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
+  const onlyLetters = /^[A-Za-z\s]*$/;
+
+  const handleToggle = () => setRestrictAccess(!restrictAccess);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Service Types');
+        setServiceType(servicetypeoption);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm({
+    mode: 'all',
+    defaultValues: {
+      name: '',
+      code: '',
+      serviceType: '',
+      beneficiaryInformation: '',
+      campaignsSupported: '',
+      engagement: '',
+      eventsAttended: '',
+      fundingInterests: '',
+      fundraisingActivities: '',
+      notes: '',
+      file: null,
+      restrictAccess: false
+    }
+  });
+
+  const onSubmit = async (data) => {
+    setIsloading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('name', data.name || '');
+      formData.append('code', data.code || '');
+      formData.append('serviceType', data.serviceType || '');
+      formData.append('benificiary', data.beneficiaryInformation || '');
+      formData.append('campaigns', data.campaignsSupported || '');
+      formData.append('engagement', data.engagement || '');
+      formData.append('eventAttanded', data.eventsAttended || '');
+      formData.append('fundingInterest', data.fundingInterests || '');
+      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      formData.append('description', data.notes || '');
+      formData.append('isActive', restrictAccess || false);
+      if (data.file) {
+        formData.append('file', data.file || '');
+      }
+      const response = await postApi(urls.service.create, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      toast.success('Service added successfully');
+      navigate('/services');
+      setIsloading(false);
+    } catch (error) {
+      toast.error('Error submitting service');
+      setIsloading(false);
+    }
+  };
+
+  return (
+    <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4">Adding New Service</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/services')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
+        </Box>
+      </Box>
+
+      <Card sx={{ padding: 2, marginTop: 2 }}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="name"
+                    control={control}
+                    rules={{
+                      required: 'Service Name is required',
+                      minLength: { value: 3, message: 'Minimum 3 characters' },
+                      maxLength: { value: 50, message: 'Maximum 50 characters' },
+                      pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Service Name"
+                        size="small"
+                        onKeyDown={allowOnlyText}
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="code"
+                    control={control}
+                    rules={{
+                      required: 'Service Code is required',
+                      pattern: { value: onlyLettersAndNumbers, message: 'Only letters and numbers allowed' },
+                      minLength: { value: 3, message: 'Minimum 3 char' },
+                      maxLength: { value: 10, message: 'Maximum 10 char' }
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Service Code"
+                        size="small"
+                        onKeyDown={onlyLettersAndNumbers}
+                        error={!!errors.code}
+                        helperText={errors.code?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <Controller
+                    name="serviceType"
+                    control={control}
+                    rules={{
+                      required: 'Service Type is required'
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        select
+                        fullWidth
+                        label="Service Type"
+                        size="small"
+                        error={!!errors.serviceType}
+                        helperText={errors.serviceType?.message}
+                      >
+                        {servicetype?.map((option) => (
+                          <MenuItem key={option._id} value={option._id}>
+                            {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ p: 2 }}>
+              <Grid item xs={12} md={6}>
+                <Paper elevation={2} sx={{ p: 2 }}>
+                  <Typography variant="subtitle1" mb={2}>
+                    Service Tag
+                  </Typography>
+
+                  <Grid container spacing={2}>
+                    {[
+                      'beneficiaryInformation',
+                      'campaignsSupported',
+                      'engagement',
+                      'eventsAttended',
+                      'fundingInterests',
+                      'fundraisingActivities'
+                    ].map((field) => (
+                      <Grid item xs={12} key={field}>
+                        <Controller
+                          name={field}
+                          control={control}
+                          rules={{
+                            minLength: { value: 2, message: 'Minimum 2 characters' },
+                            maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
+                            pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
+                          }}
+                          render={({ field: controllerField }) => (
+                            <TextField
+                              {...controllerField}
+                              fullWidth
+                              size="small"
+                              onKeyDown={allowOnlyText}
+                              label={field.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                              error={!!errors[field]}
+                              helperText={errors[field]?.message}
+                            />
+                          )}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                  <Controller
+                    name="file"
+                    control={control}
+                    render={({ field }) => (
+                      <Box mb={2} display="flex" justifyContent="space-between">
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          value={field.value ? field.value.name : ''}
+                          placeholder="Attachments"
+                          InputProps={{
+                            readOnly: true,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AttachFileIcon fontSize="small" />
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                  <Link component="span">Upload a file</Link>
+                                  <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                </Button>
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      </Box>
+                    )}
+                  />
+                  <Controller
+                    name="notes"
+                    control={control}
+                    rules={{
+                      required: 'Notes are required',
+                      minLength: {
+                        value: 10,
+                        message: 'Notes must be at least 10 characters long'
+                      },
+                      validate: {
+                        maxWords: (value) => {
+                          const wordCount = value.trim().split(/\s+/).length;
+                          return wordCount <= 500 || 'Notes cannot exceed 500 words';
+                        },
+                        validCharacters: (value) =>
+                          /^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value) ||
+                          'Notes can only contain letters, numbers, and common punctuation'
+                      }
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Notes"
+                        multiline
+                        minRows={11}
+                        fullWidth
+                        variant="outlined"
+                        sx={{ mb: 2 }}
+                        error={!!errors.notes}
+                        helperText={errors.notes?.message}
+                      />
+                    )}
+                  />
+
+                  <FormControlLabel
+                    control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                    label="Restrict Access?"
+                    labelPlacement="start"
+                    sx={{ gap: 1 }}
+                  />
+                </Paper>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+              <Grid item>
+                <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'SAVE CHANGES'}
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button variant="outlined" color="error" onClick={onCancel}>
+                  CANCEL
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </form>
+      </Card>
+    </Card>
+  );
+};
+
+export default AddCaseForm;

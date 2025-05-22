@@ -1,251 +1,388 @@
-import { useState } from 'react';
-import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { Edit, Delete, Add, Close } from '@mui/icons-material';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button, InputBase } from '@mui/material';
+import TableStyle from '../../ui-component/TableStyle';
+import { Close } from '@mui/icons-material';
+import { IconTrash, IconPencil } from '@tabler/icons';
 import FilterPanel from 'components/FilterPanel';
-
-const getCountryFlag = (countryCode) => `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+import CheckIcon from '@mui/icons-material/Check';
+import LoopIcon from '@mui/icons-material/Loop';
+import AddIcon from '@mui/icons-material/Add';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import SearchIcon from '@mui/icons-material/Search';
+import { urls } from 'common/urls';
+import { getApi, updateApi } from 'common/apiClient';
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [status, setStatus] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [name, setNameFilter] = useState('');
+  const [countriesWithFlags, setCountriesWithFlags] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState([]);
+  const [allData, setAllData] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const navigate = useNavigate();
 
   const columns = [
     {
       field: 'name',
-      headerName: 'NAME',
-      flex: 1,
+      headerName: 'Name',
+      flex: 2,
       renderCell: (params) => (
         <Box>
-          <Typography sx={{ fontWeight: 'bold' }}>{params.row.name}</Typography>
+          <Typography sx={{ fontWeight: '450' }} mb={1}>
+            {params.row.name}
+          </Typography>
           <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
         </Box>
       )
     },
-    {
-      field: 'country',
-      headerName: 'COUNTRY',
-      flex: 1.5,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <img src={getCountryFlag(params.row.countryCode)} alt={params.value} width="24px" height="16px" />
-          <Typography>{params.value}</Typography>
-        </Box>
-      )
-    },
-    { field: 'date', headerName: 'DATE', flex: 1 },
-    { field: 'age', headerName: 'AGE', flex: 1 },
+    { field: 'date', headerName: 'Date', flex: 1.2 },
     {
       field: 'status',
-      headerName: 'STATUS',
-      flex: 1,
+      headerName: 'Status',
+      flex: 1.5,
       renderCell: (params) => (
         <Chip
           label={params.value}
+          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          variant="outlined"
           sx={{
-            color: params.value === 'Active' ? '#79dbfb' : '#ff6a67',
-            backgroundColor: params.value === 'Active' ? '#e5f8fe' : '#ffeae9'
+            borderColor: params.value === 'Open' ? '#808080' : '#808080',
+            backgroundColor: 'transparent',
+            color: params.value === 'Open' ? '#808080' : '#808080'
           }}
         />
       )
     },
     {
+      field: 'country',
+      headerName: 'Country',
+      flex: 1.5,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {params.row.countryFlag && (
+            <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
+          )}
+          <Typography>{params.row.country}</Typography>
+        </Box>
+      )
+    },
+    { field: 'age', headerName: 'Age', flex: 1 },
+
+    {
       field: 'actions',
-      headerName: 'MANAGE',
-      renderCell: () => (
-        <Box sx={{ display: 'flex', width: '100%' }}>
-          <IconButton color="error" size="small">
-            <Delete sx={{ fontSize: '16px' }} />
+      headerName: 'Manage',
+      flex: 1,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', width: '100%', gap: 1 }}>
+          <IconButton color="error" size="small" onClick={() => handleDelete(params.row.id)}>
+            <IconTrash color="orangered" size={18} />
           </IconButton>
-          <IconButton color="error" size="small">
-            <Edit sx={{ fontSize: '16px' }} />
+          <IconButton color="error" size="small" onClick={() => navigate('/add-user', { state: allData })}>
+            <IconPencil color="orangered" size={18} />
           </IconButton>
         </Box>
-      ),
-      flex: 1
+      )
     }
   ];
 
-  const rows = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      country: 'USA',
-      countryCode: 'US',
-      date: '2025/02/28',
-      age: 30,
-      status: 'Active'
-    },
-    {
-      id: 2,
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      country: 'UK',
-      countryCode: 'GB',
-      date: '2025/01/15',
-      age: 25,
-      status: 'Inactive'
-    },
-    {
-      id: 3,
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      country: 'India',
-      countryCode: 'IN',
-      date: '2024/12/10',
-      age: 35,
-      status: 'Active'
-    },
-    {
-      id: 4,
-      name: 'Hilda Rath',
-      email: 'rath@example.com',
-      country: 'United Arab Emirates',
-      countryCode: 'AE',
-      date: '2024/02/28',
-      age: 30,
-      status: 'Inactive'
-    },
-    {
-      id: 5,
-      name: 'Herman Miller',
-      email: 'miller@example.com',
-      country: 'Switzerland',
-      countryCode: 'CH',
-      date: '2024/01/15',
-      age: 25,
-      status: 'Inactive'
-    },
-    {
-      id: 6,
-      name: 'Jaccy Smith',
-      email: 'smith@example.com',
-      country: 'Canada',
-      countryCode: 'CA',
-      date: '2023/12/10',
-      age: 35,
-      status: 'Active'
+  const CustomHeader = () => {
+    return (
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: '450',
+              color: '#333',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            User List
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    );
+  };
+  const statusFilter = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
+  ];
+
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
+
+  const nameFilter = [
+    { value: 'name1', label: 'Name 1' },
+    { value: 'name2', label: 'Name 2' }
+  ];
+
+  useEffect(() => {
+    fetch('https://restcountries.com/v3.1/all')
+      .then((res) => res.json())
+      .then((data) => {
+        const countries = data.map((country) => ({
+          value: country.cca2,
+          label: country.name.common,
+          flag: country.flags.png
+        }));
+        setCountriesWithFlags(countries);
+      });
+  }, []);
+
+  const fetchUser = async () => {
+    if (countriesWithFlags.length === 0) return;
+
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'user'
+      });
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setAllData(allUser);
+
+      const formattedUsers = allUser?.map((user, index) => {
+        const dob = new Date(user.personalInfo?.dateOfBirth);
+        const today = new Date();
+
+        let age = '';
+        if (!isNaN(dob)) {
+          age = today.getFullYear() - dob.getFullYear();
+          const m = today.getMonth() - dob.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+            age--;
+          }
+        }
+
+        const countryName = user?.contactInfo?.country || '';
+        const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
+
+        return {
+          id: user?._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          name: `${user?.personalInfo?.firstName || ''} ${user?.personalInfo?.lastName || ''}`.trim(),
+          date: user?.createdAt ? new Date(user?.createdAt).toLocaleDateString() : '',
+          email: user?.contactInfo?.email || '',
+          country: countryName,
+          countryFlag: matchedCountry?.flag || '',
+          age: age || '',
+          status: user?.isActive === 'Active' ? 'Open' : 'Closed'
+        };
+      });
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
-  const formTypes = [
-    { value: 'Self Referral form', label: 'Self Referral form' },
-    { value: 'Community Referral form', label: 'Community Referral form' },
-    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-  ];
+  };
 
-  const dateFilters = [
-    { value: 'today', label: 'All Dates' },
-    { value: 'week', label: 'Last 7 days' },
-    { value: 'month', label: 'Last 30 days' },
-    { value: 'year', label: 'Last 2 months' }
-  ];
+  useEffect(() => {
+    fetchUser();
+  }, [countriesWithFlags, paginationModel]);
 
-  return (<Grid container spacing={2}>
-    <FilterPanel
-      showFilter={showFilter}
-      formTypes={formTypes}
-      setFormType={setFormType}
-      dateFilters={dateFilters}
-      setDateFilter={setDateFilter} />
-    <Grid item xs={9}>
-      <Card sx={{ backgroundColor: '#EEF2F6' }}>
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm('Are you sure you want to delete this user?');
+    if (!confirmed) return;
+
+    try {
+      const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
+      fetchUser();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
+  return (
+    <>
+      <Card sx={{ backgroundColor: '#eef2f6' }}>
         <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2} sx={{ width: '100%' }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-              Add User
-            </Typography>
-            <Tooltip title="Invite User" arrow>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+            <Tooltip title="Add" arrow>
               <IconButton
-                onClick={() => setShowForm(true)}
+                onClick={() => navigate('/add-user')}
                 sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
+                  backgroundColor: '#009fc7',
+                  borderRadius: '4px',
+                  width: '220px',
                   height: '35px',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  boxShadow: 3,
                   color: 'white',
-                  cursor: 'pointer',
+                  gap: 1,
+                  fontSize: '14px',
                   '&:hover': {
-                    backgroundColor: '#41C048',
+                    backgroundColor: '#1565c0',
                     color: '#ffffff'
                   }
                 }}
               >
-                <Add />
+                Add New User
+                <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
+              }}
+            >
+              <InputBase
+                placeholder="Search..."
+                // value={searchQuery}
+                // onChange={handleSearchChange}
+                // onKeyPress={(e) => {
+                //   if (e.key === 'Enter') {
+                //     handleFilter();
+                //   }
+                // }}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                // onClick={handleFilter}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
           </Stack>
 
-          <Box width="100%">
-            <Card>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={65}
-                getRowId={(row) => row.id}
-                pageSize={5}
-                sx={{
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor: '#f5f5f5'
-                  },
-                  '& .MuiDataGrid-row:nth-of-type(2n)': {
-                    backgroundColor: '#F9F9F9'
-                  },
-                  '& .MuiDataGrid-cell': {
-                    textAlign: 'left',
-                    fontSize: '14px'
-                  }
-                }}
-                disableSelectionOnClick
-                checkboxSelection
-              />
-            </Card>
-          </Box>
+          <Grid container spacing={2}>
+            <FilterPanel
+              showFilter={showFilter}
+              statuses={statusFilter}
+              setStatusFilter={setStatus}
+              dateAddedFilters={dateAddedFilters}
+              setDateAddedFilter={setDateOpenedFilter}
+              names={nameFilter}
+              setNameFilter={setNameFilter}
+              countriesWithFlags={countriesWithFlags}
+              selectedFilters={['nameFilter','countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
+            />
+            <Grid item xs={9}>
+              <TableStyle>
+                <Box width="100%">
+                  <Card style={{ height: 'auto' }}>
+                    <DataGrid
+                      rows={
+                        loading
+                          ? []
+                          : rows.map((row, index) => ({
+                              ...row,
+                              sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                            }))
+                      }
+                      columns={columns}
+                      rowCount={totalRows}
+                      loading={loading}
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      onPaginationModelChange={setPaginationModel}
+                      pageSizeOptions={[10]}
+                      checkboxSelection
+                      rowHeight={65}
+                      components={{
+                        Toolbar: () => <CustomHeader />
+                      }}
+                      getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
+                      sx={{
+                        '& .MuiDataGrid-row': {
+                          borderBottom: '1px solid #ccc'
+                        }
+                      }}
+                    />
+                  </Card>
+                </Box>
+              </TableStyle>
+            </Grid>
+          </Grid>
         </Grid>
-
-        <Modal open={showForm} onClose={() => setShowForm(false)}>
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              bgcolor: 'white',
-              p: 4,
-              borderRadius: 2,
-              boxShadow: 24,
-              minWidth: 400
-            }}
-          >
-            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="h4">Invite User</Typography>
-              <IconButton onClick={() => setShowForm(false)}>
-                <Close />
-              </IconButton>
-            </Stack>
-
-            <TextField fullWidth label="Invite user via their email" variant="outlined" sx={{ mb: 2 }} />
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button variant="contained" color="secondary">
-                Invite
-              </Button>
-              <Button variant="outlined" color="error" onClick={() => setShowForm(false)}>
-                Cancel
-              </Button>
-            </Stack>
-          </Box>
-        </Modal>
       </Card>
-    </Grid>
-  </Grid>
+      {/* <Modal open={showForm} onClose={() => setShowForm(false)}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'white',
+            p: 4,
+            borderRadius: 2,
+            boxShadow: 24,
+            minWidth: 400
+          }}
+        >
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h4">Invite User</Typography>
+            <IconButton onClick={() => setShowForm(false)}>
+              <Close />
+            </IconButton>
+          </Stack>
+
+          <TextField fullWidth label="Invite user via their email" variant="outlined" sx={{ mb: 2 }} />
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button variant="contained" sx={{ backgroundColor: '#053146' }}>
+              Invite
+            </Button>
+            <Button variant="outlined" color="error" onClick={() => setShowForm(false)}>
+              Cancel
+            </Button>
+          </Stack>
+        </Box>
+      </Modal> */}
+    </>
   );
 };
 

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Stack, Grid, Card, Box } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Stack, Grid, Card, Box, Typography, TextField, IconButton, InputBase } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import ApartmentIcon from '@mui/icons-material/Apartment';
+import SearchIcon from '@mui/icons-material/Search';
 import TableStyle from '../../ui-component/TableStyle';
 import FilterPanel from 'components/FilterPanel';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import ViewReferral from './view';
 
 const referralData = [
   { id: 1, name: 'John Doe', formTitle: 'Medical Form', dateReceived: '08/01/2024', referredBy: 'Dr. Smith', type: 'person' },
@@ -15,31 +16,32 @@ const referralData = [
 const columns = [
   {
     field: 'name',
-    headerName: 'NAME OF REFERRAL',
+    headerName: 'Name of Referral',
     flex: 1,
     renderCell: (params) => (
       <Stack direction="row" alignItems="center" spacing={1}>
-        {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
+        <PersonIcon />
         {params.value}
       </Stack>
     )
   },
   {
     field: 'formTitle',
-    headerName: 'FORM TITLE',
+    headerName: 'Form Title',
     flex: 1
   },
   {
     field: 'dateReceived',
-    headerName: 'DATE RECEIVED',
+    headerName: 'Date Received',
     flex: 1
   },
   {
     field: 'referredBy',
-    headerName: 'REFERRED BY',
+    headerName: 'Referred By',
     flex: 1
-  },
+  }
 ];
+
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
   { value: 'Community Referral form', label: 'Community Referral form' },
@@ -48,45 +50,155 @@ const formTypes = [
   { value: 'Workshop sign up form', label: 'Workshop sign up form' }
 ];
 
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
+const dateAddedFilters = [
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'Last 7 Days' },
+  { value: 'month', label: 'Last 30 Days' },
+  { value: 'year', label: 'Last 1 Year' }
 ];
+
+const formNames = [
+  { value: 'form-x', label: 'Form X' },
+  { value: 'form-y', label: 'Form Y' }
+];
+
+const CustomHeader = () => {
+  return (
+    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+      <GridToolbarContainer
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #ddd',
+          width: '100%',
+          height: '100%',
+          padding: '0 12px'
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: '',
+            color: '#333',
+            fontSize: '14px',
+            lineHeight: '36px'
+          }}
+        >
+          Referral List
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <GridToolbarExport />
+        </Box>
+      </GridToolbarContainer>
+    </Box>
+  );
+};
 
 const ReferralTable = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [formName, setFormName] = useState('');
+  const [dateAddedFilter, setDateAddedFilter] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleAccept = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDecline = () => {
+    setDialogOpen(false);
+  };
+
   return (
-    <Grid container spacing={4}>
-      <FilterPanel
-        showFilter={showFilter}
-        formTypes={formTypes}
-        setFormType={setFormType}
-        dateFilters={dateFilters}
-        setDateFilter={setDateFilter} />
-      <Grid item xs={9}>
-        <TableStyle>
-          <Box width="100%">
-            <Card style={{ height: '400px' }}>
-              <DataGrid
-                rows={referralData}
-                columns={columns}
-                checkboxSelection
-                getRowId={(row) => row.id}
-                sx={{
-                  '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #ccc'
-                  },
-                }}
-              />
-            </Card>
-          </Box>
-        </TableStyle>
+    <>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Typography variant="h5">New Referrals</Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '30px',
+            paddingLeft: '16px',
+            border: '1px solid #e0e0e0',
+            width: '350px',
+            height: '40px'
+          }}
+        >
+          <InputBase
+            placeholder="Search..."
+            // value={searchQuery}
+            // onChange={handleSearchChange}
+            // onKeyPress={(e) => {
+            //   if (e.key === 'Enter') {
+            //     handleFilter();
+            //   }
+            // }}
+            sx={{
+              flex: 1,
+              color: 'text.primary'
+            }}
+          />
+          <IconButton
+            // onClick={handleFilter}
+            sx={{
+              marginRight: '8px',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </Box>
+      </Stack>
+      <Grid container spacing={2}>
+        <FilterPanel
+          showFilter={showFilter}
+          formTypes={formTypes}
+          setFormType={setFormType}
+          formNames={formNames}
+          setFormNameFilter={setFormName}
+          dateAddedFilters={dateAddedFilters}
+          setDateAddedFilter={setDateAddedFilter}
+          selectedFilters={['formType', 'formNameFilter', 'dateAddedFilter']}
+        />
+        <Grid item xs={9}>
+          <TableStyle>
+            <Box width="100%">
+              <Card style={{ height: 'auto' }}>
+                <DataGrid
+                  rows={referralData}
+                  columns={columns}
+                  onRowClick={handleOpenDialog}
+                  getRowId={(row) => row.id}
+                  components={{
+                    Toolbar: () => <CustomHeader />
+                  }}
+                  sx={{
+                    '& .MuiDataGrid-row': {
+                      borderBottom: '1px solid #ccc'
+                    }
+                  }}
+                />
+              </Card>
+            </Box>
+          </TableStyle>
+        </Grid>
       </Grid>
-    </Grid>
+
+      <ViewReferral open={dialogOpen} onClose={handleCloseDialog} onAccept={handleAccept} onDecline={handleDecline} />
+    </>
   );
 };
 

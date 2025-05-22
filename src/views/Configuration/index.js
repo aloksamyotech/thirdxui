@@ -1,251 +1,525 @@
-import React, { useState } from 'react';
-import { Tabs, Tab, Box, Switch, IconButton, Card, styled, Modal, Typography, TextField, Button, Grid } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { Edit, Delete, Add } from '@mui/icons-material';
-import AntSwitch from 'components/AntSwitch.js';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button, InputBase } from '@mui/material';
+import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
+import SearchIcon from '@mui/icons-material/Search';
+import AntSwitch from 'components/AntSwitch';
+import { postApi, getApi, updateApi, deleteApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import toast from 'react-hot-toast';
+import { IconTrash, IconPencil } from '@tabler/icons';
 
-const tabLabels = [
+const defaultTabTypes = [
   'Contact Types',
   'Referral Types',
   'Contact Purpose',
-  'Key Indicator',
-  'Archive Reason',
+  'Campaign',
+  'Key Indicators',
   'Payment Method',
+  'Archive Reason',
   'Form Types',
   'Reason',
-  'Service Types',
-  'Locations'
+  'Service Types'
 ];
 
-const tabData = {
-  'Contact Types': [
-    { id: 1, name: 'Email', status: true },
-    { id: 2, name: 'Phone text', status: true },
-    { id: 3, name: 'Group sessions', status: true },
-    { id: 4, name: 'Missed appointments', status: true },
-    { id: 5, name: 'Bertha Heller', status: true },
-    { id: 6, name: 'Note', status: true }
-  ],
-  'Referral Types': [
-    { id: 1, name: 'Family Member', status: true },
-    { id: 2, name: 'Community Member', status: true },
-    { id: 3, name: 'Parent', status: true },
-    { id: 4, name: 'School', status: true },
-    { id: 5, name: 'Self Referral', status: true }
-  ],
-  'Contact Purpose': [
-    { id: 1, name: 'Newsletter', status: true },
-    { id: 2, name: 'Upcoming Events', status: true },
-    { id: 3, name: 'Professional Meetings', status: true }
-  ],
-  'Key Indicator': [
-    { id: 1, name: 'Poor School Attendance and Engagement', status: true },
-    { id: 2, name: 'School Exclusion (temp or perm)', status: true },
-    { id: 3, name: 'Not in education,trianing or work (NEET)', status: true },
-    { id: 4, name: 'Parent', status: true },
-    { id: 5, name: 'CAHMS', status: true },
-    { id: 6, name: 'Social Service', status: true },
-    { id: 7, name: 'Child Criminal and Sexual Exploitation (CRE/CSE)', status: true }
-  ],
-  'Archive Reason': [
-    { id: 1, name: 'Deceased', status: true },
-    { id: 2, name: 'Gone Away', status: true }
-  ],
-  'Payment Method': [
-    { id: 1, name: 'Credit or Debit Card', status: true },
-    { id: 2, name: 'Cash', status: true },
-    { id: 3, name: 'Cheque', status: true },
-    { id: 4, name: 'ApplePal', status: true }
-  ],
-  'Form Types': [
-    { id: 1, name: 'Referral Form', status: true },
-    { id: 12, name: 'Workshop Sign-up form', status: true }
-  ],
-  Reason: [
-    { id: 1, name: 'By Request', status: true },
-    { id: 2, name: 'Legitimate Interest', status: true },
-    { id: 3, name: 'Deceased', status: true },
-    { id: 4, name: 'Gone Away', status: true }
-  ],
-  'Service Types': [
-    { id: 1, name: 'Education', status: true },
-    { id: 2, name: 'Health', status: true },
-    { id: 3, name: 'Mentoring', status: true },
-    { id: 4, name: 'Groupwork', status: true },
-    { id: 5, name: 'Sports', status: true },
-    { id: 6, name: 'Arts and Culture', status: true },
-    { id: 7, name: 'Social Programs', status: true }
-  ],
-  Locations: [
-    { id: 1, name: 'Youth Center', status: true },
-    { id: 12, name: 'Youth Center', status: true }
-  ]
-};
-
-const columns = [
-  { field: 'name', headerName: 'CONFIGURATION', flex: 1 },
-  {
-    field: 'status',
-    headerName: 'STATUS',
-    renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
-    flex: 1
-  },
-  {
-    field: 'actions',
-    headerName: 'DELETE/EDIT',
-    headerAlign: 'right',
-    renderCell: (params) => (
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-        <IconButton color="error" size="small">
-          <Delete sx={{ fontSize: '16px' }} />
-        </IconButton>
-        <IconButton color="error" size="small">
-          <Edit sx={{ fontSize: '16px' }} />
-        </IconButton>
-      </Box>
-    ),
-    flex: 1,
-    align: 'right'
-  }
-];
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-];
-
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
-];
 const TabbedDataGrid = () => {
-  const [showFilter, setShowFilter] = useState(true);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-  const [selectedTab, setSelectedTab] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [toggleValue, setToggleValue] = useState(true);
+  const [configurationNameFilter, setConfigurationNameFilter] = useState('');
+  const [modalSection, setModalSection] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [editId, setEditId] = useState(null);
+  const [status, setStatus] = useState('');
+  const [tabData, setTabData] = useState({});
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [showFilter, setShowFilter] = useState(true);
+  const [inputError, setInputError] = useState('');
 
-  const handleOpenModal = () => setOpenModal(true);
+  const handleEdit = (item) => {
+    setInputValue(item.name);
+    setToggleValue(item.status);
+    setEditMode(true);
+    setEditId(item.id);
+    const sectionName = Object.entries(tabData).find(([_, items]) => items.some((configItem) => configItem.id === item.id))?.[0];
+    setModalSection(sectionName);
+    setOpenModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    const res = await updateApi(urls.configuration.delete.replace(':configId', id));
+    await fetchConfigurations();
+    toast.success('Item deleted successfully!');
+  };
+
+  const handleUpdateConfiguration = () => {
+    if (!inputValue.trim()) {
+      setInputError('This field is required.');
+      return;
+    }
+
+    const res = updateApi(urls.configuration.updatedData.replace(':configId', id));
+    const updatedItems = items.map((item) => (item.id === currentItem.id ? { ...item, name: inputValue, status: toggleValue } : item));
+
+    setItems(updatedItems);
+    setOpenModal(false);
+    setInputValue('');
+    setInputError('');
+    setEditMode(false);
+    setCurrentItem(null);
+  };
+
+  const handleOpenModal = (section) => {
+    setModalSection(section);
+    setInputValue('');
+    setToggleValue(true);
+    setEditMode(false);
+    setCurrentItem(null);
+    setOpenModal(true);
+  };
+
   const handleCloseModal = () => {
     setOpenModal(false);
     setInputValue('');
     setToggleValue(true);
+    setEditMode(false);
+    setEditId(null);
+    setInputError('');
+  };
+
+  const configTypeFilter = useMemo(() => {
+    return defaultTabTypes.map((type) => ({
+      value: type,
+      label: type
+    }));
+  }, []);
+
+  const statusFilter = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' }
+  ];
+
+  const fetchConfigurations = async () => {
+    try {
+      const res = await getApi(urls.configuration.fetch);
+      const data = res?.data?.allConfiguration || [];
+
+      const grouped = {};
+      defaultTabTypes.forEach((type) => {
+        grouped[type] = [];
+      });
+
+      data.forEach((item) => {
+        const type = item.configurationType;
+        if (!grouped[type]) {
+          grouped[type] = [];
+        }
+        grouped[type].push({
+          id: item._id,
+          name: item.name,
+          status: item.isActive
+        });
+      });
+      setTabData(grouped);
+    } catch (error) {
+      toast.error('Error fetching configurations:', error);
+    }
+  };
+
+  const fetchFilteredConfigurations = async (type, statusFilterVal) => {
+    try {
+      let url = `${urls.configuration.filterType}?type=${encodeURIComponent(type)}`;
+      if (statusFilterVal !== '') {
+        url += `&status=${statusFilterVal === 'active' ? 'true' : 'false'}`;
+      }
+
+      const res = await getApi(url);
+      const filteredData = res?.data || [];
+
+      const filteredByStatus =
+        statusFilterVal !== ''
+          ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false'))
+          : filteredData;
+
+      const grouped = {
+        [type]: filteredByStatus.map((item) => ({
+          id: item._id,
+          name: item.name,
+          status: item.isActive
+        }))
+      };
+
+      setTabData(grouped);
+    } catch (error) {
+      toast.error('Error fetching filtered configurations');
+    }
+  };
+
+  useEffect(() => {
+    if (configurationNameFilter) {
+      fetchFilteredConfigurations(configurationNameFilter, status);
+    } else {
+      fetchConfigurations();
+    }
+  }, [configurationNameFilter, status]);
+
+  const validateInput = (value) => {
+    if (!value) {
+      setInputError('This field is required');
+      return false;
+    }
+    if (!/^[A-Za-z\s]+$/.test(value)) {
+      setInputError('Only letters and spaces are allowed');
+      return false;
+    }
+    if (value.length < 1 || value.length > 25) {
+      setInputError('Length must be between 1 and 25 characters');
+      return false;
+    }
+    setInputError('');
+    return true;
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    validateInput(value);
+  };
+
+  const handleSaveConfiguration = async () => {
+    if (!validateInput(inputValue)) {
+      return;
+    }
+
+    const payload = {
+      name: inputValue,
+      isActive: toggleValue,
+      configurationType: modalSection
+    };
+
+    try {
+      if (editMode) {
+        const res = await updateApi(urls.configuration.updatedData.replace(':configId', editId), payload);
+        toast.success('Item updated successfully!');
+      } else {
+        const res = await postApi(urls.configuration.create, payload);
+        toast.success('Item added successfully!');
+      }
+
+      fetchConfigurations();
+      handleCloseModal();
+      setEditMode(false);
+      setEditId(null);
+    } catch (err) {
+      toast.error('Error saving configuration.');
+    }
+  };
+
+  const handleStatusUpdate = async (itemId, newStatus) => {
+    try {
+      const payload = {
+        isActive: newStatus
+      };
+
+      const url = `${urls.configuration.updateStatus.replace(':configId', itemId)}`;
+
+      const res = await updateApi(url, payload);
+      if (res?.data) {
+        setTabData((prevData) => {
+          const newData = { ...prevData };
+          Object.keys(newData).forEach((type) => {
+            newData[type] = newData[type].map((item) => (item.id === itemId ? { ...item, status: newStatus } : item));
+          });
+          return newData;
+        });
+
+        const statusMessage = newStatus ? 'Active' : 'Inactive';
+        toast.success(`Status updated to ${statusMessage}`);
+      }
+    } catch (error) {
+      toast.error('Error updating status');
+    }
+  };
+
+  const resetFilters = () => {
+    setSelectedSection('');
+    setStatus('');
+    fetchConfigurations();
   };
 
   return (
-    <Grid container spacing={2}>
-      <FilterPanel
-        showFilter={showFilter}
-        formTypes={formTypes}
-        setFormType={setFormType}
-        dateFilters={dateFilters}
-        setDateFilter={setDateFilter} />
+    <>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Typography variant="h5">Configurations</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '30px',
+            paddingLeft: '16px',
+            border: '1px solid #e0e0e0',
+            width: '350px',
+            height: '40px'
+          }}
+        >
+          <InputBase
+            placeholder="Search..."
+            // value={searchQuery}
+            // onChange={handleSearchChange}
+            // onKeyPress={(e) => {
+            //   if (e.key === 'Enter') {
+            //     handleFilter();
+            //   }
+            // }}
+            sx={{
+              flex: 1,
+              color: 'text.primary'
+            }}
+          />
+          <IconButton
+            // onClick={handleFilter}
+            sx={{
+              marginRight: '8px',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </Box>
+      </Stack>
 
-      <Grid item xs={9}>
-        <Card sx={{ backgroundColor: 'white', height: '100%' }}>
-          <Box sx={{ width: '100%', p: 1 }}>
-            <Tabs
-              value={selectedTab}
-              onChange={(e, newValue) => setSelectedTab(newValue)}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{ '& .MuiTab-root': { fontSize: '0.85rem', display: 'flex', alignItems: 'center' }, borderBottom: '1px solid #1e87e4' }}
-            >
-              {tabLabels.map((label, index) => (
-                <Tab
-                  key={index}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {label}
-                      {selectedTab === index && (
-                        <IconButton
-                          onClick={handleOpenModal}
+      <Grid container spacing={2}>
+        <FilterPanel
+          showFilter={showFilter}
+          statuses={statusFilter}
+          configurationNames={configTypeFilter}
+          configurationNameFilter={configurationNameFilter}
+          setConfigurationNameFilter={(val) => {
+            setConfigurationNameFilter(val);
+          }}
+          statusFilter={status}
+          setStatusFilter={(val) => {
+            setStatus(val);
+          }}
+          selectedFilters={['configurationNameFilter', 'statusFilter']}
+          onReset={resetFilters}
+        />
+
+        <Grid item xs={9}>
+          <Grid container spacing={2}>
+            {Object.entries(tabData).map(([section, items]) => (
+              <Grid item xs={12} sm={6} md={4} key={section}>
+                <Card
+                  sx={{
+                    p: 0,
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    height: '300px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderBottom: '1px solid #e0e0e0',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                      <Typography variant="h6" fontWeight="500">
+                        {section}
+                      </Typography>
+                      <IconButton
+                        onClick={() => handleOpenModal(section)}
+                        sx={{
+                          backgroundColor: '#41C048',
+                          borderRadius: '50%',
+                          width: '20px',
+                          height: '20px',
+                          color: 'white',
+                          '&:hover': { backgroundColor: '#41C048' }
+                        }}
+                      >
+                        <Add sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ px: 2, py: 1, backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="subtitle2" fontWeight="medium">
+                        Configuration
+                      </Typography>
+                      <Typography variant="subtitle2" fontWeight="medium">
+                        Status
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
+                    {items.length > 0 ? (
+                      items.map((item) => (
+                        <Box
+                          key={item.id}
                           sx={{
-                            bgcolor: '#41c048',
-                            color: 'white',
-                            width: 15,
-                            height: 15,
-                            borderRadius: '50%',
-                            '&:hover': { bgcolor: '#41c048', color: 'white' }
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mb: 1,
+                            pb: 1,
+                            borderBottom: '1px solid #f0f0f0',
+                            flexWrap: 'wrap'
                           }}
                         >
-                          <Add sx={{ fontSize: '16px' }} />
-                        </IconButton>
-                      )}
-                    </Box>
+                          <Typography
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              wordBreak: 'break-word',
+                              whiteSpace: 'pre-line',
+                              pr: 2,
+                              maxWidth: '60%'
+                            }}
+                          >
+                            {item.name}
+                          </Typography>
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
+                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
+                            &nbsp;
+                            <IconButton onClick={() => handleEdit(item)}>
+                              <IconPencil color="orangered" size={18} />
+                            </IconButton>
+                            <IconButton onClick={() => handleDelete(item.id)}>
+                              <IconTrash color="orangered" size={18} />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="textSecondary">
+                        No items found
+                      </Typography>
+                    )}
+                  </Box>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 420,
+              height: 160,
+              bgcolor: '#fff',
+              p: 2,
+              borderRadius: '8px',
+              boxShadow: 24
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: 1 }}>
+              <TextField
+                placeholder="New item"
+                value={inputValue}
+                onChange={handleInputChange}
+                error={!!inputError}
+                helperText={inputError}
+                inputProps={{
+                  maxLength: 25,
+                  style: {
+                    fontSize: '14px',
+                    padding: '10px 12px'
                   }
-                  sx={{
-                    backgroundColor: selectedTab === index ? '#e3f2fd' : 'transparent',
-                    transition: 'background-color 0.3s ease',
-                    marginRight: 2,
-                  }}
-                />
-              ))}
-            </Tabs>
-
-            <Modal open={openModal} onClose={handleCloseModal}>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 500,
-                  bgcolor: 'white',
-                  p: 3,
-                  borderRadius: 2,
-                  boxShadow: 24
                 }}
-              >
-                <Typography variant="h4" sx={{ mb: 2 }}>
-                  New Item
-                </Typography>
-                <TextField label="Enter Name" fullWidth value={inputValue} onChange={(e) => setInputValue(e.target.value)} sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Typography variant="body1">Active or Inactive ?</Typography>
-                  <Switch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} />
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                  <Button variant="contained" color="secondary" onClick={handleCloseModal}>
-                    Submit
-                  </Button>
-                  <Button onClick={handleCloseModal} variant="outlined" color="error">
-                    Cancel
-                  </Button>
-                </Box>
-              </Box>
-            </Modal>
-
-            <Box sx={{ height: 'auto', mt: 2 }}>
-              <DataGrid
-                rows={tabData[tabLabels[selectedTab]] || []}
-                columns={columns}
-                pageSize={5}
-                disableSelectionOnClick
-                getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                 sx={{
-                  '& .even-row': { backgroundColor: '#ffffff' },
-                  '& .odd-row': { backgroundColor: '#f5f5f5' },
-                  '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #ccc'
+                  width: '65%',
+                  '& .MuiInputBase-root': {
+                    height: '40px',
+                    fontSize: '14px'
                   },
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor: '#f5f5f5'
+                  '& .MuiOutlinedInput-input': {
+                    padding: '0 12px'
                   }
                 }}
+                variant="outlined"
               />
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '40%' }}>
+                <Typography sx={{ fontSize: '14px', mb: 0.5, ml: 2 }}>Active Or Inactive?</Typography>
+                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ ml: -10 }} />
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 2,
+                mt: 4
+              }}
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#053146',
+                  borderRadius: '8px',
+                  width: '35%',
+                  height: '30px',
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  '&:hover': {
+                    backgroundColor: '#031e2a'
+                  }
+                }}
+                onClick={handleSaveConfiguration}
+              >
+                {editMode ? 'UPDATE' : 'SAVE CHANGES'}
+              </Button>
+
+              <Button
+                variant="outlined"
+                sx={{
+                  borderColor: '#178df9',
+                  color: '#178df9',
+                  borderRadius: '8px',
+                  width: '25%',
+                  height: '30px',
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  '&:hover': {
+                    borderColor: '#b39ddb',
+                    backgroundColor: '#f3e5f5'
+                  }
+                }}
+                onClick={handleCloseModal}
+              >
+                CANCEL
+              </Button>
             </Box>
           </Box>
-        </Card>
+        </Modal>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

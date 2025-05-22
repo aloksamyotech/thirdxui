@@ -1,42 +1,70 @@
-import { useState } from 'react';
-import {
-  Stack,
-  Grid,
-  Typography,
-  Box,
-  Card,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+/* eslint-disable react/jsx-no-undef */
+import { useState, useEffect, useMemo } from 'react';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { DataGrid, GridToolbarContainer } from '@mui/x-data-grid';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
-import AddCaseForm from './AddPeople.js';
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import FilterPanel from 'components/FilterPanel';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
+const districts = [
+  { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
+  { label: 'Adur District', value: 'adur_district' },
+  { label: 'Amber Valley Borough', value: 'amber_valley_borough' },
+  { label: 'Arun District', value: 'arun_district' },
+  { label: 'Ashford Borough', value: 'ashford_borough' },
+  { label: 'Babergh District', value: 'babergh_district' },
+  { label: 'Ashfield District', value: 'ashfield_district' },
+  { label: 'Basildon Borough', value: 'basildon_borough' }
 ];
 
-const dateFilters = [
-  { value: 'today', label: 'All Dates' },
-  { value: 'week', label: 'Last 7 days' },
-  { value: 'month', label: 'Last 30 days' },
-  { value: 'year', label: 'Last 2 months' }
+const dateAddedFilters = [
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'Last 7 Days' },
+  { value: 'month', label: 'Last 30 Days' },
+  { value: 'year', label: 'Last 1 Year' }
 ];
+
+const genders = [
+  { value: 'Male', label: 'Male' },
+  { value: 'Female', label: 'Female' },
+  { value: 'Non-Binary', label: 'Non-Binary' },
+  { value: 'Others', label: 'Prefer not to say' }
+];
+
 const Lead = () => {
   const navigate = useNavigate();
-  const [showForm, setShowForm] = useState(false);
-  const [formType, setFormType] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [districtFilter, setDistrictFilter] = useState('');
+  const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+
+  const district = useMemo(() => {
+    return districts.map((type) => ({
+      value: type.value,
+      label: type.label
+    }));
+  }, []);
+
+  const gender = useMemo(() => {
+    return genders.map((type) => ({
+      value: type.value,
+      label: type.label
+    }));
+  }, []);
 
   const CustomHeader = () => {
     return (
@@ -56,15 +84,17 @@ const Lead = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '',
               color: '#333',
-              ml: 2,
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            PEOPLE LIST
+            People List
           </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <GridToolbarExport />
+          </Box>
         </GridToolbarContainer>
       </Box>
     );
@@ -72,28 +102,26 @@ const Lead = () => {
 
   const columns = [
     {
-      field: 'person',
+      field: 'details',
       headerName: 'Details',
       flex: 1,
       renderCell: (params) => (
         <Stack direction="row" alignItems="center" spacing={2} width="100%" justifyContent="space-between">
           <Stack direction="row" alignItems="center" spacing={2}>
-            {/* Conditional Icon Rendering */}
-            {params.row.type === 'person' ? <PersonIcon /> : <ApartmentIcon />}
-
+            <PersonIcon />
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {params.row.name} #{params.row.id}
+              <Typography variant="body1" sx={{ fontWeight: 450 }}>
+                {params.row.firstName} {params.row.lastName} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}
+                {params.row.address} {params.row.country} {params.row.postcode}
               </Typography>
             </Box>
           </Stack>
 
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon color="action" />
+              <InfoIcon sx={{ color: '#49494c' }} />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -101,88 +129,227 @@ const Lead = () => {
     }
   ];
 
-  const rows = [
-    { id: 'C-001', name: 'John Doe', address: '123 Main Street, New York, NY 10001', type: 'person' },
-    { id: 'C-002', name: 'Jane Smith', address: '456 Elm Street, Los Angeles, CA 90001', type: 'apartment' },
-    { id: 'C-003', name: 'Michael Johnson', address: '789 Oak Street, Chicago, IL 60601', type: 'person' },
-    { id: 'C-004', name: 'Emily Davis', address: '321 Pine Avenue, Houston, TX 77001', type: 'apartment' },
-    { id: 'C-005', name: 'David Brown', address: '654 Maple Drive, Miami, FL 33101', type: 'person' },
-    { id: 'C-006', name: 'Sophia Wilson', address: '987 Cedar Lane, San Francisco, CA 94101', type: 'apartment' }
-  ];
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (districtFilter) queryParams.append('district', districtFilter);
+      if (genderFilter) queryParams.append('gender', genderFilter);
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('archive', 'false');
+      queryParams.append('role', 'service_user');
+
+      const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
+      const response = await getApi(url);
+
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+      const formattedUsers = allUser?.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        firstName: user.personalInfo?.firstName || '',
+        lastName: user.personalInfo?.lastName || '',
+        address: user.contactInfo?.addressLine1 || '',
+        country: user.contactInfo?.country || '',
+        postcode: user.contactInfo?.postcode || ''
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered services:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (districtFilter || genderFilter || dateOpenedFilter || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [districtFilter, genderFilter, dateOpenedFilter || searchQuery]);
+
+  const handleReset = () => {
+    setDistrictFilter('');
+    setGenderFilter('');
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    fetchpeople();
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const fetchpeople = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'service_user'
+      });
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+      const formattedUsers = allUser?.map((user, index) => ({
+        id: user._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        firstName: user.personalInfo?.firstName || '',
+        lastName: user.personalInfo?.lastName || '',
+        address: user.contactInfo?.addressLine1 || '',
+        country: user.contactInfo?.country || '',
+        postcode: user.contactInfo?.postcode || ''
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchpeople();
+  }, [paginationModel]);
+
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
-      {showForm ? (
-        <AddCaseForm onCancel={() => setShowForm(false)} />
-      ) : (
-        <Grid>
-          <Stack direction="row" alignItems="center" mb={2} spacing={2}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-              Add Service User
-            </Typography>
-            <Tooltip title="Add Service User" arrow>
-              <IconButton
-                onClick={() => setShowForm(true)}
+      <Grid>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Tooltip title="Add" arrow>
+            <IconButton
+              onClick={() => navigate('/add-serviceuser')}
+              sx={{
+                backgroundColor: '#009fc7',
+                borderRadius: '4px',
+                width: '220px',
+                height: '35px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: 1,
+                fontSize: '14px',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  color: '#ffffff'
+                }
+              }}
+            >
+              Add New Service User <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
+            }}
+          >
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
+        </Stack>
+        <Grid container spacing={2}>
+          <FilterPanel
+            showFilter={showFilter}
+            districts={district}
+            districtFilter={districtFilter}
+            setDistrictFilter={(val) => {
+              setDistrictFilter(val);
+            }}
+            genders={gender}
+            genderFilter={genderFilter}
+            setGenderFilter={setGenderFilter}
+            dateAddedFilters={dateAddedFilters}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter']}
+            onReset={handleReset}
+          />
+
+          <Grid item xs={9}>
+            <Card style={{ height: 'auto' }}>
+              <DataGrid
+                rows={
+                  loading
+                    ? []
+                    : rows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
+                columns={columns}
+                rowCount={totalRows}
+                loading={loading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
+                rowHeight={65}
+                getRowId={(row) => row.id}
+                onRowClick={(params) => navigate('/view-people', { state: params.row })}
+                components={{
+                  Toolbar: () => <CustomHeader />
+                }}
                 sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '35px',
-                  height: '35px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#41C048',
-                    color: '#ffffff'
+                  '& .MuiDataGrid-columnHeaders': {
+                    display: 'none'
+                  },
+                  '& .MuiDataGrid-cell': {
+                    textAlign: 'left',
+                    fontSize: '14px'
                   }
                 }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-
-          <Grid container spacing={3}>
-            <FilterPanel
-              showFilter={showFilter}
-              formTypes={formTypes}
-              setFormType={setFormType}
-              dateFilters={dateFilters}
-              setDateFilter={setDateFilter}
-            />
-
-            <Grid item xs={9}>
-              <Card style={{ height: '600px' }}>
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  rowHeight={65}
-                  getRowId={(row) => row.id}
-                  onRowClick={() => navigate('/dashboard/view-people')}
-                  components={{
-                    Toolbar: () => <CustomHeader />
-                  }}
-                  sx={{
-                    '& .MuiDataGrid-columnHeaders': {
-                      display: 'none'
-                    },
-                    '& .MuiDataGrid-row:nth-of-type(2n)': {
-                      backgroundColor: '#f9f9f9'
-                    },
-                    '& .MuiDataGrid-cell': {
-                      textAlign: 'left',
-                      fontSize: '14px'
-                    }
-                  }}
-                  disableSelectionOnClick
-                />
-              </Card>
-            </Grid>
+                disableSelectionOnClick
+              />
+            </Card>
           </Grid>
         </Grid>
-      )}
+      </Grid>
     </Card>
   );
 };

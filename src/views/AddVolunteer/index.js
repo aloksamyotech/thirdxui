@@ -1,9 +1,9 @@
+/* eslint-disable prettier/prettier */
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
   MenuItem,
-  IconButton,
   Card,
   CardHeader,
   CardContent,
@@ -21,6 +21,7 @@ import {
   FormHelperText
 } from '@mui/material';
 import { CircularProgress } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -30,7 +31,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, getApi } from 'common/apiClient';
+import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -43,6 +44,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [contactpurpose, setContactpurpose] = useState([]);
   const [reason, setReason] = useState([]);
   const [contactmethod, setContactmethod] = useState([]);
+  const location = useLocation();
+  const editdata = location.state;
 
   const {
     register,
@@ -56,51 +59,76 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-      title: '',
-      firstname: '',
-      lastname: '',
-      preferred: '',
-      phone: '',
-      email: '',
-      gender: '',
-      dob: null,
-      address: '',
-      town: '',
-      country: '',
-      pinCode: '',
-      riskNotes: '',
-      keyIndicators: '',
-      service: '',
-      fromDate: null,
-      toDate: null,
-      referDate: null,
-      referrerName: '',
-      referrerJob: '',
-      referrerAddress: '',
-      referrerEmail: '',
-      referrerPhone: '',
-      referralType: '',
-      telephone: true,
-      emailConsent: true,
-      sms: true,
-      whatsapp: true,
-      letter: true,
-      preferredContact: '',
-      reason: '',
-      contactPurpose: '',
-      confirmationDate: null
+      personalInfo: {
+        title: editdata?.personalInfo?.title || '',
+        firstName: editdata?.personalInfo?.firstName || '',
+        lastName: editdata?.personalInfo?.lastName || '',
+        nickName: editdata?.personalInfo?.nickName || '',
+        gender: editdata?.personalInfo?.gender || '',
+        dateOfBirth: editdata?.personalInfo?.dateOfBirth || null,
+        ethnicity: editdata?.personalInfo?.ethnicity || ''
+      },
+      phone: editdata?.contactInfo?.homePhone || '',
+      mobilePhone: editdata?.contactInfo?.phone || '',
+      email: editdata?.contactInfo?.email || '',
+      address: editdata?.contactInfo?.addressLine1 || '',
+      address2: editdata?.contactInfo?.addressLine2 || '',
+      town: editdata?.contactInfo?.town || '',
+      district: editdata?.contactInfo?.district || '',
+      pinCode: editdata?.contactInfo?.postcode || '',
+      country: editdata?.contactInfo?.country || '',
+      language: editdata?.contactInfo?.firstLanguage || '',
+      otherId: editdata?.contactInfo?.otherId || '',
+      riskNotes: editdata?.otherInfo?.description || '',
+      Beneficiary: editdata?.otherInfo?.benificiary || '',
+      Campaigns: editdata?.otherInfo?.campaigns || '',
+      engagement: editdata?.otherInfo?.engagement || '',
+      eventsAttended: editdata?.otherInfo?.eventAttanded || '',
+      fundingInterests: editdata?.otherInfo?.fundingInterest || '',
+      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
+      restrictAccess: editdata?.otherInfo?.restrictAccess || false,
+      title: editdata?.emergencyContact?.title || '',
+      gender: editdata?.emergencyContact?.gender || '',
+      firstname: editdata?.emergencyContact?.firstName || '',
+      lastname: editdata?.emergencyContact?.lastName || '',
+      preferred: editdata?.emergencyContact?.relationshipToUser || '',
+      emergencyhomePhone: editdata?.emergencyContact?.homePhone || '',
+      emergencyphone: editdata?.emergencyContact?.phone || '',
+      emergencyemail: editdata?.emergencyContact?.email || '',
+      emergencyaddress: editdata?.emergencyContact?.addressLine1 || '',
+      emergencyaddress2: editdata?.emergencyContact?.addressLine2 || '',
+      emergencytown: editdata?.emergencyContact?.town || '',
+      emergencypinCode: editdata?.emergencyContact?.postcode || '',
+      emergencycountry: editdata?.emergencyContact?.country || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      reason: editdata?.contactPreferences?.reason?._id || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
+      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email || true,
+      sms: editdata?.contactPreferences?.contactMethods?.sms || true,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp || true
     }
   });
 
   const ethnicityOptions = [
     'Arabic or North African',
-    'Asian or Asian British',
-    'Asian-Indian',
-    'Asian-Pakistan',
-    'Asian-Bangladeshi',
-    'Asian–any other Asian background',
-    'Black-Caribbean',
-    'Black-African'
+    'Asian or Asian British – Indian',
+    'Asian – Pakistani',
+    'Asian – Bangladeshi',
+    'Asian – Any other Asian background',
+    'Black – Caribbean',
+    'Black – African',
+    'Black – Any other Black background',
+    'Mixed – White and Black Caribbean',
+    'Mixed – White and Black African',
+    'Mixed – White and Asian',
+    'Mixed – Other',
+    'Chinese',
+    'White – British',
+    'White – Irish',
+    'White – Other',
+    'Unknown'
   ];
 
   useEffect(() => {
@@ -115,22 +143,7 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getApi(urls.configuration.fetch);
-        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
-        setReason(filterreason);
-        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
-        setContactpurpose(filtercontactpurpose);
-        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
-        setContactmethod(filtercontactmethod);
-      } catch (error) {
-        console.error('Error fetching config:', error);
-      }
-    };
-    fetchData();
-  }, []);
+
   const districts = [
     { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
     { label: 'Adur District', value: 'adur_district' },
@@ -151,6 +164,23 @@ const AddCaseForm = ({ onCancel }) => {
     const selectedFile = event.target.files[0];
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -169,6 +199,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
+
     fd.append('contactInfo[homePhone]', formData.phone || '');
     fd.append('contactInfo[phone]', formData.mobilePhone || '');
     fd.append('contactInfo[email]', formData.email || '');
@@ -203,10 +234,18 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[country]', formData.emergencycountry || '');
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
+    if (data.preferredContact) {
+      fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    }
 
-    fd.append('contactPreferences[preferredMethod]', formData.preferredContact || '');
-    fd.append('contactPreferences[reason]', formData.reason || '');
-    fd.append('contactPreferences[contactPurposes]', formData.contactPurpose || '');
+    if (data.contactPurpose) {
+      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    }
+
+    if (data.reason) {
+      fd.append('contactPreferences[reason]', data.reason);
+    }
+
     const confirmDate = formData.confirmationDate;
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 
@@ -214,6 +253,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[contactMethods][email]', formData.emailConsent || '');
     fd.append('contactPreferences[contactMethods][sms]', formData.sms || '');
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp || '');
+
     fd.append('role', 'volunteer');
     fd.append('isActive', true);
 
@@ -222,10 +262,18 @@ const AddCaseForm = ({ onCancel }) => {
     }
 
     try {
-      const response = await postApi(urls.serviceuser.create, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success('Volunteer added successfully!');
+      if (editdata) {
+        await updateApiPatch(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service user updated successfully!');
+      } else {
+        await postApi(urls.serviceuser.create, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service user added successfully!');
+      }
+
       setIsloading(false);
       navigate('/volunteer');
     } catch (error) {
@@ -313,7 +361,7 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">Add New Volunteer</Typography>
+          <Typography variant="h4">{editdata ? 'Edit Volunteer' : 'Add Volunteer'}</Typography>
 
           <Box
             sx={{
@@ -560,22 +608,48 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="personalInfo.ethnicity"
                                 control={control}
                                 rules={{ required: 'Ethnicity is required' }}
-                                render={({ field }) => (
-                                  <TextField
-                                    {...field}
-                                    select
-                                    fullWidth
-                                    label="Ethnicity"
-                                    size="small"
-                                    error={!!errors?.personalInfo?.ethnicity}
-                                    helperText={errors?.personalInfo?.ethnicity?.message}
-                                  >
-                                    {ethnicityOptions.map((option, index) => (
-                                      <MenuItem key={index} value={option}>
-                                        {option}
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
+                                render={({ field, fieldState: { error } }) => (
+                                  <Autocomplete
+                                    options={ethnicityOptions}
+                                    getOptionLabel={(option) => option}
+                                    onChange={(_, value) => field.onChange(value)}
+                                    value={field.value || null}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Ethnicity"
+                                        size="small"
+                                        error={!!error}
+                                        helperText={error ? error.message : ''}
+                                        fullWidth
+                                      />
+                                    )}
+                                    PopperProps={{
+                                      modifiers: [
+                                        {
+                                          name: 'preventOverflow',
+                                          options: {
+                                            altBoundary: true,
+                                            rootBoundary: 'viewport',
+                                            tether: false
+                                          }
+                                        },
+                                        {
+                                          name: 'flip',
+                                          options: {
+                                            fallbackPlacements: ['bottom-start']
+                                          }
+                                        }
+                                      ],
+                                      placement: 'bottom-start'
+                                    }}
+                                    ListboxProps={{
+                                      style: {
+                                        maxHeight: 200,
+                                        overflowY: 'auto'
+                                      }
+                                    }}
+                                  />
                                 )}
                               />
                             </Grid>
@@ -956,8 +1030,8 @@ const AddCaseForm = ({ onCancel }) => {
                                     message: 'Other Id must be at least 3 characters'
                                   },
                                   maxLength: {
-                                    value: 12,
-                                    message: 'Other Id cannot exceed 12 characters'
+                                    value: 20,
+                                    message: 'Other Id cannot exceed 20 characters'
                                   },
                                   pattern: {
                                     value: /^[A-Za-z0-9_-]+$/,
@@ -1333,7 +1407,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="contained" sx={{ background: '#053146' }}  onClick={() => handleTabChange(tabIndex + 1)}>
+                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
                         Next
                       </Button>
                     </Grid>
@@ -1977,7 +2051,7 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/volunteer')}>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
                         CANCEL
                       </Button>
                     </Grid>

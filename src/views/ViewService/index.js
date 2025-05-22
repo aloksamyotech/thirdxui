@@ -131,7 +131,7 @@ const UserProfile = () => {
               <Grid item xs={12} md={8}>
                 <Stack>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box>
+                    <Box sx={{ maxWidth: '60%' }}>
                       <Tooltip title={(serviceData?.name || '').toUpperCase()}>
                         <Typography
                           variant="h4"
@@ -183,7 +183,7 @@ const UserProfile = () => {
 
                     <Button
                       variant="contained"
-                      sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2 }}
+                      sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2,whiteSpace: 'nowrap'  }}
                       onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                     >
                       Add New Session {<AddIcon />}

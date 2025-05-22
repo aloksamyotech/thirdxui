@@ -28,7 +28,11 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
 
   const handleOptionClick = (label) => {
     if (label === 'Edit') {
-      navigate('/add-serviceuser', { state: data });
+      if (data?.role === 'volunteer') {
+        navigate('/add-volunteer', { state: { ...data, isEdit: true } });
+      } else {
+        navigate('/add-serviceuser', { state: data });
+      }
       onClose();
     } else if (label === 'Delete') {
       setConfirmOpen(true);
@@ -91,7 +95,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
         </List>
       </Popover>
 
-      {/* Delete Confirmation Dialog */}
+     
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
         <DialogContent>
@@ -107,7 +111,6 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Archive Confirmation Dialog */}
       <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
         <DialogContent>

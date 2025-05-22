@@ -337,9 +337,9 @@ const Lead = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -358,8 +358,9 @@ const Lead = () => {
                     onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}
                     sx={{
                       '& .MuiDataGrid-row': {
-                        borderBottom: '1px solid #ccc'
-                      }
+                        borderBottom: '1px solid #ccc',
+                        cursor: 'pointer'
+                      },
                     }}
                   />
                 </Card>

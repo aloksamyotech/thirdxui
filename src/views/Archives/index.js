@@ -41,6 +41,7 @@ const BulkDelete = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(false);
   const [confirmUnarchiveOpen, setConfirmUnarchiveOpen] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rows, setRows] = useState([]);
   const [dateAddedFilter, setDateAddedFilter] = useState(dayjs());
@@ -172,12 +173,12 @@ const BulkDelete = () => {
           <Stack direction="row" spacing={1}>
             <Tooltip title="Unarchive" arrow>
               <IconButton onClick={() => handleUnarchiveClick(params.row)}>
-                  <ArchiveIcon sx={{ color: '#49494c' }} />
+                <ArchiveIcon sx={{ color: '#49494c' }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Info" arrow>
               <IconButton>
-                <InfoIcon sx={{ color: '#49494c' }}  />
+                <InfoIcon sx={{ color: '#49494c' }} />
               </IconButton>
             </Tooltip>
           </Stack>
@@ -229,7 +230,6 @@ const BulkDelete = () => {
               <SearchIcon />
             </IconButton>
           </Box>
-
         </Stack>
       </Stack>
 
@@ -242,7 +242,9 @@ const BulkDelete = () => {
           setSessionNameFilter={setSessionNameFilter}
           dateAddedFilter={dateAddedFilter}
           setDateAddedFilter={setDateAddedFilter}
-          selectedFilters={['activityTypeFilter', 'dateAddedFilter', 'sessionNameFilter']}
+          includeArchives={includeArchives}
+          setIncludeArchives={setIncludeArchives}
+          selectedFilters={['activityTypeFilter', 'dateAddedFilter', 'sessionNameFilter', 'includeArchives']}
         />
         <Grid item xs={9}>
           <Box width="100%">
@@ -276,12 +278,8 @@ const BulkDelete = () => {
       </Grid>
 
       <Dialog open={confirmUnarchiveOpen} onClose={() => setConfirmUnarchiveOpen(false)}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>
-          📦  Unarchive User
-        </DialogTitle>
-        <DialogContent>
-          Are you sure you want to unarchive {selectedUser?.name}?
-        </DialogContent>
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Unarchive User</DialogTitle>
+        <DialogContent>Are you sure you want to unarchive {selectedUser?.name}?</DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmUnarchiveOpen(false)} variant="outlined">
             Cancel

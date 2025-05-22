@@ -79,10 +79,10 @@ const AddDonorForm = () => {
       eventsAttended: editdata?.otherInfo?.eventAttanded || '',
       fundingInterests: editdata?.otherInfo?.fundingInterest || '',
       fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
-      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
-      reason: editdata?.contactPreferences?.reason || '',
+      reason: editdata?.contactPreferences?.reason?._id || '',
       contactemail: editdata?.contactPreferences?.email || '',
       contactNo: editdata?.contactPreferences?.phone || '',
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
@@ -91,7 +91,7 @@ const AddDonorForm = () => {
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
       telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
-      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       role: 'donor'
     }
   });
@@ -176,11 +176,19 @@ const AddDonorForm = () => {
     fd.append('otherInfo[fundingInterest]', data.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
     fd.append('otherInfo[restrictAccess]', restrictAccess || '');
+    if (data.preferredContact) {
+      fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    }
 
-    fd.append('contactPreferences[preferredMethod]', data.preferredContact || '');
-    fd.append('contactPreferences[contactPurposes]', data.contactPurpose || '');
+    if (data.contactPurpose) {
+      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    }
+
+    if (data.reason) {
+      fd.append('contactPreferences[reason]', data.reason);
+    }
+
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
-    fd.append('contactPreferences[reason]', data.reason || '');
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent ?? true);
@@ -190,7 +198,9 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[contactMethods][telephone]', data.telephone ?? true);
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
-    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+    if (data.Recruitmentcampaign) {
+      fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+    }
 
     fd.append('role', 'donor');
     fd.append('subRole', 'donar_individual');

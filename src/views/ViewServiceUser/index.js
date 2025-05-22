@@ -490,21 +490,21 @@ const UserProfileCard = () => {
                           <Typography className="heading" variant="body2">
                             Reason:{' '}
                             <Typography component="span" className="text">
-                              {contactPreferences?.reason || 'N/A'}
+                              {contactPreferences?.reason?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography className="heading" variant="body2">
                             Contact purposes:{' '}
                             <Typography component="span" className="text">
-                              {contactPreferences?.contactPurposes || 'N/A'}
+                              {contactPreferences?.contactPurposes?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography className="heading" variant="body2">
                             Preferred Method of Contact:{' '}
                             <Typography component="span" className="text">
-                              {contactPreferences?.preferredMethod || 'N/A'}
+                              {contactPreferences?.preferredMethod?.name || 'N/A'}
                             </Typography>
                           </Typography>
 

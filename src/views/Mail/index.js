@@ -292,6 +292,7 @@ const Lead = () => {
             listNameFilter={listName}
             setListNameFilter={(value) => setListName(value)}
             tags={tagOptions}
+            tagFilter={tag}
             setTagFilter={(value) => setTag(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}

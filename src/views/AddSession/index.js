@@ -487,7 +487,7 @@ const AddCaseForm = ({ onCancel }) => {
             </Button>
           </Grid>
           <Grid item>
-            <Button variant="outlined" color="error" onClick={onCancel} disabled={isLoading}>
+            <Button variant="outlined" color="error" onClick={() => navigate('/services')} disabled={isLoading}>
               CANCEL
             </Button>
           </Grid>

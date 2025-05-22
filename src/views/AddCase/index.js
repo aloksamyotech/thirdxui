@@ -554,7 +554,7 @@ const AddCaseForm = () => {
               color="error"
               onClick={() => {
                 reset();
-                onCancel();
+                navigate('/case');
               }}
             >
               CANCEL

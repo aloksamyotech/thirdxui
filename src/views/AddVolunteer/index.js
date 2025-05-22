@@ -40,6 +40,9 @@ const AddCaseForm = ({ onCancel }) => {
   const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [contactpurpose, setContactpurpose] = useState([]);
+  const [reason, setReason] = useState([]);
+  const [contactmethod, setContactmethod] = useState([]);
 
   const {
     register,
@@ -112,7 +115,22 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
   const districts = [
     { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
     { label: 'Adur District', value: 'adur_district' },
@@ -148,7 +166,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[title]', formData.personalInfo.title || '');
     fd.append('personalInfo[gender]', formData.personalInfo.gender || '');
     const dob = formData.personalInfo.dateOfBirth;
-    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : null);
+    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
     fd.append('contactInfo[homePhone]', formData.phone || '');
@@ -1813,12 +1831,11 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.preferredContact}
                           helperText={errors.preferredContact?.message}
                         >
-                          <MenuItem value="email">Email</MenuItem>
-                          <MenuItem value="phone">Phone</MenuItem>
-                          <MenuItem value="text">Text</MenuItem>
-                          <MenuItem value="letter">Letter</MenuItem>
-                          <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                          <MenuItem value="doNotContact">Do not contact</MenuItem>
+                          {contactmethod?.map((option) => (
+                            <MenuItem key={option._id} value={option._id}>
+                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />
@@ -1840,8 +1857,11 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.contactPurpose}
                           helperText={errors.contactPurpose?.message}
                         >
-                          <MenuItem value="newsletter">Newsletter</MenuItem>
-                          <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                          {contactpurpose?.map((option) => (
+                            <MenuItem key={option._id} value={option._id}>
+                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />
@@ -1890,10 +1910,11 @@ const AddCaseForm = ({ onCancel }) => {
                           error={!!errors.reason}
                           helperText={errors.reason?.message}
                         >
-                          <MenuItem value="interest">Legitimate Interest</MenuItem>
-                          <MenuItem value="byRequest">By Request</MenuItem>
-                          <MenuItem value="deceased">Deceased</MenuItem>
-                          <MenuItem value="goneAway">Gone Away</MenuItem>
+                          {reason?.map((option) => (
+                            <MenuItem key={option._id} value={option._id}>
+                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                            </MenuItem>
+                          ))}
                         </TextField>
                       )}
                     />

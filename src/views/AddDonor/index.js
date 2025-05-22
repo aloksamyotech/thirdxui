@@ -79,10 +79,10 @@ const AddDonorForm = () => {
       eventsAttended: editdata?.otherInfo?.eventAttanded || '',
       fundingInterests: editdata?.otherInfo?.fundingInterest || '',
       fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
-      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
-      reason: editdata?.contactPreferences?.reason || '',
+      reason: editdata?.contactPreferences?.reason?._id || '',
       contactemail: editdata?.contactPreferences?.email || '',
       contactNo: editdata?.contactPreferences?.phone || '',
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
@@ -91,7 +91,7 @@ const AddDonorForm = () => {
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
       telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
-      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       role: 'donor'
     }
   });

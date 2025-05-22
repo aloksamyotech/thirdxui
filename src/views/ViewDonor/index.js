@@ -363,7 +363,7 @@ const UserProfileCard = () => {
                                 <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Recruitment Campaign:</span>{' '}
                                   <Typography component="span" fontSize="12px">
-                                    {companyInformation.recruitmentCampaign}
+                                    {companyInformation.recruitmentCampaign?.name}
                                   </Typography>
                                 </Typography>
                               </Box>
@@ -433,21 +433,21 @@ const UserProfileCard = () => {
                           <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Reason:{' '}
                             <Typography component="span" fontSize="12px">
-                              {contactPreferences?.reason || 'N/A'}
+                              {contactPreferences?.reason?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Contact purposes:{' '}
                             <Typography component="span" fontSize="12px">
-                              {contactPreferences?.contactPurposes || 'N/A'}
+                              {contactPreferences?.contactPurposes?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Preferred Method of Contact:{' '}
                             <Typography component="span" fontSize="12px">
-                              {contactPreferences?.preferredMethod || 'N/A'}
+                              {contactPreferences?.preferredMethod?.name || 'N/A'}
                             </Typography>
                           </Typography>
 

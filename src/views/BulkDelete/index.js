@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Grid, IconButton, TextField, Tooltip, Typography,InputBase } from '@mui/material';
+import { Button, Card, Grid, IconButton, TextField, Tooltip, Typography, InputBase } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -23,6 +23,7 @@ const sessionNames = [
 const BulkDelete = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [activityType, setActivityTypeFilter] = useState('');
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [sessionName, setSessionNameFilter] = useState('');
   const [dateAddedFilter, setDateAddedFilter] = useState(dayjs());
 
@@ -79,7 +80,7 @@ const BulkDelete = () => {
           </Stack>
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon sx={{ color: '#49494c' }}  />
+              <InfoIcon sx={{ color: '#49494c' }} />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -105,7 +106,7 @@ const BulkDelete = () => {
           <Button
             size="small"
             variant="outlined"
-            endIcon={<IconTrash  size={16}/>}
+            endIcon={<IconTrash size={16} />}
             sx={{
               color: '#ff4d4d',
               borderColor: '#ff4d4d',
@@ -119,45 +120,44 @@ const BulkDelete = () => {
             Delete All
           </Button>
 
-        <Box
-                                                      sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        backgroundColor: '#f8f9fa',
-                                                        borderRadius: '30px',
-                                                        paddingLeft: '16px',
-                                                        border: '1px solid #e0e0e0',
-                                                        width: '350px',
-                                                        height: '40px'
-                                                      }}
-                                                    >
-                                                      <InputBase
-                                                        placeholder="Search..."
-                                                        // value={searchQuery}
-                                                        // onChange={handleSearchChange}
-                                                        // onKeyPress={(e) => {
-                                                        //   if (e.key === 'Enter') {
-                                                        //     handleFilter();
-                                                        //   }
-                                                        // }}
-                                                        sx={{
-                                                          flex: 1,
-                                                          color: 'text.primary'
-                                                        }}
-                                                      />
-                                                      <IconButton
-                                                        // onClick={handleFilter}
-                                                        sx={{
-                                                          marginRight: '8px',
-                                                          width: 32,
-                                                          height: 32,
-                                                          cursor: 'pointer'
-                                                        }}
-                                                      >
-                                                        <SearchIcon />
-                                                      </IconButton>
-                                                    </Box>
-        
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
+            }}
+          >
+            <InputBase
+              placeholder="Search..."
+              // value={searchQuery}
+              // onChange={handleSearchChange}
+              // onKeyPress={(e) => {
+              //   if (e.key === 'Enter') {
+              //     handleFilter();
+              //   }
+              // }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              // onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
         </Stack>
       </Stack>
 
@@ -170,7 +170,9 @@ const BulkDelete = () => {
           setSessionNameFilter={setSessionNameFilter}
           dateAddedFilter={dateAddedFilter}
           setDateAddedFilter={setDateAddedFilter}
-          selectedFilters={['activityTypeFilter', 'dateAddedFilter', 'sessionNameFilter']}
+          includeArchives={includeArchives}
+          setIncludeArchives={setIncludeArchives}
+          selectedFilters={['activityTypeFilter', 'dateAddedFilter', 'sessionNameFilter', 'includeArchives']}
         />
         <Grid item xs={9}>
           <Box width="100%">

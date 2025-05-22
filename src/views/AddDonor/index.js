@@ -28,7 +28,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, updateApiPatch } from 'common/apiClient';
+import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddDonorForm = () => {
@@ -38,6 +38,11 @@ const AddDonorForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [campaigns, setCampaigns] = useState([]);
+  const [contactpurpose, setContactpurpose] = useState([]);
+  const [reason, setReason] = useState([]);
+  const [contactmethod, setContactmethod] = useState([]);
+
   const location = useLocation();
   const editdata = location.state;
   const fileInputRef = React.useRef(null);
@@ -74,10 +79,10 @@ const AddDonorForm = () => {
       eventsAttended: editdata?.otherInfo?.eventAttanded || '',
       fundingInterests: editdata?.otherInfo?.fundingInterest || '',
       fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
-      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
-      reason: editdata?.contactPreferences?.reason || '',
+      reason: editdata?.contactPreferences?.reason?._id || '',
       contactemail: editdata?.contactPreferences?.email || '',
       contactNo: editdata?.contactPreferences?.phone || '',
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
@@ -86,7 +91,7 @@ const AddDonorForm = () => {
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
       telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
-      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       role: 'donor'
     }
   });
@@ -123,7 +128,24 @@ const AddDonorForm = () => {
       setValue('attachments', file);
     }
   };
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filtercampaigns = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Campaign');
+        setCampaigns(filtercampaigns);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
   const onSubmit = async (data) => {
     setIsloading(true);
 
@@ -137,7 +159,7 @@ const AddDonorForm = () => {
     fd.append('personalInfo[firstName]', data.firstname || '');
     fd.append('personalInfo[lastName]', data.lastname || '');
     fd.append('personalInfo[gender]', data.gender || '');
-    fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : null);
+    fd.append('personalInfo[dateOfBirth]', data.dob ? new Date(data.dob).toISOString() : '');
     fd.append('contactInfo[phone]', data.phone || '');
     fd.append('contactInfo[homePhone]', data.mobilePhone || '');
     fd.append('contactInfo[email]', data.email || '');
@@ -154,11 +176,19 @@ const AddDonorForm = () => {
     fd.append('otherInfo[fundingInterest]', data.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
     fd.append('otherInfo[restrictAccess]', restrictAccess || '');
+    if (data.preferredContact) {
+      fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    }
 
-    fd.append('contactPreferences[preferredMethod]', data.preferredContact || '');
-    fd.append('contactPreferences[contactPurposes]', data.contactPurpose || '');
+    if (data.contactPurpose) {
+      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    }
+
+    if (data.reason) {
+      fd.append('contactPreferences[reason]', data.reason);
+    }
+
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
-    fd.append('contactPreferences[reason]', data.reason || '');
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent ?? true);
@@ -168,7 +198,9 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[contactMethods][telephone]', data.telephone ?? true);
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
-    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign || '');
+    if (data.Recruitmentcampaign) {
+      fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+    }
 
     fd.append('role', 'donor');
     fd.append('subRole', 'donar_individual');
@@ -252,21 +284,21 @@ const AddDonorForm = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4">{location.state?.isEdit ? 'Edit Donor' : 'Add Donor'}</Typography>
 
-           <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'grey',
-            borderRadius: '50%',
-            width: 32,
-            height: 32,
-            cursor: 'pointer'
-          }}
-          onClick={() => navigate('/donor')}
-        >
-          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
-        </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'grey',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/donor')}
+          >
+            <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
+          </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -809,8 +841,11 @@ const AddDonorForm = () => {
                                     helperText={errors.Recruitmentcampaign?.message}
                                     {...field}
                                   >
-                                    <MenuItem value="Campaign 1">Campaign 1</MenuItem>
-                                    <MenuItem value="Campaign 2">Campaign 2</MenuItem>
+                                    {campaigns?.map((option) => (
+                                      <MenuItem key={option._id} value={option._id}>
+                                        {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                      </MenuItem>
+                                    ))}
                                   </TextField>
                                 )}
                               />
@@ -1188,12 +1223,11 @@ const AddDonorForm = () => {
                             error={!!errors.preferredContact}
                             helperText={errors.preferredContact?.message}
                           >
-                            <MenuItem value="email">Email</MenuItem>
-                            <MenuItem value="phone">Phone</MenuItem>
-                            <MenuItem value="text">Text</MenuItem>
-                            <MenuItem value="letter">Letter</MenuItem>
-                            <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                            <MenuItem value="doNotContact">Do not contact</MenuItem>
+                            {contactmethod?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -1216,8 +1250,11 @@ const AddDonorForm = () => {
                             error={!!errors.contactPurpose}
                             helperText={errors.contactPurpose?.message}
                           >
-                            <MenuItem value="newsletter">Newsletter</MenuItem>
-                            <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                            {contactpurpose?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -1268,10 +1305,11 @@ const AddDonorForm = () => {
                             error={!!errors.reason}
                             helperText={errors.reason?.message}
                           >
-                            <MenuItem value="interest">Legitimate Interest</MenuItem>
-                            <MenuItem value="byRequest">By Request</MenuItem>
-                            <MenuItem value="deceased">Deceased</MenuItem>
-                            <MenuItem value="goneAway">Gone Away</MenuItem>
+                            {reason?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />

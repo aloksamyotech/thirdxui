@@ -31,6 +31,7 @@ const UserProfileCard = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -165,7 +166,11 @@ const UserProfileCard = () => {
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
-                  <img src={fullImageUrl || ServiceUser} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
+                  <img
+                    src={fullImageUrl || ServiceUser}
+                    alt={name}
+                    style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
+                  />
                   <Grid item xs>
                     <Typography component="span">
                       {personalInfo.firstName || personalInfo.lastName
@@ -313,7 +318,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Telephone no:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {contactInfo?.homePhone}
@@ -328,7 +333,7 @@ const UserProfileCard = () => {
                           <>
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Company Name:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.companyName}
@@ -336,7 +341,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Contact person Name:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.mainContactName}
@@ -344,7 +349,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Email:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {contactInfo.email}
@@ -355,15 +360,15 @@ const UserProfileCard = () => {
 
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Recruitment Campaign:</span>{' '}
                                   <Typography component="span" fontSize="12px">
-                                    {companyInformation.recruitmentCampaign}
+                                    {companyInformation.recruitmentCampaign?.name}
                                   </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Social Media Link:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.socialMediaLinks}
@@ -371,7 +376,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px"fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
                                   <span>Phone no.:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {contactInfo.phone}
@@ -395,7 +400,7 @@ const UserProfileCard = () => {
 
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
-                          <Typography variant="body2" fontSize="12px"fontWeight="600">
+                          <Typography variant="body2" fontSize="12px" fontWeight="600">
                             Email:{' '}
                             <Typography component="span" fontWeight="normal" fontSize="12px">
                               {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
@@ -428,21 +433,21 @@ const UserProfileCard = () => {
                           <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Reason:{' '}
                             <Typography component="span" fontSize="12px">
-                              {contactPreferences?.reason || 'N/A'}
+                              {contactPreferences?.reason?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Contact purposes:{' '}
                             <Typography component="span" fontSize="12px">
-                              {contactPreferences?.contactPurposes || 'N/A'}
+                              {contactPreferences?.contactPurposes?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Preferred Method of Contact:{' '}
                             <Typography component="span" fontSize="12px">
-                              {contactPreferences?.preferredMethod || 'N/A'}
+                              {contactPreferences?.preferredMethod?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
@@ -491,7 +496,9 @@ const UserProfileCard = () => {
                   setSessionNameFilter={setSessionName}
                   dateAddedFilters={dateAddedFilters}
                   setDateAddedFilter={setDateOpenedFilter}
-                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter']}
+                  includeArchives={includeArchives}
+                  setIncludeArchives={setIncludeArchives}
+                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
                 />
 
                 <Grid item xs={9}>

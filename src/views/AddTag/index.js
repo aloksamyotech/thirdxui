@@ -360,7 +360,7 @@ const TagForm = () => {
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="error">
+              <Button variant="outlined" color="error" onClick={() => navigate('/tags')}>
                 CANCEL
               </Button>
             </Grid>

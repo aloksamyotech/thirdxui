@@ -271,8 +271,7 @@ const CaseDetailsPage = () => {
     fetchData();
   }, [id]);
 
-   useEffect(() => {
-    const fetchData = async () => {
+   const fetchdata = async () => {
       try {
         const response = await getApi(
           `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
@@ -297,7 +296,9 @@ const CaseDetailsPage = () => {
       }
     };
 
-    fetchData();
+   useEffect(() => {
+   
+    fetchdata();
   }, [paginationModel]);
 
 
@@ -455,7 +456,7 @@ const CaseDetailsPage = () => {
         </Grid>
       </Box>
 
-      <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
+      <CaseNoteDialog open={openDialog} fetchdata={fetchdata} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
       <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>
   );

@@ -187,7 +187,8 @@ const ReferralTable = () => {
                   }}
                   sx={{
                     '& .MuiDataGrid-row': {
-                      borderBottom: '1px solid #ccc'
+                      borderBottom: '1px solid #ccc',
+                      cursor: 'pointer'
                     }
                   }}
                 />

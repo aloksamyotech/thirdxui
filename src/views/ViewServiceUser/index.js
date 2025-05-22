@@ -30,6 +30,7 @@ const UserProfileCard = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -489,21 +490,21 @@ const UserProfileCard = () => {
                           <Typography className="heading" variant="body2">
                             Reason:{' '}
                             <Typography component="span" className="text">
-                              {contactPreferences?.reason || 'N/A'}
+                              {contactPreferences?.reason?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography className="heading" variant="body2">
                             Contact purposes:{' '}
                             <Typography component="span" className="text">
-                              {contactPreferences?.contactPurposes || 'N/A'}
+                              {contactPreferences?.contactPurposes?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
                           <Typography className="heading" variant="body2">
                             Preferred Method of Contact:{' '}
                             <Typography component="span" className="text">
-                              {contactPreferences?.preferredMethod || 'N/A'}
+                              {contactPreferences?.preferredMethod?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
@@ -552,7 +553,9 @@ const UserProfileCard = () => {
                   setSessionNameFilter={setSessionName}
                   dateAddedFilters={dateAddedFilters}
                   setDateAddedFilter={setDateOpenedFilter}
-                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter']}
+                  includeArchives={includeArchives}
+                  setIncludeArchives={setIncludeArchives}
+                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
                 />
 
                 <Grid item xs={9}>

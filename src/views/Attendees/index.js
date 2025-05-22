@@ -28,18 +28,19 @@ export default function SessionRegisterPage() {
   const [selectedUserId, setSelectedUserId] = useState('');
 
   const location = useLocation();
-  const session = location.state.session;
 
-  const sessionId = session._id;
+  const session = location?.state?.session || {};
+
+  const sessionId = session?._id;
 
   useEffect(() => {
     const fetchpeople = async () => {
-      const response = await getApi(urls.serviceuser.fetch);
+      const response = await getApi(urls?.serviceuser?.fetch);
       const allUser = response?.data?.allUser || [];
 
       const formattedUsers = allUser.map((user) => ({
-        id: user._id,
-        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        id: user?._id,
+        name: `${user?.personalInfo?.firstName || ''} ${user?.personalInfo?.lastName || ''}`
       }));
       setRows(formattedUsers);
     };

@@ -18,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import InfoIcon from '@mui/icons-material/Info';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Background from 'assets/images/groupWork.jpg';
+import Background from 'assets/images/UserProfile.png'
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';

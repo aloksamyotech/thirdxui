@@ -69,6 +69,14 @@ export const urls = Object.freeze({
   casenote: {
     create: `${baseUrl}/caseNote/add`,
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+
+  },
+  forms: {
+    add: `${baseUrl}/forms`,
+    getAll: `${baseUrl}/forms/getallforms`
+  },
+  responses: {
+    submit: `${baseUrl}/responses`
   },
   attendees: {
     create: `${baseUrl}/attendees/addAttendee`,

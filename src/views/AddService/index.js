@@ -167,7 +167,7 @@ const AddCaseForm = ({ onCancel }) => {
                       required: 'Service Code is required',
                       pattern: { value: onlyLettersAndNumbers, message: 'Only letters and numbers allowed' },
                       minLength: { value: 3, message: 'Minimum 3 char' },
-                      maxLength: { value: 10, message: 'Maximum 10 char' }
+                      maxLength: { value: 20, message: 'Maximum 20 char' }
                     }}
                     render={({ field }) => (
                       <TextField

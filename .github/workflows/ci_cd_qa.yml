@@ -1,14 +1,14 @@
-name: Deploy to new-dev
+name: Deploy to qa
 
 on:
   push:
     branches:
-      - development
+      - qa
   workflow_dispatch:  # Enable manual trigger
 
 jobs:
   redeploy_frontend:
-    name: Deploy frontend to development
+    name: Deploy frontend to qa
     runs-on: ubuntu-latest
 
     steps:
@@ -26,8 +26,8 @@ jobs:
             cd /thiredx/thirdxui
             sudo git stash
             sudo git fetch --all
-            sudo git checkout development
-            sudo git pull origin development
+            sudo git checkout qa
+            sudo git pull origin qa
             git log -1
             sudo npm install -f
             sudo npm run build

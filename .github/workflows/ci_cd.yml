@@ -1,12 +1,12 @@
-name: Deploy to new-dev
+name: Deploy to develop
 on:
   push:
     branches:
-      - new-dev
+      - develop
 
 jobs:
   redeploy_frontend:
-    name: Deploy frontend to new-dev
+    name: Deploy frontend to develop
     runs-on: ubuntu-latest
 
     steps:
@@ -21,11 +21,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /thirdexDev/thirdxui
+            cd /thiredx/thirdxui
             sudo git stash
             sudo git fetch --all
-            sudo git checkout new-dev
-            sudo git pull origin new-dev
+            sudo git checkout develop
+            sudo git pull origin develop
             git log -1
             sudo npm install -f
             sudo npm run build 

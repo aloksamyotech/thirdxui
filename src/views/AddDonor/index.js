@@ -96,27 +96,6 @@ const AddDonorForm = () => {
     }
   });
 
-    useEffect(() => {
-      if (editdata) {
-        setValue('preferredContact', editdata?.contactPreferences?.preferredMethod?._id || '');
-        setValue('reason', editdata?.contactPreferences?.reason?._id || '');
-        setValue('contactPurpose', editdata?.contactPreferences?.contactPurposes?._id || '');
-        setValue('confirmationDate', editdata?.contactPreferences?.dateOfConfirmation || null);
-        setValue('telephone', editdata?.contactPreferences?.contactMethods?.telephone ?? true);
-        setValue('emailConsent', editdata?.contactPreferences?.contactMethods?.email ?? true);
-        setValue('sms', editdata?.contactPreferences?.contactMethods?.sms ?? true);
-        setValue('whatsapp', editdata?.contactPreferences?.contactMethods?.whatsapp ?? true);
-        setValue('donortag', editdata?.contactPreferences?.contactMethods?.donortag ?? true);
-      }
-    }, [editdata, setValue]);
-
-    const restrictAccessValue = watch('restrictAccess');
-      const telephoneValue = watch('telephone');
-      const emailConsentValue = watch('emailConsent');
-      const smsValue = watch('sms');
-      const donortagValue = watch('donortag');
-      const whatsappValue = watch('whatsapp');
-
   const [restrictAccess, setRestrictAccess] = useState(true);
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 

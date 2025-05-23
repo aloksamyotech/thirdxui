@@ -368,10 +368,10 @@ const UserProfile = () => {
             </Stack> */}
             <Stack spacing={1} mt={2} >
               {loading ? (
-                // Loader while fetching
+           
                 <Box
                   sx={{
-                    minHeight: 200, // 👈 Ensures visible vertical space
+                    minHeight: 200, 
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',

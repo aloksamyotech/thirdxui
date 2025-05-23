@@ -111,20 +111,20 @@ const AddCaseForm = ({ onCancel }) => {
     }
   });
 
-   useEffect(() => {
-      if (editdata) {
-        setValue('preferredContact', editdata?.contactPreferences?.preferredMethod?._id || '');
-        setValue('reason', editdata?.contactPreferences?.reason?._id || '');
-        setValue('contactPurpose', editdata?.contactPreferences?.contactPurposes?._id || '');
-        setValue('confirmationDate', editdata?.contactPreferences?.dateOfConfirmation || null);
-        setValue('telephone', editdata?.contactPreferences?.contactMethods?.telephone ?? true);
-        setValue('emailConsent', editdata?.contactPreferences?.contactMethods?.email ?? true);
-        setValue('sms', editdata?.contactPreferences?.contactMethods?.sms ?? true);
-        setValue('whatsapp', editdata?.contactPreferences?.contactMethods?.whatsapp ?? true);
-      }
-    }, [editdata, setValue]);
+  useEffect(() => {
+    if (editdata) {
+      setValue('preferredContact', editdata?.contactPreferences?.preferredMethod?._id || '');
+      setValue('reason', editdata?.contactPreferences?.reason?._id || '');
+      setValue('contactPurpose', editdata?.contactPreferences?.contactPurposes?._id || '');
+      setValue('confirmationDate', editdata?.contactPreferences?.dateOfConfirmation || null);
+      setValue('telephone', editdata?.contactPreferences?.contactMethods?.telephone ?? true);
+      setValue('emailConsent', editdata?.contactPreferences?.contactMethods?.email ?? true);
+      setValue('sms', editdata?.contactPreferences?.contactMethods?.sms ?? true);
+      setValue('whatsapp', editdata?.contactPreferences?.contactMethods?.whatsapp ?? true);
+    }
+  }, [editdata, setValue]);
 
-    const restrictAccessValue = watch('restrictAccess');
+  const restrictAccessValue = watch('restrictAccess');
   const telephoneValue = watch('telephone');
   const emailConsentValue = watch('emailConsent');
   const smsValue = watch('sms');
@@ -871,7 +871,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        label="Select District"
+                                        label="Borough/District"
                                         size="small"
                                         error={!!error}
                                         helperText={error?.message}
@@ -886,6 +886,41 @@ const AddCaseForm = ({ onCancel }) => {
                                         }}
                                       />
                                     )}
+                                  />
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="pinCode"
+                                control={control}
+                                rules={{
+                                  required: 'Postcode is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Postcode must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
+                                  },
+                                  pattern: {
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
+                                  }
+                                }}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Postcode"
+                                    size="small"
+                                    error={!!errors.pinCode}
+                                    helperText={errors.pinCode?.message}
+                                    inputProps={{
+                                      pattern: onlyLetterNumberSpace.source
+                                    }}
+                                    {...field}
                                   />
                                 )}
                               />
@@ -943,41 +978,6 @@ const AddCaseForm = ({ onCancel }) => {
                                         overflowY: 'auto'
                                       }
                                     }}
-                                  />
-                                )}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <Controller
-                                name="pinCode"
-                                control={control}
-                                rules={{
-                                  required: 'Postcode is required',
-                                  minLength: {
-                                    value: 5,
-                                    message: 'Postcode must be at least 5 characters'
-                                  },
-                                  maxLength: {
-                                    value: 10,
-                                    message: 'Postcode cannot exceed 10 characters'
-                                  },
-                                  pattern: {
-                                    value: onlyLetterNumberSpace,
-                                    message: 'Postcode can only contain letters, numbers, and spaces'
-                                  }
-                                }}
-                                render={({ field }) => (
-                                  <TextField
-                                    fullWidth
-                                    label="Postcode"
-                                    size="small"
-                                    error={!!errors.pinCode}
-                                    helperText={errors.pinCode?.message}
-                                    inputProps={{
-                                      pattern: onlyLetterNumberSpace.source
-                                    }}
-                                    {...field}
                                   />
                                 )}
                               />

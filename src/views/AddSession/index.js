@@ -141,7 +141,7 @@ const AddCaseForm = ({ onCancel }) => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/services')}
+          onClick={() => navigate(`/view-service`, { state: { row: serviceId } })}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -487,7 +487,7 @@ const AddCaseForm = ({ onCancel }) => {
             </Button>
           </Grid>
           <Grid item>
-            <Button variant="outlined" color="error" onClick={() => navigate('/services')} disabled={isLoading}>
+            <Button variant="outlined" color="error"  onClick={() => navigate(`/view-service`, { state: { row: serviceId } })} disabled={isLoading}>
               CANCEL
             </Button>
           </Grid>

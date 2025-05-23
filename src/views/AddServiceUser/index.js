@@ -116,11 +116,11 @@ const AddCaseForm = ({ onCancel }) => {
         if (editdata.contactPreferences.preferredMethod && editdata.contactPreferences.preferredMethod._id) {
           setValue('preferredContact', editdata.contactPreferences.preferredMethod._id);
         }
-        
+
         if (editdata.contactPreferences.reason && editdata.contactPreferences.reason._id) {
           setValue('reason', editdata.contactPreferences.reason._id);
         }
-        
+
         if (editdata.contactPreferences.contactPurposes && editdata.contactPreferences.contactPurposes._id) {
           setValue('contactPurpose', editdata.contactPreferences.contactPurposes._id);
         }
@@ -252,7 +252,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('otherInfo[eventAttanded]', formData.eventsAttended || '');
     fd.append('otherInfo[fundingInterest]', formData.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities || '');
-    fd.append('otherInfo[restrictAccess]', formData.restrictAccess? 'true' : 'false');
+    fd.append('otherInfo[restrictAccess]', formData.restrictAccess ? 'true' : 'false');
 
     fd.append('emergencyContact[firstName]', formData.firstname || '');
     fd.append('emergencyContact[lastName]', formData.lastname || '');
@@ -885,7 +885,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        label="Select District"
+                                        label="Borough/District"
                                         size="small"
                                         error={!!error}
                                         helperText={error?.message}
@@ -900,6 +900,41 @@ const AddCaseForm = ({ onCancel }) => {
                                         }}
                                       />
                                     )}
+                                  />
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="pinCode"
+                                control={control}
+                                rules={{
+                                  required: 'Postcode is required',
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Postcode must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 10,
+                                    message: 'Postcode cannot exceed 10 characters'
+                                  },
+                                  pattern: {
+                                    value: onlyLetterNumberSpace,
+                                    message: 'Postcode can only contain letters, numbers, and spaces'
+                                  }
+                                }}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Postcode"
+                                    size="small"
+                                    error={!!errors.pinCode}
+                                    helperText={errors.pinCode?.message}
+                                    inputProps={{
+                                      pattern: onlyLetterNumberSpace.source
+                                    }}
+                                    {...field}
                                   />
                                 )}
                               />
@@ -957,41 +992,6 @@ const AddCaseForm = ({ onCancel }) => {
                                         overflowY: 'auto'
                                       }
                                     }}
-                                  />
-                                )}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <Controller
-                                name="pinCode"
-                                control={control}
-                                rules={{
-                                  required: 'Postcode is required',
-                                  minLength: {
-                                    value: 5,
-                                    message: 'Postcode must be at least 5 characters'
-                                  },
-                                  maxLength: {
-                                    value: 10,
-                                    message: 'Postcode cannot exceed 10 characters'
-                                  },
-                                  pattern: {
-                                    value: onlyLetterNumberSpace,
-                                    message: 'Postcode can only contain letters, numbers, and spaces'
-                                  }
-                                }}
-                                render={({ field }) => (
-                                  <TextField
-                                    fullWidth
-                                    label="Postcode"
-                                    size="small"
-                                    error={!!errors.pinCode}
-                                    helperText={errors.pinCode?.message}
-                                    inputProps={{
-                                      pattern: onlyLetterNumberSpace.source
-                                    }}
-                                    {...field}
                                   />
                                 )}
                               />
@@ -1408,11 +1408,7 @@ const AddCaseForm = ({ onCancel }) => {
                               render={({ field }) => (
                                 <FormControlLabel
                                   control={
-                                    <AntSwitch
-                                      {...field}
-                                      checked={field.value}
-                                      onChange={(e) => field.onChange(e.target.checked)}
-                                    />
+                                    <AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
                                   }
                                   label="Restrict Access"
                                   labelPlacement="start"
@@ -2008,13 +2004,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={
-                            <AntSwitch
-                              {...field}
-                              checked={field.value}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          }
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="Telephone"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2028,13 +2018,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={
-                            <AntSwitch
-                              {...field}
-                              checked={field.value}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          }
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="Email"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2048,13 +2032,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={
-                            <AntSwitch
-                              {...field}
-                              checked={field.value}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          }
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="SMS"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2068,13 +2046,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={
-                            <AntSwitch
-                              {...field}
-                              checked={field.value}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          }
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="Whatsapp"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}

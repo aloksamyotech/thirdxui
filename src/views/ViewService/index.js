@@ -18,18 +18,18 @@ import AddIcon from '@mui/icons-material/Add';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import InfoIcon from '@mui/icons-material/Info';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Background from 'assets/images/groupWork.jpg';
+import Background from 'assets/images/UserProfile.png'
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import { imageUrl } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import { toast } from 'react-hot-toast';
 
 const UserProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const serviceId = location.state?.row;
-  const userId = serviceId?._id;
+  const serviceId = location.state?.row?._id || location.state?.row || location.state?.serviceId;
   const [showFilter, setShowFilter] = useState(true);
   const [countryOfOriginFilter, setCountryOfOriginFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
@@ -38,7 +38,7 @@ const UserProfile = () => {
   const [timeFilter, setTimeFilter] = useState('');
   const [timeOptions, settimeOptions] = useState('');
   const [sessionLeadFilter, setSessionLeadFilter] = useState('');
-  const [serviceData, setServiceData] = useState('');
+  const [serviceData, setServiceData] = useState(null);
   const [sessionData, setSessionData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
@@ -75,28 +75,51 @@ const UserProfile = () => {
 
   useEffect(() => {
     const fetchService = async () => {
-      const res = await getApi(urls.service.getById.replace(':id', userId));
+      if (!serviceId) {
+        toast.error('Service ID not found');
+        navigate('/services');
+        return;
+      }
 
-      setServiceData(res?.data?.userData || {});
-      setLoading(false);
+      try {
+        setLoading(true);
+        const res = await getApi(urls.service.getById.replace(':id', serviceId));
+        if (res?.data?.userData) {
+          setServiceData(res.data.userData);
+          fetchSessionlist(res.data.userData._id);
+        } else {
+          toast.error('Service not found');
+          navigate('/services');
+        }
+      } catch (error) {
+        toast.error('Failed to fetch service details');
+        navigate('/services');
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchService();
-  }, [userId]);
+  }, [serviceId]);
 
-  useEffect(() => {
-    const fetchSessionlist = async () => {
-      const response = await getApi(urls.session.getById.replace(':id', serviceData._id));
-      setSessionData(response?.data?.userData);
-    };
-    fetchSessionlist();
-  }, [serviceData._id]);
+  const fetchSessionlist = async (serviceId) => {
+    if (!serviceId) return;
+
+    try {
+      const response = await getApi(urls.session.getById.replace(':id', serviceId));
+      if (response?.data?.userData) {
+        setSessionData(response.data.userData);
+      }
+    } catch (error) {
+      toast.error('Failed to fetch sessions');
+    }
+  };
 
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
 
-     if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('date', formattedDate);
       }
@@ -106,25 +129,23 @@ const UserProfile = () => {
 
       const url = `${urls.session.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
-     
 
       const allSessions = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-     
-      const formattedUsers = allSessions.map((item, index) => ({
+
+      const formattedUsers = allSessions?.map((item, index) => ({
         id: item._id || index,
         date: item?.date ? new Date(item.date).toLocaleDateString() : '',
         country: item?.country || '',
         time: item?.time || ''
       }));
 
-      
       setSessionData(formattedUsers);
 
       setTotalRows(pagination?.total);
       setIsFiltered(true);
     } catch (error) {
-      console.error('Failed to fetch filtered cases:', error);
+      console.error('Failed to fetch filtered sessions:', error);
     }
   };
 
@@ -133,28 +154,24 @@ const UserProfile = () => {
     setTimeFilter('');
     setDateOpenedFilter('');
     setIsFiltered(false);
-    
   };
 
-  useEffect(() => {
-    
-    if (dateOpenedFilter || isFiltered || timeFilter || countriesWithFlags) {
-    handleFilter();
-    }
- 
- },[isFiltered, dateOpenedFilter, timeFilter, countriesWithFlags]);
   return (
     <>
-      <Grid item xs={12} mb={2}>
-        <Stack direction="row" alignItems="center">
-          <Typography fontWeight="bold" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/services')}>
-              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
-            </IconButton>
-            Service Details
-          </Typography>
-        </Stack>
-      </Grid>
+      {!serviceId ? (
+        <Typography>Loading...</Typography>
+      ) : (
+        <Grid item xs={12} mb={2}>
+          <Stack direction="row" alignItems="center">
+            <Typography fontWeight="bold" display="flex" alignItems="center">
+              <IconButton onClick={() => navigate('/services')}>
+                <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+              </IconButton>
+              Service Details
+            </Typography>
+          </Stack>
+        </Grid>
+      )}
 
       <Grid container spacing={2}>
         <FilterPanel
@@ -168,7 +185,6 @@ const UserProfile = () => {
           timeFilter={timeFilter}
           setTimeFilter={(value) => setTimeFilter(value)}
           timeOptions={timeOptions}
-
           sessionLeads={[
             { value: 'john_doe', label: 'John Doe' },
             { value: 'jane_smith', label: 'Jane Smith' }
@@ -187,9 +203,9 @@ const UserProfile = () => {
                   src={
                     loading
                       ? Background
-                      : serviceData.file
-                        ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                        : Background
+                      : serviceData?.file
+                      ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                      : Background
                   }
                   alt="Service"
                   sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
@@ -352,10 +368,10 @@ const UserProfile = () => {
             </Stack> */}
             <Stack spacing={1} mt={2} >
               {loading ? (
-                // Loader while fetching
+           
                 <Box
                   sx={{
-                    minHeight: 200, // 👈 Ensures visible vertical space
+                    minHeight: 200, 
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',

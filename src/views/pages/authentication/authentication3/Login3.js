@@ -17,53 +17,62 @@ const Login = () => {
   return (
     <AuthWrapper1>
       <Grid container sx={{ minHeight: '100vh', backgroundColor: '#053146' }}>
-        <Grid
-          item
-          xs={12}
-          md={6}
+     <Grid
+  item
+  xs={12}
+  md={6}
+  sx={{
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4 // Added padding to increase effective size
+  }}
+>
+  <AuthCardWrapper
+    sx={{
+      maxWidth:700,
+      width: '600',
+      boxShadow: theme.shadows[3],
+      borderRadius: 2,
+      backgroundColor: theme.palette.background.paper,
+      padding: 4 
+    }}
+  >
+    <Grid container spacing={3} alignItems="center">
+      <Grid item xs={12} sx={{ textAlign: 'center' }}>
+        <Box
           sx={{
             display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
-            justifyContent: 'center'
+            marginBottom: 3 
           }}
         >
-          <AuthCardWrapper
-            sx={{
-              maxWidth: 400,
-              width: '100%',
-              boxShadow: theme.shadows[3],
-              borderRadius: 2,
-              backgroundColor: theme.palette.background.paper
+          <Logo sx={{ width: 80, height: 80 }} />
+        </Box>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Stack alignItems="center" spacing={2}>
+          <Typography 
+            variant="h2" 
+            sx={{ 
+              fontWeight: 700, 
+              color: '#240046',
+              fontSize: '2.0rem' 
             }}
           >
-            <Grid container spacing={2} alignItems="center">
-              <Grid item sx={{ mb: 2, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: '2px',
-                    marginLeft: 12
-                  }}
-                >
-                  <Logo />
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} sx={{ marginTop: '-20px' }}>
-                <Stack alignItems="center">
-                  <Typography variant="h3" sx={{ fontWeight: 700, textAlign: 'center', color: '#240046' }}>
-                    Welcome to Thridex!
-                  </Typography>
-                </Stack>
-              </Grid>
-              <Grid item xs={12}>
-                <AuthLogin />
-              </Grid>
-            </Grid>
-          </AuthCardWrapper>
-        </Grid>
+            Welcome to Thridex!👋
+          </Typography>
+        </Stack>
+      </Grid>
+      
+      <Grid item xs={12}>
+        <AuthLogin />
+      </Grid>
+    </Grid>
+  </AuthCardWrapper>
+</Grid>
         <Grid
           item
           xs={12}
@@ -99,10 +108,10 @@ const Login = () => {
               transform: 'translateY(-50%)'
             }}
           >
-            <Typography variant="h2" sx={{ color: 'white' }}>
+            <Typography variant="h2" sx={{ fontSize: '35px', color: 'white' }}>
               Thirdex helps you win!
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: '14px', mt: 1, color: 'white' }}>
+            <Typography variant="body2" sx={{ fontSize: '20px', mt: 1, color: 'white' }}>
               Organize your forms, events, workshops, and more with our CRM suite.
             </Typography>
           </Box>

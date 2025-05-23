@@ -1,8 +1,10 @@
 name: Deploy to develop
+
 on:
   push:
     branches:
       - develop
+  workflow_dispatch:  # Enable manual trigger
 
 jobs:
   redeploy_frontend:
@@ -28,5 +30,4 @@ jobs:
             sudo git pull origin develop
             git log -1
             sudo npm install -f
-            sudo npm run build 
-
+            sudo npm run build

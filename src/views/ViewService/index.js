@@ -23,6 +23,7 @@ import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import { imageUrl } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -120,8 +121,8 @@ const UserProfile = () => {
                     loading
                       ? Background
                       : serviceData.file
-                      ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                      : Background
+                        ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                        : Background
                   }
                   alt="Service"
                   sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
@@ -183,7 +184,7 @@ const UserProfile = () => {
 
                     <Button
                       variant="contained"
-                      sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2,whiteSpace: 'nowrap'  }}
+                      sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2, whiteSpace: 'nowrap' }}
                       onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                     >
                       Add New Session {<AddIcon />}
@@ -205,13 +206,13 @@ const UserProfile = () => {
             </Grid>
           </Card>
 
-          <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff' }}>
+          <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400 }}>
             <Typography variant="h5" mb={1}>
               Session List
             </Typography>
             <Divider />
 
-            <Stack spacing={1} mt={2}>
+            {/* <Stack spacing={1} mt={2}>
               {sessionData?.map((session, index) => (
                 <Box
                   key={index}
@@ -281,6 +282,101 @@ const UserProfile = () => {
                   </Box>
                 </Box>
               ))}
+            </Stack> */}
+            <Stack spacing={1} mt={2} >
+              {loading ? (
+                // Loader while fetching
+                <Box
+                  sx={{
+                    minHeight: 200, // 👈 Ensures visible vertical space
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    px: 2,
+                  }}
+                >
+                  <SingleRowLoader />
+                </Box>
+              ) : (
+                sessionData?.map((session, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      px: 2,
+                      py: 1.5,
+                      borderBottom: '1px solid #e0e0e0',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <Box minWidth={90}>
+                      <Typography variant="subtitle2" fontWeight="bold">
+                        {new Date(session.date).toLocaleDateString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </Typography>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {session.time}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ flexGrow: 1, px: 2, minWidth: 200 }}>
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight="bold"
+                        sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
+                      >
+                        {session.campaigns}
+                      </Typography>
+                    </Box>
+
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: '#1B4B66',
+                          textTransform: 'none',
+                          fontSize: '10px',
+                          py: 0.5,
+                          px: 0.5,
+                          maxHeight: '50px',
+                        }}
+                        onClick={() => navigate('/add-session', { state: { session } })}
+                      >
+                        Edit Session
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={{
+                          textTransform: 'none',
+                          color: '#1B4B66',
+                          fontSize: '10px',
+                          py: 0.48,
+                          px: 0.5,
+                          maxHeight: '50px',
+                        }}
+                        onClick={() => navigate('/attendees', { state: { session } })}
+                      >
+                        Add Attendee
+                      </Button>
+                      <IconButton size="small">
+                        <InfoIcon
+                          sx={{ color: '#49494c' }}
+                          fontSize="small"
+                          onClick={() => navigate('/view-session')}
+                        />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ))
+              )}
             </Stack>
           </Card>
         </Grid>

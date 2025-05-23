@@ -15,9 +15,11 @@ import { getApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
 import dayjs from 'dayjs';
 import { imageUrl } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
@@ -27,10 +29,11 @@ const CaseDetailsPage = () => {
   const [serviceuserDetails, setServiceuserDetails] = useState('');
   const [row, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
-   const [paginationModel, setPaginationModel] = useState({
-      page: 0,
-      pageSize: 10
-    });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -162,7 +165,7 @@ const CaseDetailsPage = () => {
           <Chip
             label={status === 'Active' ? 'Open' : 'Close'}
             icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-            variant="outlined" 
+            variant="outlined"
             sx={{
               borderColor: 'gray',
               color: 'gray',
@@ -196,35 +199,6 @@ const CaseDetailsPage = () => {
 
   const userProfile = serviceuserDetails?.otherInfo?.file;
   const fullImageUrl = userProfile ? `${imageUrl}${userProfile}` : '';
-  const caseNotes = [
-    {
-      id: 1,
-      date: '08/25/2017',
-      subject: 'SUPERVISION',
-      contactType: 'Email',
-      createdBy: 'Sammy odoi',
-      hours: '2 Hr',
-      hidden: false
-    },
-    {
-      id: 2,
-      date: '08/25/2017',
-      subject: 'AA–Mum and AA–Phone Contact',
-      contactType: 'Email',
-      createdBy: 'Sammy odoi',
-      hours: '2 Hr',
-      hidden: true
-    },
-    {
-      id: 3,
-      date: '08/25/2017',
-      subject: 'SUPERVISION',
-      contactType: 'Email',
-      createdBy: 'Sammy odoi',
-      hours: '2 Hr',
-      hidden: false
-    }
-  ];
 
   const columns = [
     { field: 'date', headerName: 'Date', flex: 1 },
@@ -258,6 +232,7 @@ const CaseDetailsPage = () => {
 
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await getApi(urls.case.getById.replace(':id', id));
         const Data = response?.data?.caseData;
         setCaseData(Data);
@@ -265,39 +240,44 @@ const CaseDetailsPage = () => {
         setServiceuserDetails(Data?.userServiceDetails);
       } catch (error) {
         console.error('Error fetching case data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [id]);
 
-   const fetchdata = async () => {
-      try {
-        const response = await getApi(
-          `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
-        );
-        const allCasesNotes = response?.data?.data || [];
-        const pagination = response?.data?.meta || { total: 0 };
+  const fetchdata = async () => {
+    try {
+      setLoading(true)
+      const response = await getApi(
+        `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
+      );
+      const allCasesNotes = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
-        const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
-          id: item._id || index,
-          date: item.date ? new Date(item.date).toLocaleDateString() : '',
-          subject: item?.subject || '',
-          contactType: item?.configurationId?.name || '',
-          
-        }));
+      const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
+        id: item._id || index,
+        date: item.date ? new Date(item.date).toLocaleDateString() : '',
+        subject: item?.subject || '',
+        contactType: item?.configurationId?.name || '',
 
-        setRows(formattedCasesNotes);
+      }));
 
-        setTotalRows(pagination?.total);
-        
-      } catch (err) {
-        console.error('Failed to fetch data:', err);
-      }
-    };
+      setRows(formattedCasesNotes);
 
-   useEffect(() => {
-   
+      setTotalRows(pagination?.total);
+
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+
     fetchdata();
   }, [paginationModel]);
 
@@ -435,19 +415,40 @@ const CaseDetailsPage = () => {
             selectedFilters={['dateOpenedFilter']}
           />
 
-          <Grid item xs={12} md={9}>
-            <Box sx={{ height: 'auto', width: '100%', backgroundColor: '#ffff' }}>
+          <Grid item xs={12} md={9} >
+            <Box sx={{ height: '400px', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
+                loading={loading}
                 rows={row}
                 columns={columns}
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (
+                    loading ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                  ),
                 }}
                 disableSelectionOnClick
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#f9fafb',
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
                   }
                 }}
               />

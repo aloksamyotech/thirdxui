@@ -4,6 +4,10 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import FilterPanel from 'components/FilterPanel';
+import { urls } from 'common/urls';
+import { useEffect } from 'react';
+import { getApi } from 'common/apiClient';
+import moment from 'moment';
 
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
@@ -63,7 +67,7 @@ const columns = [
     )
   },
   {
-    field: 'date',
+    field: 'submissionDate',
     headerName: 'Date Submitted',
     flex: 0.8,
     renderCell: (params) => (
@@ -78,7 +82,8 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-        {params.value}
+        {/* {params.value} */}
+        -
       </Typography>
     )
   },
@@ -103,32 +108,52 @@ const columns = [
   }
 ];
 
-const initialRows = [
-  {
-    id: 1,
-    description: 'Self Referral form',
-    date: '08/05/2017',
-    campaign: 'Beach Cleaning -Corporate volunteer project 2019',
-    title: 'Satisfaction Survey'
-  },
-  { id: 2, description: 'Community Referral form', date: '08/05/2017', campaign: 'Form Campaign', title: 'Community Referral' },
-  {
-    id: 3,
-    description: 'Satisfaction survey',
-    date: '08/05/2017',
-    campaign: 'Beach Cleaning -Corporate volunteer project 2019',
-    title: 'Volunteer Signup'
-  },
-  { id: 4, description: 'Volunteer sign up form', date: '08/05/2017', campaign: 'Form Campaign' },
-  { id: 5, description: 'Workshop sign up form', date: '08/05/2017', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
-];
+// const initialRows = [
+//   {
+//     id: 1,
+//     description: 'Self Referral form',
+//     date: '08/05/2017',
+//     campaign: 'Beach Cleaning -Corporate volunteer project 2019',
+//     title: 'Satisfaction Survey'
+//   },
+//   { id: 2, description: 'Community Referral form', date: '08/05/2017', campaign: 'Form Campaign', title: 'Community Referral' },
+//   {
+//     id: 3,
+//     description: 'Satisfaction survey',
+//     date: '08/05/2017',
+//     campaign: 'Beach Cleaning -Corporate volunteer project 2019',
+//     title: 'Volunteer Signup'
+//   },
+//   { id: 4, description: 'Volunteer sign up form', date: '08/05/2017', campaign: 'Form Campaign' },
+//   { id: 5, description: 'Workshop sign up form', date: '08/05/2017', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
+// ];
 
 const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [formType, setFormType] = useState('');
   const [showFilter, setShowFilter] = useState(true);
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState([]);
 
+  const getAllResponse = async () => {
+    const fromUrl = urls?.responses?.submit
+    const response = await getApi(fromUrl)
+    const formattedData = response?.data?.map((item, index) => {
+      const submissionDate = moment(item?.submittedAt).format('L')
+      let data = {
+        id: item?._id,
+        index: index + 1,
+        description: item?.formId?.title,
+        campaign: item?.template,
+        title: "help",
+        submissionDate
+      }
+      return data
+    })
+    setRows(formattedData)
+  }
+  useEffect(() => {
+    getAllResponse()
+  }, [])
   return (
     <>
       <Grid>

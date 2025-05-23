@@ -1,74 +1,80 @@
 import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, MenuItem, Button, Stack } from '@mui/material';
+import { Modal, Box, Typography, TextField, MenuItem, Button, Stack, Dialog, DialogTitle } from '@mui/material';
+import FormBuilder from 'formBuilder/FormBuilder';
+import SelectTemplate from 'formBuilder/SelectTemplate';
+import TemplateOne from 'formBuilder/TemplateOne';
+import TemplateTwo from 'formBuilder/TemplateTwo';
+import TemplateThree from 'formBuilder/TemplateThree';
+import { useEffect } from 'react';
+import DefaultFields from 'formBuilder/DefaultFields';
 
-const AddFormModal = ({ open = false, onClose = () => {} }) => {
-  const [formData, setFormData] = useState({
-    formType: '',
-    description: '',
-    campaign: ''
+const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
+
+  const [formData, setFormData] = useState(() => {
+    const savedData = localStorage.getItem("formData");
+    return savedData ? JSON.parse(savedData) : [];
   });
 
-  const handleChange = (e) => {
-    if (!e || !e.target) return;
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  useEffect(() => {
+    localStorage.setItem("formData", JSON.stringify(formData));
+  }, [formData]);
 
-  const handleSubmit = () => {
-    console.log('Submitted Data:', formData);
-    onClose();
-  };
+  const [preset, setPreset] = useState(true);
+  const [preview, setPreview] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [templateData, setTemplateData] = useState([]);
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
-          Add Form
-        </Typography>
-        <Stack spacing={2}>
-          <TextField select label="Form Type" name="formType" value={formData.formType} onChange={handleChange} fullWidth>
-            <MenuItem value="Self Referral form">Self Referral form</MenuItem>
-            <MenuItem value="Community Referral form">Community Referral form</MenuItem>
-            <MenuItem value="Satisfaction survey">Satisfaction survey</MenuItem>
-            <MenuItem value="Volunteer sign up form">Volunteer sign up form</MenuItem>
-            <MenuItem value="Workshop sign up form">Workshop sign up form</MenuItem>
-          </TextField>
-
-          <TextField select label="Campaign" name="campaign" value={formData.campaign} onChange={handleChange} fullWidth />
-
-          <TextField
-            label="Description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            rows={3}
-          />
-        </Stack>
-
-        <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 3 }}>
-          
-          <Button variant="contained"  sx={{ background: '#053146' }} onClick={handleSubmit}>
-            Save Changes
-          </Button>
-          <Button variant="outlined" color="error" onClick={onClose}>
-            Cancel
-          </Button>
-        </Stack>
-      </Box>
-    </Modal>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='md'>
+      {
+        preset &&
+        <DefaultFields
+          templateData={templateData}
+          setTemplateData={setTemplateData}
+          setPreset={setPreset}
+          onClose={onClose} />}
+      {
+        !preview &&
+        !preset &&
+        <FormBuilder
+          setFormData={setFormData}
+          formData={formData}
+          setPreview={setPreview}
+          onClose={onClose}
+          templateData={templateData}
+          setTemplateData={setTemplateData}
+          setPreset={setPreset} />}
+      {
+        preview &&
+        !selectedTemplate &&
+        <SelectTemplate
+          setPreview={setPreview}
+          setSelectedTemplate={setSelectedTemplate}
+          onClose={onClose}
+          setPreset={setPreset} />}
+      {
+        selectedTemplate === 1 &&
+        <TemplateOne
+          formData={formData}
+          setFormData={setFormData}
+          setSelectedTemplate={setSelectedTemplate}
+          setPreview={setPreview}
+          setPreset={setPreset}
+          onClose={onClose}
+          getAllForms={getAllForms} />}
+      {
+        selectedTemplate === 2 &&
+        <TemplateTwo
+          formData={formData}
+          setSelectedTemplate={setSelectedTemplate}
+          setPreview={setPreview} />}
+      {
+        selectedTemplate === 3 &&
+        <TemplateThree
+          formData={formData}
+          setSelectedTemplate={setSelectedTemplate}
+          setPreview={setPreview} />}
+    </Dialog>
   );
 };
 

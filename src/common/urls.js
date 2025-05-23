@@ -2,6 +2,9 @@ const baseUrl = process.env.REACT_APP_BASE_URL;
 export const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
 
+// const baseUrl = 'http://localhost:7201/api/v1';
+// export const imageUrl = 'http://localhost:7200/';
+
 export const urls = Object.freeze({
   baseUrl,
   configuration: {
@@ -70,6 +73,14 @@ export const urls = Object.freeze({
   casenote: {
     create: `${baseUrl}/caseNote/add`,
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+
+  },
+  forms: {
+    add: `${baseUrl}/forms`,
+    getAll: `${baseUrl}/forms/getallforms`
+  },
+  responses: {
+    submit: `${baseUrl}/responses`
   },
   attendees: {
     create: `${baseUrl}/attendees/addAttendee`

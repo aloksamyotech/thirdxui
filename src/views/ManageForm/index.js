@@ -6,6 +6,11 @@ import AddFormModal from './AddForm.js';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import FilterPanel from 'components/FilterPanel';
+import { urls } from 'common/urls.js';
+import { getApi } from 'common/apiClient.js';
+import { useEffect } from 'react';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useNavigate } from 'react-router';
 
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
@@ -53,62 +58,22 @@ const CustomHeader = () => {
   );
 };
 
-const columns = [
-  {
-    field: 'description',
-    headerName: 'Form Type',
-    flex: 0.8,
-    renderCell: (params) => (
-      <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-        {params.value}
-      </Typography>
-    )
-  },
-  {
-    field: 'campaign',
-    headerName: 'Form Campaign',
-    flex: 1,
-    renderCell: (params) => (
-      <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-        {params.value}
-      </Typography>
-    )
-  },
-  {
-    field: 'title',
-    headerName: 'Form Display Title',
-    flex: 0.8,
-    renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
-  },
-  {
-    field: 'edit',
-    headerName: 'Edit',
-    flex: 0.3,
-    align: 'center',
-    headerAlign: 'center',
-    sortable: false,
-    renderCell: (params) => (
-      <IconButton onClick={() => handleEdit(params.row)} sx={{ p: 0.5 }}>
-        <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" />
-      </IconButton>
-    )
-  }
-];
 
-const initialRows = [
-  { id: 1, description: 'Self Referral form', campaign: 'Beach Cleaning -Corporate volunteer project 2019', title: 'Satisfaction Survey' },
-  { id: 2, description: 'Community Referral form', campaign: 'Form Campaign', title: 'Community Referral' },
-  { id: 3, description: 'Satisfaction survey', campaign: 'Beach Cleaning -Corporate volunteer project 2019', title: 'Volunteer Signup' },
-  { id: 4, description: 'Volunteer sign up form', campaign: 'Form Campaign' },
-  { id: 5, description: 'Workshop sign up form', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
-];
+// const initialRows = [
+//   { id: 1, description: 'Self Referral form', campaign: 'Beach Cleaning -Corporate volunteer project 2019', title: 'Satisfaction Survey' },
+//   { id: 2, description: 'Community Referral form', campaign: 'Form Campaign', title: 'Community Referral' },
+//   { id: 3, description: 'Satisfaction survey', campaign: 'Beach Cleaning -Corporate volunteer project 2019', title: 'Volunteer Signup' },
+//   { id: 4, description: 'Volunteer sign up form', campaign: 'Form Campaign' },
+//   { id: 5, description: 'Workshop sign up form', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
+// ];
 
 const Lead = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [campaign, setCampaignFilter] = useState('');
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState([]);
   const [formType, setFormType] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const navigate = useNavigate()
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -118,10 +83,78 @@ const Lead = () => {
     setOpenAdd(false);
   };
 
+  const handleNavigate = (id) => {
+    navigate(`/surveyform/${id}`)
+  }
+
+  const getAllForms = async () => {
+    const fromUrl = urls?.forms?.getAll
+    const response = await getApi(fromUrl)
+    const formattedData = response?.data?.map((item, index) => {
+      let data = {
+        id: item?._id,
+        index: index + 1,
+        description: item?.title,
+        campaign: item?.template,
+        title: "help",
+        link: item?.publicId
+      }
+      return data
+    })
+    setRows(formattedData)
+  }
+  useEffect(() => {
+    getAllForms()
+  }, [])
+
+  const columns = [
+    {
+      field: 'description',
+      headerName: 'Form Type',
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
+          {params.value}
+        </Typography>
+      )
+    },
+    {
+      field: 'campaign',
+      headerName: 'Form Campaign',
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+          {/* {params.value} */}
+          -
+        </Typography>
+      )
+    },
+    {
+      field: 'title',
+      headerName: 'Form Display Title',
+      flex: 0.8,
+      renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
+    },
+    {
+      field: 'edit',
+      headerName: 'Action',
+      flex: 0.3,
+      align: 'center',
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <OpenInNewIcon color='primary' fontSize='small' sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.link)} />
+          <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+        </Box>
+      )
+    }
+  ];
+
   return (
     <>
       <Grid>
-        <AddFormModal open={openAdd} onClose={handleCloseAdd} />
+        <AddFormModal open={openAdd} onClose={handleCloseAdd} getAllForms={getAllForms} />
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
             <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>

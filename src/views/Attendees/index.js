@@ -120,7 +120,6 @@ export default function SessionRegisterPage() {
       };
 
       const response = await postApi(urls.attendees.create, payload);
-      console.log(response, 'responseresponse');
 
       if (response.success) {
         toast.success('Attendee added successfully');

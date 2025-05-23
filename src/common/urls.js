@@ -64,7 +64,9 @@ export const urls = Object.freeze({
     filter: `${baseUrl}/session/search`,
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
-    update: `${baseUrl}/session/editSession/:id`
+    update: `${baseUrl}/session/editSession/:id`,
+    fetchWithPagination:`${baseUrl}/session/allwithpagination`
+
   },
   casenote: {
     create: `${baseUrl}/caseNote/add`,

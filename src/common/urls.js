@@ -57,7 +57,8 @@ export const urls = Object.freeze({
   tag: {
     create: `${baseUrl}/tag/`,
     getAllTags: `${baseUrl}/tag/getalltag`,
-    updateStatus: `${baseUrl}/tag/updateStatus`
+    updateStatus: `${baseUrl}/tag/updateStatus`,
+    fetchWithPagination: `${baseUrl}/tag/allwithpagination`
   },
   session: {
     create: `${baseUrl}/session/addSession`,

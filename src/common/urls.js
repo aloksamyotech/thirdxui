@@ -1,10 +1,6 @@
 const baseUrl = process.env.REACT_APP_BASE_URL;
 export const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
-
-// const baseUrl = 'http://localhost:7201/api/v1';
-// export const imageUrl = 'http://localhost:7200/';
-
 export const urls = Object.freeze({
   baseUrl,
   configuration: {

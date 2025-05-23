@@ -6,13 +6,17 @@ import FilterPanel from 'components/FilterPanel.js';
 import TableStyle from '../../ui-component/TableStyle';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
-
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { getApi, updateApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+import { toast } from 'react-toastify';
 
 const Tag = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
+  const [tags, setTags] = useState([]);
 
   const statusFilter = [
     { value: 'active', label: 'Active' },
@@ -53,22 +57,22 @@ const Tag = () => {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Configuration', flex: 1 },
+    { field: 'name', headerName: 'Configrution', flex: 1 },
     {
-      field: 'status',
+      field: 'isActive',
       headerName: 'Status',
-      renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        const handleToggle = (event) => {
+          const newStatus = event.target.checked;
+          handleStatusChange(params.row._id, newStatus);
+        };
+
+        return <AntSwitch defaultChecked={params.value} color="primary" onChange={handleToggle} />;
+      }
     }
   ];
 
-  const rows = [
-    { id: 1, name: 'Adoption Enquirer', status: true },
-    { id: 2, name: 'Adoption Gift Recipients', status: true },
-    { id: 3, name: 'Past Adopters', status: true },
-    { id: 4, name: 'Current Adopters', status: true },
-    { id: 5, name: 'Self Referral', status: true }
-  ];
   const formTypes = [
     { value: 'Self Referral form', label: 'Self Referral form' },
     { value: 'Community Referral form', label: 'Community Referral form' },
@@ -83,6 +87,30 @@ const Tag = () => {
     { value: 'month', label: 'Last 30 days' },
     { value: 'year', label: 'Last 2 months' }
   ];
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+        setTags(response?.data?.allTags);
+      } catch (error) {
+        console.error('Failed to fetch tags:', error);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
+  const handleStatusChange = async (tagId, newStatus) => {
+    try {
+      await updateApi(`${urls.tag.updateStatus}/${tagId}`, {
+        isActive: newStatus
+      });
+      toast.success('Tag update successfully');
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
@@ -165,18 +193,16 @@ const Tag = () => {
               <Box width="100%">
                 <Card style={{ height: 'auto' }}>
                   <DataGrid
-                    rows={rows}
+                    rows={tags}
                     columns={columns}
                     rowHeight={65}
-                    getRowId={(row) => row.id}
+                    getRowId={(row) => row._id}
                     pageSize={5}
                     rowsPerPageOptions={[5, 10]}
                     components={{
                       Toolbar: () => <CustomHeader />
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                    // onRowClick={(params) => navigate(`/dashboard/view-service/${params.id}`)}
-                    onRowClick={() => navigate('/dashboard/view-service')}
                     sx={{
                       '& .MuiDataGrid-row': {
                         borderBottom: '1px solid #ccc'

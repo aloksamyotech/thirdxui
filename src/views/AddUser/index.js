@@ -1,9 +1,9 @@
+/* eslint-disable prettier/prettier */
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Grid,
   MenuItem,
-  IconButton,
   Card,
   CardHeader,
   CardContent,
@@ -31,14 +31,13 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi, getApi, updateApiPatch } from 'common/apiClient';
+import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
-  const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [contactpurpose, setContactpurpose] = useState([]);
@@ -47,6 +46,7 @@ const AddCaseForm = ({ onCancel }) => {
   const location = useLocation();
   const userdata = location.state;
   const editdata = userdata?.[0] || null;
+  console.log(editdata);
 
   const {
     register,
@@ -105,12 +105,47 @@ const AddCaseForm = ({ onCancel }) => {
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-      telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email || true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms || true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp || true
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true
     }
   });
+
+  useEffect(() => {
+    if (editdata) {
+      if (editdata.contactPreferences) {
+        if (editdata.contactPreferences.preferredMethod) {
+          setValue('preferredContact', editdata.contactPreferences.preferredMethod);
+        }
+
+        if (editdata.contactPreferences.reason) {
+          setValue('reason', editdata.contactPreferences.reason);
+        }
+
+        if (editdata.contactPreferences.contactPurposes) {
+          setValue('contactPurpose', editdata.contactPreferences.contactPurposes);
+        }
+
+        if (editdata.contactPreferences.dateOfConfirmation) {
+          setValue('confirmationDate', editdata.contactPreferences.dateOfConfirmation);
+        }
+
+        if (editdata.contactPreferences.contactMethods) {
+          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? true);
+          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
+          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
+          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
+        }
+      }
+    }
+  }, [editdata, setValue]);
+
+  const restrictAccessValue = watch('restrictAccess');
+  const telephoneValue = watch('telephone');
+  const emailConsentValue = watch('emailConsent');
+  const smsValue = watch('sms');
+  const whatsappValue = watch('whatsapp');
 
   const ethnicityOptions = [
     'Arabic or North African',
@@ -144,22 +179,7 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getApi(urls.configuration.fetch);
-        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
-        setReason(filterreason);
-        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
-        setContactpurpose(filtercontactpurpose);
-        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
-        setContactmethod(filtercontactmethod);
-      } catch (error) {
-        console.error('Error fetching config:', error);
-      }
-    };
-    fetchData();
-  }, []);
+
   const districts = [
     { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
     { label: 'Adur District', value: 'adur_district' },
@@ -179,6 +199,22 @@ const AddCaseForm = ({ onCancel }) => {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
@@ -218,7 +254,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('otherInfo[eventAttanded]', formData.eventsAttended || '');
     fd.append('otherInfo[fundingInterest]', formData.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities || '');
-    fd.append('otherInfo[restrictAccess]', restrictAccess);
+    fd.append('otherInfo[restrictAccess]', formData.restrictAccess ? 'true' : 'false');
 
     fd.append('emergencyContact[firstName]', formData.firstname || '');
     fd.append('emergencyContact[lastName]', formData.lastname || '');
@@ -245,14 +281,13 @@ const AddCaseForm = ({ onCancel }) => {
     if (formData.reason) {
       fd.append('contactPreferences[reason]', formData.reason);
     }
-
     const confirmDate = formData.confirmationDate;
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 
-    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone || '');
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent || '');
-    fd.append('contactPreferences[contactMethods][sms]', formData.sms || '');
-    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp || '');
+    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
 
     fd.append('role', 'user');
     fd.append('isActive', true);
@@ -592,7 +627,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.ethnicity"
                                 control={control}
-                                // rules={{ required: 'Ethnicity is required' }}
+                                rules={{ required: 'Ethnicity is required' }}
                                 render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={ethnicityOptions}
@@ -654,7 +689,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="phone"
                                 control={control}
                                 rules={{
-                                  // required: 'Phone number is required',
+                                  required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -687,7 +722,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="mobilePhone"
                                 control={control}
                                 rules={{
-                                  // required: 'Phone number is required',
+                                  required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -801,7 +836,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="town"
                                 control={control}
                                 rules={{
-                                  // required: 'Town is required',
+                                  required: 'Town is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Town must be at least 2 characters'
@@ -934,7 +969,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="pinCode"
                                 control={control}
                                 rules={{
-                                  // required: 'Postcode is required',
+                                  required: 'Postcode is required',
                                   minLength: {
                                     value: 5,
                                     message: 'Postcode must be at least 5 characters'
@@ -969,6 +1004,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="language"
                                 control={control}
                                 rules={{
+                                  required: 'This is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Last name must be at least 2 characters'
@@ -1008,6 +1044,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="otherId"
                                 control={control}
                                 rules={{
+                                  required: 'Other Id is required',
                                   minLength: {
                                     value: 3,
                                     message: 'Other Id must be at least 3 characters'
@@ -1329,7 +1366,7 @@ const AddCaseForm = ({ onCancel }) => {
                               name="riskNotes"
                               control={control}
                               rules={{
-                                // required: 'Notes are required',
+                                required: 'Notes are required',
                                 minLength: {
                                   value: 10,
                                   message: 'Notes must be at least 10 characters long'
@@ -1370,7 +1407,6 @@ const AddCaseForm = ({ onCancel }) => {
                             <Controller
                               name="restrictAccess"
                               control={control}
-                              defaultValue={true}
                               render={({ field }) => (
                                 <FormControlLabel
                                   control={
@@ -1390,7 +1426,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="contained" onClick={() => handleTabChange(tabIndex + 1)}>
+                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
                         Next
                       </Button>
                     </Grid>
@@ -1412,7 +1448,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="title"
                                 control={control}
-                                // rules={{ required: 'Title is required' }}
+                                rules={{ required: 'Title is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -1437,7 +1473,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="gender"
                                 control={control}
-                                // rules={{ required: 'Gender is required' }}
+                                rules={{ required: 'Gender is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -1461,7 +1497,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="firstname"
                                 control={control}
                                 rules={{
-                                  // required: 'First name is required',
+                                  required: 'First name is required',
                                   minLength: {
                                     value: 2,
                                     message: 'First name must be at least 2 characters'
@@ -1500,7 +1536,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="lastname"
                                 control={control}
                                 rules={{
-                                  // required: 'Last name is required',
+                                  required: 'Last name is required',
                                   minLength: {
                                     value: 2,
                                     message: 'Last name must be at least 2 characters'
@@ -1539,7 +1575,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="preferred"
                                 control={control}
                                 rules={{
-                                  // required: 'Relationship to service user is required',
+                                  required: 'Relationship to service user is required',
                                   maxLength: {
                                     value: 30,
                                     message: 'Preferred known as cannot exceed 30 characters'
@@ -1574,7 +1610,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyhomePhone"
                                 control={control}
                                 rules={{
-                                  // required: 'Phone number is required',
+                                  required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -1607,7 +1643,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyphone"
                                 control={control}
                                 rules={{
-                                  // required: 'Phone number is required',
+                                  required: 'Phone number is required',
                                   pattern: {
                                     value: /^[0-9]{10,12}$/,
                                     message: 'Phone number must be between 10 and 12 digits'
@@ -1640,7 +1676,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyemail"
                                 control={control}
                                 rules={{
-                                  // required: 'Email is required',
+                                  required: 'Email is required',
                                   pattern: {
                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: 'Invalid email address'
@@ -1664,7 +1700,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencyaddress"
                                 control={control}
                                 rules={{
-                                  // required: 'Address is required',
+                                  required: 'Address is required',
                                   minLength: {
                                     value: 5,
                                     message: 'Address must be at least 5 characters'
@@ -1732,9 +1768,9 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="emergencycountry"
                                 control={control}
-                                // rules={{
-                                //   required: 'Country is required'
-                                // }}
+                                rules={{
+                                  required: 'Country is required'
+                                }}
                                 render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={countryList}
@@ -1792,7 +1828,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencytown"
                                 control={control}
                                 rules={{
-                                  // required: 'Town is required',
+                                  required: 'Town is required',
                                   pattern: {
                                     value: onlyLetters,
                                     message: 'Town can only contain letters'
@@ -1824,7 +1860,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="emergencypinCode"
                                 control={control}
                                 rules={{
-                                  // required: 'Postcode is required',
+                                  required: 'Postcode is required',
                                   minLength: {
                                     value: 5,
                                     message: 'Postcode must be at least 5 characters'
@@ -1861,7 +1897,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="contained" onClick={() => handleTabChange(tabIndex + 1)}>
+                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
                         Next
                       </Button>
                     </Grid>
@@ -1875,9 +1911,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="preferredContact"
                       control={control}
-                      // rules={{
-                      //   required: 'Preferred method of contact is required'
-                      // }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1901,9 +1934,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="contactPurpose"
                       control={control}
-                      // rules={{
-                      //   required: 'Contact purpose is required'
-                      // }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1927,9 +1957,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="confirmationDate"
                       control={control}
-                      // rules={{
-                      //   required: 'Confirmation Date is required'
-                      // }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
@@ -1954,9 +1981,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="reason"
                       control={control}
-                      // rules={{
-                      //   required: 'Reason is required'
-                      // }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1982,7 +2006,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="Telephone"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -1996,7 +2020,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="Email"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2010,7 +2034,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="SMS"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2024,7 +2048,7 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                           label="Whatsapp"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2034,7 +2058,7 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/users')}>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
                         CANCEL
                       </Button>
                     </Grid>

@@ -530,7 +530,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 {
                     "type": "text",
                     "required": false,
-                    "label": "If yes, please provide any details that would help us understand your needs and ensure appropriate accommodations.",
+                    "label": "If yes, please provide any details that would help us understand your needs and ensure appropriate accommodations",
                     "className": "form-control",
                     "name": "text-1747390671327-0",
                     "subtype": "text"
@@ -538,7 +538,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 {
                     "type": "select",
                     "required": true,
-                    "label": "Please choose which session you will be attending.",
+                    "label": "Please choose which session you will be attending",
                     "className": "form-control",
                     "name": "select-1747390674293-0",
                     "values": [
@@ -875,7 +875,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 {
                     "type": "textarea",
                     "required": true,
-                    "label": "I'd also like to add... ",
+                    "label": "I'd also like to add...",
                     "className": "form-control",
                     "name": "textarea-1747731154988-0",
                     "subtype": "textarea"

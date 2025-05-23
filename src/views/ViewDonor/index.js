@@ -172,18 +172,44 @@ const UserProfileCard = () => {
                     style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
                   />
                   <Grid item xs>
-                    <Typography component="span">
+                    <Typography component="span" fontWeight="600" lineHeight="2">
                       {personalInfo.firstName || personalInfo.lastName
                         ? `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim()
                         : companyInformation.companyName || 'N/A'}
                     </Typography>
 
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <Typography variant="body2" color={isActive ? 'green' : 'red'}>
+                      <Box sx={{ position: 'relative', width: 16, height: 16 }}>
+                        <Box
+                          sx={{
+                            width: 16,
+                            height: 16,
+                            borderRadius: '50%',
+                            border: `1.5px solid ${isActive ? 'green' : 'red'}`,
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            backgroundColor: isActive ? 'green' : 'red',
+                            position: 'absolute',
+                            top: '4px',
+                            left: '4px'
+                          }}
+                        />
+                      </Box>
+
+                      <Typography variant="body2" color={isActive ? 'green' : 'red'} lineHeight="2">
                         {isActive ? 'ACTIVE DONOR' : 'INACTIVE DONOR'}
                       </Typography>
                     </Stack>
-                    <Typography variant="body2" color="textSecondary">
+
+                    <Typography variant="body2" color="textSecondary" lineHeight="2">
                       {contactInfo.email}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
@@ -253,9 +279,9 @@ const UserProfileCard = () => {
             </Tabs>
 
             {tabValue === 0 && (
-              <Grid container>
+              <Grid container sx={{ px: '10px', py: '20px' }}>
                 <Grid item xs={12} md={6}>
-                  <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
+                  <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '245px' }}>
                     <CardContent>
                       <Typography variant="h6" fontWeight="bold" gutterBottom>
                         About
@@ -265,15 +291,15 @@ const UserProfileCard = () => {
                           <>
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Full Name:</span>{' '}
-                                  <Typography component="span" fontSize="12px">
+                                  <Typography component="span" fontSize="12px" fontWeight="400">
                                     {personalInfo?.firstName} {personalInfo?.lastName}
                                   </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Phone:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {contactInfo?.phone}
@@ -281,15 +307,15 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>DOB:</span>{' '}
-                                  <Typography fontSize="12px">
+                                  <Typography component="span" fontSize="12px">
                                     {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
                                   </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Age:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {personalInfo?.dateOfBirth
@@ -298,30 +324,54 @@ const UserProfileCard = () => {
                                   </Typography>
                                 </Typography>
                               </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
+                                  <span>Donor ID:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    1765
+                                  </Typography>
+                                </Typography>
+                              </Box>
                             </Grid>
 
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
-                                  <span>Address:</span>{' '}
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
+                                  <span>Total Donation:</span>{' '}
                                   <Typography component="span" fontSize="12px">
-                                    {contactInfo?.addressLine1}
+                                    $5,000
                                   </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px">
-                                  <strong>Country:</strong>{' '}
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
+                                  <span>Number of Donation:</span>{' '}
                                   <Typography component="span" fontSize="12px">
-                                    {contactInfo?.country}
+                                    06
                                   </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
-                                  <span>Telephone no:</span>{' '}
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
+                                  <span>Last Donation Date:</span>{' '}
                                   <Typography component="span" fontSize="12px">
-                                    {contactInfo?.homePhone}
+                                    31/10/2024
+                                  </Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
+                                  <span>Largest Donation:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    $1,500(January 10,2025)
+                                  </Typography>
+                                </Typography>
+                              </Box>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
+                                  <span>Donation Purpose:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    Education & Healthcare
                                   </Typography>
                                 </Typography>
                               </Box>
@@ -333,7 +383,7 @@ const UserProfileCard = () => {
                           <>
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Company Name:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.companyName}
@@ -341,7 +391,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Contact person Name:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.mainContactName}
@@ -349,7 +399,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Email:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {contactInfo.email}
@@ -360,7 +410,7 @@ const UserProfileCard = () => {
 
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Recruitment Campaign:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.recruitmentCampaign?.name}
@@ -368,7 +418,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Social Media Link:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {companyInformation.socialMediaLinks}
@@ -376,7 +426,7 @@ const UserProfileCard = () => {
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                   <span>Phone no.:</span>{' '}
                                   <Typography component="span" fontSize="12px">
                                     {contactInfo.phone}
@@ -392,73 +442,84 @@ const UserProfileCard = () => {
                 </Grid>
 
                 <Grid item xs={12} md={6}>
-                  <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
+                  <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '245px' }}>
                     <CardContent>
-                      <Typography variant="subtitle1" fontWeight="bold" color="#042E4C" gutterBottom fontSize="12px">
+                      <Typography variant="subtitle1" fontWeight="bold" color="#042E4C" gutterBottom fontSize="12px" lineHeight="2">
                         GDPR
                       </Typography>
 
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
-                          <Typography variant="body2" fontSize="12px" fontWeight="600">
-                            Email:{' '}
-                            <Typography component="span" fontWeight="normal" fontSize="12px">
-                              {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography variant="body2" fontSize="12px" fontWeight="600" lineHeight="2">
+                              Email:{' '}
+                              <Typography component="span" fontWeight="normal" fontSize="12px">
+                                {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
+                              </Typography>
                             </Typography>
-                          </Typography>
+                          </Box>
 
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            Telephone:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              Telephone:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
+                              </Typography>
                             </Typography>
-                          </Typography>
-
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            SMS:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
+                          </Box>
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              SMS:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
+                              </Typography>
                             </Typography>
-                          </Typography>
-
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            Letter:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
+                          </Box>
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              Letter:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
+                              </Typography>
                             </Typography>
-                          </Typography>
+                          </Box>
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              Reason:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.reason?.name || 'N/A'}
+                              </Typography>
+                            </Typography>
+                          </Box>
                         </Grid>
 
                         <Grid item xs={6}>
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            Reason:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.reason?.name || 'N/A'}
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              Contact purposes:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.contactPurposes?.name || 'N/A'}
+                              </Typography>
                             </Typography>
-                          </Typography>
-
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            Contact purposes:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.contactPurposes?.name || 'N/A'}
+                          </Box>
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              Preferred Method of Contact:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.preferredMethod?.name || 'N/A'}
+                              </Typography>
                             </Typography>
-                          </Typography>
-
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            Preferred Method of Contact:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.preferredMethod?.name || 'N/A'}
+                          </Box>
+                          <Box display="flex" alignItems="center" mb={1}>
+                            <Typography fontWeight="600" variant="body2" fontSize="12px" lineHeight="2">
+                              Date of confirmation:{' '}
+                              <Typography component="span" fontSize="12px">
+                                {contactPreferences?.dateOfConfirmation
+                                  ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
+                                  : 'N/A'}
+                              </Typography>
                             </Typography>
-                          </Typography>
-
-                          <Typography fontWeight="600" variant="body2" fontSize="12px">
-                            Date of confirmation:{' '}
-                            <Typography component="span" fontSize="12px">
-                              {contactPreferences?.dateOfConfirmation
-                                ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
-                                : 'N/A'}
-                            </Typography>
-                          </Typography>
+                          </Box>
                         </Grid>
                       </Grid>
                     </CardContent>

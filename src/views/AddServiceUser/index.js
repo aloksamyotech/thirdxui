@@ -38,7 +38,6 @@ const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
-  const [restrictAccess, setRestrictAccess] = useState(false);
   const [isLoading, setIsloading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [contactpurpose, setContactpurpose] = useState([]);
@@ -104,12 +103,47 @@ const AddCaseForm = ({ onCancel }) => {
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-      telephone: editdata?.contactPreferences?.contactMethods?.telephone || true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email || true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms || true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp || true
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true
     }
   });
+
+  useEffect(() => {
+    if (editdata) {
+      if (editdata.contactPreferences) {
+        if (editdata.contactPreferences.preferredMethod && editdata.contactPreferences.preferredMethod._id) {
+          setValue('preferredContact', editdata.contactPreferences.preferredMethod._id);
+        }
+        
+        if (editdata.contactPreferences.reason && editdata.contactPreferences.reason._id) {
+          setValue('reason', editdata.contactPreferences.reason._id);
+        }
+        
+        if (editdata.contactPreferences.contactPurposes && editdata.contactPreferences.contactPurposes._id) {
+          setValue('contactPurpose', editdata.contactPreferences.contactPurposes._id);
+        }
+
+        if (editdata.contactPreferences.dateOfConfirmation) {
+          setValue('confirmationDate', editdata.contactPreferences.dateOfConfirmation);
+        }
+
+        if (editdata.contactPreferences.contactMethods) {
+          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? true);
+          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
+          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
+          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
+        }
+      }
+    }
+  }, [editdata, setValue]);
+
+  const restrictAccessValue = watch('restrictAccess');
+  const telephoneValue = watch('telephone');
+  const emailConsentValue = watch('emailConsent');
+  const smsValue = watch('sms');
+  const whatsappValue = watch('whatsapp');
 
   const ethnicityOptions = [
     'Arabic or North African',
@@ -179,6 +213,7 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchData();
   }, []);
+
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -217,7 +252,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('otherInfo[eventAttanded]', formData.eventsAttended || '');
     fd.append('otherInfo[fundingInterest]', formData.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities || '');
-    fd.append('otherInfo[restrictAccess]', restrictAccess);
+    fd.append('otherInfo[restrictAccess]', formData.restrictAccess? 'true' : 'false');
 
     fd.append('emergencyContact[firstName]', formData.firstname || '');
     fd.append('emergencyContact[lastName]', formData.lastname || '');
@@ -247,10 +282,10 @@ const AddCaseForm = ({ onCancel }) => {
     const confirmDate = formData.confirmationDate;
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 
-    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone || '');
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent || '');
-    fd.append('contactPreferences[contactMethods][sms]', formData.sms || '');
-    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp || '');
+    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
 
     fd.append('role', 'service_user');
     fd.append('isActive', true);
@@ -336,21 +371,6 @@ const AddCaseForm = ({ onCancel }) => {
     2: ['preferredContact', 'reason', 'contactPurpose', 'confirmDate', 'telephone', 'emailConsent', 'sms', 'letter', 'whatsapp']
   };
 
-  // const handleTabChange = async (newIndex) => {
-  //   if (newIndex < tabIndex) {
-  //     setTabIndex(newIndex);
-  //     return;
-  //   }
-
-  //   const currentFields = tabFieldMap[tabIndex];
-  //   const isValid = await trigger(currentFields);
-
-  //   if (isValid) {
-  //     setTabIndex(newIndex);
-  //   } else {
-  //     toast.error('Please fix validation errors before continuing.');
-  //   }
-  // };
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
@@ -1385,11 +1405,14 @@ const AddCaseForm = ({ onCancel }) => {
                             <Controller
                               name="restrictAccess"
                               control={control}
-                              defaultValue={true}
                               render={({ field }) => (
                                 <FormControlLabel
                                   control={
-                                    <AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                                    <AntSwitch
+                                      {...field}
+                                      checked={field.value}
+                                      onChange={(e) => field.onChange(e.target.checked)}
+                                    />
                                   }
                                   label="Restrict Access"
                                   labelPlacement="start"
@@ -1890,9 +1913,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="preferredContact"
                       control={control}
-                      rules={{
-                        required: 'Preferred method of contact is required'
-                      }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1916,9 +1936,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="contactPurpose"
                       control={control}
-                      rules={{
-                        required: 'Contact purpose is required'
-                      }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1942,9 +1959,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="confirmationDate"
                       control={control}
-                      rules={{
-                        required: 'Confirmation Date is required'
-                      }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker
@@ -1969,9 +1983,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="reason"
                       control={control}
-                      rules={{
-                        required: 'Reason is required'
-                      }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1997,7 +2008,13 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={
+                            <AntSwitch
+                              {...field}
+                              checked={field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                            />
+                          }
                           label="Telephone"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2011,7 +2028,13 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={
+                            <AntSwitch
+                              {...field}
+                              checked={field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                            />
+                          }
                           label="Email"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2025,7 +2048,13 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={
+                            <AntSwitch
+                              {...field}
+                              checked={field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                            />
+                          }
                           label="SMS"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}
@@ -2039,7 +2068,13 @@ const AddCaseForm = ({ onCancel }) => {
                       control={control}
                       render={({ field }) => (
                         <FormControlLabel
-                          control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                          control={
+                            <AntSwitch
+                              {...field}
+                              checked={field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                            />
+                          }
                           label="Whatsapp"
                           labelPlacement="start"
                           sx={{ display: 'flex', gap: '10px' }}

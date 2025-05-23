@@ -147,7 +147,7 @@ const Lead = () => {
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
           owner: user?.serviceType || '',
-          status: user?.serviceStatus === 'Active' ? 'Open' : 'Closed'
+          status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });
 
@@ -180,6 +180,7 @@ const Lead = () => {
 
     try {
       const response = await getApi(`${urls.case.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+
       const allCases = response?.data?.data || [];
 
       const formatDate = (dateString) => {
@@ -200,7 +201,7 @@ const Lead = () => {
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
           owner: user?.serviceType || '',
-          status: user?.serviceStatus === 'Active' ? 'Open' : 'Closed'
+          status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });
 
@@ -338,9 +339,9 @@ const Lead = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -361,19 +362,13 @@ const Lead = () => {
                             display: 'flex',
                             alignItems: 'self-start',
                             justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)'
                           }}
                         >
                           <SingleRowLoader />
                         </Box>
                       ),
-                      noRowsOverlay: () => (
-                        loading ? null : (
-                          <Box sx={{ padding: 2, textAlign: 'center' }}>
-                            No data available.
-                          </Box>
-                        )
-                      ),
+                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                     }}
                     checkboxSelection
                     onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}
@@ -381,7 +376,7 @@ const Lead = () => {
                       '& .MuiDataGrid-row': {
                         borderBottom: '1px solid #ccc',
                         cursor: 'pointer'
-                      },
+                      }
                     }}
                   />
                 </Card>

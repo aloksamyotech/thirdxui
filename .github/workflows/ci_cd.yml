@@ -3,7 +3,7 @@ name: Deploy to new-dev
 on:
   push:
     branches:
-      - new-dev
+      - development
   workflow_dispatch:  # Enable manual trigger
 
 jobs:

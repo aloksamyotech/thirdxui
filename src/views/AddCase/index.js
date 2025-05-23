@@ -34,7 +34,6 @@ const AddCaseForm = () => {
       serviceUserId: '',
       serviceId: '',
       serviceType: '',
-      serviceStatus: '',
       caseOpened: null,
       caseClosed: null,
       benificiary: '',
@@ -70,7 +69,6 @@ const AddCaseForm = () => {
       formData.append('serviceUserId', data.serviceUserId || '');
       formData.append('serviceId', data.serviceId || '');
       formData.append('serviceType', data.serviceType || '');
-      formData.append('serviceStatus', data.serviceStatus || '');
       formData.append('caseOpened', data.caseOpened || '');
       formData.append('caseClosed', data.caseClosed || '');
       formData.append('benificiary', data.benificiary || '');
@@ -79,7 +77,7 @@ const AddCaseForm = () => {
       formData.append('fundingInterest', data.fundingInterests || '');
       formData.append('fundraisingActivities', data.fundraisingActivities || '');
       formData.append('description', data.description || '');
-      formData.append('isActive', data.isActive || '');
+      formData.append('isActive', data.serviceStatus);
       if (data.file) {
         formData.append('file', data.file || '');
       }
@@ -292,18 +290,26 @@ const AddCaseForm = () => {
                       <FormControl fullWidth size="small" error={!!errors.serviceStatus}>
                         <InputLabel id="status-label">Service Status</InputLabel>
                         <Select {...field} labelId="status-label" label="Service Status">
-                          {['Active', 'Inactive'].map((status) => (
-                            <MenuItem key={status} value={status}>
-                              <Chip
-                                label={status}
-                                sx={{
-                                  color: status === 'Active' ? '#79dbfb' : '#ff6a67',
-                                  backgroundColor: status === 'Active' ? '#e5f8fe' : '#ffeae9',
-                                  fontWeight: 500
-                                }}
-                              />
-                            </MenuItem>
-                          ))}
+                          <MenuItem value="true">
+                            <Chip
+                              label="Active"
+                              sx={{
+                                color: '#79dbfb',
+                                backgroundColor: '#e5f8fe',
+                                fontWeight: 500
+                              }}
+                            />
+                          </MenuItem>
+                          <MenuItem value="false">
+                            <Chip
+                              label="Inactive"
+                              sx={{
+                                color: '#ff6a67',
+                                backgroundColor: '#ffeae9',
+                                fontWeight: 500
+                              }}
+                            />
+                          </MenuItem>
                         </Select>
                       </FormControl>
                     )}
@@ -316,7 +322,7 @@ const AddCaseForm = () => {
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2 }}>
                   <Typography variant="subtitle1" mb={2}>
-                   Case Tag
+                    Case Tag
                   </Typography>
 
                   <Grid container spacing={2}>

@@ -96,6 +96,27 @@ const AddDonorForm = () => {
     }
   });
 
+    useEffect(() => {
+      if (editdata) {
+        setValue('preferredContact', editdata?.contactPreferences?.preferredMethod?._id || '');
+        setValue('reason', editdata?.contactPreferences?.reason?._id || '');
+        setValue('contactPurpose', editdata?.contactPreferences?.contactPurposes?._id || '');
+        setValue('confirmationDate', editdata?.contactPreferences?.dateOfConfirmation || null);
+        setValue('telephone', editdata?.contactPreferences?.contactMethods?.telephone ?? true);
+        setValue('emailConsent', editdata?.contactPreferences?.contactMethods?.email ?? true);
+        setValue('sms', editdata?.contactPreferences?.contactMethods?.sms ?? true);
+        setValue('whatsapp', editdata?.contactPreferences?.contactMethods?.whatsapp ?? true);
+        setValue('donortag', editdata?.contactPreferences?.contactMethods?.donortag ?? true);
+      }
+    }, [editdata, setValue]);
+
+    const restrictAccessValue = watch('restrictAccess');
+      const telephoneValue = watch('telephone');
+      const emailConsentValue = watch('emailConsent');
+      const smsValue = watch('sms');
+      const donortagValue = watch('donortag');
+      const whatsappValue = watch('whatsapp');
+
   const [restrictAccess, setRestrictAccess] = useState(true);
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
@@ -175,7 +196,7 @@ const AddDonorForm = () => {
     fd.append('otherInfo[eventAttanded]', data.eventsAttended || '');
     fd.append('otherInfo[fundingInterest]', data.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
-    fd.append('otherInfo[restrictAccess]', restrictAccess || '');
+    fd.append('otherInfo[restrictAccess]', data.restrictAccess ? 'true' : 'false');
     if (data.preferredContact) {
       fd.append('contactPreferences[preferredMethod]', data.preferredContact);
     }
@@ -191,11 +212,11 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ?? true);
-    fd.append('contactPreferences[contactMethods][donor]', data.donortag ?? true);
-    fd.append('contactPreferences[contactMethods][sms]', data.sms ?? true);
-    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ?? true);
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ?? true);
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donor]', data.donortag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ? 'true' : 'false');
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
     if (data.Recruitmentcampaign) {
@@ -242,38 +263,6 @@ const AddDonorForm = () => {
     { label: 'Basildon Borough', value: 'basildon_borough' }
   ];
 
-  // const handleTabChange = async (newValue) => {
-  //   if (newValue > tabIndex) {
-  //     const firstTabFields = [
-  //       'title',
-  //       'firstname',
-  //       'lastname',
-  //       'phone',
-  //       'email',
-  //       'gender',
-  //       'dob',
-  //       'address',
-  //       'country',
-  //       'pinCode',
-  //       'riskNotes',
-  //       'socialmedia',
-  //       'district'
-  //     ];
-
-  //     try {
-  //       const isValid = await trigger(firstTabFields);
-  //       if (isValid) {
-  //         setTabIndex(newValue);
-  //       } else {
-  //         toast.error('Please fill all required fields before proceeding');
-  //       }
-  //     } catch (error) {
-  //       toast.error('Error validating form fields');
-  //     }
-  //   } else {
-  //     setTabIndex(newValue);
-  //   }
-  // };
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
@@ -1380,9 +1369,10 @@ const AddDonorForm = () => {
                       <Controller
                         name="donortag"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Donor Tag"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1394,9 +1384,10 @@ const AddDonorForm = () => {
                       <Controller
                         name="emailConsent"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Email"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1408,9 +1399,10 @@ const AddDonorForm = () => {
                       <Controller
                         name="sms"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="SMS"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1422,9 +1414,10 @@ const AddDonorForm = () => {
                       <Controller
                         name="telephone"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Telephone"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1437,9 +1430,10 @@ const AddDonorForm = () => {
                       <Controller
                         name="whatsapp"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Whatsapp"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}

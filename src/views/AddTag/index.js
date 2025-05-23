@@ -35,11 +35,13 @@ import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import moment from 'moment';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import { useEffect } from 'react';
 
 const TagForm = () => {
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState([]);
+  const [filteredTags, setFilteredTags] = useState([]);
   const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,17 +75,28 @@ const TagForm = () => {
   const handleTagChange = async (selectedTagCategory) => {
     try {
       setIsloading(true);
-      const response = await getApi(urls.tag.getAllTags);
-
-      const filteredTags = response?.data?.allTags?.filter((item) => item.tagCategoryName === selectedTagCategory);
-
-      setTags(filteredTags);
+      const filtered = tags.filter((item) => item.tagCategoryName === selectedTagCategory);
+      setFilteredTags(filtered);
     } catch (error) {
       console.error('Error fetching tags for selected category:', error);
     } finally {
       setIsloading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+        setTags(response?.data?.allTags);
+        setFilteredTags(response?.data?.allTags);
+      } catch (error) {
+        console.error('Failed to fetch tags:', error);
+      }
+    };
+
+    fetchTags();
+  }, [isModalOpen]);
 
   const handleStatusChange = async (tagId, newStatus) => {
     try {
@@ -97,21 +110,21 @@ const TagForm = () => {
   };
 
   const columns = [
-    { field: 'tagCategoryName', headerName: 'Tag Category Name', flex: 1 },
-    { field: 'name', headerName: 'Tag Name', flex: 1 },
-    { field: 'tagDescription', headerName: 'Tag Description', flex: 1 },
-    {
-      field: 'startDate',
-      headerName: 'Start Date',
-      flex: 1,
-      valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
-    },
-    {
-      field: 'endDate',
-      headerName: 'End Date',
-      flex: 1,
-      valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
-    },
+    // { field: 'tagCategoryName', headerName: 'Tag Category Name', flex: 1 },
+    { field: 'name', headerName: 'Configrution', flex: 1 },
+    // { field: 'tagDescription', headerName: 'Tag Description', flex: 1 },
+    // {
+    //   field: 'startDate',
+    //   headerName: 'Start Date',
+    //   flex: 1,
+    //   valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
+    // },
+    // {
+    //   field: 'endDate',
+    //   headerName: 'End Date',
+    //   flex: 1,
+    //   valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
+    // },
 
     {
       field: 'isActive',
@@ -255,28 +268,8 @@ const TagForm = () => {
               }}
             />
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Tags can be applied to" value={tags} onChange={(e) => setTags(e.target.value)} size="small" />
-          </Grid> */}
 
           <Grid item xs={12} sm={6}>
-            {/* <Controller
-              name="tagCategoryName"
-              control={control}
-              rules={{
-                required: 'Tag Category is required'
-              }}
-              render={({ field }) => (
-                <TextField {...field} select fullWidth label="Tags can be applied to" size="small">
-                  {categoryOptions?.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            /> */}
-
             <Controller
               name="tagCategoryName"
               control={control}
@@ -338,7 +331,7 @@ const TagForm = () => {
         <Box width="100%" sx={{ mt: 1 }}>
           <Card style={{ height: '100%', minHeight: '200' }}>
             <DataGrid
-              rows={tags}
+              rows={filteredTags}
               columns={columns}
               getRowId={(row) => row._id}
               slots={{
@@ -350,19 +343,13 @@ const TagForm = () => {
                       display: 'flex',
                       alignItems: 'self-start',
                       justifyContent: 'center',
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)'
                     }}
                   >
                     <SingleRowLoader />
                   </Box>
                 ),
-                noRowsOverlay: () => (
-                  isLoading ? null : (
-                    <Box sx={{ padding: 2, textAlign: 'center' }}>
-                      No data available.
-                    </Box>
-                  )
-                ),
+                noRowsOverlay: () => (isLoading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
               }}
               pagination={false}
               hideFooter

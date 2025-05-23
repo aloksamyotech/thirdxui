@@ -1,5 +1,5 @@
-const baseUrl = 'https://thirdex.samyotech.in/api/v1';
-export const imageUrl = 'https://thirdex.samyotech.in';
+const baseUrl = process.env.REACT_APP_BASE_URL;
+export const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
 export const urls = Object.freeze({
   baseUrl,
@@ -10,7 +10,7 @@ export const urls = Object.freeze({
     updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`,
     delete: `${baseUrl}/config/deleteconfiguration/:configId`,
     updatedData: `${baseUrl}/config/updateConfigurationData/:configId`,
-    fetchWithPagination: `${baseUrl}/config/allwithpagination`,
+    fetchWithPagination: `${baseUrl}/config/allwithpagination`
   },
   serviceuser: {
     create: `${baseUrl}/user/adduser`,

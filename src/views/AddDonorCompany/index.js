@@ -87,21 +87,22 @@ const AddCaseForm = ({ onCancel }) => {
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
       donortag: editdata?.contactPreferences?.contactMethods?.donortag ?? true,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-      reason: editdata?.contactPreferences?.reason || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      reason: editdata?.contactPreferences?.reason ?._id|| '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
       companyname: editdata?.companyInformation?.companyName || '',
       contactname: editdata?.companyInformation?.mainContactName || '',
       otherId: editdata?.companyInformation?.otherId || '',
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
-      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       Beneficiary: editdata?.otherInfo?.benificiary || '',
       Campaigns: editdata?.otherInfo?.campaigns || '',
       engagement: editdata?.otherInfo?.engagement || '',
       eventsAttended: editdata?.otherInfo?.eventAttanded || '',
       fundingInterests: editdata?.otherInfo?.fundingInterest || '',
-      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || ''
+      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
+      restrictAccess: editdata?.otherInfo?.restrictAccess || false
     }
   });
 
@@ -172,7 +173,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('otherInfo[eventAttanded]', data.eventsAttended || '');
     fd.append('otherInfo[fundingInterest]', data.fundingInterests || '');
     fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
-    fd.append('otherInfo[restrictAccess]', restrictAccess || '');
+    fd.append('otherInfo[restrictAccess]', data.restrictAccess ? 'true' : 'false');
 
     if (data.preferredContact) {
       fd.append('contactPreferences[preferredMethod]', data.preferredContact);
@@ -187,11 +188,11 @@ const AddCaseForm = ({ onCancel }) => {
     }
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
 
-    fd.append('contactPreferences[contactMethods][donortag]', data.donortag || '');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent || '');
-    fd.append('contactPreferences[contactMethods][sms]', data.sms || '');
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone || '');
-    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp || '');
+    fd.append('contactPreferences[contactMethods][donortag]', data.donortag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
 
     fd.append('companyInformation[companyName]', data.companyname || '');
     fd.append('companyInformation[mainContactName]', data.contactname || '');
@@ -1038,9 +1039,10 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="donortag"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Donor Tag"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1052,9 +1054,10 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="emailConsent"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Email"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1066,9 +1069,10 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="sms"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="SMS"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1080,9 +1084,10 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="telephone"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Telephone"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}
@@ -1095,9 +1100,10 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="whatsapp"
                         control={control}
+                        defaultValue={false}
                         render={({ field }) => (
                           <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={field.onChange} />}
+                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                             label="Whatsapp"
                             labelPlacement="start"
                             sx={{ display: 'flex', gap: '10px' }}

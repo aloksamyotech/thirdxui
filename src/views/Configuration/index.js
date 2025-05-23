@@ -8,12 +8,14 @@ import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import { IconTrash, IconPencil } from '@tabler/icons';
+import CommonConfirmDialog from '../../components/deleteDialog';
 
 const defaultTabTypes = [
   'Contact Types',
   'Referral Types',
   'Contact Purpose',
   'Campaign',
+  'Location',
   'Key Indicators',
   'Payment Method',
   'Archive Reason',
@@ -35,6 +37,8 @@ const TabbedDataGrid = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [inputError, setInputError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
     pageSize: 100
@@ -49,11 +53,16 @@ const TabbedDataGrid = () => {
     setModalSection(sectionName);
     setOpenModal(true);
   };
-
-  const handleDelete = async (id) => {
-    await updateApi(urls.configuration.delete.replace(':configId', id));
+  const handleDeleteClick = (id) => {
+    setSelectedId(id);
+    setConfirmOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    await updateApi(urls.configuration.delete.replace(':configId', selectedId));
     await fetchConfigurations();
     toast.success('Item deleted successfully!');
+    setConfirmOpen(false);
+    setSelectedId(null);
   };
 
   const handleOpenModal = (section) => {
@@ -127,7 +136,7 @@ const TabbedDataGrid = () => {
   };
 
   const handleFilter = () => {
-    setPaginationModel(prev => ({
+    setPaginationModel((prev) => ({
       ...prev,
       page: 1
     }));
@@ -143,8 +152,8 @@ const TabbedDataGrid = () => {
       setInputError('This field is required');
       return false;
     }
-    if (!/^[A-Za-z\s]+$/.test(value)) {
-      setInputError('Only letters and spaces are allowed');
+    if (!/^[A-Za-z0-9\s]+$/.test(value)) {
+      setInputError('Only letters, numbers and spaces are allowed');
       return false;
     }
     if (value.length < 1 || value.length > 25) {
@@ -265,19 +274,19 @@ const TabbedDataGrid = () => {
           configurationNameFilter={configurationNameFilter}
           setConfigurationNameFilter={(val) => {
             setConfigurationNameFilter(val);
-            setPaginationModel(prev => ({ ...prev, page: 1 }));
+            setPaginationModel((prev) => ({ ...prev, page: 1 }));
           }}
           statusFilter={status}
           setStatusFilter={(val) => {
             setStatus(val);
-            setPaginationModel(prev => ({ ...prev, page: 1 }));
+            setPaginationModel((prev) => ({ ...prev, page: 1 }));
           }}
           selectedFilters={['configurationNameFilter', 'statusFilter']}
           onReset={() => {
             setConfigurationNameFilter('');
             setStatus('');
             setSearchQuery('');
-            setPaginationModel(prev => ({ ...prev, page: 1 }));
+            setPaginationModel((prev) => ({ ...prev, page: 1 }));
             fetchConfigurations();
           }}
         />
@@ -368,9 +377,18 @@ const TabbedDataGrid = () => {
                             <IconButton onClick={() => handleEdit(item)}>
                               <IconPencil color="orangered" size={18} />
                             </IconButton>
-                            <IconButton onClick={() => handleDelete(item.id)}>
+                            <IconButton onClick={() => handleDeleteClick(item.id)}>
                               <IconTrash color="orangered" size={18} />
                             </IconButton>
+                            <CommonConfirmDialog
+                              open={confirmOpen}
+                              onClose={() => setConfirmOpen(false)}
+                              onConfirm={handleConfirmDelete}
+                              content="Are you sure you want to delete ?"
+                              title="⚠️ Delete"
+                              confirmText="Delete"
+                              cancelText="Cancel"
+                            />
                           </Box>
                         </Box>
                       ))
@@ -394,7 +412,7 @@ const TabbedDataGrid = () => {
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 420,
-            height: 160,
+            height: 'auto',
             bgcolor: '#fff',
             p: 2,
             borderRadius: '8px',

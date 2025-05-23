@@ -1,13 +1,14 @@
-name: Deploy to samyotech
+name: Deploy to develop
 
 on:
   push:
     branches:
-      - "samyotech"
+      - develop
+  workflow_dispatch:  # Enable manual trigger
 
 jobs:
   redeploy_frontend:
-    name: Deploy frontend to samyotech
+    name: Deploy frontend to develop
     runs-on: ubuntu-latest
 
     steps:
@@ -17,17 +18,16 @@ jobs:
       - name: SSH Into Server and Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 139.59.19.212
-          username: root
-          password: ${{ secrets.SERVER_PASSWORD }}
+          host: 16.16.205.158
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /thirdx/thirdxui
-            git stash
-            git fetch --all
-            git checkout samyotech
-            git pull origin samyotech
+            cd /thiredx/thirdxui
+            sudo git stash
+            sudo git fetch --all
+            sudo git checkout develop
+            sudo git pull origin develop
             git log -1
-            npm install -f
-            npm run build | tee build.log
-
+            sudo npm install -f
+            sudo npm run build

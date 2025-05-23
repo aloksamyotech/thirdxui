@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip, Chip } from '@mui/material';
 import { DataGrid, GridToolbarExport, GridToolbarContainer } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -10,6 +10,7 @@ import FilterPanel from 'components/FilterPanel';
 import { useNavigate } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const Lead = () => {
   const navigate = useNavigate();
@@ -23,6 +24,12 @@ const Lead = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFiltered, setIsFiltered] = useState(false);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const [loading, setLoading] = useState(true);
+  const [totalRows, setTotalRows] = useState(0);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
@@ -55,13 +62,12 @@ const Lead = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            CASE LIST
+            Case List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -82,9 +88,11 @@ const Lead = () => {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          variant="outlined"
+          icon={params.value === 'Open' ? <CheckIcon /> : <LoopIcon />}
           sx={{
-            borderColor: params.value === 'Open' ? 'green' : 'gray'
+            borderColor: params.value === 'gray',
+            backgroundColor: 'transparent'
           }}
         />
       )
@@ -100,15 +108,13 @@ const Lead = () => {
       if (serviceType && serviceType !== '') {
         queryParams.append('serviceId', serviceType);
       }
-      if (status && status !== '') {
-        queryParams.append('serviceStatus', status);
-      }
+      if (status) queryParams.append('status', status === 'active');
       if (owner && owner !== '') {
         queryParams.append('serviceType', owner);
       }
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
-        queryParams.append('caseOpened', formattedDate);
+        queryParams.append('createdAt', formattedDate);
       }
 
       if (searchQuery && searchQuery !== '') {
@@ -116,10 +122,12 @@ const Lead = () => {
       }
 
       const queryString = queryParams.toString();
-      const url = `${urls.case.filterType}${queryString ? `?${queryString}` : ''}`;
+      const url = `${urls.case.fetchWithPagination}?${queryParams.toString()}`;
+
       const response = await getApi(url);
 
-    const filteredCases = response?.data || [];
+      const filteredCases = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
       const formatDate = (dateString) => {
         if (!dateString) return '';
@@ -133,7 +141,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
@@ -144,6 +152,7 @@ const Lead = () => {
       });
 
       setRows(formattedUsers);
+      setTotalRows(pagination?.total);
       setIsFiltered(true);
     } catch (error) {
       console.error('Failed to fetch filtered cases:', error);
@@ -167,9 +176,11 @@ const Lead = () => {
   }, [serviceType, status, owner, dateOpenedFilter, searchQuery]);
 
   const fetchInitialData = async () => {
+    setLoading(true);
+
     try {
-      const response = await getApi(urls.case.fetch);
-      const allCases = response?.data || [];
+      const response = await getApi(`${urls.case.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const allCases = response?.data?.data || [];
 
       const formatDate = (dateString) => {
         if (!dateString) return '';
@@ -178,27 +189,38 @@ const Lead = () => {
       };
 
       const formattedUsers = allCases?.map((user, index) => {
-        const firstName = user?.userServiceDetails?.personalInfo?.firstName || '';
-        const lastName = user?.userServiceDetails?.personalInfo?.lastName || '';
+        const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
+        const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
 
         return {
           id: user?._id,
-          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
-          serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
-          service: user?.serviceDetails?.name || '',
+          serviceUser: `${firstName} ${lastName}`.trim() || '',
+          service: user?.serviceId?.name || '',
           owner: user?.serviceType || '',
           status: user?.serviceStatus === 'Active' ? 'Open' : 'Closed'
         };
       });
 
-      setRows(formattedUsers);
+      const pagination = response?.data?.meta || { total: 0 };
 
-      const uniqueServiceTypes = [...new Set(allCases.map((item) => item?.serviceDetails).filter(Boolean))].map((service) => ({
-        value: service._id,
-        label: service.name
-      }));
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      const serviceMap = new Map();
+
+      allCases.forEach((item) => {
+        const service = item.serviceId;
+        if (service && !serviceMap.has(service._id)) {
+          serviceMap.set(service._id, {
+            label: service.name,
+            value: service._id
+          });
+        }
+      });
+
+      const uniqueServiceTypes = Array.from(serviceMap.values());
 
       setServiceTypeFilterOptions(uniqueServiceTypes);
 
@@ -209,12 +231,14 @@ const Lead = () => {
       setOwnerFilters(uniqueOwners);
     } catch (error) {
       console.error('Failed to fetch services:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [paginationModel]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -230,9 +254,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -248,22 +271,44 @@ const Lead = () => {
               Add New Case <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-
-          <TextField
-            size="small"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleFilter();
-              }
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
             }}
-            InputProps={{
-              endAdornment: <SearchIcon onClick={handleFilter} style={{ cursor: 'pointer' }} />
-            }}
-            sx={{ width: '350px' }}
-          />
+          >
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
         </Stack>
         <Grid container spacing={2}>
           <FilterPanel
@@ -287,23 +332,56 @@ const Lead = () => {
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
-                    rows={rows}
+                    rows={
+                      loading
+                        ? []
+                        : rows.map((row, index) => ({
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
+                    }
                     columns={columns}
-                    rowHeight={60}
-                    checkboxSelection
-                    components={{
-                      Toolbar: () => <CustomHeader />
-                    }}
-                    onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}
+                    rowCount={totalRows}
+                    loading={loading}
+                    pagination
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    pageSizeOptions={[10]}
+                    rowHeight={65}
                     getRowId={(row) => row.id}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10]}
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (
+                        loading ? null : (
+                          <Box sx={{ padding: 2, textAlign: 'center' }}>
+                            No data available.
+                          </Box>
+                        )
+                      ),
+                    }}
+                    checkboxSelection
+                    onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}
                     sx={{
                       '& .MuiDataGrid-row': {
-                        borderBottom: '1px solid #ccc'
-                      }
+                        borderBottom: '1px solid #ccc',
+                        cursor: 'pointer'
+                      },
                     }}
                   />
                 </Card>

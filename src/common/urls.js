@@ -1,6 +1,6 @@
-// const baseUrl = 'https://thirdex.samyotech.in/api/v1';
-const baseUrl = 'http://139.59.19.212:81/api/v1';
-export const imageUrl = 'https://thirdex.samyotech.in/';
+const baseUrl = process.env.REACT_APP_BASE_URL;
+export const imageUrl = process.env.REACT_APP_IMAGE_URL;
+
 
 // const baseUrl = 'http://localhost:7201/api/v1';
 // export const imageUrl = 'http://localhost:7200/';
@@ -14,6 +14,7 @@ export const urls = Object.freeze({
     updateStatus: `${baseUrl}/config/updateconfigurationstatus/:configId`,
     delete: `${baseUrl}/config/deleteconfiguration/:configId`,
     updatedData: `${baseUrl}/config/updateConfigurationData/:configId`,
+    fetchWithPagination: `${baseUrl}/config/allwithpagination`
   },
   serviceuser: {
     create: `${baseUrl}/user/adduser`,
@@ -27,7 +28,8 @@ export const urls = Object.freeze({
     editUser: `${baseUrl}/user/edituser`,
     deleteUser: `${baseUrl}/user/deleteuser`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
-    archive:`${baseUrl}/user/archive`,
+    archive: `${baseUrl}/user/archive`,
+    unarchive: `${baseUrl}/user/unarchive`
   },
   service: {
     create: `${baseUrl}/services/addServices`,
@@ -41,23 +43,25 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/cases/getAllCases`,
     delete: `${baseUrl}/cases/deleteCase/:id`,
     filterType: `${baseUrl}/cases/search`,
-    getById: `${baseUrl}/cases/getCaseById/:id`
+    getById: `${baseUrl}/cases/getCaseById/:id`,
+    fetchWithPagination: `${baseUrl}/cases/allwithpagination`
   },
   mail: {
     create: `${baseUrl}/mail/addmail`,
     fetch: `${baseUrl}/mail/getallmail`,
-    filterType: `${baseUrl}/mail/filter`
+    filterType: `${baseUrl}/mail/filter`,
+    fetchWithPagination: `${baseUrl}/mail/allwithpagination`
   },
   transaction: {
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
     filterType: `${baseUrl}/transaction/filter`,
-     fetchWithPagination:`${baseUrl}/transaction/allwithpagination`,
-
-
+    fetchWithPagination: `${baseUrl}/transaction/allwithpagination`
   },
   tag: {
-    create: `${baseUrl}/tag/addtag`
+    create: `${baseUrl}/tag/`,
+    getAllTags: `${baseUrl}/tag/getalltag`,
+    updateStatus: `${baseUrl}/tag/updateStatus`
   },
   session: {
     create: `${baseUrl}/session/addSession`,
@@ -77,5 +81,8 @@ export const urls = Object.freeze({
   },
   responses: {
     submit: `${baseUrl}/responses`
+  },
+  attendees: {
+    create: `${baseUrl}/attendees/addAttendee`
   }
 });

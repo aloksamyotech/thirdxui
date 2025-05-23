@@ -3,7 +3,7 @@ const config = {
   // like '/crm-material-react/react/default'
   basename: '/',
   defaultPath: '/dashboard/default',
-  fontFamily: `'Roboto', sans-serif`,
+  fontFamily: 'Poppins',
   borderRadius: 12
 };
 

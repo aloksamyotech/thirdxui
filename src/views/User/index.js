@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button, InputBase } from '@mui/material';
 import TableStyle from '../../ui-component/TableStyle';
 import { Close } from '@mui/icons-material';
 import { IconTrash, IconPencil } from '@tabler/icons';
@@ -12,6 +12,7 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
 import { getApi, updateApi } from 'common/apiClient';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
@@ -19,17 +20,19 @@ const User = () => {
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
+  const [countryOfOriginFilter, setCountryOfOriginFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [allData, setAllData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
   });
   const navigate = useNavigate();
-
+ 
   const columns = [
     {
       field: 'name',
@@ -37,7 +40,9 @@ const User = () => {
       flex: 2,
       renderCell: (params) => (
         <Box>
-          <Typography sx={{ fontWeight: 'bold' }}>{params.row.name}</Typography>
+          <Typography sx={{ fontWeight: '450' }} mb={1}>
+            {params.row.name}
+          </Typography>
           <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
         </Box>
       )
@@ -50,9 +55,12 @@ const User = () => {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'green' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+          variant="outlined"
           sx={{
-            borderColor: params.value === 'Open' ? 'green' : 'gray'
+            borderColor: params.value === 'Open' ? '#808080' : '#808080',
+            backgroundColor: 'transparent',
+            color: params.value === 'Open' ? '#808080' : '#808080'
           }}
         />
       )
@@ -71,7 +79,7 @@ const User = () => {
       )
     },
     { field: 'age', headerName: 'Age', flex: 1 },
-
+ 
     {
       field: 'actions',
       headerName: 'Manage',
@@ -88,7 +96,7 @@ const User = () => {
       )
     }
   ];
-
+ 
   const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -106,13 +114,13 @@ const User = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '450',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            USER LIST
+            User List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -125,19 +133,19 @@ const User = () => {
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' }
   ];
-
+ 
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
     { value: 'week', label: 'Last 7 Days' },
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
   ];
-
+ 
   const nameFilter = [
     { value: 'name1', label: 'Name 1' },
     { value: 'name2', label: 'Name 2' }
   ];
-
+ 
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -150,10 +158,10 @@ const User = () => {
         setCountriesWithFlags(countries);
       });
   }, []);
-
+ 
   const fetchUser = async () => {
     if (countriesWithFlags.length === 0) return;
-
+ 
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
@@ -163,17 +171,34 @@ const User = () => {
         role: 'user'
       });
 
-      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      if (searchQuery) {
+        queryParams.append('search', searchQuery);
+      }
+      if (status) queryParams.append('status', status === 'active');
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+      if (countryOfOriginFilter) {
+        const selectedCountry = countriesWithFlags.find(country => country.value === countryOfOriginFilter);
+        if (selectedCountry) {
+          queryParams.append('country', selectedCountry.label);
+        }
+      }
+      if (name) {
+        queryParams.append('name', name);
+      }
 
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+ 
       const allUser = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-
+ 
       setAllData(allUser);
-
       const formattedUsers = allUser?.map((user, index) => {
         const dob = new Date(user.personalInfo?.dateOfBirth);
         const today = new Date();
-
+ 
         let age = '';
         if (!isNaN(dob)) {
           age = today.getFullYear() - dob.getFullYear();
@@ -182,10 +207,10 @@ const User = () => {
             age--;
           }
         }
-
+ 
         const countryName = user?.contactInfo?.country || '';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
-
+ 
         return {
           id: user?._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
@@ -198,30 +223,43 @@ const User = () => {
           status: user?.isActive === 'Active' ? 'Open' : 'Closed'
         };
       });
-
+ 
       setRows(formattedUsers);
       setTotalRows(pagination?.total);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
   };
-
+ 
   useEffect(() => {
     fetchUser();
-  }, [countriesWithFlags, paginationModel]);
+  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, name, searchQuery, countryOfOriginFilter]);
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
-
+ 
     try {
       const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
       fetchUser();
     } catch (error) {
       console.error('Error deleting user:', error);
     }
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleReset = () => {
+    setStatus('');
+    setDateOpenedFilter('');
+    setNameFilter('');
+    setSearchQuery('');
+    setCountryOfOriginFilter('');
+    fetchUser();
   };
 
   return (
@@ -235,9 +273,8 @@ const User = () => {
                 sx={{
                   backgroundColor: '#009fc7',
                   borderRadius: '4px',
-                  width: 'auto',
+                  width: '220px',
                   height: '35px',
-                  px: 2,
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -254,33 +291,63 @@ const User = () => {
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
               }}
-              sx={{ width: '350px' }}
-            />
+            >
+              <InputBase
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                onClick={fetchUser}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
           </Stack>
-
+ 
           <Grid container spacing={2}>
             <FilterPanel
               showFilter={showFilter}
               statuses={statusFilter}
-              setStatusFilter={setStatus}
+              statusFilter={status}
+              setStatusFilter={(value) => setStatus(value)}
               dateAddedFilters={dateAddedFilters}
-              setDateAddedFilter={setDateOpenedFilter}
+              dateOpenedFilter={dateOpenedFilter}
+              setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
               names={nameFilter}
               setNameFilter={setNameFilter}
               countriesWithFlags={countriesWithFlags}
-              selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter']}
+              countryOfOriginFilter={countryOfOriginFilter}
+              setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
+              selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
+              onReset={handleReset}
+              onApply={fetchUser}
             />
             <Grid item xs={9}>
               <TableStyle>
                 <Box width="100%">
-                  <Card style={{ height: 'auto' }}>
+                  <Card style={{ height: '100vh' }}>
                     <DataGrid
                       rows={
                         loading
@@ -298,8 +365,30 @@ const User = () => {
                       paginationModel={paginationModel}
                       onPaginationModelChange={setPaginationModel}
                       pageSizeOptions={[10]}
-                      components={{
-                        Toolbar: () => <CustomHeader />
+                      checkboxSelection
+                      rowHeight={65}
+                      slots={{
+                        toolbar: () => <CustomHeader />,
+                        loadingOverlay: () => (
+                          <Box
+                            sx={{
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'self-start',
+                              justifyContent: 'center',
+                              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                            }}
+                          >
+                            <SingleRowLoader />
+                          </Box>
+                        ),
+                        noRowsOverlay: () => (
+                          loading ? null : (
+                            <Box sx={{ padding: 2, textAlign: 'center' }}>
+                              No data available.
+                            </Box>
+                          )
+                        ),
                       }}
                       getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                       sx={{
@@ -335,7 +424,7 @@ const User = () => {
               <Close />
             </IconButton>
           </Stack>
-
+ 
           <TextField fullWidth label="Invite user via their email" variant="outlined" sx={{ mb: 2 }} />
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button variant="contained" sx={{ backgroundColor: '#053146' }}>
@@ -350,5 +439,5 @@ const User = () => {
     </>
   );
 };
-
+ 
 export default User;

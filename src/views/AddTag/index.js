@@ -12,33 +12,43 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
+  InputBase,
+  Chip,
+  MenuItem
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SearchIcon from '@mui/icons-material/Search';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import AntSwitch from 'components/AntSwitch.js';
 import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { postApi } from 'common/apiClient';
+import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import moment from 'moment';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const TagForm = () => {
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
-  const [tags, setTags] = useState('');
+  const [tags, setTags] = useState([]);
   const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsloading] = useState(false);
 
-
-  const { control, handleSubmit, setValue } = useForm({
+  const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
+      tagDescription: '',
+      tagCategoryName: '',
       name: '',
       startDate: null,
       endDate: null,
@@ -50,7 +60,9 @@ const TagForm = () => {
     try {
       const response = await postApi(urls.tag.create, data);
       toast.success('Tag created successfully');
+
       setIsModalOpen(false);
+      reset();
     } catch (error) {
       console.error('Error creating tag:', error);
     } finally {
@@ -58,25 +70,71 @@ const TagForm = () => {
     }
   };
 
-  const handleTagChange = (e) => {
-    setTagData({ ...tagData, [e.target.name]: e.target.value });
+  const handleTagChange = async (selectedTagCategory) => {
+    try {
+      setIsloading(true);
+      const response = await getApi(urls.tag.getAllTags);
+
+      const filteredTags = response?.data?.allTags?.filter((item) => item.tagCategoryName === selectedTagCategory);
+
+      setTags(filteredTags);
+    } catch (error) {
+      console.error('Error fetching tags for selected category:', error);
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  const handleStatusChange = async (tagId, newStatus) => {
+    try {
+      await updateApi(`${urls.tag.updateStatus}/${tagId}`, {
+        isActive: newStatus
+      });
+      toast.success('Tag update successfully');
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Configuration', flex: 1 },
+    { field: 'tagCategoryName', headerName: 'Tag Category Name', flex: 1 },
+    { field: 'name', headerName: 'Tag Name', flex: 1 },
+    { field: 'tagDescription', headerName: 'Tag Description', flex: 1 },
     {
-      field: 'status',
+      field: 'startDate',
+      headerName: 'Start Date',
+      flex: 1,
+      valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
+    },
+    {
+      field: 'endDate',
+      headerName: 'End Date',
+      flex: 1,
+      valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
+    },
+
+    {
+      field: 'isActive',
       headerName: 'Status',
-      renderCell: (params) => <AntSwitch defaultChecked={params.value} color="primary" />,
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        const handleToggle = (event) => {
+          const newStatus = event.target.checked;
+          handleStatusChange(params.row._id, newStatus);
+        };
+
+        return <AntSwitch defaultChecked={params.value} color="primary" onChange={handleToggle} />;
+      }
     }
   ];
 
-  const rows = [
-    { id: 1, name: 'Adoption Enquirer', status: true },
-    { id: 2, name: 'Adoption Gift Recipients', status: true },
-    { id: 3, name: 'Past Adopters', status: true },
-    { id: 4, name: 'Current Adopters', status: true }
+  const categoryOptions = [
+    'Beneficiary Information',
+    'Campaigns Supported',
+    'Engagement',
+    'Event Attended',
+    'Funding Interests',
+    'Fundraising Activities'
   ];
 
   const CustomHeader = () => {
@@ -97,24 +155,54 @@ const TagForm = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '450',
               color: '#333',
               ml: 2,
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            TAG LIST
+            Tag List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
               }}
-              sx={{ width: '250px' }}
-            />
+            >
+              <InputBase
+                placeholder="Search..."
+                // value={searchQuery}
+                // onChange={handleSearchChange}
+                // onKeyPress={(e) => {
+                //   if (e.key === 'Enter') {
+                //     handleFilter();
+                //   }
+                // }}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                // onClick={handleFilter}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
           </Box>
         </GridToolbarContainer>
       </Box>
@@ -124,37 +212,101 @@ const TagForm = () => {
   return (
     <Grid>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
+        <Typography variant="h5" sx={{ fontWeight: '450', color: '#333' }}>
           Add Tag Category
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/tags')}>
-          <ArrowBackIcon sx={{ color: 'grey' }} />
-          <Typography variant="h6" sx={{ mr: 1 }}>
-            Back
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/tags')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
       </Box>
 
       <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
-        <Grid container spacing={2} alignItems="center" mt={1}>
+        <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={6}>
-            <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" />
+            {/* <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" /> */}
+            <Controller
+              name="tagDescription"
+              control={control}
+              render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+            />
           </Grid>
+
           <Grid item xs={12} sm={3}>
             <FormControlLabel
               control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />}
               label="Active?"
               labelPlacement="start"
+              sx={{
+                '.MuiFormControlLabel-label': {
+                  mr: 1
+                }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Tags can be applied to" value={tags} onChange={(e) => setTags(e.target.value)} size="small" />
+          </Grid> */}
+
+          <Grid item xs={12} sm={6}>
+            {/* <Controller
+              name="tagCategoryName"
+              control={control}
+              rules={{
+                required: 'Tag Category is required'
+              }}
+              render={({ field }) => (
+                <TextField {...field} select fullWidth label="Tags can be applied to" size="small">
+                  {categoryOptions?.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            /> */}
+
+            <Controller
+              name="tagCategoryName"
+              control={control}
+              rules={{ required: 'Tag Category is required' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  fullWidth
+                  label="Tags can be applied to"
+                  size="small"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleTagChange(e.target.value);
+                  }}
+                >
+                  {categoryOptions?.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
           </Grid>
         </Grid>
 
         <Grid item xs={12} mt={2}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2} spacing={2} sx={{ width: '100%' }}>
-            <Typography sx={{ fontWeight: 'bold' }}>Tags in this Category</Typography>
+            <Typography sx={{ fontWeight: '450' }}>Tags in this Category</Typography>
 
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography>Add Tags</Typography>
@@ -183,13 +335,35 @@ const TagForm = () => {
           </Stack>
         </Grid>
 
-        <Box width="100%" sx={{ mt: 2 }}>
-          <Card>
+        <Box width="100%" sx={{ mt: 1 }}>
+          <Card style={{ height: '100%', minHeight: '200' }}>
             <DataGrid
-              rows={rows}
+              rows={tags}
               columns={columns}
-              getRowId={(row) => row.id}
-              components={{ Toolbar: CustomHeader }}
+              getRowId={(row) => row._id}
+              slots={{
+                toolbar: () => <CustomHeader />,
+                loadingOverlay: () => (
+                  <Box
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'self-start',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    }}
+                  >
+                    <SingleRowLoader />
+                  </Box>
+                ),
+                noRowsOverlay: () => (
+                  isLoading ? null : (
+                    <Box sx={{ padding: 2, textAlign: 'center' }}>
+                      No data available.
+                    </Box>
+                  )
+                ),
+              }}
               pagination={false}
               hideFooter
               sx={{
@@ -205,12 +379,12 @@ const TagForm = () => {
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
               <Button variant="contained" sx={{ background: '#053146' }}>
-                Save Changes
+                SAVE CHANGES
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="error">
-                Cancel
+              <Button variant="outlined" color="error" onClick={() => navigate('/tags')}>
+                CANCEL
               </Button>
             </Grid>
           </Grid>

@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-no-undef */
 import { useState, useEffect, useMemo } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,6 +10,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const districts = [
   { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
@@ -43,9 +45,10 @@ const Lead = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -83,13 +86,13 @@ const Lead = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            PEOPLE LIST
+            People List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -109,7 +112,7 @@ const Lead = () => {
           <Stack direction="row" alignItems="center" spacing={2}>
             <PersonIcon />
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: 450 }}>
                 {params.row.firstName} {params.row.lastName} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -120,7 +123,7 @@ const Lead = () => {
 
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon color="action" />
+              <InfoIcon sx={{ color: '#49494c' }} />
             </IconButton>
           </Tooltip>
         </Stack>
@@ -144,7 +147,9 @@ const Lead = () => {
 
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-      queryParams.append('archive', 'false');
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
       queryParams.append('role', 'service_user');
 
       const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
@@ -174,13 +179,18 @@ const Lead = () => {
     if (districtFilter || genderFilter || dateOpenedFilter || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [districtFilter, genderFilter, dateOpenedFilter || searchQuery]);
+  }, [districtFilter, genderFilter, dateOpenedFilter, searchQuery]);
+
+  useEffect(() => {
+    handleFilter();
+  }, [includeArchives]);
 
   const handleReset = () => {
     setDistrictFilter('');
     setGenderFilter('');
     setDateOpenedFilter('');
     setSearchQuery('');
+    setIncludeArchives(false);
     setIsFiltered(false);
     fetchpeople();
   };
@@ -195,9 +205,12 @@ const Lead = () => {
       const queryParams = new URLSearchParams({
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
-        archive: 'false',
         role: 'service_user'
       });
+
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
@@ -235,9 +248,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -253,17 +265,44 @@ const Lead = () => {
               Add New Service User <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-
-          <TextField
-            size="small"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            InputProps={{
-              endAdornment: <SearchIcon />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
             }}
-            sx={{ width: '350px' }}
-          />
+          >
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
         </Stack>
         <Grid container spacing={2}>
           <FilterPanel
@@ -279,20 +318,22 @@ const Lead = () => {
             dateAddedFilters={dateAddedFilters}
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter']}
+            includeArchives={includeArchives}
+            setIncludeArchives={setIncludeArchives}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
           />
 
           <Grid item xs={9}>
-            <Card style={{ height: 'auto' }}>
+            <Card style={{ height: '100vh' }}>
               <DataGrid
                 rows={
                   loading
                     ? []
                     : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                      ...row,
+                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                    }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -305,8 +346,28 @@ const Lead = () => {
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (
+                    loading ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                  ),
                 }}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
@@ -315,6 +376,9 @@ const Lead = () => {
                   '& .MuiDataGrid-cell': {
                     textAlign: 'left',
                     fontSize: '14px'
+                  },
+                  '& .MuiDataGrid-row': {
+                    cursor: 'pointer'
                   }
                 }}
                 disableSelectionOnClick

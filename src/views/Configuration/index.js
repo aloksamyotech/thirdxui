@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button } from '@mui/material';
+import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button, InputBase } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import AntSwitch from 'components/AntSwitch';
-import { postApi, getApi, updateApi, deleteApi } from 'common/apiClient';
+import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import { IconTrash, IconPencil } from '@tabler/icons';
@@ -29,13 +29,16 @@ const TabbedDataGrid = () => {
   const [configurationNameFilter, setConfigurationNameFilter] = useState('');
   const [modalSection, setModalSection] = useState('');
   const [editMode, setEditMode] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
   const [editId, setEditId] = useState(null);
   const [status, setStatus] = useState('');
   const [tabData, setTabData] = useState({});
-  const [selectedTab, setSelectedTab] = useState(0);
   const [showFilter, setShowFilter] = useState(true);
   const [inputError, setInputError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [paginationModel, setPaginationModel] = useState({
+    page: 1,
+    pageSize: 100
+  });
 
   const handleEdit = (item) => {
     setInputValue(item.name);
@@ -48,26 +51,9 @@ const TabbedDataGrid = () => {
   };
 
   const handleDelete = async (id) => {
-    const res = await updateApi(urls.configuration.delete.replace(':configId', id));
+    await updateApi(urls.configuration.delete.replace(':configId', id));
     await fetchConfigurations();
     toast.success('Item deleted successfully!');
-  };
-
-  const handleUpdateConfiguration = () => {
-    if (!inputValue.trim()) {
-      setInputError('This field is required.');
-      return;
-    }
-
-    const res = updateApi(urls.configuration.updatedData.replace(':configId', id));
-    const updatedItems = items.map((item) => (item.id === currentItem.id ? { ...item, name: inputValue, status: toggleValue } : item));
-
-    setItems(updatedItems);
-    setOpenModal(false);
-    setInputValue('');
-    setInputError('');
-    setEditMode(false);
-    setCurrentItem(null);
   };
 
   const handleOpenModal = (section) => {
@@ -75,7 +61,6 @@ const TabbedDataGrid = () => {
     setInputValue('');
     setToggleValue(true);
     setEditMode(false);
-    setCurrentItem(null);
     setOpenModal(true);
   };
 
@@ -86,6 +71,10 @@ const TabbedDataGrid = () => {
     setEditMode(false);
     setEditId(null);
     setInputError('');
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
   };
 
   const configTypeFilter = useMemo(() => {
@@ -102,15 +91,25 @@ const TabbedDataGrid = () => {
 
   const fetchConfigurations = async () => {
     try {
-      const res = await getApi(urls.configuration.fetch);
-      const data = res?.data?.allConfiguration || [];
-
-      const grouped = {};
-      defaultTabTypes.forEach((type) => {
-        grouped[type] = [];
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page,
+        limit: paginationModel.pageSize,
+        search: searchQuery,
+        status: status === 'active' ? 'true' : status === 'inactive' ? 'false' : '',
+        configurationType: configurationNameFilter
       });
 
-      data.forEach((item) => {
+      const response = await getApi(`${urls.configuration.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const grouped = {};
+      if (configurationNameFilter) {
+        grouped[configurationNameFilter] = [];
+      } else {
+        defaultTabTypes.forEach((type) => {
+          grouped[type] = [];
+        });
+      }
+      allUser?.forEach((item) => {
         const type = item.configurationType;
         if (!grouped[type]) {
           grouped[type] = [];
@@ -123,46 +122,21 @@ const TabbedDataGrid = () => {
       });
       setTabData(grouped);
     } catch (error) {
-      toast.error('Error fetching configurations:', error);
+      toast.error('Error fetching configurations');
     }
   };
 
-  const fetchFilteredConfigurations = async (type, statusFilterVal) => {
-    try {
-      let url = `${urls.configuration.filterType}?type=${encodeURIComponent(type)}`;
-      if (statusFilterVal !== '') {
-        url += `&status=${statusFilterVal === 'active' ? 'true' : 'false'}`;
-      }
-
-      const res = await getApi(url);
-      const filteredData = res?.data || [];
-
-      const filteredByStatus =
-        statusFilterVal !== ''
-          ? filteredData.filter((item) => String(item.isActive) === (statusFilterVal === 'active' ? 'true' : 'false'))
-          : filteredData;
-
-      const grouped = {
-        [type]: filteredByStatus.map((item) => ({
-          id: item._id,
-          name: item.name,
-          status: item.isActive
-        }))
-      };
-
-      setTabData(grouped);
-    } catch (error) {
-      toast.error('Error fetching filtered configurations');
-    }
+  const handleFilter = () => {
+    setPaginationModel(prev => ({
+      ...prev,
+      page: 1
+    }));
+    fetchConfigurations();
   };
 
   useEffect(() => {
-    if (configurationNameFilter) {
-      fetchFilteredConfigurations(configurationNameFilter, status);
-    } else {
-      fetchConfigurations();
-    }
-  }, [configurationNameFilter, status]);
+    fetchConfigurations();
+  }, [paginationModel.page, paginationModel.pageSize, configurationNameFilter, status, searchQuery]);
 
   const validateInput = (value) => {
     if (!value) {
@@ -191,22 +165,19 @@ const TabbedDataGrid = () => {
     if (!validateInput(inputValue)) {
       return;
     }
-
     const payload = {
       name: inputValue,
       isActive: toggleValue,
       configurationType: modalSection
     };
-
     try {
       if (editMode) {
-        const res = await updateApi(urls.configuration.updatedData.replace(':configId', editId), payload);
+        await updateApi(urls.configuration.updatedData.replace(':configId', editId), payload);
         toast.success('Item updated successfully!');
       } else {
-        const res = await postApi(urls.configuration.create, payload);
+        await postApi(urls.configuration.create, payload);
         toast.success('Item added successfully!');
       }
-
       fetchConfigurations();
       handleCloseModal();
       setEditMode(false);
@@ -221,19 +192,20 @@ const TabbedDataGrid = () => {
       const payload = {
         isActive: newStatus
       };
-
       const url = `${urls.configuration.updateStatus.replace(':configId', itemId)}`;
-
       const res = await updateApi(url, payload);
       if (res?.data) {
         setTabData((prevData) => {
           const newData = { ...prevData };
-          Object.keys(newData).forEach((type) => {
-            newData[type] = newData[type].map((item) => (item.id === itemId ? { ...item, status: newStatus } : item));
-          });
+          for (const type in newData) {
+            const idx = newData[type].findIndex((item) => item.id === itemId);
+            if (idx !== -1) {
+              newData[type][idx] = { ...newData[type][idx], status: newStatus };
+              break;
+            }
+          }
           return newData;
         });
-
         const statusMessage = newStatus ? 'Active' : 'Inactive';
         toast.success(`Status updated to ${statusMessage}`);
       }
@@ -242,19 +214,49 @@ const TabbedDataGrid = () => {
     }
   };
 
-  const resetFilters = () => {
-    setSelectedSection('');
-    setStatus('');
-    fetchConfigurations();
-  };
-
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">Configurations</Typography>
-        <TextField size="small" placeholder="Search..." InputProps={{ endAdornment: <SearchIcon /> }} sx={{ width: '350px' }} />
+        <Typography variant="h5">Configurations</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '30px',
+            paddingLeft: '16px',
+            border: '1px solid #e0e0e0',
+            width: '350px',
+            height: '40px'
+          }}
+        >
+          <InputBase
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleFilter();
+              }
+            }}
+            sx={{
+              flex: 1,
+              color: 'text.primary'
+            }}
+          />
+          <IconButton
+            onClick={handleFilter}
+            sx={{
+              marginRight: '8px',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </Box>
       </Stack>
-
       <Grid container spacing={2}>
         <FilterPanel
           showFilter={showFilter}
@@ -263,15 +265,22 @@ const TabbedDataGrid = () => {
           configurationNameFilter={configurationNameFilter}
           setConfigurationNameFilter={(val) => {
             setConfigurationNameFilter(val);
+            setPaginationModel(prev => ({ ...prev, page: 1 }));
           }}
           statusFilter={status}
           setStatusFilter={(val) => {
             setStatus(val);
+            setPaginationModel(prev => ({ ...prev, page: 1 }));
           }}
           selectedFilters={['configurationNameFilter', 'statusFilter']}
-          onReset={resetFilters}
+          onReset={() => {
+            setConfigurationNameFilter('');
+            setStatus('');
+            setSearchQuery('');
+            setPaginationModel(prev => ({ ...prev, page: 1 }));
+            fetchConfigurations();
+          }}
         />
-
         <Grid item xs={9}>
           <Grid container spacing={2}>
             {Object.entries(tabData).map(([section, items]) => (
@@ -298,7 +307,7 @@ const TabbedDataGrid = () => {
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      <Typography variant="subtitle1" fontWeight="bold">
+                      <Typography variant="h6" fontWeight="500">
                         {section}
                       </Typography>
                       <IconButton
@@ -306,9 +315,8 @@ const TabbedDataGrid = () => {
                         sx={{
                           backgroundColor: '#41C048',
                           borderRadius: '50%',
-                          width: '25px',
-                          height: '25px',
-                          boxShadow: 3,
+                          width: '20px',
+                          height: '20px',
                           color: 'white',
                           '&:hover': { backgroundColor: '#41C048' }
                         }}
@@ -317,7 +325,6 @@ const TabbedDataGrid = () => {
                       </IconButton>
                     </Box>
                   </Box>
-
                   <Box sx={{ px: 2, py: 1, backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="subtitle2" fontWeight="medium">
@@ -355,7 +362,6 @@ const TabbedDataGrid = () => {
                           >
                             {item.name}
                           </Typography>
-
                           <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
                             <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
                             &nbsp;
@@ -379,110 +385,106 @@ const TabbedDataGrid = () => {
             ))}
           </Grid>
         </Grid>
-
-        <Modal open={openModal} onClose={handleCloseModal}>
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 420,
-              height: 160,
-              bgcolor: '#fff',
-              p: 2,
-              borderRadius: '8px',
-              boxShadow: 24,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt:1 }}>
-              <TextField
-                placeholder="New item"
-                value={inputValue}
-                onChange={handleInputChange}
-                error={!!inputError}
-                helperText={inputError}
-                inputProps={{
-                  maxLength: 25,
-                  style: {
-                    fontSize: '14px',
-                    padding: '10px 12px'
-                  }
-                }}
-                sx={{
-                  width: '65%',
-                  '& .MuiInputBase-root': {
-                    height: '40px',
-                    fontSize: '14px'
-                  },
-                  '& .MuiOutlinedInput-input': {
-                    padding: '0 12px'
-                  }
-                }}
-                variant="outlined"
-              />
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '35%' }}>
-                <Typography sx={{ fontSize: '14px', mb: 0.5, ml: 2 }}>Active Or Inactive?</Typography>
-                <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ml:-8}}/>
-              </Box>
-            </Box>
-
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 2,
-                mt: 4
+      </Grid>
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 420,
+            height: 160,
+            bgcolor: '#fff',
+            p: 2,
+            borderRadius: '8px',
+            boxShadow: 24
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: 1 }}>
+            <TextField
+              placeholder="New item"
+              value={inputValue}
+              onChange={handleInputChange}
+              error={!!inputError}
+              helperText={inputError}
+              inputProps={{
+                maxLength: 25,
+                style: {
+                  fontSize: '14px',
+                  padding: '10px 12px'
+                }
               }}
-            >
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: '#053146',
-                  borderRadius: '8px',
-                  width: '35%',
-                  height: '30px',
-                  fontSize: '12px',
-                  textTransform: 'none',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  '&:hover': {
-                    backgroundColor: '#031e2a'
-                  }
-                }}
-                onClick={handleSaveConfiguration}
-              >
-                {editMode ? 'UPDATE' : 'SAVE CHANGES'}
-              </Button>
-
-              <Button
-                variant="outlined"
-                sx={{
-                  borderColor: '#178df9',
-                  color: '#178df9',
-                  borderRadius: '8px',
-                  width: '25%',
-                  height: '30px',
-                  fontSize: '12px',
-                  textTransform: 'none',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  '&:hover': {
-                    borderColor: '#b39ddb',
-                    backgroundColor: '#f3e5f5'
-                  }
-                }}
-                onClick={handleCloseModal}
-              >
-                CANCEL
-              </Button>
+              sx={{
+                width: '65%',
+                '& .MuiInputBase-root': {
+                  height: '40px',
+                  fontSize: '14px'
+                },
+                '& .MuiOutlinedInput-input': {
+                  padding: '0 12px'
+                }
+              }}
+              variant="outlined"
+            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '40%' }}>
+              <Typography sx={{ fontSize: '14px', mb: 0.5, ml: 2 }}>Active Or Inactive?</Typography>
+              <AntSwitch checked={toggleValue} onChange={(e) => setToggleValue(e.target.checked)} sx={{ ml: -10 }} />
             </Box>
           </Box>
-        </Modal>
-      </Grid>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 2,
+              mt: 4
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: '#053146',
+                borderRadius: '8px',
+                width: '35%',
+                height: '30px',
+                fontSize: '12px',
+                textTransform: 'none',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                '&:hover': {
+                  backgroundColor: '#031e2a'
+                }
+              }}
+              onClick={handleSaveConfiguration}
+            >
+              {editMode ? 'UPDATE' : 'SAVE CHANGES'}
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                borderColor: '#178df9',
+                color: '#178df9',
+                borderRadius: '8px',
+                width: '25%',
+                height: '30px',
+                fontSize: '12px',
+                textTransform: 'none',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                '&:hover': {
+                  borderColor: '#b39ddb',
+                  backgroundColor: '#f3e5f5'
+                }
+              }}
+              onClick={handleCloseModal}
+            >
+              CANCEL
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
 };

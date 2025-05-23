@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { Grid, TextField, Box, Paper, Button, MenuItem, InputAdornment, FormControlLabel, Card, Typography } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,6 @@ const AddCaseForm = ({ onCancel }) => {
   const [isLoading, setIsloading] = useState(false);
   const [servicetype, setServiceType] = useState([]);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
-
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -62,7 +61,7 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-      homePhone: '',
+      name: '',
       code: '',
       serviceType: '',
       beneficiaryInformation: '',
@@ -72,7 +71,8 @@ const AddCaseForm = ({ onCancel }) => {
       fundingInterests: '',
       fundraisingActivities: '',
       notes: '',
-      file: null
+      file: null,
+      restrictAccess: false
     }
   });
 
@@ -81,8 +81,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     try {
       const formData = new FormData();
-console.log("data::::",data);
-      formData.append('name', data.homePhone || '');
+      formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
       formData.append('benificiary', data.beneficiaryInformation || '');
@@ -91,12 +90,11 @@ console.log("data::::",data);
       formData.append('eventAttanded', data.eventsAttended || '');
       formData.append('fundingInterest', data.fundingInterests || '');
       formData.append('fundraisingActivities', data.fundraisingActivities || '');
-      formData.append('description', data.notes || ''); 
-      formData.append('isActive', restrictAccess || '');
+      formData.append('description', data.notes || '');
+      formData.append('isActive', restrictAccess || false);
       if (data.file) {
         formData.append('file', data.file || '');
       }
-      console.log(formData);
       const response = await postApi(urls.service.create, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -115,12 +113,21 @@ console.log("data::::",data);
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Add New Service</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/services')}>
-          <ArrowBackIcon sx={{ color: 'grey' }} />
-          <Typography variant="h6" sx={{ mr: 1 }}>
-            Back
-          </Typography>
+        <Typography variant="h4">Adding New Service</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/services')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
       </Box>
 
@@ -131,7 +138,7 @@ console.log("data::::",data);
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="homePhone"
+                    name="name"
                     control={control}
                     rules={{
                       required: 'Service Name is required',
@@ -146,8 +153,8 @@ console.log("data::::",data);
                         label="Service Name"
                         size="small"
                         onKeyDown={allowOnlyText}
-                        error={!!errors.homePhone}
-                        helperText={errors.homePhone?.message}
+                        error={!!errors.name}
+                        helperText={errors.name?.message}
                       />
                     )}
                   />
@@ -328,12 +335,12 @@ console.log("data::::",data);
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
               <Grid item>
                 <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
+                  {isLoading ? 'Saving...' : 'SAVE CHANGES'}
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="outlined" color="error" onClick={onCancel}>
-                  Cancel
+                <Button variant="outlined" color="error" onClick={() => navigate('/services')}>
+                  CANCEL
                 </Button>
               </Grid>
             </Grid>

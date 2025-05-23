@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Stack, Grid, Card, Box, Typography, TextField } from '@mui/material';
+import { Stack, Grid, Card, Box, Typography, TextField, IconButton, InputBase } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
 import TableStyle from '../../ui-component/TableStyle';
@@ -79,13 +79,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          REFERRAL LIST
+          Referral List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -111,28 +111,56 @@ const ReferralTable = () => {
   };
 
   const handleAccept = () => {
-    console.log('Accepted!');
     setDialogOpen(false);
   };
 
   const handleDecline = () => {
-    console.log('Declined!');
     setDialogOpen(false);
   };
 
   return (
     <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">New Referral</Typography>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+        <Typography variant="h5">New Referrals</Typography>
 
-        <TextField
-          size="small"
-          placeholder="Search..."
-          InputProps={{
-            endAdornment: <SearchIcon />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '30px',
+            paddingLeft: '16px',
+            border: '1px solid #e0e0e0',
+            width: '350px',
+            height: '40px'
           }}
-          sx={{ width: '350px' }}
-        />
+        >
+          <InputBase
+            placeholder="Search..."
+            // value={searchQuery}
+            // onChange={handleSearchChange}
+            // onKeyPress={(e) => {
+            //   if (e.key === 'Enter') {
+            //     handleFilter();
+            //   }
+            // }}
+            sx={{
+              flex: 1,
+              color: 'text.primary'
+            }}
+          />
+          <IconButton
+            // onClick={handleFilter}
+            sx={{
+              marginRight: '8px',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </Box>
       </Stack>
       <Grid container spacing={2}>
         <FilterPanel
@@ -159,7 +187,8 @@ const ReferralTable = () => {
                   }}
                   sx={{
                     '& .MuiDataGrid-row': {
-                      borderBottom: '1px solid #ccc'
+                      borderBottom: '1px solid #ccc',
+                      cursor: 'pointer'
                     }
                   }}
                 />

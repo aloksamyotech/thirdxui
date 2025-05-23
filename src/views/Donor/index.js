@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -11,6 +11,8 @@ import FilterPanel from 'components/FilterPanel';
 import DonorTypeDialog from './donorType.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
+
 const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
@@ -23,21 +25,6 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const nameFilter = [
-  { value: 'name1', label: 'Name 1' },
-  { value: 'name2', label: 'Name 2' }
-];
-
-const receiptIdFilter = [
-  { value: '#675', label: '#675' },
-  { value: '#775', label: '#775' }
-];
-
-const campaignFilter = [
-  { value: 'campaign1', label: 'Campaign 1' },
-  { value: 'campaign2', label: 'Campaign 2' }
-];
-
 const Lead = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
@@ -45,9 +32,18 @@ const Lead = () => {
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
-  const [receiptId, setReceiptIdFilter] = useState('');
   const [campaign, setCampaignFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [nameFilterOptions, setNameFilterOptions] = useState([]);
   const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const CustomHeader = () => {
     return (
@@ -67,13 +63,13 @@ const Lead = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            DONOR LIST
+            Donor List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -94,12 +90,12 @@ const Lead = () => {
             {params.row.subRole === 'donar_individual' ? <PersonIcon /> : <ApartmentIcon />}
 
             <Box>
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ fontWeight: 450 }} mb={1}>
                 {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
-                  ? params.row.companyInformation.companyName
-                  : ''}
+                    ? params.row.companyInformation.companyName
+                    : ''}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -110,33 +106,153 @@ const Lead = () => {
 
           <Tooltip title="Info" arrow>
             <IconButton>
-              <InfoIcon color="action" />
+              <InfoIcon sx={{ color: '#49494c' }} />
             </IconButton>
           </Tooltip>
         </Stack>
       )
     }
   ];
-  useEffect(() => {
-    const fetchDonor = async () => {
-      try {
-        const response = await getApi(urls.serviceuser.getalldonor);
 
-        if (response?.data) {
-          const donorsWithSerialNumber = response.data.allDonor.map((donor, index) => ({
-            ...donor,
-            serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    if (!event.target.value.trim()) {
+      fetchDonor();
+    }
+  };
+
+  const handleFilter = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
+
+      if (status) queryParams.append('status', status === 'active');
+      if (name) queryParams.append('name', name);
+
+      if (campaign) queryParams.append('campaigns', campaign);
+
+      if (dateOpenedFilter) {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('archive', 'false');
+      queryParams.append('role', 'donor');
+
+      const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
+
+      const response = await getApi(url);
+
+      const allDonor = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formattedUsers = allDonor?.map((donor, index) => ({
+        ...donor,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered donors:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setStatus('');
+    setCampaignFilter('');
+    setNameFilter('');
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    setPaginationModel({
+      page: 0,
+      pageSize: 10
+    });
+  };
+
+  useEffect(() => {
+    if (status || dateOpenedFilter || name || campaign || searchQuery) {
+      handleFilter();
+    } else {
+      fetchDonor();
+    }
+  }, [status, dateOpenedFilter, name, campaign, searchQuery, paginationModel, isFiltered]);
+
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Campaign')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
           }));
 
-          setRows(donorsWithSerialNumber);
-        }
+        setCampaignTypeOptions(options);
       } catch (error) {
-        console.error('Failed to fetch services:', error);
+        console.error('Error fetching config:', error);
       }
     };
-
-    fetchDonor();
+    fetchCampaign();
   }, []);
+
+  const fetchDonor = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'donor'
+      });
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+
+      const allDonor = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const nameOptions = allDonor
+        .map((donor) => {
+          if (donor.subRole === 'donar_individual') {
+            return {
+              value: donor?._id || '',
+              label: `${donor.personalInfo?.firstName} ${donor.personalInfo?.lastName}`
+            };
+          } else {
+            return {
+              value: donor?._id || '',
+              label: donor.companyInformation?.companyName || ''
+            };
+          }
+        })
+        .filter((option) => option.value && option.value.trim() !== '');
+
+      setNameFilterOptions(nameOptions);
+
+      const formattedUsers = allDonor?.map((donor, index) => ({
+        ...donor,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -149,9 +265,8 @@ const Lead = () => {
                 sx={{
                   backgroundColor: '#009fc7',
                   borderRadius: '4px',
-                  width: 'auto',
+                  width: '220px',
                   height: '35px',
-                  px: 2,
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -167,43 +282,126 @@ const Lead = () => {
                 Add New Donor <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '350px',
+                height: '40px'
+              }}
+            >
+              <InputBase
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilter();
+                  }
+                }}
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                onClick={handleFilter}
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
 
-            <TextField
+            {/* <TextField
               size="small"
               placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
               InputProps={{
                 endAdornment: <SearchIcon />
               }}
               sx={{ width: '350px' }}
-            />
+            /> */}
           </Stack>
           <Grid container spacing={2}>
             <FilterPanel
               showFilter={showFilter}
               statuses={statusFilter}
+              statusFilter={status}
               setStatusFilter={setStatus}
               dateAddedFilters={dateAddedFilters}
-              setDateAddedFilter={setDateOpenedFilter}
-              names={nameFilter}
+              dateOpenedFilter={dateOpenedFilter}
+              setDateOpenedFilter={setDateOpenedFilter}
+              names={nameFilterOptions}
+              nameFilter={name}
               setNameFilter={setNameFilter}
-              receipts={receiptIdFilter}
-              setReceiptIdFilter={setReceiptIdFilter}
-              campaigns={campaignFilter}
+              campaigns={campaignTypeOptions}
+              campaignFilter={campaign}
               setCampaignFilter={setCampaignFilter}
-              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'receiptIdFilter', 'campaignFilter']}
+              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'campaignFilter']}
+              onReset={handleReset}
             />
+
             <Grid item xs={9}>
-              <Card style={{ height: 'auto' }}>
+              <Card style={{ height: '100vh' }}>
                 <DataGrid
-                  rows={rows}
+                  rows={
+                    loading
+                      ? []
+                      : rows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                  }
                   columns={columns}
-                  rowHeight={65}
+                  rowCount={totalRows}
+                  loading={loading}
+                  pagination
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  pageSizeOptions={[10]}
+                  rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
-                  components={{ Toolbar: () => <CustomHeader /> }}
+                  slots={{
+                    toolbar: () => <CustomHeader />,
+                    loadingOverlay: () => (
+                      <Box
+                        sx={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'self-start',
+                          justifyContent: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        }}
+                      >
+                        <SingleRowLoader />
+                      </Box>
+                    ),
+                    noRowsOverlay: () => (
+                      loading ? null : (
+                        <Box sx={{ padding: 2, textAlign: 'center' }}>
+                          No data available.
+                        </Box>
+                      )
+                    ),
+                  }}
                   sx={{
                     '& .MuiDataGrid-columnHeaders': { display: 'none' },
-                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' }
+                    '& .MuiDataGrid-cell': { textAlign: 'left', fontSize: '14px' },
+                    '& .MuiDataGrid-row': {
+                      cursor: 'pointer'
+                    }
                   }}
                   disableSelectionOnClick
                 />

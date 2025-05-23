@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Grid, Typography, Stack, Button, IconButton, Chip, TextField } from '@mui/material';
+import { Box, Card, CardContent, Grid, Typography, InputBase, Stack, Button, IconButton, Chip, TextField } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import { Add, Visibility, VisibilityOff } from '@mui/icons-material';
@@ -22,9 +22,16 @@ const CaseDetailsPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [caseData, setCaseData] = useState(null);
   const [serviceDetails, setServiceDetails] = useState('');
   const [serviceuserDetails, setServiceuserDetails] = useState('');
+  const [row, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -87,7 +94,7 @@ const CaseDetailsPage = () => {
     dob: dobFormatted || '',
     age: age || '',
     altUserId: serviceuserDetails?.contactInfo?.otherId,
-    service: serviceDetails.name || '',
+    service: serviceDetails?.name || '',
     referredDate: '02/02/2020',
     image: 'https://via.placeholder.com/64'
   };
@@ -95,23 +102,22 @@ const CaseDetailsPage = () => {
     setOpenDialog(false);
   };
 
-  const dateAddedFilters = [
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'Last 7 Days' },
-    { value: 'month', label: 'Last 30 Days' },
-    { value: 'year', label: 'Last 1 Year' }
-  ];
+  // const dateAddedFilters = [
+  //   { value: 'today', label: 'Today' },
+  //   { value: 'week', label: 'Last 7 Days' },
+  //   { value: 'month', label: 'Last 30 Days' },
+  //   { value: 'year', label: 'Last 1 Year' }
+  // ];
 
   const columnsCase = [
     { field: 'caseId', headerName: 'Case Id', width: 100 },
-
     {
       field: 'serviceUser',
       headerName: 'Service User',
-      width: 160,
+      width: 120,
       renderCell: () => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {serviceDetails?.name || ''}
+          {`${serviceuserDetails?.personalInfo?.firstName || ''} ${serviceuserDetails?.personalInfo?.lastName || ''}`}
         </Typography>
       )
     },
@@ -142,7 +148,7 @@ const CaseDetailsPage = () => {
       valueGetter: () => formatDate(caseData?.caseOpened || '')
     },
 
-    { field: 'attachments', headerName: 'Attachments', width: 100 },
+    { field: 'attachments', headerName: 'Attachments', width: 110 },
 
     { field: 'totalHours', headerName: 'Total Hours', width: 100 },
 
@@ -154,16 +160,17 @@ const CaseDetailsPage = () => {
         const status = caseData?.serviceStatus;
 
         return (
-         
           <Chip
-  label={status === 'Active' ? 'Open' : 'Close'}
-  icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-  sx={{
-    borderColor: status === 'Active' ? 'gray' : 'gray',
-    color: status === 'Active' ? 'gray' : 'gray'
-  }}
-/>
- );
+            label={status === 'Active' ? 'Open' : 'Close'}
+            icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
+            variant="outlined"
+            sx={{
+              borderColor: 'gray',
+              color: 'gray',
+              backgroundColor: 'transparent'
+            }}
+          />
+        );
       }
     }
   ];
@@ -171,7 +178,7 @@ const CaseDetailsPage = () => {
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return isNaN(date) ? '' : date.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+    return isNaN(date) ? '' : date.toLocaleDateString('en-GB');
   };
 
   const rows = [
@@ -188,9 +195,9 @@ const CaseDetailsPage = () => {
     }
   ];
 
-const userProfile =serviceuserDetails?.otherInfo?.file
-const fullImageUrl = userProfile ? `${imageUrl}${userProfile }` : '';
-const caseNotes = [
+  const userProfile = serviceuserDetails?.otherInfo?.file;
+  const fullImageUrl = userProfile ? `${imageUrl}${userProfile}` : '';
+  const caseNotes = [
     {
       id: 1,
       date: '08/25/2017',
@@ -247,9 +254,64 @@ const caseNotes = [
       renderCell: (params) => <IconButton>{params.value ? <VisibilityOff /> : <Visibility />}</IconButton>
     }
   ];
+
+  const handleFilter = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      queryParams.append('caseId', id);
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('date', formattedDate);
+      }
+      if (searchQuery && searchQuery !== '') {
+        queryParams.append('search', searchQuery);
+      }
+
+      const queryString = queryParams.toString();
+      const url = `${urls.casenote?.fetchWithPagination}?${queryParams.toString()}`;
+
+      const response = await getApi(url);
+
+      const filteredCases = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB');
+      };
+
+      const formattedUsers = filteredCases.map((user, index) => {
+        return {
+          id: user?._id,
+          date: formatDate(user?.date),
+          subject: user?.subject || '',
+          contactType: user?.configurationId?.name || '',
+        };
+      });
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered cases:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setDateOpenedFilter('');
+    setSearchQuery('');
+  };
+
+  useEffect(() => {
+    if (dateOpenedFilter) {
+      handleFilter();
+    }
+  }, [dateOpenedFilter]);
+
   useEffect(() => {
     if (!id) return;
-
     const fetchData = async () => {
       try {
         const response = await getApi(urls.case.getById.replace(':id', id));
@@ -261,43 +323,107 @@ const caseNotes = [
         console.error('Error fetching case data:', error);
       }
     };
-
     fetchData();
   }, [id]);
+
+  const fetchdata = async () => {
+    try {
+      const response = await getApi(
+        `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
+      );
+      const allCasesNotes = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
+        id: item._id || index,
+        date: item.date ? new Date(item.date).toLocaleDateString() : '',
+        subject: item?.subject || '',
+        contactType: item?.configurationId?.name || '',
+
+      }));
+
+      setRows(formattedCasesNotes);
+
+      setTotalRows(pagination?.total);
+
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchdata();
+  }, [paginationModel]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <>
       <Box>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Stack direction="row" alignItems="center">
-                <IconButton onClick={() => navigate('/case')}>
-                  <ArrowBackIcon />
-                </IconButton>
-                <Typography variant="h5" gutterBottom>
-                  {serviceDetails.name}
+                <Typography fontWeight="bold" display="flex" alignItems="center">
+                  <IconButton onClick={() => navigate('/case')}>
+                    <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+                  </IconButton>
+                  {serviceDetails?.name}
                 </Typography>
               </Stack>
 
-              <TextField
-                size="small"
-                placeholder="Search..."
-                InputProps={{
-                  endAdornment: <SearchIcon />
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '30px',
+                  paddingLeft: '16px',
+                  width: '350px',
+                  height: '40px'
                 }}
-                sx={{ width: '350px' }}
-              />
+              >
+                <InputBase
+                  placeholder="Search..."
+                  sx={{
+                    flex: 1,
+                    color: 'text.primary'
+                  }}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+                <IconButton
+                  sx={{
+                    marginRight: '8px',
+                    width: 32,
+                    height: 32
+                  }}
+                  onClick={handleFilter}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </Box>
             </Stack>
           </Grid>
 
           <Grid item xs={12} md={3}>
             <Card sx={{ mb: 2, backgroundColor: '#042E4C', color: 'white' }}>
               <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="subtitle1" sx={{ color: 'white' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    padding: '4px 0'
+                  }}
+                >
+                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 500 }}>
                     Service User Summary
                   </Typography>
+
                   <Chip
                     label="View"
                     size="small"
@@ -305,7 +431,7 @@ const caseNotes = [
                     sx={{
                       backgroundColor: 'white',
                       color: '#042E4C',
-                      fontWeight: 400,
+                      fontWeight: 300,
                       '&:hover': {
                         backgroundColor: 'white',
                         color: '#042E4C'
@@ -313,21 +439,33 @@ const caseNotes = [
                     }}
                   />
                 </Box>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                  Name: {serviceuserDetails?.personalInfo?.firstName || ''} {serviceuserDetails?.personalInfo?.lastName || ''}
-                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                    <strong>Name:</strong> {serviceuserDetails?.personalInfo?.firstName || ''}{' '}
+                    {serviceuserDetails?.personalInfo?.lastName || ''}
+                  </Typography>
 
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>User ID: 01231</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                  Gender: {serviceuserDetails?.personalInfo?.gender || ''}
-                </Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>Contact: {serviceuserDetails?.contactInfo?.phone || ''}</Typography>
-                <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                  DOB:{' '}
-                  {serviceuserDetails?.personalInfo?.dateOfBirth
-                    ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD/MM/YYYY')
-                    : ''}
-                </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>User ID :</strong> 01231
+                    </Typography>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>Gender:</strong> {serviceuserDetails?.personalInfo?.gender || ''}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>Contact:</strong> {serviceuserDetails?.contactInfo?.phone || ''}
+                    </Typography>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>DOB:</strong>{' '}
+                      {serviceuserDetails?.personalInfo?.dateOfBirth
+                        ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
+                        : ''}
+                    </Typography>
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -352,15 +490,16 @@ const caseNotes = [
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            dateAddedFilters={dateAddedFilters}
-            setDateAddedFilter={setDateOpenedFilter}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             selectedFilters={['dateOpenedFilter']}
+            onReset={handleReset}
           />
 
           <Grid item xs={12} md={9}>
             <Box sx={{ height: 'auto', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
-                rows={caseNotes}
+                rows={row}
                 columns={columns}
                 components={{
                   Toolbar: () => <CustomHeader />
@@ -378,8 +517,8 @@ const caseNotes = [
         </Grid>
       </Box>
 
-      <CaseNoteDialog open={openDialog} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
-      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userProfile={ fullImageUrl } />
+      <CaseNoteDialog open={openDialog} fetchdata={fetchdata} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
+      <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography } from '@mui/material';
 import { MenuItem, Select, Chip, FormControl, InputLabel } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,7 @@ const AddCaseForm = () => {
     handleSubmit,
     reset,
     watch,
+    setValue,
     getValues,
     formState: { errors }
   } = useForm({
@@ -125,13 +126,22 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Add New Case</Typography>
+        <Typography variant="h4">Adding New Case</Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/case')}>
-          <ArrowBackIcon sx={{ color: 'grey' }} />
-          <Typography variant="h6" sx={{ mr: 1 }}>
-            Back
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'grey',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/case')}
+        >
+          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
       </Box>
 
@@ -306,7 +316,7 @@ const AddCaseForm = () => {
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2 }}>
                   <Typography variant="subtitle1" mb={2}>
-                    Service Tag
+                   Case Tag
                   </Typography>
 
                   <Grid container spacing={2}>
@@ -507,16 +517,15 @@ const AddCaseForm = () => {
                         {...field}
                         label="Notes"
                         multiline
-                        minRows={10}
+                        minRows={13}
                         fullWidth
                         variant="outlined"
-                        sx={{ mb: 2 }}
                         error={!!errors.description}
                         helperText={errors.description?.message}
                       />
                     )}
                   />
-                  <Controller
+                  {/* <Controller
                     name="isActive"
                     control={control}
                     defaultValue={true}
@@ -526,7 +535,7 @@ const AddCaseForm = () => {
                         <AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} color="primary" />
                       </Box>
                     )}
-                  />
+                  /> */}
                 </Paper>
               </Grid>
             </Grid>
@@ -536,7 +545,7 @@ const AddCaseForm = () => {
         <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
           <Grid item>
             <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isLoading ? 'Saving...' : 'SAVE CHANGES'}
             </Button>
           </Grid>
           <Grid item>
@@ -545,10 +554,10 @@ const AddCaseForm = () => {
               color="error"
               onClick={() => {
                 reset();
-                onCancel();
+                navigate('/case');
               }}
             >
-              Cancel
+              CANCEL
             </Button>
           </Grid>
         </Grid>

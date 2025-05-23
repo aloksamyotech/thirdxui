@@ -20,7 +20,6 @@ import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import OptionsPopoverDonor from 'components/PopoverDoner';
-
 import { imageUrl } from 'common/urls';
 
 const UserProfileCard = () => {
@@ -32,6 +31,7 @@ const UserProfileCard = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -166,7 +166,11 @@ const UserProfileCard = () => {
                 }}
               >
                 <Grid container alignItems="center" spacing={2}>
-                  <img src={fullImageUrl} alt={name} style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
+                  <img
+                    src={fullImageUrl || ServiceUser}
+                    alt={name}
+                    style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
+                  />
                   <Grid item xs>
                     <Typography component="span">
                       {personalInfo.firstName || personalInfo.lastName
@@ -261,28 +265,33 @@ const UserProfileCard = () => {
                           <>
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Full Name:</strong>{' '}
-                                  <Typography component="span">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Full Name:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
                                     {personalInfo?.firstName} {personalInfo?.lastName}
                                   </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Phone:</strong> <Typography component="span">{contactInfo?.phone}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Phone:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {contactInfo?.phone}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>DOB:</strong>{' '}
-                                  {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>DOB:</span>{' '}
+                                  <Typography fontSize="12px">
+                                    {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Age:</strong>{' '}
-                                  <Typography component="span">
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Age:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
                                     {personalInfo?.dateOfBirth
                                       ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
                                       : ''}
@@ -293,18 +302,27 @@ const UserProfileCard = () => {
 
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Address:</strong> <Typography component="span">{contactInfo?.addressLine1}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Address:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {contactInfo?.addressLine1}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Country:</strong> <Typography component="span">{contactInfo?.country}</Typography>
+                                <Typography variant="body1" fontSize="12px">
+                                  <strong>Country:</strong>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {contactInfo?.country}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Telephone no:</strong> <Typography component="span">{contactInfo?.homePhone}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Telephone no:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {contactInfo?.homePhone}
+                                  </Typography>
                                 </Typography>
                               </Box>
                             </Grid>
@@ -315,39 +333,54 @@ const UserProfileCard = () => {
                           <>
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Company Name:</strong> <Typography component="span">{companyInformation.companyName}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Company Name:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {companyInformation.companyName}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Contact person Name:</strong>{' '}
-                                  <Typography component="span">{companyInformation.mainContactName}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Contact person Name:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {companyInformation.mainContactName}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Email:</strong> <Typography component="span">{contactInfo.email}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Email:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {contactInfo.email}
+                                  </Typography>
                                 </Typography>
                               </Box>
                             </Grid>
 
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Recruitment Campaign:</strong>{' '}
-                                  <Typography component="span">{companyInformation.recruitmentCampaign}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Recruitment Campaign:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {companyInformation.recruitmentCampaign?.name}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Social Media Link:</strong>{' '}
-                                  <Typography component="span">{companyInformation.socialMediaLinks}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Social Media Link:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {companyInformation.socialMediaLinks}
+                                  </Typography>
                                 </Typography>
                               </Box>
                               <Box display="flex" alignItems="center" mb={1}>
-                                <Typography variant="body1">
-                                  <strong>Phone no.:</strong> <Typography component="span">{contactInfo.phone}</Typography>
+                                <Typography variant="body1" fontSize="12px" fontWeight="600">
+                                  <span>Phone no.:</span>{' '}
+                                  <Typography component="span" fontSize="12px">
+                                    {contactInfo.phone}
+                                  </Typography>
                                 </Typography>
                               </Box>
                             </Grid>
@@ -361,66 +394,66 @@ const UserProfileCard = () => {
                 <Grid item xs={12} md={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
                     <CardContent>
-                      <Typography variant="subtitle1" fontWeight="bold" color="#042E4C" gutterBottom>
+                      <Typography variant="subtitle1" fontWeight="bold" color="#042E4C" gutterBottom fontSize="12px">
                         GDPR
                       </Typography>
 
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography variant="body2" fontSize="12px" fontWeight="600">
                             Email:{' '}
-                            <Typography component="span" fontWeight="normal">
+                            <Typography component="span" fontWeight="normal" fontSize="12px">
                               {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
 
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Telephone:{' '}
-                            <Typography component="span" fontWeight="normal">
+                            <Typography component="span" fontSize="12px">
                               {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
 
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             SMS:{' '}
-                            <Typography component="span" fontWeight="normal">
+                            <Typography component="span" fontSize="12px">
                               {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
 
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Letter:{' '}
-                            <Typography component="span" fontWeight="normal">
+                            <Typography component="span" fontSize="12px">
                               {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
                             </Typography>
                           </Typography>
                         </Grid>
 
                         <Grid item xs={6}>
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Reason:{' '}
-                            <Typography component="span" fontWeight="normal">
-                              {contactPreferences?.reason || 'N/A'}
+                            <Typography component="span" fontSize="12px">
+                              {contactPreferences?.reason?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Contact purposes:{' '}
-                            <Typography component="span" fontWeight="normal">
-                              {contactPreferences?.contactPurposes || 'N/A'}
+                            <Typography component="span" fontSize="12px">
+                              {contactPreferences?.contactPurposes?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Preferred Method of Contact:{' '}
-                            <Typography component="span" fontWeight="normal">
-                              {contactPreferences?.preferredMethod || 'N/A'}
+                            <Typography component="span" fontSize="12px">
+                              {contactPreferences?.preferredMethod?.name || 'N/A'}
                             </Typography>
                           </Typography>
 
-                          <Typography fontWeight="bold" variant="body2">
+                          <Typography fontWeight="600" variant="body2" fontSize="12px">
                             Date of confirmation:{' '}
-                            <Typography component="span" fontWeight="normal">
+                            <Typography component="span" fontSize="12px">
                               {contactPreferences?.dateOfConfirmation
                                 ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
                                 : 'N/A'}
@@ -463,7 +496,9 @@ const UserProfileCard = () => {
                   setSessionNameFilter={setSessionName}
                   dateAddedFilters={dateAddedFilters}
                   setDateAddedFilter={setDateOpenedFilter}
-                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter']}
+                  includeArchives={includeArchives}
+                  setIncludeArchives={setIncludeArchives}
+                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
                 />
 
                 <Grid item xs={9}>
@@ -541,7 +576,7 @@ const UserProfileCard = () => {
         </Grid>
       </Card>
 
-      <OptionsPopoverDonor open={open} anchorEl={anchorEl} onClose={handleClose} data={userData}/>
+      <OptionsPopoverDonor open={open} anchorEl={anchorEl} onClose={handleClose} data={userData} />
     </>
   );
 };

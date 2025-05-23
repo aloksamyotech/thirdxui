@@ -1,4 +1,4 @@
-import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip } from '@mui/material';
+import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip,InputBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -48,7 +48,7 @@ const CustomHeader = () => {
             lineHeight: '36px'
           }}
         >
-          FORM LIST
+          Form List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -183,15 +183,45 @@ const Lead = () => {
                   <AddIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
+                          <Box
+                                              sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                backgroundColor: '#f8f9fa',
+                                                borderRadius: '30px',
+                                                paddingLeft: '16px',
+                                                border: '1px solid #e0e0e0',
+                                                width: '350px',
+                                                height: '40px'
+                                              }}
+                                            >
+                                              <InputBase
+                                                placeholder="Search..."
+                                                // value={searchQuery}
+                                                // onChange={handleSearchChange}
+                                                // onKeyPress={(e) => {
+                                                //   if (e.key === 'Enter') {
+                                                //     handleFilter();
+                                                //   }
+                                                // }}
+                                                sx={{
+                                                  flex: 1,
+                                                  color: 'text.primary'
+                                                }}
+                                              />
+                                              <IconButton
+                                                // onClick={handleFilter}
+                                                sx={{
+                                                  marginRight: '8px',
+                                                  width: 32,
+                                                  height: 32,
+                                                  cursor: 'pointer'
+                                                }}
+                                              >
+                                                <SearchIcon />
+                                              </IconButton>
+                                            </Box>
 
-              <TextField
-                size="small"
-                placeholder="Search..."
-                InputProps={{
-                  endAdornment: <SearchIcon />
-                }}
-                sx={{ width: '350px' }}
-              />
             </Stack>
           </Grid>
 

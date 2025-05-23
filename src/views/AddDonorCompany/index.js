@@ -21,13 +21,13 @@ import {
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import Link from '@mui/material/Link';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
-import { postApi } from 'common/apiClient';
+import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
 const AddCaseForm = ({ onCancel }) => {
@@ -37,9 +37,14 @@ const AddCaseForm = ({ onCancel }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const fileInputRef = React.useRef(null);
+  const [campaigns, setCampaigns] = useState([]);
+  const [contactpurpose, setContactpurpose] = useState([]);
+  const [reason, setReason] = useState([]);
+  const [contactmethod, setContactmethod] = useState([]);
+
   const location = useLocation();
   const subRole = location.state?.subRole;
-  const editdata = location.state;
+  const editdata = location.state || {};
 
   const {
     register,
@@ -53,7 +58,7 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-         title: editdata?.personalInfo?.title || '',
+      title: editdata?.personalInfo?.title || '',
       firstname: editdata?.personalInfo?.firstName || '',
       lastname: editdata?.personalInfo?.lastName || '',
       phone: editdata?.contactInfo?.phone || '',
@@ -82,17 +87,15 @@ const AddCaseForm = ({ onCancel }) => {
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
       donortag: editdata?.contactPreferences?.contactMethods?.donortag ?? true,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      preferredContact: editdata?.contactPreferences?.preferredMethod || '',
-      reason: editdata?.contactPreferences?.reason || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes || '',
-      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation
-        ? dayjs(editdata.contactPreferences.dateOfConfirmation)
-        : null,
+      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+      reason: editdata?.contactPreferences?.reason ?._id|| '',
+      contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
+      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
       companyname: editdata?.companyInformation?.companyName || '',
       contactname: editdata?.companyInformation?.mainContactName || '',
       otherId: editdata?.companyInformation?.otherId || '',
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
-      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign || '',
+      Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       Beneficiary: editdata?.otherInfo?.benificiary || '',
       Campaigns: editdata?.otherInfo?.campaigns || '',
       engagement: editdata?.otherInfo?.engagement || '',
@@ -117,7 +120,24 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filtercampaigns = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Campaign');
+        setCampaigns(filtercampaigns);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Reason');
+        setReason(filterreason);
+        const filtercontactpurpose = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+        setContactpurpose(filtercontactpurpose);
+        const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
+        setContactmethod(filtercontactmethod);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
   const handleChange = (e) => {
     setCaseData({ ...caseData, [e.target.name]: e.target.value });
   };
@@ -154,10 +174,19 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('otherInfo[fundraisingActivities]', data.fundraisingActivities || '');
     fd.append('otherInfo[restrictAccess]', restrictAccess || '');
 
-    fd.append('contactPreferences[preferredMethod]', data.preferredContact || '');
-    fd.append('contactPreferences[contactPurposes]', data.contactPurpose || '');
+    if (data.preferredContact) {
+      fd.append('contactPreferences[preferredMethod]', data.preferredContact);
+    }
+
+    if (data.contactPurpose) {
+      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    }
+
+    if (data.reason) {
+      fd.append('contactPreferences[reason]', data.reason);
+    }
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
-    fd.append('contactPreferences[reason]', data.reason || '');
+
     fd.append('contactPreferences[contactMethods][donortag]', data.donortag || '');
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent || '');
     fd.append('contactPreferences[contactMethods][sms]', data.sms || '');
@@ -168,31 +197,36 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('companyInformation[mainContactName]', data.contactname || '');
     fd.append('companyInformation[otherId]', data.otherId || '');
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
-    fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign || '');
-
+    if (data.Recruitmentcampaign) {
+      fd.append('companyInformation[recruitmentCampaign]', data.Recruitmentcampaign);
+    }
     fd.append('role', 'donor');
     fd.append('subRole', subRole);
 
-
-      try {
-       if (editdata) {
-      // ✅ EDIT user
-      await postApi(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    } else {
-      // ✅ CREATE user
-      await postApi(urls.serviceuser.create, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-    }
-      toast.success(
-        subRole === 'donar_group'
-          ? 'Donor group added successfully!'
-          : subRole === 'donar_company'
-          ? 'Donor company added successfully!'
-          : 'Donor added successfully!'
-      );
+    try {
+      if (location.state?.isEdit) {
+        await updateApiPatch(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success(
+          subRole === 'donar_group'
+            ? 'Donor group updated successfully!'
+            : subRole === 'donar_company'
+            ? 'Donor company updated successfully!'
+            : 'Donor updated successfully!'
+        );
+      } else {
+        await postApi(urls.serviceuser.create, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success(
+          subRole === 'donar_group'
+            ? 'Donor group added successfully!'
+            : subRole === 'donar_company'
+            ? 'Donor company added successfully!'
+            : 'Donor added successfully!'
+        );
+      }
 
       setIsloading(false);
       navigate('/donor');
@@ -242,32 +276,34 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    {/* <Typography variant="h4">
-  {editdata
-    ? subRole === 'donar_company'
-      ? 'Edit Donor Company'
-      : subRole === 'donar_group'
-      ? 'Edit Donor Group'
-      : 'Edit Donor'
-    : subRole === 'donar_company'
-    ? 'Add Donor Company'
-    : subRole === 'donar_group'
-    ? 'Add Donor Group'
-    : 'Add Donor'}
-</Typography> */}
+          <Typography variant="h4">
+            {location.state?.isEdit
+              ? subRole === 'donar_company'
+                ? 'Edit Donor Company'
+                : subRole === 'donar_group'
+                ? 'Edit Donor Group'
+                : 'Edit Donor'
+              : subRole === 'donar_company'
+              ? 'Add Donor Company'
+              : subRole === 'donar_group'
+              ? 'Add Donor Group'
+              : 'Add Donor'}
+          </Typography>
 
-  <Typography variant="h4">
-  {editdata ? 'Edit Donor' : 'Add Donor'}
-</Typography>
-
-
-
-
-          <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/donor')}>
-            <ArrowBackIcon sx={{ color: 'grey' }} />
-            <Typography variant="h6" sx={{ mr: 1 }}>
-              Back
-            </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'grey',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate('/donor')}
+          >
+            <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
         </Box>
         <Card sx={{ padding: 2, marginTop: 2 }}>
@@ -431,7 +467,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 name="otherId"
                                 control={control}
                                 rules={{
-                                  required: 'Other Id is required',
+                                  //   required: 'Other Id is required',
                                   minLength: {
                                     value: 3,
                                     message: 'Other Id must be at least 3 characters'
@@ -462,7 +498,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="Recruitmentcampaign"
                                 control={control}
-                                rules={{ required: 'Recruitment Campaign is required' }}
+                                // rules={{ required: 'Recruitment Campaign is required' }}
                                 render={({ field }) => (
                                   <TextField
                                     select
@@ -473,8 +509,11 @@ const AddCaseForm = ({ onCancel }) => {
                                     helperText={errors.Recruitmentcampaign?.message}
                                     {...field}
                                   >
-                                    <MenuItem value="Campaign 1">Campaign 1</MenuItem>
-                                    <MenuItem value="Campaign 2">Campaign 2</MenuItem>
+                                    {campaigns?.map((option) => (
+                                      <MenuItem key={option._id} value={option._id}>
+                                        {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                      </MenuItem>
+                                    ))}
                                   </TextField>
                                 )}
                               />
@@ -764,7 +803,7 @@ const AddCaseForm = ({ onCancel }) => {
                               name="riskNotes"
                               control={control}
                               rules={{
-                                required: 'Notes are required',
+                                // required: 'Notes are required',
                                 minLength: {
                                   value: 10,
                                   message: 'Notes must be at least 10 characters long'
@@ -829,9 +868,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="preferredContact"
                         control={control}
-                        rules={{
-                          required: 'Preferred method of contact is required'
-                        }}
+                        // rules={{
+                        //   required: 'Preferred method of contact is required'
+                        // }}
                         render={({ field }) => (
                           <TextField
                             fullWidth
@@ -842,12 +881,11 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.preferredContact}
                             helperText={errors.preferredContact?.message}
                           >
-                            <MenuItem value="email">Email</MenuItem>
-                            <MenuItem value="phone">Phone</MenuItem>
-                            <MenuItem value="text">Text</MenuItem>
-                            <MenuItem value="letter">Letter</MenuItem>
-                            <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                            <MenuItem value="doNotContact">Do not contact</MenuItem>
+                            {contactmethod?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -857,9 +895,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="contactPurpose"
                         control={control}
-                        rules={{
-                          required: 'Contact purpose is required'
-                        }}
+                        // rules={{
+                        //   required: 'Contact purpose is required'
+                        // }}
                         render={({ field }) => (
                           <TextField
                             fullWidth
@@ -870,8 +908,11 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.contactPurpose}
                             helperText={errors.contactPurpose?.message}
                           >
-                            <MenuItem value="newsletter">Newsletter</MenuItem>
-                            <MenuItem value="upcomingEvents">Upcoming Events</MenuItem>
+                            {contactpurpose?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -881,9 +922,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="confirmationDate"
                         control={control}
-                        rules={{
-                          required: 'Date is required'
-                        }}
+                        // rules={{
+                        //   required: 'Date is required'
+                        // }}
                         render={({ field }) => (
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
@@ -909,9 +950,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="reason"
                         control={control}
-                        rules={{
-                          required: 'Reason is required'
-                        }}
+                        // rules={{
+                        //   required: 'Reason is required'
+                        // }}
                         render={({ field }) => (
                           <TextField
                             fullWidth
@@ -922,10 +963,11 @@ const AddCaseForm = ({ onCancel }) => {
                             error={!!errors.reason}
                             helperText={errors.reason?.message}
                           >
-                            <MenuItem value="interest">Legitimate Interest</MenuItem>
-                            <MenuItem value="byRequest">By Request</MenuItem>
-                            <MenuItem value="deceased">Deceased</MenuItem>
-                            <MenuItem value="goneAway">Gone Away</MenuItem>
+                            {reason?.map((option) => (
+                              <MenuItem key={option._id} value={option._id}>
+                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                              </MenuItem>
+                            ))}
                           </TextField>
                         )}
                       />
@@ -936,7 +978,7 @@ const AddCaseForm = ({ onCancel }) => {
                         name="mobilePhone"
                         control={control}
                         rules={{
-                          required: 'Reason is required',
+                          // required: 'Phone number is required',
                           pattern: {
                             value: onlyNumbers,
                             message: 'Phone number must contain only numbers'
@@ -973,7 +1015,7 @@ const AddCaseForm = ({ onCancel }) => {
                         name="email"
                         control={control}
                         rules={{
-                          required: 'Email is required',
+                          // required: 'Email is required',
                           pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message: 'Invalid email address'
@@ -1075,12 +1117,12 @@ const AddCaseForm = ({ onCancel }) => {
                           onSubmit(data);
                         })}
                       >
-                        {isLoading ? 'Saving...' : 'Save Changes'}
+                        {isLoading ? 'Saving...' : 'SAVE CHANGES'}
                       </Button>
                     </Grid>
                     <Grid item>
                       <Button variant="outlined" color="error" onClick={() => navigate('/donor')}>
-                        Cancel
+                        CANCEL
                       </Button>
                     </Grid>
                   </Grid>

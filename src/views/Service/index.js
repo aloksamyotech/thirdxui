@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, Chip } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase, Chip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -10,7 +10,7 @@ import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -34,13 +34,13 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
           }}
         >
-          SERIVCE LIST
+          Service List
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <GridToolbarExport />
@@ -58,7 +58,7 @@ const Lead = () => {
   const [rows, setRows] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [totalRows, setTotalRows] = useState(0);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
@@ -67,35 +67,36 @@ const Lead = () => {
   });
 
   const columns = [
-{
-  field: 'name',
-  headerName: 'Service Name',
-  flex: 1.5,
-  renderCell: (params) => (
-    <Stack sx={{ overflow: 'hidden', width: '100%' }}>
-      <Typography
-        variant="body1"
-        sx={{
-          textTransform: 'uppercase',
-          fontWeight: 'bold',
-          whiteSpace: 'normal',         
-          wordBreak: 'break-word',      
-          overflowWrap: 'break-word',
-        }}
-      >
-        {params.row.name}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="textSecondary"
-        sx={{ whiteSpace: 'nowrap' }}  
-      >
-        {new Date(params.row.updatedAt).toDateString()}
-      </Typography>
-    </Stack>
-  )
-}
-,
+    {
+      field: 'name',
+      headerName: 'Service Name',
+      flex: 1.5,
+      renderCell: (params) => (
+        <Stack sx={{ overflow: 'hidden', width: '100%' }}>
+          <Typography
+            variant="body1"
+            sx={{
+              textTransform: 'uppercase',
+              fontWeight: 400,
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
+            }}
+            mb={1}
+          >
+            {params.row.name}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            {new Date(params.row.updatedAt).toDateString()}
+          </Typography>
+        </Stack>
+      )
+    }
+    ,
 
     {
       field: 'serviceType',
@@ -125,8 +126,7 @@ const Lead = () => {
             sx={{
               color: isActive ? '#79dbfb' : '#ff6a67',
               backgroundColor: isActive ? '#e5f8fe' : '#ffeae9',
-              fontWeight: 'bold',
-              minWidth: '80px'
+              maxWidth: '80px'
             }}
           />
         );
@@ -143,11 +143,11 @@ const Lead = () => {
           sx={{
             backgroundColor: '#f0f0f0',
             padding: '4px 8px',
-            borderRadius: '8px',
+            borderRadius: '12px',
             cursor: 'pointer'
           }}
         >
-          <Typography color="black">View More</Typography>
+          <Typography color="grey">View More</Typography>
         </Box>
       )
     }
@@ -163,8 +163,6 @@ const Lead = () => {
             value: item._id,
             label: item.name
           }));
-
-         
 
         setServiceTypeOptions(options);
       } catch (error) {
@@ -252,9 +250,8 @@ const Lead = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: 'auto',
+                width: '220px',
                 height: '35px',
-                px: 2,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -271,17 +268,45 @@ const Lead = () => {
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-
-          <TextField
-            size="small"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            InputProps={{
-              endAdornment: <SearchIcon />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
             }}
-            sx={{ width: '350px' }}
-          />
+          >
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
+              sx={{
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Box>
+
         </Stack>
 
         <Grid container spacing={2}>
@@ -293,22 +318,22 @@ const Lead = () => {
             statuses={statusFilter}
             statusFilter={status}
             setStatusFilter={setStatus}
-            selectedFilters={['statusFilter', 'serviceTypeFilter']}
+            selectedFilters={['serviceTypeFilter', 'statusFilter']}
             onReset={handleReset}
           />
 
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
                     rows={
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -318,15 +343,36 @@ const Lead = () => {
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
                     pageSizeOptions={[10]}
-                    rowHeight={65}
+                    rowHeight={70}
                     getRowId={(row) => row._id}
-                    components={{
-                      Toolbar: () => <CustomHeader />
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (
+                        loading ? null : (
+                          <Box sx={{ padding: 2, textAlign: 'center' }}>
+                            No data available.
+                          </Box>
+                        )
+                      ),
                     }}
                     onRowClick={(params) => navigate('/view-service', { state: { row: params.row } })}
                     sx={{
                       '& .MuiDataGrid-row': {
-                        borderBottom: '1px solid #ccc'
+                        borderBottom: '1px solid #ccc',
+                        cursor: 'pointer'
                       }
                     }}
                   />

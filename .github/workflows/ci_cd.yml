@@ -1,14 +1,14 @@
-name: Deploy to develop
+name: Deploy to new-dev
 
 on:
   push:
     branches:
-      - develop
+      - new-dev
   workflow_dispatch:  # Enable manual trigger
 
 jobs:
   redeploy_frontend:
-    name: Deploy frontend to develop
+    name: Deploy frontend to new-dev
     runs-on: ubuntu-latest
 
     steps:
@@ -26,8 +26,8 @@ jobs:
             cd /thiredx/thirdxui
             sudo git stash
             sudo git fetch --all
-            sudo git checkout develop
-            sudo git pull origin develop
+            sudo git checkout new-dev
+            sudo git pull origin new-dev
             git log -1
             sudo npm install -f
             sudo npm run build

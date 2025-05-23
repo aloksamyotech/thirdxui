@@ -14,7 +14,7 @@ import FilterPanel from 'components/FilterPanel';
 import CaseNoteDialog from 'components/AddCaseNote';
 import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
-import ServiceUser from 'assets/images/serviceUser.png';
+import  ServiceUser from 'assets/images/UserProfile.png'
 import OptionsPopover from 'components/AddFilter';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';

@@ -46,10 +46,15 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const handleConfirmDelete = async () => {
     try {
       await updateApi(`${urls.serviceuser.deleteUser}/${data?._id}`);
-      toast.success('Service user deleted successfully!');
       setConfirmOpen(false);
       onClose();
-      navigate('/people');
+        if (data?.role === 'volunteer') {
+        toast.success('Volunteer user Deleted successfully!');
+        navigate('/volunteer');
+      } else {
+        toast.success('Service user Deleted successfully!');
+        navigate('/people');
+      }
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error('Failed to delete the user.');
@@ -59,10 +64,15 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const handleConfirmArchive = async () => {
     try {
       await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
-      toast.success('Service user archived successfully!');
       setConfirmArchiveOpen(false);
       onClose();
-      navigate('/people');
+       if (data?.role === 'volunteer') {
+        toast.success('Volunteer user archived successfully!');
+        navigate('/volunteer');
+      } else {
+        toast.success('Service user archived successfully!');
+        navigate('/people');
+      }
     } catch (error) {
       console.error('Error archiving user:', error);
       toast.error('Failed to archive the user.');

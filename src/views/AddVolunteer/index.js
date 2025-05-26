@@ -1248,7 +1248,13 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                             <Box mb={2} display="flex" justifyContent="space-between">
-                              <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                accept="image/*"
+                                onChange={handleFileChange}
+                              />
                               <Controller
                                 name="file"
                                 control={control}
@@ -1272,7 +1278,36 @@ const AddCaseForm = ({ onCancel }) => {
                                             <Link component="span" underline="none">
                                               Upload a file
                                             </Link>
-                                            <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                            <input
+                                              type="file"
+                                              hidden
+                                              accept="image/jpeg,image/png,image/jpg"
+                                              onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                                const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                                if (file) {
+                                                  if (!allowedTypes.includes(file.type)) {
+                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
+                                                    e.target.value = null;
+                                                    field.onChange(null);
+                                                    return;
+                                                  }
+
+                                                  if (file.size > maxSizeInBytes) {
+                                                    toast.error('File size must be less than or equal to 25MB.');
+                                                    e.target.value = null;
+                                                    field.onChange(null);
+                                                    return;
+                                                  }
+
+                                                  field.onChange(file);
+                                                } else {
+                                                  field.onChange(null);
+                                                }
+                                              }}
+                                            />
                                           </Button>
                                         </InputAdornment>
                                       )
@@ -1281,6 +1316,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 )}
                               />
                             </Box>
+
                             <Controller
                               name="riskNotes"
                               control={control}

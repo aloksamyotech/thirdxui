@@ -18,7 +18,8 @@ import {
   Button,
   FormControlLabel,
   Autocomplete,
-  FormHelperText
+  FormHelperText,
+  Chip
 } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 import { useLocation } from 'react-router-dom';
@@ -44,6 +45,12 @@ const AddCaseForm = ({ onCancel }) => {
   const [contactpurpose, setContactpurpose] = useState([]);
   const [reason, setReason] = useState([]);
   const [contactmethod, setContactmethod] = useState([]);
+  const [benificiary, setBenificiary] = useState([]);
+  const [Campaigns, setCampaigns] = useState([]);
+  const [engagement, setengagement] = useState([]);
+  const [eventsAttended, seteventsAttended] = useState([]);
+  const [fundingInterests, setfundingInterests] = useState([]);
+  const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const location = useLocation();
   const editdata = location.state;
 
@@ -80,12 +87,12 @@ const AddCaseForm = ({ onCancel }) => {
       language: editdata?.contactInfo?.firstLanguage || '',
       otherId: editdata?.contactInfo?.otherId || '',
       riskNotes: editdata?.otherInfo?.description || '',
-      Beneficiary: editdata?.otherInfo?.benificiary || '',
-      Campaigns: editdata?.otherInfo?.campaigns || '',
-      engagement: editdata?.otherInfo?.engagement || '',
-      eventsAttended: editdata?.otherInfo?.eventAttanded || '',
-      fundingInterests: editdata?.otherInfo?.fundingInterest || '',
-      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities || '',
+      Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
+      Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
+      engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
+      eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
+      fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
+      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
       restrictAccess: editdata?.otherInfo?.restrictAccess || false,
       title: editdata?.emergencyContact?.title || '',
       gender: editdata?.emergencyContact?.gender || '',
@@ -113,14 +120,30 @@ const AddCaseForm = ({ onCancel }) => {
 
   useEffect(() => {
     if (editdata) {
-      setValue('preferredContact', editdata?.contactPreferences?.preferredMethod?._id || '');
-      setValue('reason', editdata?.contactPreferences?.reason?._id || '');
-      setValue('contactPurpose', editdata?.contactPreferences?.contactPurposes?._id || '');
-      setValue('confirmationDate', editdata?.contactPreferences?.dateOfConfirmation || null);
-      setValue('telephone', editdata?.contactPreferences?.contactMethods?.telephone ?? true);
-      setValue('emailConsent', editdata?.contactPreferences?.contactMethods?.email ?? true);
-      setValue('sms', editdata?.contactPreferences?.contactMethods?.sms ?? true);
-      setValue('whatsapp', editdata?.contactPreferences?.contactMethods?.whatsapp ?? true);
+      if (editdata.contactPreferences) {
+        if (editdata.contactPreferences.preferredMethod && editdata.contactPreferences.preferredMethod._id) {
+          setValue('preferredContact', editdata.contactPreferences.preferredMethod._id);
+        }
+
+        if (editdata.contactPreferences.reason && editdata.contactPreferences.reason._id) {
+          setValue('reason', editdata.contactPreferences.reason._id);
+        }
+
+        if (editdata.contactPreferences.contactPurposes && editdata.contactPreferences.contactPurposes._id) {
+          setValue('contactPurpose', editdata.contactPreferences.contactPurposes._id);
+        }
+
+        if (editdata.contactPreferences.dateOfConfirmation) {
+          setValue('confirmationDate', editdata.contactPreferences.dateOfConfirmation);
+        }
+
+        if (editdata.contactPreferences.contactMethods) {
+          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? true);
+          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
+          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
+          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
+        }
+      }
     }
   }, [editdata, setValue]);
 
@@ -199,7 +222,70 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
 
+        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
+        setBenificiary(benificiarydata);
+        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
+        setCampaigns(Campaignsdata);
+        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
+        setengagement(engagementdata);
+        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
+        seteventsAttended(eventsAttendeddata);
+        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
+        setfundingInterests(fundingInterestsdata);
+        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
+        setfundraisingActivities(fundraisingActivitiesdata);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+    fetchTags();
+  }, []);
+  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <Autocomplete
+          multiple
+          options={options}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
+          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                label={option.name}
+                {...getTagProps({ index })}
+                key={option._id}
+                deleteIcon={
+                  <span
+                    style={{
+                      backgroundColor: '#4C4E6442',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                  </span>
+                }
+              />
+            ))
+          }
+          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+        />
+      )}
+    />
+  );
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -232,12 +318,29 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactInfo[otherId]', formData.otherId || '');
 
     fd.append('otherInfo[description]', formData.riskNotes || '');
-    fd.append('otherInfo[benificiary]', formData.Beneficiary || '');
-    fd.append('otherInfo[campaigns]', formData.Campaigns || '');
-    fd.append('otherInfo[engagement]', formData.engagement || '');
-    fd.append('otherInfo[eventAttanded]', formData.eventsAttended || '');
-    fd.append('otherInfo[fundingInterest]', formData.fundingInterests || '');
-    fd.append('otherInfo[fundraisingActivities]', formData.fundraisingActivities || '');
+    (formData.Beneficiary || []).forEach((id) => {
+      fd.append('otherInfo[benificiary][]', id);
+    });
+
+    (formData.Campaigns || []).forEach((id) => {
+      fd.append('otherInfo[campaigns][]', id);
+    });
+
+    (formData.engagement || []).forEach((id) => {
+      fd.append('otherInfo[engagement][]', id);
+    });
+
+    (formData.eventsAttended || []).forEach((id) => {
+      fd.append('otherInfo[eventAttanded][]', id);
+    });
+
+    (formData.fundingInterests || []).forEach((id) => {
+      fd.append('otherInfo[fundingInterest][]', id);
+    });
+
+    (formData.fundraisingActivities || []).forEach((id) => {
+      fd.append('otherInfo[fundraisingActivities][]', id);
+    });
     fd.append('otherInfo[restrictAccess]', formData.restrictAccess ? 'true' : 'false');
 
     fd.append('emergencyContact[firstName]', formData.firstname || '');
@@ -1074,237 +1177,69 @@ const AddCaseForm = ({ onCancel }) => {
 
                             <Grid container spacing={2}>
                               <Grid item xs={12}>
-                                <Controller
-                                  name="Beneficiary"
-                                  control={control}
-                                  rules={{
-                                    minLength: {
-                                      value: 2,
-                                      message: 'Beneficiary information must be at least 2 characters'
-                                    },
-                                    maxLength: {
-                                      value: 50,
-                                      message: 'Beneficiary information cannot exceed 50 characters'
-                                    },
-                                    pattern: {
-                                      value: onlyLetters,
-                                      message: 'Beneficiary information can only contain letters'
-                                    }
-                                  }}
-                                  render={({ field }) => (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label="Beneficiary Information"
-                                      error={!!errors.Beneficiary}
-                                      helperText={errors.Beneficiary?.message}
-                                      inputProps={{
-                                        pattern: onlyLetters.source,
-                                        onKeyPress: (e) => {
-                                          if (!onlyLetters.test(e.key)) {
-                                            e.preventDefault();
-                                          }
-                                        }
-                                      }}
-                                      {...field}
-                                    />
-                                  )}
-                                />
+                                {renderAutocomplete(
+                                  'Beneficiary',
+                                  'Beneficiary Information',
+                                  benificiary,
+                                  errors.Beneficiary,
+                                  errors.Beneficiary?.message,
+                                  control
+                                )}
                               </Grid>
 
                               <Grid item xs={12}>
-                                <Controller
-                                  name="Campaigns"
-                                  control={control}
-                                  rules={{
-                                    minLength: {
-                                      value: 2,
-                                      message: 'Must be at least 2 characters'
-                                    },
-                                    maxLength: {
-                                      value: 50,
-                                      message: 'Cannot exceed 50 characters'
-                                    },
-                                    pattern: {
-                                      value: onlyLetters,
-                                      message: 'Only contain letters'
-                                    }
-                                  }}
-                                  render={({ field }) => (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label="Campaigns Supported"
-                                      error={!!errors.Campaigns}
-                                      helperText={errors.Campaigns?.message}
-                                      inputProps={{
-                                        pattern: onlyLetters.source,
-                                        onKeyPress: (e) => {
-                                          if (!onlyLetters.test(e.key)) {
-                                            e.preventDefault();
-                                          }
-                                        }
-                                      }}
-                                      {...field}
-                                    />
-                                  )}
-                                />
+                                {renderAutocomplete(
+                                  'Campaigns',
+                                  'Campaigns Supported',
+                                  Campaigns,
+                                  errors.Campaigns,
+                                  errors.Campaigns?.message,
+                                  control
+                                )}
                               </Grid>
 
                               <Grid item xs={12}>
-                                <Controller
-                                  name="engagement"
-                                  control={control}
-                                  rules={{
-                                    minLength: {
-                                      value: 2,
-                                      message: 'Engagement must be at least 2 characters'
-                                    },
-                                    maxLength: {
-                                      value: 50,
-                                      message: 'Engagement cannot exceed 50 characters'
-                                    },
-                                    pattern: {
-                                      value: onlyLetters,
-                                      message: 'Engagement can only contain letters'
-                                    }
-                                  }}
-                                  render={({ field }) => (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label="Engagement"
-                                      error={!!errors.engagement}
-                                      helperText={errors.engagement?.message}
-                                      inputProps={{
-                                        pattern: onlyLetters.source,
-                                        onKeyPress: (e) => {
-                                          if (!onlyLetters.test(e.key)) {
-                                            e.preventDefault();
-                                          }
-                                        }
-                                      }}
-                                      {...field}
-                                    />
-                                  )}
-                                />
+                                {renderAutocomplete(
+                                  'engagement',
+                                  'Engagement',
+                                  engagement,
+                                  errors.engagement,
+                                  errors.engagement?.message,
+                                  control
+                                )}
                               </Grid>
 
                               <Grid item xs={12}>
-                                <Controller
-                                  name="eventsAttended"
-                                  control={control}
-                                  rules={{
-                                    minLength: {
-                                      value: 2,
-                                      message: 'Events attended must be at least 2 characters'
-                                    },
-                                    maxLength: {
-                                      value: 50,
-                                      message: 'Events attended cannot exceed 50 characters'
-                                    },
-                                    pattern: {
-                                      value: onlyLetters,
-                                      message: 'Events attended can only contain letters'
-                                    }
-                                  }}
-                                  render={({ field }) => (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label="Events Attended"
-                                      error={!!errors.eventsAttended}
-                                      helperText={errors.eventsAttended?.message}
-                                      inputProps={{
-                                        pattern: onlyLetters.source,
-                                        onKeyPress: (e) => {
-                                          if (!onlyLetters.test(e.key)) {
-                                            e.preventDefault();
-                                          }
-                                        }
-                                      }}
-                                      {...field}
-                                    />
-                                  )}
-                                />
+                                {renderAutocomplete(
+                                  'eventsAttended',
+                                  'Events Attended',
+                                  eventsAttended,
+                                  errors.eventsAttended,
+                                  errors.eventsAttended?.message,
+                                  control
+                                )}
                               </Grid>
 
                               <Grid item xs={12}>
-                                <Controller
-                                  name="fundingInterests"
-                                  control={control}
-                                  rules={{
-                                    minLength: {
-                                      value: 2,
-                                      message: 'Funding interests must be at least 2 characters'
-                                    },
-                                    maxLength: {
-                                      value: 50,
-                                      message: 'Funding interests cannot exceed 50 characters'
-                                    },
-                                    pattern: {
-                                      value: onlyLetters,
-                                      message: 'Funding interests can only contain letters'
-                                    }
-                                  }}
-                                  render={({ field }) => (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label="Funding Interests"
-                                      error={!!errors.fundingInterests}
-                                      helperText={errors.fundingInterests?.message}
-                                      inputProps={{
-                                        pattern: onlyLetters.source,
-                                        onKeyPress: (e) => {
-                                          if (!onlyLetters.test(e.key)) {
-                                            e.preventDefault();
-                                          }
-                                        }
-                                      }}
-                                      {...field}
-                                    />
-                                  )}
-                                />
+                                {renderAutocomplete(
+                                  'fundingInterests',
+                                  'Funding Interests',
+                                  fundingInterests,
+                                  errors.fundingInterests,
+                                  errors.fundingInterests?.message,
+                                  control
+                                )}
                               </Grid>
 
                               <Grid item xs={12}>
-                                <Controller
-                                  name="fundraisingActivities"
-                                  control={control}
-                                  rules={{
-                                    minLength: {
-                                      value: 2,
-                                      message: 'Fundraising activities must be at least 2 characters'
-                                    },
-                                    maxLength: {
-                                      value: 50,
-                                      message: 'Fundraising activities cannot exceed 50 characters'
-                                    },
-                                    pattern: {
-                                      value: onlyLetters,
-                                      message: 'Fundraising activities can only contain letters'
-                                    }
-                                  }}
-                                  render={({ field }) => (
-                                    <TextField
-                                      fullWidth
-                                      size="small"
-                                      label="Fundraising Activities"
-                                      error={!!errors.fundraisingActivities}
-                                      helperText={errors.fundraisingActivities?.message}
-                                      inputProps={{
-                                        pattern: onlyLetters.source,
-                                        onKeyPress: (e) => {
-                                          if (!onlyLetters.test(e.key)) {
-                                            e.preventDefault();
-                                          }
-                                        }
-                                      }}
-                                      {...field}
-                                    />
-                                  )}
-                                />
+                                {renderAutocomplete(
+                                  'fundraisingActivities',
+                                  'Fundraising Activities',
+                                  fundraisingActivities,
+                                  errors.fundraisingActivities,
+                                  errors.fundraisingActivities?.message,
+                                  control
+                                )}
                               </Grid>
                             </Grid>
                           </Paper>

@@ -58,8 +58,6 @@ const AuthLogin = ({ ...others }) => {
             setIsSubmitting(true);
 
             const response = await postApi(`${urls.login.login}`, values);
-            console.log(`response`, response);
-
             if (response?.data?.statusCode == 401) {
               toast.warn(response?.message || 'Wrong Password ');
             } else if (response?.data?.statusCode == 404) {
@@ -72,7 +70,7 @@ const AuthLogin = ({ ...others }) => {
               }, 1000);
             }
           } catch (error) {
-            console.log(error);
+            console.error(error);
             toast.error(error.response?.data?.message || 'Login failed');
           } finally {
             setIsSubmitting(false);

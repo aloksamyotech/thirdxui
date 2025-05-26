@@ -88,6 +88,7 @@ const AddCaseForm = ({ onCancel }) => {
       language: editdata?.contactInfo?.firstLanguage || '',
       otherId: editdata?.contactInfo?.otherId || '',
       riskNotes: editdata?.otherInfo?.description || '',
+      file: editdata?.otherInfo?.file || '',
       Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
       Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
       engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
@@ -470,7 +471,7 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">{editdata ? 'Edit Service User' : 'Add New Service User'}</Typography>
+          <Typography variant="h4">{editdata ? 'Edit User' : 'Add New User'}</Typography>
 
           <Box
             sx={{
@@ -1264,7 +1265,15 @@ const AddCaseForm = ({ onCancel }) => {
                                     variant="outlined"
                                     size="small"
                                     fullWidth
-                                    value={field.value ? field.value.name : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object' && field.value.name
+                                          ? field.value.name
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop()
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Attachments"
                                     InputProps={{
                                       readOnly: true,
@@ -1276,9 +1285,7 @@ const AddCaseForm = ({ onCancel }) => {
                                       endAdornment: (
                                         <InputAdornment position="end">
                                           <Button component="label" sx={{ minWidth: 0, p: 0, whiteSpace: 'nowrap' }}>
-                                            <Link component="span" underline="none">
-                                              Upload a file
-                                            </Link>
+                                            <Link component="span">{editdata?.otherInfo?.file ? 'Change file' : 'Upload a file'}</Link>
                                             <input
                                               type="file"
                                               hidden
@@ -1286,7 +1293,7 @@ const AddCaseForm = ({ onCancel }) => {
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024; 
+                                                const maxSizeInBytes = 25 * 1024 * 1024;
 
                                                 if (file) {
                                                   if (!allowedTypes.includes(file.type)) {

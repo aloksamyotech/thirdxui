@@ -196,7 +196,8 @@ const response = await getApi(
                 pageSizeOptions={[5]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                onRowClick={(params) => navigate('/people', { state: params.row })}
+                onRowClick={(params) => navigate('/view-people', { state: { id: params.row.attendeeId } })}
+
                 slots={{
                   toolbar: CustomHeader,
                   loadingOverlay: () => (

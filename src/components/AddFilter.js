@@ -46,7 +46,6 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const handleConfirmDelete = async () => {
     try {
       await updateApi(`${urls.serviceuser.deleteUser}/${data?._id}`);
-      // toast.success('Service user deleted successfully!');
       setConfirmOpen(false);
       onClose();
         if (data?.role === 'volunteer') {
@@ -65,7 +64,6 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const handleConfirmArchive = async () => {
     try {
       await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
-      // toast.success('Service user archived successfully!');
       setConfirmArchiveOpen(false);
       onClose();
        if (data?.role === 'volunteer') {

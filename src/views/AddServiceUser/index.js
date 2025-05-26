@@ -54,8 +54,6 @@ const AddCaseForm = ({ onCancel }) => {
   const location = useLocation();
   const editdata = location.state;
 
-  console.log('Edit data:', editdata);
-
   const {
     register,
     handleSubmit,

@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   Grid,
   IconButton,
@@ -19,17 +17,15 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router';
-import useScriptRef from 'hooks/useScriptRef';
-import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { urls } from 'common/urls';
+import { postApi } from 'common/apiClient';
 
 const AuthRegister = ({ ...others }) => {
   const theme = useTheme();
-  const scriptedRef = useScriptRef();
   const [showPassword, setShowPassword] = useState(false);
-  const [checked, setChecked] = useState(true);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleClickShowPassword = () => {
@@ -43,77 +39,62 @@ const AuthRegister = ({ ...others }) => {
   return (
     <Formik
       initialValues={{
-        name: '',
+        userName: '',
         email: '',
-        password: '',
-        phone: ''
+        password: ''
       }}
       validationSchema={Yup.object().shape({
-        name: Yup.string().required('Name is required'),
-        email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-        password: Yup.string().required('Password is required'),
-        phone: Yup.string()
-          .matches(/^[1-9][0-9]{9}$/, 'Phone number must be 10 digits and cannot start with 0')
-          .required('Phone number is required')
+        userName: Yup.string().required('userName is required'),
+        email: Yup.string().email('Must be a valid email').required('Email is required'),
+        password: Yup.string().required('Password is required')
       })}
       onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-        console.log('Attempting to register user:', values);
         try {
-          if (scriptedRef.current) {
-            const res = await addUser(values);
-            console.log('User registered successfully:', res.data);
-            setStatus({ success: true });
-            toast.success('Customer added successfully');
-            values.name = '';
-            values.email = '';
-            values.password = '';
-            values.phone = '';
+          setLoading(true);
+          const response = await postApi(`${urls.login.register}`, values);
+          if (response?.data?.statusCode == 404) {
+            toast.warn(response?.message || 'User already exists');
+          } else if (response?.success) {
+            toast.success(response?.message || 'User Registered Successfully');
+            setTimeout(() => {
+              navigate('/login');
+            }, 1000);
           }
         } catch (err) {
-          console.error('Registration error:', err.response ? err.response.data : err);
-          if (scriptedRef.current) {
-            setStatus({ success: false });
-            if (err.response && err.response.data && err.response.data.message) {
-              const message = err.response.data.message;
-              if (message.includes('User already registered')) {
-                toast.error('Email already in use. Please use a different email.');
-              } else {
-                toast.error(message);
-              }
-              setErrors({ submit: message });
-            } else {
-              toast.error('Failed to add customer');
-              setErrors({ submit: err.message });
-            }
-            setSubmitting(false);
-          }
+          console.error(err);
+          setStatus({ success: false });
+          setErrors({ submit: err.message || 'Something went wrong' });
+          toast.error('Registration failed');
+          setSubmitting(false);
+        } finally {
+          setLoading(false);
         }
       }}
     >
-      {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+      {({ errors, handleBlur, handleChange, handleSubmit, touched, values }) => (
         <form noValidate onSubmit={handleSubmit} {...others}>
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Name"
+              label="UserName"
               margin="normal"
-              name="name"
-              type="text"
-              value={values.name}
+              name="userName"
+              value={values.userName}
               onBlur={handleBlur}
               onChange={handleChange}
+              error={Boolean(touched.userName && errors.userName)}
+              helperText={touched.userName && errors.userName}
               sx={{
                 '& .MuiFormLabel-root': {
                   color: '#000066'
                 },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: errors.name ? '#000066' : ''
+                    borderColor: errors.userName ? '#000066' : ''
                   }
                 }
               }}
             />
-            {touched.name && errors.name && <FormHelperText error>{errors.name}</FormHelperText>}
           </Grid>
 
           <TextField
@@ -139,33 +120,11 @@ const AuthRegister = ({ ...others }) => {
             }}
           />
 
-          <TextField
+          <FormControl
             fullWidth
-            label="Password"
-            margin="normal"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            value={values.password}
-            onBlur={handleBlur}
-            onChange={handleChange}
             error={Boolean(touched.password && errors.password)}
-            helperText={touched.password && errors.password}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge="end"
-                    size="small"
-                  >
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
             sx={{
+              mt: 2,
               '& .MuiFormLabel-root': {
                 color: '#000066'
               },
@@ -175,49 +134,26 @@ const AuthRegister = ({ ...others }) => {
                 }
               }
             }}
-          />
-
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Phone"
-              margin="normal"
-              name="phone"
-              type="text"
-              value={values.phone}
+          >
+            <InputLabel htmlFor="register-password">Password</InputLabel>
+            <OutlinedInput
+              id="register-password"
+              type={showPassword ? 'text' : 'password'}
+              value={values.password}
+              name="password"
               onBlur={handleBlur}
               onChange={handleChange}
-              sx={{
-                '& .MuiFormLabel-root': {
-                  color: '#000066'
-                },
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: errors.phone ? '#000066' : ''
-                  }
-                }
-              }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} edge="end" size="small">
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Password"
             />
-            {touched.phone && errors.phone && <FormHelperText error>{errors.phone}</FormHelperText>}
-          </Grid>
-
-          {/* <Grid container alignItems="center" justifyContent="space-between">
-            <Grid item>
-              <FormControlLabel
-                control={
-                  <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} name="checked" color="primary" />
-                }
-                label={
-                  <Typography variant="subtitle1">
-                    Agree with &nbsp;
-                    <Typography variant="subtitle1" component={Link} to="#">
-                      Terms & Condition.
-                    </Typography>
-                  </Typography>
-                }
-              />
-            </Grid>
-          </Grid> */}
+            {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
+          </FormControl>
 
           {errors.submit && (
             <Box sx={{ mt: 1 }}>
@@ -225,20 +161,20 @@ const AuthRegister = ({ ...others }) => {
             </Box>
           )}
 
-          <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
-          <Button
-                disableElevation
-                fullWidth
-                size="small"
-                type="submit"
-                variant="contained"
-                sx={{
-                  backgroundColor: '#f7931e !important'
-                }}
-                onClick={() => navigate('/dashboard/default')}
-              >
-                REGISTER
-              </Button>
+          <Box sx={{ mt: 2 }}>
+            <Button
+              disableElevation
+              fullWidth
+              size="small"
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: '#f7931e !important'
+              }}
+              disabled={loading}
+            >
+              REGISTER
+            </Button>
           </Box>
         </form>
       )}

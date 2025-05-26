@@ -85,7 +85,7 @@ const BulkDelete = () => {
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
         archive: 'true',
-        role: 'service_user'
+        
       });
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);

@@ -65,12 +65,13 @@ export const urls = Object.freeze({
     filter: `${baseUrl}/session/search`,
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
-    update: `${baseUrl}/session/editSession/:id`
+    update: `${baseUrl}/session/editSession/:id`,
+    fetchWithPagination:`${baseUrl}/session/allwithpagination`
+
   },
   casenote: {
     create: `${baseUrl}/caseNote/add`,
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
-
   },
   forms: {
     add: `${baseUrl}/forms`,
@@ -82,5 +83,9 @@ export const urls = Object.freeze({
   attendees: {
     create: `${baseUrl}/attendees/addAttendee`,
     getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`
+  },
+  login: {
+    login: `${baseUrl}/admin/login`,
+    register: `${baseUrl}/admin/`
   }
 });

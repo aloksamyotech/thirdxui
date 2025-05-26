@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
+import PrivateRoutes from './PrivateRoute';
 
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const PeopleManagement = Loadable(lazy(() => import('views/People')));
@@ -48,169 +49,175 @@ const MainRoutes = {
   children: [
     {
       path: '/',
-      element: <DashboardDefault />
-    },
-    {
-      path: 'dashboard',
+      element: <PrivateRoutes />,
       children: [
         {
-          path: 'default',
+          path: '/',
           element: <DashboardDefault />
+        },
+        {
+          path: 'dashboard',
+          children: [
+            {
+              path: 'default',
+              element: <DashboardDefault />
+            }
+          ]
+        },
+        {
+          path: 'people',
+          element: <PeopleManagement />
+        },
+        {
+          path: 'view-people',
+          element: <ViewServiceUser />
+        },
+        {
+          path: 'add-serviceuser',
+          element: <AddServiceUser />
+        },
+        {
+          path: 'add-user',
+          element: <AddUser />
+        },
+        {
+          path: 'add-volunteer',
+          element: <AddVolunteer />
+        },
+        {
+          path: 'volunteer',
+          element: <Volunteer />
+        },
+        {
+          path: 'referral',
+          element: <NewReferral />
+        },
+        {
+          path: 'services',
+          element: <ServiceManagement />
+        },
+        {
+          path: 'add-service',
+          element: <AddService />
+        },
+        {
+          path: 'case',
+          element: <Case />
+        },
+        {
+          path: 'add-case',
+          element: <AddCase />
+        },
+        {
+          path: 'mail',
+          element: <Mail />
+        },
+        {
+          path: 'add-mail',
+          element: <AddMail />
+        },
+        {
+          path: 'donor',
+          element: <Donor />
+        },
+        {
+          path: 'add-donor',
+          element: <AddDonor />
+        },
+        {
+          path: 'add-donorCompany',
+          element: <AddDonorCompany />
+        },
+        {
+          path: 'financial',
+          element: <Financial />
+        },
+        {
+          path: 'add-transaction',
+          element: <AddTransaction />
+        },
+        {
+          path: 'mailing-list',
+          element: <MailingList />
+        },
+        {
+          path: 'manage-form',
+          element: <ManageForm />
+        },
+        {
+          path: 'submission',
+          element: <Submission />
+        },
+        {
+          path: 'history',
+          element: <History />
+        },
+        {
+          path: 'report',
+          element: <Report />
+        },
+        {
+          path: 'bulkupload',
+          element: <BulkUpload />
+        },
+        {
+          path: 'duplicate',
+          element: <Duplicate />
+        },
+        {
+          path: 'bulkdelete',
+          element: <BulkDelete />
+        },
+        {
+          path: 'archives',
+          element: <Archives />
+        },
+        {
+          path: 'configuration',
+          element: <Configuration />
+        },
+        {
+          path: 'tags',
+          element: <Tag />
+        },
+        {
+          path: 'add-tag',
+          element: <AddTag />
+        },
+        {
+          path: 'users',
+          element: <User />
+        },
+        {
+          path: 'account',
+          element: <UserAccount />
+        },
+        {
+          path: 'view-service',
+          element: <ViewService />
+        },
+        {
+          path: 'add-session',
+          element: <AddSession />
+        },
+        {
+          path: 'view-case',
+          element: <ViewCase />
+        },
+        {
+          path: 'view-session',
+          element: <ViewSession />
+        },
+        {
+          path: 'attendees',
+          element: <Attendees />
+        },
+        {
+          path: 'view-donor',
+          element: <ViewDonor />
         }
       ]
-    },
-    {
-      path: 'people',
-      element: <PeopleManagement />
-    },
-    {
-      path: 'view-people',
-      element: <ViewServiceUser />
-    },
-    {
-      path: 'add-serviceuser',
-      element: <AddServiceUser />
-    },
-     {
-      path: 'add-user',
-      element: <AddUser />
-    },
-    {
-      path: 'add-volunteer',
-      element: <AddVolunteer />
-    },
-    {
-      path: 'volunteer',
-      element: <Volunteer />
-    },
-    {
-      path: 'referral',
-      element: <NewReferral />
-    },
-    {
-      path: 'services',
-      element: <ServiceManagement />
-    },
-    {
-      path: 'add-service',
-      element: <AddService />
-    },
-    {
-      path: 'case',
-      element: <Case />
-    },
-    {
-      path: 'add-case',
-      element: <AddCase />
-    },
-    {
-      path: 'mail',
-      element: <Mail />
-    },
-    {
-      path: 'add-mail',
-      element: <AddMail />
-    },
-    {
-      path: 'donor',
-      element: <Donor />
-    },
-    {
-      path: 'add-donor',
-      element: <AddDonor />
-    },
-    {
-      path: 'add-donorCompany',
-      element: <AddDonorCompany />
-    },
-    {
-      path: 'financial',
-      element: <Financial />
-    },
-    {
-      path: 'add-transaction',
-      element: <AddTransaction />
-    },
-    {
-      path: 'mailing-list',
-      element: <MailingList />
-    },
-    {
-      path: 'manage-form',
-      element: <ManageForm />
-    },
-    {
-      path: 'submission',
-      element: <Submission />
-    },
-    {
-      path: 'history',
-      element: <History />
-    },
-    {
-      path: 'report',
-      element: <Report />
-    },
-    {
-      path: 'bulkupload',
-      element: <BulkUpload />
-    },
-    {
-      path: 'duplicate',
-      element: <Duplicate />
-    },
-    {
-      path: 'bulkdelete',
-      element: <BulkDelete />
-    },
-    {
-      path: 'archives',
-      element: <Archives />
-    },
-    {
-      path: 'configuration',
-      element: <Configuration />
-    },
-    {
-      path: 'tags',
-      element: <Tag />
-    },
-    {
-      path: 'add-tag',
-      element: <AddTag />
-    },
-    {
-      path: 'users',
-      element: <User />
-    },
-    {
-      path: 'account',
-      element: <UserAccount />
-    },
-    {
-      path: 'view-service',
-      element: <ViewService />
-    },
-    {
-      path: 'add-session',
-      element: <AddSession />
-    },
-    {
-      path: 'view-case',
-      element: <ViewCase />
-    },
-    {
-      path: 'view-session',
-      element: <ViewSession />
-    },
-    {
-      path: 'attendees',
-      element: <Attendees />
-    },
-    {
-      path: 'view-donor',
-      element: <ViewDonor />
-    },
+    }
   ]
 };
 

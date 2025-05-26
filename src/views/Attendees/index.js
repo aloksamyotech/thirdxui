@@ -194,7 +194,8 @@ export default function SessionRegisterPage() {
                 pageSizeOptions={[5]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                onRowClick={(params) => navigate('/services', { state: params.row })}
+                onRowClick={(params) => navigate('/view-people', { state: { id: params.row.attendeeId } })}
+
                 slots={{
                   toolbar: CustomHeader,
                   loadingOverlay: () => (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Box, Paper, Autocomplete, Button, MenuItem, InputAdornment, Card, Typography } from '@mui/material';
+import { Grid, TextField, Box, Paper, Autocomplete, Button, MenuItem, InputAdornment, Card, Typography, Chip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useForm, Controller } from 'react-hook-form';
@@ -7,7 +7,7 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { postApi, updateApi } from 'common/apiClient';
+import { postApi, updateApi, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -18,6 +18,12 @@ const AddCaseForm = ({ onCancel }) => {
   const [countryList, setCountryList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [serviceid, setServiceid] = useState();
+  const [benificiary, setBenificiary] = useState([]);
+  const [Campaigns, setCampaigns] = useState([]);
+  const [engagement, setengagement] = useState([]);
+  const [eventsAttended, seteventsAttended] = useState([]);
+  const [fundingInterests, setfundingInterests] = useState([]);
+  const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const location = useLocation();
   const session = location.state.session;
   const serviceId = session?.serviceId || location.state?.serviceId;
@@ -33,12 +39,12 @@ const AddCaseForm = ({ onCancel }) => {
       date: dayjs(),
       countryOfOrigin: '',
       type: '',
-      benificiary: '',
-      campaigns: '',
-      engagement: '',
-      eventAttanded: '',
-      fundingInterest: '',
-      fundraisingActivities: '',
+      benificiary: [],
+      campaigns: [],
+      engagement: [],
+      eventAttanded: [],
+      fundingInterest: [],
+      fundraisingActivities: [],
       time: dayjs().format('HH:mm'),
       description: '',
       file: null
@@ -53,13 +59,13 @@ const AddCaseForm = ({ onCancel }) => {
         date: session.date ? dayjs(session.date) : dayjs(),
         time: session.time || dayjs().format('HH:mm'),
         description: session.description || '',
-        benificiary: session.benificiary || '',
-        campaigns: session.campaigns || '',
-        engagement: session.engagement || '',
-        eventAttanded: session.eventAttanded || '',
-        fundingInterest: session.fundingInterest || '',
-        fundraisingActivities: session.fundraisingActivities || '',
-        serviceId: session.serviceId,
+        beneficiary: session.benificiary || [],
+        campaigns: session.campaigns || [],
+        engagement: session.engagement || [],
+        eventsAttended: session.eventAttanded || [],
+        fundingInterests: session.fundingInterest || [],
+        fundraisingActivities: session.fundraisingActivities || [],
+        serviceId: session.serviceId || '',
         file: null
       };
 
@@ -67,9 +73,74 @@ const AddCaseForm = ({ onCancel }) => {
     }
   }, [session, reset, serviceId]);
 
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+
+        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
+        setBenificiary(benificiarydata);
+        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
+        setCampaigns(Campaignsdata);
+        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
+        setengagement(engagementdata);
+        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
+        seteventsAttended(eventsAttendeddata);
+        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
+        setfundingInterests(fundingInterestsdata);
+        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
+        setfundraisingActivities(fundraisingActivitiesdata);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+    fetchTags();
+  }, []);
+  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <Autocomplete
+          multiple
+          options={options}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
+          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                label={option.name}
+                {...getTagProps({ index })}
+                key={option._id}
+                deleteIcon={
+                  <span
+                    style={{
+                      backgroundColor: '#4C4E6442',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                  </span>
+                }
+              />
+            ))
+          }
+          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+        />
+      )}
+    />
+  );
   const onSubmit = async (data) => {
     setIsLoading(true);
     let response;
+
     try {
       const formData = new FormData();
 
@@ -78,17 +149,37 @@ const AddCaseForm = ({ onCancel }) => {
       formData.append('date', data.date || '');
       formData.append('time', data.time || '');
       formData.append('description', data.description || '');
-      formData.append('benificiary', data.benificiary || '');
-      formData.append('campaigns', data.campaigns || '');
-      formData.append('engagement', data.engagement || '');
-      formData.append('eventAttanded', data.eventAttanded || '');
-      formData.append('fundingInterest', data.fundingInterest || '');
-      formData.append('fundraisingActivities', data.fundraisingActivities || '');
-      formData.append('serviceId', serviceId || '');
+
+      (data.beneficiary || []).forEach((id) => {
+        formData.append('benificiary[]', id);
+      });
+
+      (data.campaigns || []).forEach((id) => {
+        formData.append('campaigns[]', id);
+      });
+
+      (data.engagement || []).forEach((id) => {
+        formData.append('engagement[]', id);
+      });
+
+      (data.eventsAttended || []).forEach((id) => {
+        formData.append('eventAttanded[]', id);
+      });
+
+      (data.fundingInterests || []).forEach((id) => {
+        formData.append('fundingInterest[]', id);
+      });
+
+      (data.fundraisingActivities || []).forEach((id) => {
+        formData.append('fundraisingActivities[]', id);
+      });
+
+      formData.append('serviceId', data.serviceId || '');
 
       if (data.file) {
-        formData.append('file', data.file || '');
+        formData.append('file', data.file);
       }
+
       if (session?._id) {
         response = await updateApi(urls.session.update.replace(':id', session._id), formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -263,130 +354,62 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
-                      <Controller
-                        name="benificiary"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Beneficiary Information"
-                            error={!!errors.benificiary}
-                            helperText={errors.benificiary?.message}
-                            {...field}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'beneficiary',
+                        'Beneficiary Information',
+                        benificiary,
+                        errors.beneficiary,
+                        errors.beneficiary?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="campaigns"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Campaigns Supported"
-                            error={!!errors.campaigns}
-                            helperText={errors.campaigns?.message}
-                            {...field}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'campaigns',
+                        'Campaigns Supported',
+                        Campaigns,
+                        errors.campaigns,
+                        errors.campaigns?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="engagement"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Engagement"
-                            error={!!errors.engagement}
-                            helperText={errors.engagement?.message}
-                            {...field}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete('engagement', 'Engagement', engagement, errors.engagement, errors.engagement?.message, control)}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="eventAttanded"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Events Attended"
-                            error={!!errors.eventAttanded}
-                            helperText={errors.eventAttanded?.message}
-                            {...field}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'eventsAttended',
+                        'Events Attended',
+                        eventsAttended,
+                        errors.eventsAttended,
+                        errors.eventsAttended?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="fundingInterest"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Funding Interests"
-                            error={!!errors.fundingInterest}
-                            helperText={errors.fundingInterest?.message}
-                            {...field}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'fundingInterests',
+                        'Funding Interests',
+                        fundingInterests,
+                        errors.fundingInterests,
+                        errors.fundingInterests?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="fundraisingActivities"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Fundraising Activities"
-                            error={!!errors.fundraisingActivities}
-                            helperText={errors.fundraisingActivities?.message}
-                            {...field}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'fundraisingActivities',
+                        'Fundraising Activities',
+                        fundraisingActivities,
+                        errors.fundraisingActivities,
+                        errors.fundraisingActivities?.message,
+                        control
+                      )}
                     </Grid>
                   </Grid>
                 </Paper>

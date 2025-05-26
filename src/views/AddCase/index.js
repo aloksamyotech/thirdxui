@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography } from '@mui/material';
-import { MenuItem, Select, Chip, FormControl, InputLabel, Autocomplete } from '@mui/material';
+import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography, FormControlLabel, Autocomplete } from '@mui/material';
+import { MenuItem, Select, Chip, FormControl, InputLabel } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
@@ -20,6 +20,12 @@ const AddCaseForm = () => {
   const fileInputRef = React.useRef(null);
   const [rows, setRows] = useState([]);
   const [services, setServices] = useState([]);
+  const [benificiary, setBenificiary] = useState([]);
+  const [Campaigns, setCampaigns] = useState([]);
+  const [engagement, setengagement] = useState([]);
+  const [eventsAttended, seteventsAttended] = useState([]);
+  const [fundingInterests, setfundingInterests] = useState([]);
+  const [fundraisingActivities, setfundraisingActivities] = useState([]);
 
   const {
     control,
@@ -36,12 +42,12 @@ const AddCaseForm = () => {
       serviceType: '',
       caseOpened: null,
       caseClosed: null,
-      benificiary: '',
-      campaigns: '',
-      engagement: '',
-      eventAttanded: '',
-      fundingInterest: '',
-      fundraisingActivities: '',
+      benificiary: [],
+      campaigns: [],
+      engagement: [],
+      eventAttanded: [],
+      fundingInterest: [],
+      fundraisingActivities: [],
       description: '',
       files: null
     },
@@ -59,7 +65,70 @@ const AddCaseForm = () => {
       setValue('attachments', file);
     }
   };
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
 
+        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
+        setBenificiary(benificiarydata);
+        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
+        setCampaigns(Campaignsdata);
+        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
+        setengagement(engagementdata);
+        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
+        seteventsAttended(eventsAttendeddata);
+        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
+        setfundingInterests(fundingInterestsdata);
+        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
+        setfundraisingActivities(fundraisingActivitiesdata);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+    fetchTags();
+  }, []);
+  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <Autocomplete
+          multiple
+          options={options}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
+          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                label={option.name}
+                {...getTagProps({ index })}
+                key={option._id}
+                deleteIcon={
+                  <span
+                    style={{
+                      backgroundColor: '#4C4E6442',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                  </span>
+                }
+              />
+            ))
+          }
+          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+        />
+      )}
+    />
+  );
   const onSubmit = async (data) => {
     setIsloading(true);
 
@@ -71,15 +140,36 @@ const AddCaseForm = () => {
       formData.append('serviceType', data.serviceType || '');
       formData.append('caseOpened', data.caseOpened || '');
       formData.append('caseClosed', data.caseClosed || '');
-      formData.append('benificiary', data.benificiary || '');
-      formData.append('campaigns', data.campaigns || '');
-      formData.append('engagement', data.engagement || '');
-      formData.append('fundingInterest', data.fundingInterests || '');
-      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+
+      (data.Beneficiary || []).forEach((id) => {
+        formData.append('benificiary[]', id);
+      });
+
+      (data.Campaigns || []).forEach((id) => {
+        formData.append('campaigns[]', id);
+      });
+
+      (data.engagement || []).forEach((id) => {
+        formData.append('engagement[]', id);
+      });
+
+      (data.eventsAttended || []).forEach((id) => {
+        formData.append('eventAttanded[]', id);
+      });
+
+      (data.fundingInterests || []).forEach((id) => {
+        formData.append('fundingInterest[]', id);
+      });
+
+      (data.fundraisingActivities || []).forEach((id) => {
+        formData.append('fundraisingActivities[]', id);
+      });
+
       formData.append('description', data.description || '');
       formData.append('isActive', data.serviceStatus);
+
       if (data.file) {
-        formData.append('file', data.file || '');
+        formData.append('file', data.file);
       }
 
       const response = await postApi(urls.case.create, formData, {
@@ -284,7 +374,7 @@ const AddCaseForm = () => {
                         <DatePicker
                           label="Date Case Closed"
                           value={field.value}
-                          minDate={getValues('caseOpened') || undefined} 
+                          minDate={getValues('caseOpened') || undefined}
                           onChange={(newValue) => field.onChange(newValue)}
                           renderInput={(params) => (
                             <TextField
@@ -347,148 +437,62 @@ const AddCaseForm = () => {
 
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
-                      <Controller
-                        name="benificiary"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: {
-                            value: onlyLetters,
-                            message: 'Only letters are allowed'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            size="small"
-                            label="Beneficiary Information"
-                            error={!!errors.benificiary}
-                            helperText={errors.benificiary?.message}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'Beneficiary',
+                        'Beneficiary Information',
+                        benificiary,
+                        errors.benificiary,
+                        errors.benificiary?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="campaigns"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: {
-                            value: onlyLetters,
-                            message: 'Only letters are allowed'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            size="small"
-                            label="Campaigns Supported"
-                            error={!!errors.campaigns}
-                            helperText={errors.campaigns?.message}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'Campaigns',
+                        'Campaigns Supported',
+                        Campaigns,
+                        errors.Campaigns,
+                        errors.Campaigns?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="engagement"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: {
-                            value: onlyLetters,
-                            message: 'Only letters are allowed'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            size="small"
-                            label="Engagement"
-                            error={!!errors.engagement}
-                            helperText={errors.engagement?.message}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete('engagement', 'Engagement', engagement, errors.engagement, errors.engagement?.message, control)}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="eventAttanded"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: {
-                            value: onlyLetters,
-                            message: 'Only letters are allowed'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            size="small"
-                            label="Events Attended"
-                            error={!!errors.eventAttanded}
-                            helperText={errors.eventAttanded?.message}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'eventsAttended',
+                        'Events Attended',
+                        eventsAttended,
+                        errors.eventsAttended,
+                        errors.eventsAttended?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="fundingInterest"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: {
-                            value: onlyLetters,
-                            message: 'Only letters are allowed'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            size="small"
-                            label="Funding Interests"
-                            error={!!errors.fundingInterest}
-                            helperText={errors.fundingInterest?.message}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'fundingInterests',
+                        'Funding Interests',
+                        fundingInterests,
+                        errors.fundingInterests,
+                        errors.fundingInterests?.message,
+                        control
+                      )}
                     </Grid>
+
                     <Grid item xs={12}>
-                      <Controller
-                        name="fundraisingActivities"
-                        control={control}
-                        rules={{
-                          minLength: { value: 2, message: 'Minimum 2 characters' },
-                          maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                          pattern: {
-                            value: onlyLetters,
-                            message: 'Only letters are allowed'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            size="small"
-                            label="Fundraising Activities"
-                            error={!!errors.fundraisingActivities}
-                            helperText={errors.fundraisingActivities?.message}
-                          />
-                        )}
-                      />
+                      {renderAutocomplete(
+                        'fundraisingActivities',
+                        'Fundraising Activities',
+                        fundraisingActivities,
+                        errors.fundraisingActivities,
+                        errors.fundraisingActivities?.message,
+                        control
+                      )}
                     </Grid>
                   </Grid>
                 </Paper>

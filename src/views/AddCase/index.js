@@ -243,23 +243,29 @@ const AddCaseForm = () => {
                     name="serviceUserId"
                     control={control}
                     rules={{ required: 'Service user is required' }}
-                    render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
-                        <InputLabel id="service-user-label">Service User</InputLabel>
-                        <Select {...field} labelId="service-user-label" label="Service User">
-                          {rows?.map((user) => (
-                            <MenuItem key={user.id} value={user.id}>
-                              {user.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        {errors.serviceUserId && (
-                          <Typography color="error" variant="caption">
-                            {errors.serviceUserId.message}
-                          </Typography>
-                        )}
-                      </FormControl>
-                    )}
+                    render={({ field }) => {
+                      const selectedUser = rows?.find((user) => user.id === field.value) || null;
+
+                      return (
+                        <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
+                          <Autocomplete
+                            value={selectedUser}
+                            onChange={(_, value) => field.onChange(value ? value.id : '')}
+                            options={rows || []}
+                            getOptionLabel={(option) => option.name || ''}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Service User" variant="outlined" size="small" error={!!errors.serviceUserId} />
+                            )}
+                          />
+                          {errors.serviceUserId && (
+                            <Typography color="error" variant="caption">
+                              {errors.serviceUserId.message}
+                            </Typography>
+                          )}
+                        </FormControl>
+                      );
+                    }}
                   />
                 </Grid>
 
@@ -268,23 +274,29 @@ const AddCaseForm = () => {
                     name="serviceId"
                     control={control}
                     rules={{ required: 'Service is required' }}
-                    render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.serviceId}>
-                        <InputLabel id="service-label">Service</InputLabel>
-                        <Select {...field} labelId="service-label" label="Service">
-                          {services?.map((service) => (
-                            <MenuItem key={service._id} value={service._id}>
-                              {service.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        {errors.serviceId && (
-                          <Typography color="error" variant="caption">
-                            {errors.serviceId.message}
-                          </Typography>
-                        )}
-                      </FormControl>
-                    )}
+                    render={({ field }) => {
+                      const selectedService = services?.find((service) => service._id === field.value) || null;
+
+                      return (
+                        <FormControl fullWidth size="small" error={!!errors.serviceId}>
+                          <Autocomplete
+                            value={selectedService}
+                            onChange={(_, value) => field.onChange(value ? value._id : '')}
+                            options={services || []}
+                            getOptionLabel={(option) => option.name || ''}
+                            isOptionEqualToValue={(option, value) => option._id === value._id}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Service" variant="outlined" size="small" error={!!errors.serviceId} />
+                            )}
+                          />
+                          {errors.serviceId && (
+                            <Typography color="error" variant="caption">
+                              {errors.serviceId.message}
+                            </Typography>
+                          )}
+                        </FormControl>
+                      );
+                    }}
                   />
                 </Grid>
 
@@ -293,21 +305,29 @@ const AddCaseForm = () => {
                     name="serviceType"
                     control={control}
                     rules={{ required: 'Service owner is required' }}
-                    render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.serviceType}>
-                        <InputLabel id="service-type-label">Service Owner</InputLabel>
-                        <Select {...field} labelId="service-type-label" label="Service Owner">
-                          <MenuItem value="owner1">Owner 1</MenuItem>
-                          <MenuItem value="owner2">Owner 2</MenuItem>
-                          <MenuItem value="owner3">Owner 3</MenuItem>
-                        </Select>
-                        {errors.serviceType && (
-                          <Typography color="error" variant="caption">
-                            {errors.serviceType.message}
-                          </Typography>
-                        )}
-                      </FormControl>
-                    )}
+                    render={({ field }) => {
+                      const options = ['owner1', 'owner2', 'owner3'];
+
+                      return (
+                        <FormControl fullWidth size="small" error={!!errors.serviceType}>
+                          <Autocomplete
+                            value={field.value || null}
+                            onChange={(_, value) => field.onChange(value || '')}
+                            options={options}
+                            getOptionLabel={(option) => option}
+                            isOptionEqualToValue={(option, value) => option === value}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Service Owner" variant="outlined" size="small" error={!!errors.serviceType} />
+                            )}
+                          />
+                          {errors.serviceType && (
+                            <Typography color="error" variant="caption">
+                              {errors.serviceType.message}
+                            </Typography>
+                          )}
+                        </FormControl>
+                      );
+                    }}
                   />
                 </Grid>
 

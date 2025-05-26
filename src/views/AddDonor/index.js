@@ -81,6 +81,7 @@ const AddDonorForm = () => {
       pinCode: editdata?.contactInfo?.postcode || '',
       country: editdata?.contactInfo?.country || '',
       riskNotes: editdata?.otherInfo?.description || '',
+      file: editdata?.otherInfo?.file || '',
       Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
       campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
       engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
@@ -923,7 +924,7 @@ const AddDonorForm = () => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2 }}>
                             <Typography variant="subtitle1" mb={2}>
-                              Service User Tag
+                              Donor Tag
                             </Typography>
 
                             <Grid container spacing={2}>
@@ -1014,7 +1015,15 @@ const AddDonorForm = () => {
                                     variant="outlined"
                                     size="small"
                                     fullWidth
-                                    value={field.value ? field.value.name : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object' && field.value.name
+                                          ? field.value.name
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop()
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Attachments"
                                     InputProps={{
                                       readOnly: true,
@@ -1026,9 +1035,7 @@ const AddDonorForm = () => {
                                       endAdornment: (
                                         <InputAdornment position="end">
                                           <Button component="label" sx={{ minWidth: 0, p: 0, whiteSpace: 'nowrap' }}>
-                                            <Link component="span" underline="none">
-                                              Upload a file
-                                            </Link>
+                                            <Link component="span">{editdata?.otherInfo?.file ? 'Change file' : 'Upload a file'}</Link>
                                             <input
                                               type="file"
                                               hidden
@@ -1036,7 +1043,7 @@ const AddDonorForm = () => {
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024; 
+                                                const maxSizeInBytes = 25 * 1024 * 1024;
 
                                                 if (file) {
                                                   if (!allowedTypes.includes(file.type)) {

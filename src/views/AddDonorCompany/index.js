@@ -79,6 +79,7 @@ const AddCaseForm = ({ onCancel }) => {
       country: editdata?.contactInfo?.country || '',
       pinCode: editdata?.contactInfo?.pinCode || '',
       riskNotes: editdata?.otherInfo?.description || '',
+      file: editdata?.otherInfo?.file || '',
       keyIndicators: editdata?.otherInfo?.keyIndicators || '',
       service: editdata?.otherInfo?.service || '',
       fromDate: editdata?.otherInfo?.fromDate ? dayjs(editdata.otherInfo.fromDate) : null,
@@ -610,16 +611,31 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              <Controller
-                                name="file"
-                                control={control}
-                                render={({ field }) => (
-                                  <Box display="flex" justifyContent="space-between">
+                              <Box mb={2} display="flex" justifyContent="space-between">
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  style={{ display: 'none' }}
+                                  accept="image/*"
+                                  onChange={handleFileChange}
+                                />
+                                <Controller
+                                  name="file"
+                                  control={control}
+                                  render={({ field }) => (
                                     <TextField
                                       variant="outlined"
                                       size="small"
                                       fullWidth
-                                      value={field.value ? field.value.name : ''}
+                                      value={
+                                        field.value
+                                          ? typeof field.value === 'object' && field.value.name
+                                            ? field.value.name
+                                            : typeof field.value === 'string'
+                                            ? field.value.split('/').pop()
+                                            : ''
+                                          : ''
+                                      }
                                       placeholder="Attachments"
                                       InputProps={{
                                         readOnly: true,
@@ -630,17 +646,46 @@ const AddCaseForm = ({ onCancel }) => {
                                         ),
                                         endAdornment: (
                                           <InputAdornment position="end">
-                                            <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                              <Link component="span">Upload a file</Link>
-                                              <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                            <Button component="label" sx={{ minWidth: 0, p: 0, whiteSpace: 'nowrap' }}>
+                                              <Link component="span">{editdata?.otherInfo?.file ? 'Change file' : 'Upload a file'}</Link>
+                                              <input
+                                                type="file"
+                                                hidden
+                                                accept="image/jpeg,image/png,image/jpg"
+                                                onChange={(e) => {
+                                                  const file = e.target.files?.[0];
+                                                  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                                  const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                                  if (file) {
+                                                    if (!allowedTypes.includes(file.type)) {
+                                                      toast.error('Only JPG, JPEG, or PNG image files are allowed.');
+                                                      e.target.value = null;
+                                                      field.onChange(null);
+                                                      return;
+                                                    }
+
+                                                    if (file.size > maxSizeInBytes) {
+                                                      toast.error('File size must be less than or equal to 25MB.');
+                                                      e.target.value = null;
+                                                      field.onChange(null);
+                                                      return;
+                                                    }
+
+                                                    field.onChange(file);
+                                                  } else {
+                                                    field.onChange(null);
+                                                  }
+                                                }}
+                                              />
                                             </Button>
                                           </InputAdornment>
                                         )
                                       }}
                                     />
-                                  </Box>
-                                )}
-                              />
+                                  )}
+                                />
+                              </Box>
                             </Grid>
                           </Grid>
                         </CardContent>

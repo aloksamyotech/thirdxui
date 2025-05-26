@@ -104,15 +104,11 @@ const UserProfile = () => {
 
   const fetchSessionlist = async (serviceId) => {
     if (!serviceId) return;
-
-    try {
-      const response = await getApi(urls.session.getById.replace(':id', serviceId));
+   const response = await getApi(urls.session.getById.replace(':id', serviceId));
       if (response?.data?.userData) {
         setSessionData(response.data.userData);
       }
-    } catch (error) {
-      toast.error('Failed to fetch sessions');
-    }
+   
   };
 
   const handleFilter = async () => {

@@ -87,6 +87,7 @@ const AddCaseForm = ({ onCancel }) => {
       language: editdata?.contactInfo?.firstLanguage || '',
       otherId: editdata?.contactInfo?.otherId || '',
       riskNotes: editdata?.otherInfo?.description || '',
+      file: editdata?.otherInfo?.file || '',
       Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
       Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
       engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
@@ -388,12 +389,12 @@ const AddCaseForm = ({ onCancel }) => {
         await updateApiPatch(`${urls.serviceuser.editUser}/${editdata._id}`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        toast.success('Service user updated successfully!');
+        toast.success('Volunteer updated successfully!');
       } else {
         await postApi(urls.serviceuser.create, fd, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        toast.success('Service user added successfully!');
+        toast.success('Volunteer added successfully!');
       }
 
       setIsloading(false);
@@ -1172,7 +1173,7 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2 }}>
                             <Typography variant="subtitle1" mb={2}>
-                              Service User Tag
+                              Volunteer Tag
                             </Typography>
 
                             <Grid container spacing={2}>
@@ -1263,7 +1264,15 @@ const AddCaseForm = ({ onCancel }) => {
                                     variant="outlined"
                                     size="small"
                                     fullWidth
-                                    value={field.value ? field.value.name : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object' && field.value.name
+                                          ? field.value.name
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop()
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Attachments"
                                     InputProps={{
                                       readOnly: true,
@@ -1275,9 +1284,7 @@ const AddCaseForm = ({ onCancel }) => {
                                       endAdornment: (
                                         <InputAdornment position="end">
                                           <Button component="label" sx={{ minWidth: 0, p: 0, whiteSpace: 'nowrap' }}>
-                                            <Link component="span" underline="none">
-                                              Upload a file
-                                            </Link>
+                                            <Link component="span">{editdata?.otherInfo?.file ? 'Change file' : 'Upload a file'}</Link>
                                             <input
                                               type="file"
                                               hidden

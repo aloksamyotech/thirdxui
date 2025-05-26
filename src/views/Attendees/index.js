@@ -60,13 +60,15 @@ export default function SessionRegisterPage() {
   const fetchpeopleAttendee = async () => {
     try {
       setLoading(true);
-      const response = await getApi(`${urls.attendees.getAttendeesBySession}/${sessionId}`, {
-        params: {
-          page: paginationModel.page + 1,
-          limit: paginationModel.pageSize,
-          role: 'service_user'
-        }
-      });
+    const queryParams = new URLSearchParams({
+  page: paginationModel.page + 1,
+  limit: paginationModel.pageSize,
+  role: 'service_user'
+});
+
+const response = await getApi(
+  `${urls.attendees.getAttendeesBySession}/${sessionId}?${queryParams.toString()}`
+);
 
       const attendeesData = response?.data?.data || [];
       const formattedUsers = attendeesData.map((item, index) => ({
@@ -194,7 +196,7 @@ export default function SessionRegisterPage() {
                 pageSizeOptions={[5]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                onRowClick={(params) => navigate('/services', { state: params.row })}
+                onRowClick={(params) => navigate('/people', { state: params.row })}
                 slots={{
                   toolbar: CustomHeader,
                   loadingOverlay: () => (

@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 
-const AddCaseForm = ({ onCancel }) => {
+const AddCaseForm = () => {
   const navigate = useNavigate();
   const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
@@ -279,7 +279,36 @@ const AddCaseForm = ({ onCancel }) => {
                               <InputAdornment position="end">
                                 <Button component="label" sx={{ minWidth: 0, p: 0 }}>
                                   <Link component="span">Upload a file</Link>
-                                  <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                  <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                      const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                      if (file) {
+                                        if (!allowedTypes.includes(file.type)) {
+                                          toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        if (file.size > maxSizeInBytes) {
+                                          toast.error('File size must be less than or equal to 25MB.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        field.onChange(file);
+                                      } else {
+                                        field.onChange(null);
+                                      }
+                                    }}
+                                  />
                                 </Button>
                               </InputAdornment>
                             )
@@ -288,6 +317,7 @@ const AddCaseForm = ({ onCancel }) => {
                       </Box>
                     )}
                   />
+
                   <Controller
                     name="notes"
                     control={control}

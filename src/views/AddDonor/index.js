@@ -248,7 +248,7 @@ const AddDonorForm = () => {
     });
 
     (data.Campaigns || []).forEach((id) => {
-      fd.append('otherInfo[campaigns][]', id);
+      fd.append('otherInfo[Campaignstag][]', id);
     });
 
     (data.engagement || []).forEach((id) => {

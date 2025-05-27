@@ -78,7 +78,8 @@ export const urls = Object.freeze({
     getAll: `${baseUrl}/forms/getallforms`
   },
   responses: {
-    submit: `${baseUrl}/responses`
+    submit: `${baseUrl}/responses`,
+    response: `${baseUrl}/responses/responsebyid`
   },
   attendees: {
     create: `${baseUrl}/attendees/addAttendee`,

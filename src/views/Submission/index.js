@@ -1,4 +1,4 @@
-import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip ,InputBase} from '@mui/material';
+import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip, InputBase } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -8,6 +8,8 @@ import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import { getApi } from 'common/apiClient';
 import moment from 'moment';
+import ReadMoreIcon from '@mui/icons-material/ReadMore';
+import { useNavigate } from 'react-router';
 
 const formTypes = [
   { value: 'Self Referral form', label: 'Self Referral form' },
@@ -55,59 +57,6 @@ const CustomHeader = () => {
   );
 };
 
-const columns = [
-  {
-    field: 'description',
-    headerName: 'Form Type',
-    flex: 0.8,
-    renderCell: (params) => (
-      <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-        {params.value}
-      </Typography>
-    )
-  },
-  {
-    field: 'submissionDate',
-    headerName: 'Date Submitted',
-    flex: 0.8,
-    renderCell: (params) => (
-      <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-        {params.value}
-      </Typography>
-    )
-  },
-  {
-    field: 'campaign',
-    headerName: 'Form Campaign',
-    flex: 1,
-    renderCell: (params) => (
-      <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-        {/* {params.value} */}
-        -
-      </Typography>
-    )
-  },
-  {
-    field: 'title',
-    headerName: 'Form Display Title',
-    flex: 0.8,
-    renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
-  },
-  {
-    field: 'edit',
-    headerName: 'Edit',
-    flex: 0.3,
-    align: 'center',
-    headerAlign: 'center',
-    sortable: false,
-    renderCell: (params) => (
-      <IconButton onClick={() => handleEdit(params.row)} sx={{ p: 0.5 }}>
-        <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" />
-      </IconButton>
-    )
-  }
-];
-
 // const initialRows = [
 //   {
 //     id: 1,
@@ -134,6 +83,11 @@ const Lead = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
 
+  const navigate = useNavigate()
+  const handleNavigate = (id) => {
+    navigate(`${id}`)
+  }
+
   const getAllResponse = async () => {
     const fromUrl = urls?.responses?.submit
     const response = await getApi(fromUrl)
@@ -154,6 +108,61 @@ const Lead = () => {
   useEffect(() => {
     getAllResponse()
   }, [])
+
+  const columns = [
+    {
+      field: 'description',
+      headerName: 'Form Type',
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
+          {params.value}
+        </Typography>
+      )
+    },
+    {
+      field: 'submissionDate',
+      headerName: 'Date Submitted',
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
+          {params.value}
+        </Typography>
+      )
+    },
+    {
+      field: 'campaign',
+      headerName: 'Form Campaign',
+      flex: 1,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+          {/* {params.value} */}
+          -
+        </Typography>
+      )
+    },
+    {
+      field: 'title',
+      headerName: 'Form Display Title',
+      flex: 0.8,
+      renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
+    },
+    {
+      field: 'edit',
+      headerName: 'Edit',
+      flex: 0.3,
+      align: 'center',
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <ReadMoreIcon sx={{cursor:'pointer'}} onClick={() => handleNavigate(params.row.id)} />
+          <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+        </Box>
+      )
+    }
+  ];
+
   return (
     <>
       <Grid>
@@ -161,46 +170,46 @@ const Lead = () => {
           <Grid>
             <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
               <Typography variant="h4">Submitted Form</Typography>
-                <Box
-                                              sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                backgroundColor: '#f8f9fa',
-                                                borderRadius: '30px',
-                                                paddingLeft: '16px',
-                                                border: '1px solid #e0e0e0',
-                                                width: '350px',
-                                                height: '40px'
-                                              }}
-                                            >
-                                              <InputBase
-                                                placeholder="Search..."
-                                                // value={searchQuery}
-                                                // onChange={handleSearchChange}
-                                                // onKeyPress={(e) => {
-                                                //   if (e.key === 'Enter') {
-                                                //     handleFilter();
-                                                //   }
-                                                // }}
-                                                sx={{
-                                                  flex: 1,
-                                                  color: 'text.primary'
-                                                }}
-                                              />
-                                              <IconButton
-                                                // onClick={handleFilter}
-                                                sx={{
-                                                  marginRight: '8px',
-                                                  width: 32,
-                                                  height: 32,
-                                                  cursor: 'pointer'
-                                                }}
-                                              >
-                                                <SearchIcon />
-                                              </IconButton>
-                                            </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '30px',
+                  paddingLeft: '16px',
+                  border: '1px solid #e0e0e0',
+                  width: '350px',
+                  height: '40px'
+                }}
+              >
+                <InputBase
+                  placeholder="Search..."
+                  // value={searchQuery}
+                  // onChange={handleSearchChange}
+                  // onKeyPress={(e) => {
+                  //   if (e.key === 'Enter') {
+                  //     handleFilter();
+                  //   }
+                  // }}
+                  sx={{
+                    flex: 1,
+                    color: 'text.primary'
+                  }}
+                />
+                <IconButton
+                  // onClick={handleFilter}
+                  sx={{
+                    marginRight: '8px',
+                    width: 32,
+                    height: 32,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </Box>
 
-  
+
             </Stack>
           </Grid>
 

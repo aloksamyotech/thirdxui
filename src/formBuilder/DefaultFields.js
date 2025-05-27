@@ -21,7 +21,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Name",
                     "className": "form-control",
                     "name": "text-1747390638003-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "disabledFieldButtons": ['remove', 'edit']
                 },
                 {
                     "type": "text",
@@ -29,7 +30,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isNumber"
                 },
                 {
                     "type": "text",
@@ -37,7 +39,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isEmail"
                 },
                 {
                     "type": "text",
@@ -114,7 +117,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747393741211-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isEmail"
                 },
                 {
                     "type": "text",
@@ -122,7 +126,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Phone Number",
                     "className": "form-control",
                     "name": "text-1747393776960-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isNumber"
                 },
                 {
                     "type": "select",
@@ -303,7 +308,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isNumber"
                 },
                 {
                     "type": "text",
@@ -311,7 +317,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isEmail"
                 },
                 {
                     "type": "textarea",
@@ -359,7 +366,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 },
                 {
                     "type": "checkbox-group",
-                    "required": true,
+                    "required": false,
                     "label": "Do you any past experience in volunteer work ?",
                     "name": "checkbox-group-1747392385352-0",
                     "values": [
@@ -457,7 +464,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isNumber"
                 },
                 {
                     "type": "text",
@@ -465,7 +473,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isEmail"
                 },
                 {
                     "type": "date",
@@ -530,7 +539,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 {
                     "type": "text",
                     "required": false,
-                    "label": "If yes, please provide any details that would help us understand your needs and ensure appropriate accommodations.",
+                    "label": "If yes, please provide any details that would help us understand your needs and ensure appropriate accommodations",
                     "className": "form-control",
                     "name": "text-1747390671327-0",
                     "subtype": "text"
@@ -538,7 +547,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 {
                     "type": "select",
                     "required": true,
-                    "label": "Please choose which session you will be attending.",
+                    "label": "Please choose which session you will be attending",
                     "className": "form-control",
                     "name": "select-1747390674293-0",
                     "values": [
@@ -689,7 +698,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Email",
                     "className": "form-control",
                     "name": "text-1747390648300-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isEmail"
                 },
                 {
                     "type": "text",
@@ -697,7 +707,8 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                     "label": "Contact Number",
                     "className": "form-control",
                     "name": "text-1747390643179-0",
-                    "subtype": "text"
+                    "subtype": "text",
+                    "validation": "isNumber"
                 },
                 {
                     "type": "radio-group",
@@ -875,7 +886,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
                 {
                     "type": "textarea",
                     "required": true,
-                    "label": "I'd also like to add... ",
+                    "label": "I'd also like to add",
                     "className": "form-control",
                     "name": "textarea-1747731154988-0",
                     "subtype": "textarea"

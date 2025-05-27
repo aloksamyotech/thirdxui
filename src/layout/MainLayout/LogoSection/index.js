@@ -1,23 +1,20 @@
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-
-// material-ui
 import { ButtonBase } from '@mui/material';
-
-// project imports
-import config from 'config';
-import Logo from 'ui-component/Logo';
 import logo from '../../../assets/images/ThirdexLogo.png';
-import { MENU_OPEN } from 'store/actions';
 
-// ==============================|| MAIN LOGO ||============================== //
-
-const LogoSection = () => {
-  const defaultId = useSelector((state) => state.customization.defaultId);
-  const dispatch = useDispatch();
+const LogoSection = ({ height = '45px', maxWidth = '120px' }) => {
   return (
     <ButtonBase disableRipple>
-      <img src={logo} alt="Logo" style={{ height: '45px', width: 'auto', maxWidth: '120px', display: 'block', objectFit: 'contain' }} />
+      <img
+        src={logo}
+        alt="Logo"
+        style={{
+          height: height,
+          width: 'auto',
+          maxWidth: maxWidth,
+          display: 'block',
+          objectFit: 'contain'
+        }}
+      />
     </ButtonBase>
   );
 };

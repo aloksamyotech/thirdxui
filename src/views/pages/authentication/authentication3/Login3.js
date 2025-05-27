@@ -16,63 +16,62 @@ const Login = () => {
 
   return (
     <AuthWrapper1>
-      <Grid container sx={{ minHeight: '100vh', backgroundColor: '#053146' }}>
-     <Grid
-  item
-  xs={12}
-  md={6}
-  sx={{
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 4 // Added padding to increase effective size
-  }}
->
-  <AuthCardWrapper
-    sx={{
-      maxWidth:700,
-      width: '600',
-      boxShadow: theme.shadows[3],
-      borderRadius: 2,
-      backgroundColor: theme.palette.background.paper,
-      padding: 4 
-    }}
-  >
-    <Grid container spacing={3} alignItems="center">
-      <Grid item xs={12} sx={{ textAlign: 'center' }}>
-        <Box
+      <Grid container sx={{ height: '100vh', overflow: 'hidden', backgroundColor: '#053146' }}>
+        <Grid
+          item
+          xs={12}
+          md={6}
           sx={{
             display: 'flex',
-            justifyContent: 'center',
             alignItems: 'center',
-            marginBottom: 3 
+            justifyContent: 'center',
+            padding: 8
           }}
         >
-          <Logo sx={{ width: 80, height: 80 }} />
-        </Box>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Stack alignItems="center" spacing={2}>
-          <Typography 
-            variant="h2" 
-            sx={{ 
-              fontWeight: 700, 
-              color: '#240046',
-              fontSize: '2.0rem' 
+          <AuthCardWrapper
+            sx={{
+              maxWidth: 600,
+              width: '100%',
+              boxShadow: theme.shadows[3],
+              borderRadius: 2,
+              backgroundColor: theme.palette.background.paper,
+              padding: 0
             }}
           >
-            Welcome to Thridex!👋
-          </Typography>
-        </Stack>
-      </Grid>
-      
-      <Grid item xs={12}>
-        <AuthLogin />
-      </Grid>
-    </Grid>
-  </AuthCardWrapper>
-</Grid>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Logo height="60px" maxWidth="220px" />
+                </Box>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Stack alignItems="center">
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 600,
+                      color: '#4C4E64DE',
+                      fontSize: '22px'
+                    }}
+                  >
+                    Welcome to Thirdex!👋
+                  </Typography>
+                </Stack>
+              </Grid>
+
+              <Grid item xs={12}>
+                <AuthLogin />
+              </Grid>
+            </Grid>
+          </AuthCardWrapper>
+        </Grid>
         <Grid
           item
           xs={12}
@@ -93,7 +92,8 @@ const Login = () => {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              borderRadius: '0px',
+              opacity: '75%',
+              borderRadius: '0px'
             }}
           />
 
@@ -104,14 +104,14 @@ const Login = () => {
               left: '5%',
               color: 'white',
               textAlign: 'left',
-              maxWidth: '50%',
+              maxWidth: '60%',
               transform: 'translateY(-50%)'
             }}
           >
-            <Typography variant="h2" sx={{ fontSize: '35px', color: 'white' }}>
+            <Typography variant="h5" sx={{ fontSize: '30px', color: 'white' }}>
               Thirdex helps you win!
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: '20px', mt: 1, color: 'white' }}>
+            <Typography variant="body2" sx={{ fontSize: '18px', mt: 1, color: 'white' }}>
               Organize your forms, events, workshops, and more with our CRM suite.
             </Typography>
           </Box>

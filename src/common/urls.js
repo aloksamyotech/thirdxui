@@ -88,7 +88,8 @@ export const urls = Object.freeze({
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,
     getTotalSession: `${baseUrl}/dashboard/totalSession`,
     getTotalActiveUser: `${baseUrl}/dashboard/totalActiveUser`,
-    getTotalOpenedCases: `${baseUrl}/dashboard/totalOpenedCases`
+    getTotalOpenedCases: `${baseUrl}/dashboard/totalOpenedCases`,
+    getMedia: `${baseUrl}/dashboard/allMedia`,
   },
   login: {
     login: `${baseUrl}/admin/login`,

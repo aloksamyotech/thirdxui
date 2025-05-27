@@ -223,7 +223,7 @@ const CaseDetailsPage = () => {
       )
     }
     ,
-    { field: 'contactType', headerName: 'Contact Type', flex: 1 },
+    { field: 'configurationName', headerName: 'Contact Type', flex: 1 },
     { field: 'createdBy', headerName: 'Created By', flex: 1 },
     {
       field: 'hours',

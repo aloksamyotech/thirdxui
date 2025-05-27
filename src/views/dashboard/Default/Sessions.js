@@ -3,6 +3,11 @@ import { Box, Stack } from '@mui/system';
 import React from 'react';
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const sessionsData = [
   {
@@ -39,76 +44,108 @@ const sessionsData = [
   }
 ];
 
-const SessionItem = ({ date, time, title, description, summary, presenter }) => (
-  <Box sx={{ py: 1, px: 1 }}>
-    <Grid container spacing={1} alignItems="center" wrap="wrap">
-      <Grid item xs={12} sm={2}>
-        <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{date}</Typography>
-        <Typography sx={{ fontSize: 13 }}>{time}</Typography>
-      </Grid>
+const SessionItem = ({ date, time, title, description, summary, presenter }) => {
+  const navigate = useNavigate();
 
-      <Grid item xs={12} sm={5}>
-        <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{title}</Typography>
-        <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>{description}</Typography>
-        <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
-          <span style={{ fontWeight: 500 }}>{presenter}</span> {summary}
-        </Typography>
-      </Grid>
+  const handleEditClick = () => {
+    navigate('/add-session', { state: { id } })
+  };
+    
 
-      <Grid item xs={12} sm={5} md={4}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="center">
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              backgroundColor: '#1B4B66',
-              textTransform: 'none',
-              fontSize: 8,
-              px: 0.5,
-              py: 0.6,
-              maxWidth: 90,
-              borderRadius: 1.5,
-              boxShadow: 'none',
-              '&:hover': {
-                backgroundColor: '#163A52'
-              }
-            }}
-          >
-            Edit Session
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            sx={{
-              textTransform: 'none',
-              fontSize: 8, 
-              px: 1.2,
-              py: 0.5,
-              maxWidth: 120,
-              whiteSpace: 'nowrap',
-              borderRadius: 1.5,
-              color: '#1B4B66',
-              borderColor: '#1B4B66',
-              '&:hover': {
-                backgroundColor: 'rgba(27,75,102,0.04)',
-                borderColor: '#1B4B66'
-              }
-            }}
-          >
-            Add Attendees
-          </Button>
+  const handleAddAttendeesClick = () => {
+    navigate(`/attendees`);
+  };
+  return (
+    <Box sx={{ py: 1, px: 1 }}>
+      <Grid container spacing={1} alignItems="center" wrap="wrap">
+        <Grid item xs={12} sm={2}>
+          <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{date}</Typography>
+          <Typography sx={{ fontSize: 13 }}>{time}</Typography>
+        </Grid>
 
-          <IconButton size="small">
-            <InfoIcon fontSize="small" sx={{ color: '#49494c' }}/>
-          </IconButton>
-        </Stack>
+        <Grid item xs={12} sm={5}>
+          <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{title}</Typography>
+          <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>{description}</Typography>
+          <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
+            <span style={{ fontWeight: 500 }}>{presenter}</span> {summary}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={5} md={4}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="center">
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleEditClick}
+              sx={{
+                backgroundColor: '#1B4B66',
+                textTransform: 'none',
+                fontSize: 8,
+                px: 0.5,
+                py: 0.6,
+                maxWidth: 90,
+                borderRadius: 1.5,
+                boxShadow: 'none',
+                '&:hover': {
+                  backgroundColor: '#163A52'
+                }
+              }}
+            >
+              Edit Session
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleAddAttendeesClick}
+              sx={{
+                textTransform: 'none',
+                fontSize: 8,
+                px: 1.2,
+                py: 0.5,
+                maxWidth: 120,
+                whiteSpace: 'nowrap',
+                borderRadius: 1.5,
+                color: '#1B4B66',
+                borderColor: '#1B4B66',
+                '&:hover': {
+                  backgroundColor: 'rgba(27,75,102,0.04)',
+                  borderColor: '#1B4B66'
+                }
+              }}
+            >
+              Add Attendees
+            </Button>
+
+            <IconButton size="small">
+              <InfoIcon fontSize="small" sx={{ color: '#49494c' }} />
+            </IconButton>
+          </Stack>
+        </Grid>
       </Grid>
-    </Grid>
-    <Divider sx={{ mt: 2 }} />
-  </Box>
-);
+      <Divider sx={{ mt: 2 }} />
+    </Box>
+  );
+};
 
 const Sessions = () => {
+  const [allSession, setAllSession] = useState([]);
+  const fetchDashboardData = async () => {
+    const session = await getApi(urls.session.fetch);
+    const currentSessions = session?.data?.allSession;
+    const formattedSessions = currentSessions?.map((item, index) => ({
+      id: item._id || index,
+      date: item?.date ? new Date(item.date).toLocaleDateString() : '',
+      title: item?.serviceId?.name || '',
+      time: item?.time || '',
+      description: item?.description || ''
+    }));
+    
+
+    setAllSession(formattedSessions);
+  };
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
   return (
     <Box
       sx={{
@@ -151,10 +188,11 @@ const Sessions = () => {
       </Stack>
 
       <Divider />
-
-      {sessionsData.map((session, index) => (
-        <SessionItem key={index} {...session} />
-      ))}
+      <Box sx={{ maxHeight: 328, overflowY: 'auto', pr: 1 }}>
+        {allSession.map((session, index) => (
+          <SessionItem key={index} {...session} id={session.id} />
+        ))}
+      </Box>
 
       <Typography
         sx={{

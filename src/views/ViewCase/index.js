@@ -16,15 +16,7 @@ import { urls } from 'common/urls';
 import dayjs from 'dayjs';
 import { imageUrl } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 
 const CaseDetailsPage = () => {
@@ -324,7 +316,7 @@ const CaseDetailsPage = () => {
 
   const fetchdata = async () => {
     try {
-      setLoading2(true)
+      setLoading2(true);
       const response = await getApi(
         `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
       );
@@ -363,7 +355,9 @@ const CaseDetailsPage = () => {
   useEffect(() => {
     fetchdata();
   }, [paginationModel]);
-
+  useEffect(() => {
+    handleFilter();
+  }, [searchQuery]);
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -566,7 +560,7 @@ const CaseDetailsPage = () => {
                                 backgroundColor: 'transparent',
                                 fontSize: '10px',
                                 height: '20px',
-                                paddingRight: '4px',
+                                paddingRight: '4px'
                               }}
                             />
                           </TableCell>

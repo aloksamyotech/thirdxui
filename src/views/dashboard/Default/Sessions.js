@@ -44,16 +44,15 @@ const sessionsData = [
   }
 ];
 
-const SessionItem = ({ date, time, title, description, summary, presenter }) => {
+const SessionItem = ({ id, date, time, title, description, summary, presenter }) => {
   const navigate = useNavigate();
 
   const handleEditClick = () => {
-    navigate('/add-session', { state: { id } })
+    navigate();
   };
-    
 
   const handleAddAttendeesClick = () => {
-    navigate(`/attendees`);
+    navigate();
   };
   return (
     <Box sx={{ py: 1, px: 1 }}>
@@ -65,7 +64,11 @@ const SessionItem = ({ date, time, title, description, summary, presenter }) => 
 
         <Grid item xs={12} sm={5}>
           <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{title}</Typography>
-          <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>{description}</Typography>
+          <Typography
+            sx={{ fontSize: 12, color: 'text.secondary', whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word' }}
+          >
+            {description}
+          </Typography>
           <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>
             <span style={{ fontWeight: 500 }}>{presenter}</span> {summary}
           </Typography>
@@ -134,12 +137,21 @@ const Sessions = () => {
     const currentSessions = session?.data?.allSession;
     const formattedSessions = currentSessions?.map((item, index) => ({
       id: item._id || index,
-      date: item?.date ? new Date(item.date).toLocaleDateString() : '',
+      date: item?.date
+        ? new Date(item.date)
+            .toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: '2-digit'
+            })
+            .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
+        : '',
+
       title: item?.serviceId?.name || '',
+      serviceId: item?.serviceId || '',
       time: item?.time || '',
       description: item?.description || ''
     }));
-    
 
     setAllSession(formattedSessions);
   };
@@ -190,7 +202,7 @@ const Sessions = () => {
       <Divider />
       <Box sx={{ maxHeight: 328, overflowY: 'auto', pr: 1 }}>
         {allSession.map((session, index) => (
-          <SessionItem key={index} {...session} id={session.id} />
+          <SessionItem key={index} {...session} id={session.serviceId} />
         ))}
       </Box>
 

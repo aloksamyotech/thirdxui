@@ -105,10 +105,8 @@ const Tag = () => {
       if (configurationNameFilter) queryParams.append('categoryName', configurationNameFilter);
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-
       const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
-
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
@@ -121,6 +119,12 @@ const Tag = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (configurationNameFilter || status || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [configurationNameFilter, status, searchQuery]);
 
   const handleReset = () => {
     setStatus('');
@@ -147,7 +151,6 @@ const Tag = () => {
 
       setTags(allTags);
       setTotalRows(pagination?.total);
-
       const uniqueList = [...new Set(allTags.map((item) => item.tagCategoryName).filter(Boolean))].map((value) => ({
         value,
         label: value
@@ -267,9 +270,9 @@ const Tag = () => {
                       loading
                         ? []
                         : tags.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -292,19 +295,13 @@ const Tag = () => {
                             display: 'flex',
                             alignItems: 'self-start',
                             justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)'
                           }}
                         >
                           <SingleRowLoader />
                         </Box>
                       ),
-                      noRowsOverlay: () => (
-                        loading ? null : (
-                          <Box sx={{ padding: 2, textAlign: 'center' }}>
-                            No data available.
-                          </Box>
-                        )
-                      ),
+                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{

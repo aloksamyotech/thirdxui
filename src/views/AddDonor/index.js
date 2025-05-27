@@ -83,7 +83,7 @@ const AddDonorForm = () => {
       riskNotes: editdata?.otherInfo?.description || '',
       file: editdata?.otherInfo?.file || '',
       Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-      campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
+      Campaignstag: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
       engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
       eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
       fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
@@ -247,8 +247,8 @@ const AddDonorForm = () => {
       fd.append('otherInfo[benificiary][]', id);
     });
 
-    (data.Campaigns || []).forEach((id) => {
-      fd.append('otherInfo[Campaignstag][]', id);
+    (data.Campaignstag || []).forEach((id) => {
+      fd.append('otherInfo[campaigns][]', id);
     });
 
     (data.engagement || []).forEach((id) => {
@@ -941,11 +941,11 @@ const AddDonorForm = () => {
 
                               <Grid item xs={12}>
                                 {renderAutocomplete(
-                                  'campaigns',
+                                  'Campaignstag',
                                   'Campaigns Supported',
                                   Campaignstag,
-                                  errors.campaigns,
-                                  errors.campaigns?.message,
+                                  errors.Campaignstag,
+                                  errors.Campaignstag?.message,
                                   control
                                 )}
                               </Grid>

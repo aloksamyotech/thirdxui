@@ -9,7 +9,8 @@ export const initialState = {
   defaultId: 'default',
   fontFamily: config.fontFamily,
   borderRadius: config.borderRadius,
-  opened: true
+  opened: true,
+  miniSidebar: false
 };
 
 // ==============================|| CUSTOMIZATION REDUCER ||============================== //
@@ -37,6 +38,12 @@ const customizationReducer = (state = initialState, action) => {
       return {
         ...state,
         borderRadius: action.borderRadius
+      };
+    case actionTypes.TOGGLE_MINI_SIDEBAR:
+      return {
+        ...state,
+        miniSidebar: !state.miniSidebar,
+        opened: state.miniSidebar
       };
     default:
       return state;

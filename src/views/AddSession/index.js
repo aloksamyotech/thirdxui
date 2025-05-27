@@ -26,7 +26,9 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const location = useLocation();
   const session = location.state.session;
+
   const serviceId = session?.serviceId || location.state?.serviceId;
+
 
   const {
     control,
@@ -174,7 +176,9 @@ const AddCaseForm = ({ onCancel }) => {
         formData.append('fundraisingActivities[]', id);
       });
 
-      formData.append('serviceId', data.serviceId || '');
+      if (serviceId) {
+        formData.append('serviceId', serviceId);
+      }
 
       if (data.file) {
         formData.append('file', data.file);
@@ -192,7 +196,7 @@ const AddCaseForm = ({ onCancel }) => {
         toast.success('Session added successfully');
       }
 
-      navigate('/services');
+      navigate(`/view-service`, { state: { row: serviceId } });
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error(error.response?.data?.message || 'Error submitting session');
@@ -219,7 +223,7 @@ const AddCaseForm = ({ onCancel }) => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Add New Session</Typography>
+        <Typography variant="h4">{session ? 'Edit Session' : 'Add New Session'}</Typography>
 
         <Box
           sx={{
@@ -473,7 +477,7 @@ const AddCaseForm = ({ onCancel }) => {
                                             'application/msword',
                                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                                           ];
-                                          const maxSizeInBytes = 25 * 1024 * 1024; 
+                                          const maxSizeInBytes = 25 * 1024 * 1024;
 
                                           if (file) {
                                             if (!allowedTypes.includes(file.type)) {

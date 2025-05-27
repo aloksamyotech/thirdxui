@@ -423,7 +423,7 @@ const UserProfile = () => {
                       </Typography>
                     </Box>
 
-                    <Box sx={{ flexGrow: 1, px: 2, minWidth: 200 }}>
+                    <Box sx={{ flexGrow: 1, px: 2, maxWidth: 200 }}>
                       <Typography
                         variant="subtitle2"
                         fontWeight="bold"

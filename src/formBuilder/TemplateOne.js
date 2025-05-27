@@ -22,14 +22,26 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import { toast } from 'react-toastify';
 
 const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, onClose, getAllForms, setPreset }) => {
+    
+    //temporary solution
+    const formDataUpdated = formData.map(field => {
+        let updatedField = { ...field };
 
+        if (updatedField.label === "Phone" || updatedField.label === "Phone Number"|| updatedField.label === "Contact Number") {
+            updatedField.validation = "isNumber";
+        } else if (updatedField.label === "Email" || updatedField.label === "Email Address") {
+            updatedField.validation = "isEmail";
+        }
+        return updatedField;
+    });
+    
     const initialValues = {}
     const validationSchema = {}
     const formik = useFormik({
         initialValues,
         onSubmit: async () => {
             const apiUrl = urls?.forms?.add
-            await postApi(apiUrl, formData)
+            await postApi(apiUrl, formDataUpdated)
             formik.resetForm();
             onClose()
             setPreview(false)

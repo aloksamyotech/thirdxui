@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const Tag = () => {
   const navigate = useNavigate();
@@ -104,10 +105,8 @@ const Tag = () => {
       if (configurationNameFilter) queryParams.append('categoryName', configurationNameFilter);
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-
       const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
-
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
@@ -120,6 +119,12 @@ const Tag = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (configurationNameFilter || status || searchQuery || isFiltered) {
+      handleFilter();
+    }
+  }, [configurationNameFilter, status, searchQuery]);
 
   const handleReset = () => {
     setStatus('');
@@ -146,7 +151,6 @@ const Tag = () => {
 
       setTags(allTags);
       setTotalRows(pagination?.total);
-
       const uniqueList = [...new Set(allTags.map((item) => item.tagCategoryName).filter(Boolean))].map((value) => ({
         value,
         label: value
@@ -260,7 +264,7 @@ const Tag = () => {
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
                     rows={
                       loading
@@ -282,8 +286,22 @@ const Tag = () => {
                     getRowId={(row) => row._id}
                     pageSize={5}
                     rowsPerPageOptions={[5, 10]}
-                    components={{
-                      Toolbar: () => <CustomHeader />
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{

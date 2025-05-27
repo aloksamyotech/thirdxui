@@ -25,11 +25,18 @@ const GetFormById = () => {
     setRes(response?.data)
     const values = {};
     const validations = {};
-
     response?.data?.fields?.forEach(field => {
       values[field.label] = '';
       if (field.required) {
-        validations[field.label] = Yup.string().required('This is a required field');
+        if (field.validation === 'isEmail') {
+          validations[field.label] = Yup.string().required('This is a required field').email('Please enter a valid Email Address.');
+        }
+        if (field.validation === 'isNumber') {
+          validations[field.label] = Yup.string().required('This is a required field').matches(/^[0-9]/, 'Please enter a valid Phone Number.')
+        }
+        if (field.validation === '') {
+          validations[field.label] = Yup.string().required('This is a required field');
+        }
       }
     });
     setInitialValues(values);
@@ -48,6 +55,8 @@ const GetFormById = () => {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
+      console.log("submit form",values);
+      
       const formUrl = `${urls?.responses?.submit}/${formid}`
       await postApi(formUrl, values)
       formik.resetForm();

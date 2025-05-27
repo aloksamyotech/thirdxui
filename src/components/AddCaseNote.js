@@ -9,7 +9,6 @@ import Link from '@mui/material/Link';
 import { getApi, postApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-
 import dayjs from 'dayjs';
 
 const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add Case Note', initialData = null, caseid }) => {
@@ -26,6 +25,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
 
   const [contactPurposeEntry, setContactPurposeEntry] = useState([]);
   const [errors, setErrors] = useState({ notes: '', subject: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   const fileInputRef = useRef();
   useEffect(() => {
@@ -70,6 +70,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     try {
       const form = new FormData();
 
@@ -91,7 +92,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
 
       onSubmit(response.data);
       fetchdata();
-      toast.success('Successfully added caseNote');
+      toast.success('Case note added successfully!');
 
       setFormData({
         date: dayjs(),
@@ -109,6 +110,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
       }
     } catch (error) {
       console.error('Error submitting case note:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -152,7 +155,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
               value={formData.contactPurpose}
               onChange={handleChange}
             >
-              {contactPurposeEntry.map((option) => (
+              {contactPurposeEntry?.map((option) => (
                 <MenuItem key={option._id} value={option._id}>
                   {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
                 </MenuItem>
@@ -228,11 +231,11 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
           />
 
           <Box display="flex" gap={2}>
-            <Button variant="outlined" color="error" onClick={handleClose}>
+            <Button variant="outlined" color="error" onClick={handleClose} disabled={isLoading}>
               CANCEL
             </Button>
-            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit}>
-              SAVE CASE
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'SAVE CASE'}
             </Button>
           </Box>
         </Box>

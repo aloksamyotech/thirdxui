@@ -5,7 +5,18 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData, setPreset }) => {
-
+  const updatedTemplateData = templateData.map(field => {
+    if (field.type !== "header") {
+      return {
+        ...field,
+        disabledFieldButtons: ["remove", "edit"]
+      }
+    } else {
+      return field
+    }
+  }
+  );
+  
   const loadScripts = () => {
     const scriptJQuery = document.createElement('script');
     scriptJQuery.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
@@ -21,7 +32,7 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
           scriptFormRender.onload = () => {
             if (!document.getElementById('fb-editor').classList.contains('fb-builder-initialized')) {
               const options = {
-                disableFields: ['autocomplete', 'hidden', 'header', 'button'],
+                disableFields: ['textDefault', 'autocomplete', 'hidden', 'header', 'button'],
                 controlPosition: 'left',
                 disabledActionButtons: ['save', 'data', 'clear'],
                 disabledFieldButtons: { 'header': ['remove', 'copy'] },
@@ -43,8 +54,26 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
                   'subtype',
                   'value',
                 ],
-                defaultFields: templateData,
-                formData: formData
+                defaultFields: updatedTemplateData,
+                formData: formData,
+                fields: [{
+                  label: 'textDefault',
+                  disabledFieldButtons: ['remove', 'copy', 'edit'],
+                  attrs: {
+                    type: 'textDefault'
+                  },
+                  icon: '🌟'
+                }],
+                templates: {
+                  textDefault: function (fieldData) {
+                    return {
+                      field: `<input type="text" name="${fieldData.name}" class="form-control"/>`,
+                      onRender: function () {
+                        // add logic here
+                      }
+                    };
+                  }
+                }
               }
               window.$(document.getElementById('fb-editor')).formBuilder(options);
               document.getElementById('fb-editor').classList.add('fb-builder-initialized');
@@ -62,7 +91,7 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
   useEffect(() => {
     loadScripts();
   }, []);
-
+  
   const getFormData = () => {
     const formData = window.$('#fb-editor').formBuilder('getData');
     setFormData(formData)

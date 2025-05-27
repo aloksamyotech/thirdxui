@@ -20,12 +20,15 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Iconify from '../../../ui-component/iconify';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
+import { useEffect } from 'react';
+
 AppTasks.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
   list: PropTypes.array.isRequired
 };
-
 export default function AppTasks({ title, subheader, list, ...other }) {
   const { control } = useForm({
     defaultValues: {
@@ -33,10 +36,33 @@ export default function AppTasks({ title, subheader, list, ...other }) {
     }
   });
 
+  const [myTasks, setMyTasks] = useState([]);
+  const [search, setSearch] = useState(''); 
+
+  const myTask = async () => {
+    const task = await getApi(urls.dashboard.getmyTasks);
+    const allTasks = task?.data?.allTask;
+    const formattedtasks = allTasks?.map((item, index) => ({
+      id: item?._id,
+      date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+      label: item.details || '',
+    }));
+
+    setMyTasks(formattedtasks);
+  };
+
+  useEffect(() => {
+    myTask();
+  }, []);
+
+  const filteredTasks = myTasks.filter((task) =>
+    task.label.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <Box
       sx={{
-        height: '310px',
+        height: '400px',
         bgcolor: '#fff',
         borderRadius: 2,
         boxShadow: '0 1px 6px rgba(0,0,0,0.1)'
@@ -47,7 +73,7 @@ export default function AppTasks({ title, subheader, list, ...other }) {
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         spacing={2}
-        sx={{ p:2 }}
+        sx={{ p: 2 }}
       >
         <Typography variant="h5" fontWeight={600}>
           My Task
@@ -63,6 +89,8 @@ export default function AppTasks({ title, subheader, list, ...other }) {
             placeholder="Search"
             size="small"
             sx={{ maxWidth: 120 }}
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -75,30 +103,34 @@ export default function AppTasks({ title, subheader, list, ...other }) {
       </Stack>
 
       <Divider />
-      <Controller
-        name="taskCompleted"
-        control={control}
-        render={({ field }) => {
-          const onSelected = (task) =>
-            field.value.includes(task) ? field.value.filter((value) => value !== task) : [...field.value, task];
 
-          return (
-            <>
-              {list.map((task) => (
-                <>
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    // checked={field.value.includes(task.id)}
-                    onChange={() => field.onChange(onSelected(task.id))}
-                  />
-                  <Divider />
-                </>
-              ))}
-            </>
-          );
-        }}
-      />
+      <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+        <Controller
+          name="taskCompleted"
+          control={control}
+          render={({ field }) => {
+            const onSelected = (task) =>
+              field.value.includes(task)
+                ? field.value.filter((value) => value !== task)
+                : [...field.value, task];
+
+            return (
+              <>
+                {filteredTasks.map((task) => (
+                  <div key={task.id}>
+                    <TaskItem
+                      task={task}
+                      checked={field.value.includes(task.id)}
+                      onChange={() => field.onChange(onSelected(task.id))}
+                    />
+                    <Divider />
+                  </div>
+                ))}
+              </>
+            );
+          }}
+        />
+      </Box>
     </Box>
   );
 }
@@ -146,5 +178,6 @@ function TaskItem({ task, checked, onChange }) {
         <Iconify icon={'eva:trash-2-outline'} />
       </IconButton>
     </Stack>
+    
   );
 }

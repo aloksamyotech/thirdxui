@@ -358,14 +358,49 @@ const FilterPanel = ({
 
             if (filter.type === 'date') {
               return (
-                <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label={filter.label}
-                    value={filter.value || dayjs()}
-                    onChange={(newValue) => filter.onChange(newValue)}
-                    renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                  />
-                </LocalizationProvider>
+                <>
+                  <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label={filter.label}
+                        value={filter.value || dayjs()}
+                        onChange={(newValue) => filter.onChange(newValue)}
+                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, 8]
+                              }
+                            }
+                          ],
+                          sx: {
+                            '& .MuiPaper-root': {
+                              width: 220,
+                              height: 260,
+                              marginLeft:'50px'
+                            },
+                            '& .MuiPickersCalendarHeader-root': {
+                              maxWidth: '220px',
+                              fontSize: '1.2rem'
+                            },
+                            '& .MuiDayPicker-header': {
+                              maxWidth: '220px'
+                            },
+                            '& .MuiDayPicker-monthContainer': {
+                              maxWidth: '220px'
+                            },
+                            '& .MuiPickersDay-root': {
+                              maxWidth: '220px',
+                              height: '30px',
+                              margin: '0 2px',
+                              fontSize: '0.6rem'
+                            }
+                          }
+                        }}
+                      />
+                  </LocalizationProvider>
+                </>
               );
             }
 

@@ -8,82 +8,118 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
       open={open}
       onClose={handleClose}
       PaperProps={{
-        sx: { width: '520px', maxWidth: '90%', height: '4' }
+        sx: { width: '600px', maxWidth: '90%',
+           height: '420px',      
+      maxHeight: '90vh',
+        borderRadius: 5,
+         }
       }}
     >
-      <DialogTitle>
-        <Grid container alignItems="center" spacing={2}>
-          <img src={userView || userProfile} alt={user.name} style={{ width: 64, height: 64, borderRadius: '50%' }} />
+      <DialogTitle  sx={{
+    padding: 2,
+    
+   }} >
+      <Box
+  sx={{
+    border: '1px solid #ccc',
+    borderRadius: 2,
+    boxShadow: 1,
+    padding: 2,
+    maxWidth: 600,
+    margin: 'auto',
+    backgroundColor: '#fff',
+    height:'110px'
+  }}
+>
+  <Grid container alignItems="center" spacing={2}>
+    <Grid item>
+      <img
+        src={userView || userProfile}
+        alt={user?.name}
+        style={{ width: 64, height: 64, borderRadius: '50%' }}
+      />
+    </Grid>
 
-          <Grid item xs>
-            <Typography mb={1} variant="h5">
-              {user.name}
-            </Typography>
-            <Typography mb={1}>{user.email}</Typography>
-            <Typography mb={1}>{user.phone}</Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography mb={1} align="right" fontWeight="bold">
-              Address
-            </Typography>
-            <Typography mb={1} align="right">
-              {user.address}
-            </Typography>
-            <Typography mb={1} align="right">
-              {user.country}
-            </Typography>
-          </Grid>
-        </Grid>
+    <Grid item xs>
+      <Typography mb={1} variant="h5">
+        {user.name}
+      </Typography>
+      <Typography mb={1} sx={{fontSize:'10px'}}>{user?.email}</Typography>
+      <Typography mb={1} sx={{fontSize:'10px'}}>{user?.phone}</Typography>
+    </Grid>
+
+    <Grid item xs={4}>
+      <Typography mb={1} align="right"  sx={{fontSize:'10px'}}>
+        Address
+      </Typography>
+      <Typography mb={1} align="right"  sx={{fontSize:'10px'}}>
+        {user?.address}
+      </Typography>
+      <Typography mb={1} align="right"  sx={{fontSize:'10px'}}>
+        {user?.country}
+      </Typography>
+    </Grid>
+  </Grid>
+</Box>
       </DialogTitle>
 
-      <DialogContent dividers>
-        <Typography variant="subtitle1" gutterBottom>
-          ABOUT
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography mb={1}>
-              <strong>User ID:</strong> {user.userId}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Name:</strong> {user.name}
-            </Typography>
-            <Typography mb={1}>
-              <strong>DOB:</strong> {user.dob}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Age:</strong> {user.age}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Contact:</strong> {user.phone}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Email:</strong> {user.email}
-            </Typography>
-          </Grid>
 
-          <Grid item xs={6}>
-            <Typography mb={1}>
-              <strong>Gender:</strong> {user.gender}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Ethnicity:</strong> {user.ethnicity}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Country of Origin:</strong> {user.country}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Alternate User ID:</strong> {user.altUserId}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Name of Service:</strong> {user.service}
-            </Typography>
-            <Typography mb={1}>
-              <strong>Referred Date:</strong> {user.referredDate}
-            </Typography>
-          </Grid>
-        </Grid>
-      </DialogContent>
-    </Dialog>
+ <DialogContent
+  sx={{
+   padding: 2,
+    height: '400px',
+    overflowY: 'auto', 
+    mt:'-5px'
+  }}
+>
+  <Box
+    sx={{
+      border: '1px solid #ccc',
+      borderRadius: 2,
+      padding: 2,
+      backgroundColor: '#fff',
+      height: '100%',
+    }}
+  >
+    <Typography variant="subtitle1" gutterBottom>
+      ABOUT
+    </Typography>
+
+    <Grid container spacing={2}>
+      <Grid item xs={6}>
+        {[
+          ['User ID', user?.userId],
+          ['Name', user?.name],
+          ['DOB', user?.dob],
+          ['Age', user?.age],
+          ['Contact', user?.phone],
+          ['Email', user?.email],
+        ].map(([label, value]) => (
+          <Typography key={label} mb={2}>
+            <strong style={{ fontSize: '12px', color: '#7f7f7f' }}>{label}:</strong>{' '}
+            <span style={{ fontSize: '12px' }}>{value}</span>
+          </Typography>
+        ))}
+</Grid>
+
+      <Grid item xs={6}>
+        {[
+          ['Gender', user?.gender],
+          ['Ethnicity', user?.ethnicity],
+          ['Country of Origin', user?.country],
+          ['Alternate User ID', user?.altUserId],
+          ['Name of Service', user?.service],
+          ['Referred Date', user?.referredDate],
+        ].map(([label, value]) => (
+          <Typography key={label} mb={2}>
+            <strong style={{ fontSize: '12px', color: '#7f7f7f' }}>{label}:</strong>{' '}
+            <span style={{ fontSize: '12px' }}>{value}</span>
+          </Typography>
+        ))}
+      </Grid>
+    </Grid>
+  </Box>
+</DialogContent>
+</Dialog>
   );
 }

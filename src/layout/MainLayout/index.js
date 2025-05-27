@@ -1,20 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
-
 import { styled, useTheme } from '@mui/material/styles';
 import { AppBar, Box, CssBaseline, Toolbar, useMediaQuery } from '@mui/material';
-
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import MiniSidebar from './Sidebar/MiniSidebar';
 import navigation from 'menu-items';
 import { drawerWidth } from 'store/constant';
-import { SET_MENU } from 'store/actions';
-
+import { TOGGLE_MINI_SIDEBAR } from 'store/actions';
 import { IconChevronRight } from '@tabler/icons';
 
-// styles
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open, miniSidebar }) => ({
   ...theme.typography.mainContent,
   borderBottomLeftRadius: 0,
   borderBottomRightRadius: 0,
@@ -31,8 +28,8 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
         }
   ),
   [theme.breakpoints.up('md')]: {
-    marginLeft: open ? 0 : -(drawerWidth - 20),
-    width: `calc(100% - ${drawerWidth}px)`
+    marginLeft: miniSidebar ? 0 : open ? 0 : -(drawerWidth - 20),
+    width: `calc(100% - ${miniSidebar ? 60 : open ? drawerWidth : 0}px)`
   },
   [theme.breakpoints.down('md')]: {
     marginLeft: '20px',
@@ -50,16 +47,20 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
 const MainLayout = () => {
   const theme = useTheme();
   const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
-  const leftDrawerOpened = useSelector((state) => state.customization.opened);
+
   const dispatch = useDispatch();
+
+  const leftDrawerOpened = useSelector((state) => state.customization.opened);
+  const miniSidebar = useSelector((state) => state.customization.miniSidebar);
+
   const handleLeftDrawerToggle = () => {
-    dispatch({ type: SET_MENU, opened: !leftDrawerOpened });
+    dispatch({ type: TOGGLE_MINI_SIDEBAR });
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      {/* header */}
+
       <AppBar
         enableColorOnDark
         position="fixed"
@@ -75,12 +76,15 @@ const MainLayout = () => {
         </Toolbar>
       </AppBar>
 
-      {/* drawer */}
-      <Sidebar drawerOpen={!matchDownMd ? leftDrawerOpened : !leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} />
+      {matchDownMd ? (
+        <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} miniSidebar={miniSidebar} />
+      ) : miniSidebar ? (
+        <MiniSidebar />
+      ) : (
+        <Sidebar drawerOpen={leftDrawerOpened} drawerToggle={handleLeftDrawerToggle} miniSidebar={miniSidebar} />
+      )}
 
-      {/* main content */}
-      <Main theme={theme} open={leftDrawerOpened}>
-        {/* breadcrumb */}
+      <Main theme={theme} open={leftDrawerOpened} miniSidebar={miniSidebar}>
         <Breadcrumbs separator={IconChevronRight} navigation={navigation} icon title rightAlign />
         <Outlet />
       </Main>

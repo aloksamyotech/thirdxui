@@ -14,13 +14,15 @@ import FilterPanel from 'components/FilterPanel';
 import CaseNoteDialog from 'components/AddCaseNote';
 import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
-import  ServiceUser from 'assets/images/UserProfile.png'
+import ServiceUser from 'assets/images/UserProfile.png'
 import OptionsPopover from 'components/AddFilter';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { imageUrl } from 'common/urls';
 import './index.css';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+
 const UserProfileCard = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
@@ -60,10 +62,10 @@ const UserProfileCard = () => {
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-      })
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    })
     : '';
   const personalInfo = userData?.personalInfo || {};
   const contactInfo = userData?.contactInfo || {};
@@ -139,72 +141,82 @@ const UserProfileCard = () => {
 
       <Card>
         <Grid item xs={12}>
-          <Box
-            sx={{
-              backgroundImage: `url(${UserBg})`,
-              height: 100,
-              borderTopLeftRadius: 10,
-              borderTopRightRadius: 10,
-              position: 'relative'
-            }}
-          >
-            <Card
+          {loading ? (
+            <Box
               sx={{
-                position: 'absolute',
-                top: 35,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '95%',
-                borderRadius: 3,
-                overflow: 'hidden',
-                boxShadow: 3
+                margin: "5px"
               }}
             >
-              <CardContent
+              <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                backgroundImage: `url(${UserBg})`,
+                height: 100,
+                borderTopLeftRadius: 10,
+                borderTopRightRadius: 10,
+                position: 'relative'
+              }}
+            >
+              <Card
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  p: 2
+                  position: 'absolute',
+                  top: 35,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '95%',
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                  boxShadow: 3
                 }}
               >
-                <Grid container alignItems="center" spacing={2}>
-                  <img
-                    src={fullImageUrl || ServiceUser}
-                    alt={personalInfo?.firstName || 'User'}
-                    style={{ width: 84, height: 84, borderRadius: '50%', marginLeft: '16px' }}
-                  />
-                  <Grid item xs>
-                    <Typography variant="body1" fontSize={16} fontWeight={500} mb={1}>
-                      {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
-                    </Typography>
-                    <Typography variant="body2" mb={1}>
-                      {contactInfo?.email ?? ''}
-                    </Typography>
-                    <Typography variant="body2">
-                      {uniqueid ?? ''} | Individual | Added {formattedDate ?? ''}
-                    </Typography>
+                <CardContent
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    p: 2
+                  }}
+                >
+                  <Grid container alignItems="center" spacing={2}>
+                    <img
+                      src={fullImageUrl || ServiceUser}
+                      alt={personalInfo?.firstName || 'User'}
+                      style={{ width: 84, height: 84, borderRadius: '50%', marginLeft: '16px' }}
+                    />
+                    <Grid item xs>
+                      <Typography variant="body1" fontSize={16} fontWeight={500} mb={1}>
+                        {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
+                      </Typography>
+                      <Typography variant="body2" mb={1}>
+                        {contactInfo?.email ?? ''}
+                      </Typography>
+                      <Typography variant="body2">
+                        {uniqueid ?? ''} | Individual | Added {formattedDate ?? ''}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                </Grid>
 
-                <Box textAlign="right" sx={{ pr: 2 }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleClick}
-                    sx={{ mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
-                  >
-                    MANAGE
-                  </Button>
-                  <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    Address
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
-                    {`${contactInfo?.addressLine1 ?? ''} ${contactInfo?.country ?? ''}`}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
+                  <Box textAlign="right" sx={{ pr: 2 }}>
+                    <Button
+                      variant="contained"
+                      onClick={handleClick}
+                      sx={{ mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
+                    >
+                      MANAGE
+                    </Button>
+                    <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
+                      Address
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap', overflowWrap: 'break-word' }}>
+                      {`${contactInfo?.addressLine1 ?? ''} ${contactInfo?.country ?? ''}`}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+          )}
         </Grid>
 
         <Grid item xs={12} mt={10}>
@@ -239,300 +251,314 @@ const UserProfileCard = () => {
               <Grid container sx={{ px: '10px', py: '20px' }}>
                 <Grid item xs={12} md={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '318px' }}>
-                    <CardContent>
-                      <Typography variant="h5" fontWeight="600" gutterBottom mb={1}>
-                        ABOUT
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Full Name:</span>
-                              <Typography component="span" className="text">{`${personalInfo?.firstName ?? ''} ${
-                                personalInfo?.lastName ?? ''
-                              }`}</Typography>
-                            </Typography>
-                          </Box>{' '}
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>User ID:</span> <Typography component="span" className="text">{`${uniqueid ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Ethnicity:</span>{' '}
-                              <Typography component="span" className="text">{`${personalInfo?.ethnicity ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Language:</span>{' '}
-                              <Typography component="span" className="text">{`${contactInfo?.firstLanguage ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Contact:</span>{' '}
-                              <Typography component="span" className="text">
-                                +{`${contactInfo?.phone ?? ''}`}
+                    {loading ? (
+                      <SectionSkeleton lines={1} variant="rectangular" width="100%" height={300} />
+                    ) : (
+                      <CardContent>
+                        <Typography variant="h5" fontWeight="600" gutterBottom mb={1}>
+                          ABOUT
+                        </Typography>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Full Name:</span>
+                                <Typography component="span" className="text">{`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''
+                                  }`}</Typography>
                               </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Address:</span>{' '}
-                              <Typography component="span" className="text">{`${contactInfo?.addressLine1 ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
+                            </Box>{' '}
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>User ID:</span> <Typography component="span" className="text">{`${uniqueid ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Ethnicity:</span>{' '}
+                                <Typography component="span" className="text">{`${personalInfo?.ethnicity ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Language:</span>{' '}
+                                <Typography component="span" className="text">{`${contactInfo?.firstLanguage ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Contact:</span>{' '}
+                                <Typography component="span" className="text">
+                                  +{`${contactInfo?.phone ?? ''}`}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Address:</span>{' '}
+                                <Typography component="span" className="text">{`${contactInfo?.addressLine1 ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
+
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Gender:</span>{' '}
+                                <Typography component="span" className="text">{`${personalInfo?.gender ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>DOB:</span>{' '}
+                                <Typography component="span" className="text">
+                                  {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Age:</span>{' '}
+                                <Typography component="span" className="text">
+                                  {personalInfo?.dateOfBirth
+                                    ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
+                                    : ''}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Alternative Id:</span> <Typography component="span" fontSize="12px">{`${uniqueid ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Telephone no:</span>{' '}
+                                <Typography component="span" className="text">
+                                  +{`${contactInfo?.homePhone ?? ''}`}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
                         </Grid>
-
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Gender:</span>{' '}
-                              <Typography component="span" className="text">{`${personalInfo?.gender ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>DOB:</span>{' '}
-                              <Typography component="span" className="text">
-                                {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
-                              </Typography>
-                            </Typography>
-                          </Box>
-
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Age:</span>{' '}
-                              <Typography component="span" className="text">
-                                {personalInfo?.dateOfBirth
-                                  ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
-                                  : ''}
-                              </Typography>
-                            </Typography>
-                          </Box>
-
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Alternative Id:</span> <Typography component="span" fontSize="12px">{`${uniqueid ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Telephone no:</span>{' '}
-                              <Typography component="span" className="text">
-                                +{`${contactInfo?.homePhone ?? ''}`}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
+                      </CardContent>
+                    )}
                   </Card>
                 </Grid>
 
                 <Grid item xs={12} md={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '318px', p: 2 }}>
-                    <CardContent sx={{ p: 0 }}>
-                      <Typography variant="h6" fontWeight={600} gutterBottom>
-                        Risk Assessment
-                      </Typography>
+                    {loading ? (
+                      <SectionSkeleton lines={1} variant="rectangular" width="100%" height={300} />
+                    ) : (
+                      <CardContent sx={{ p: 0 }}>
+                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                          Risk Assessment
+                        </Typography>
 
-                      <Typography variant="body2" color="textSecondary" mb={2} className="text">
-                        {otherInfo?.description ?? 'No description available.'}
-                      </Typography>
+                        <Typography variant="body2" color="textSecondary" mb={2} className="text">
+                          {otherInfo?.description ?? 'No description available.'}
+                        </Typography>
 
-                      <Typography variant="subtitle1" sx={{ color: '#009fc7', mb: 1 }} className="text">
-                        Key Indicator Concern
-                      </Typography>
+                        <Typography variant="subtitle1" sx={{ color: '#009fc7', mb: 1 }} className="text">
+                          Key Indicator Concern
+                        </Typography>
 
-                      <Grid container spacing={1}>
-                        {[
-                          'Attendance and Engagement',
-                          'Poor school',
-                          'Learning disability',
-                          'Subtractive Mixture',
-                          'Learning disability'
-                        ].map((label, index) => (
-                          <Grid item key={index}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                bgcolor: '#009FC7',
-                                color: '#fff',
-                                px: 1,
-                                py: 0.5,
-                                borderRadius: '20px',
-                                fontSize: '12px',
-                                fontWeight: 400
-                              }}
-                            >
-                              {label}
+                        <Grid container spacing={1}>
+                          {[
+                            'Attendance and Engagement',
+                            'Poor school',
+                            'Learning disability',
+                            'Subtractive Mixture',
+                            'Learning disability'
+                          ].map((label, index) => (
+                            <Grid item key={index}>
                               <Box
-                                component="span"
                                 sx={{
-                                  ml: 1,
-                                  fontWeight: 'bold',
-                                  cursor: 'pointer'
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  bgcolor: '#009FC7',
+                                  color: '#fff',
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: '20px',
+                                  fontSize: '12px',
+                                  fontWeight: 400
                                 }}
                               >
-                                ✕
+                                {label}
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    ml: 1,
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  ✕
+                                </Box>
                               </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </CardContent>
+                    )}
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '218px' }}>
+                    {loading ? (
+                      <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
+                    ) : (
+                      <CardContent>
+                        <Typography variant="subtitle1" fontWeight="600" gutterBottom mb={1}>
+                          Next of Kin Details
+                        </Typography>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Full Name:</span>{' '}
+                                <Typography component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${emergencyContact?.lastName ?? ''
+                                  }`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Gender:</span>{' '}
+                                <Typography component="span" className="text">{`${emergencyContact?.gender ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Relationship to Service User:</span>{' '}
+                                <Typography component="span" className="text">{`${emergencyContact?.relationshipToUser ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Address:</span>{' '}
+                                <Typography component="span" className="text">{`${emergencyContact?.addressLine1 ?? ''}`}</Typography>
+                              </Typography>
                             </Box>
                           </Grid>
-                        ))}
-                      </Grid>
-                    </CardContent>
+
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Home no:</span>{' '}
+                                <Typography component="span" className="text">
+                                  +{`${emergencyContact?.homePhone ?? ''}`}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Mobile no:</span>{' '}
+                                <Typography component="span" className="text">
+                                  +{`${emergencyContact?.phone ?? ''}`}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography variant="body1" className="heading">
+                                <span>Email:</span>{' '}
+                                <Typography component="span" className="text">{`${emergencyContact?.email ?? ''}`}</Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    )}
                   </Card>
                 </Grid>
 
                 <Grid item xs={12} md={6}>
                   <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '218px' }}>
-                    <CardContent>
-                      <Typography variant="subtitle1" fontWeight="600" gutterBottom mb={1}>
-                        Next of Kin Details
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Full Name:</span>{' '}
-                              <Typography component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${
-                                emergencyContact?.lastName ?? ''
-                              }`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Gender:</span>{' '}
-                              <Typography component="span" className="text">{`${emergencyContact?.gender ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Relationship to Service User:</span>{' '}
-                              <Typography component="span" className="text">{`${emergencyContact?.relationshipToUser ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Address:</span>{' '}
-                              <Typography component="span" className="text">{`${emergencyContact?.addressLine1 ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
+                    {loading ? (
+                      <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
+                    ) : (
+                      <CardContent>
+                        <Typography variant="subtitle1" fontWeight="600" color="#042E4C" gutterBottom mb={1}>
+                          Contact Preferences
+                        </Typography>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Email:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Telephone:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                SMS:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Letter:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
 
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Home no:</span>{' '}
-                              <Typography component="span" className="text">
-                                +{`${emergencyContact?.homePhone ?? ''}`}
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Reason:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.reason?.name || 'N/A'}
+                                </Typography>
                               </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Mobile no:</span>{' '}
-                              <Typography component="span" className="text">
-                                +{`${emergencyContact?.phone ?? ''}`}
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Contact purposes:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.contactPurposes?.name || 'N/A'}
+                                </Typography>
                               </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography variant="body1" className="heading">
-                              <span>Email:</span>{' '}
-                              <Typography component="span" className="text">{`${emergencyContact?.email ?? ''}`}</Typography>
-                            </Typography>
-                          </Box>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Preferred Method of Contact:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.preferredMethod?.name || 'N/A'}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Date of confirmation:{' '}
+                                <Typography component="span" className="text">
+                                  {contactPreferences?.dateOfConfirmation
+                                    ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
+                                    : 'N/A'}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '218px' }}>
-                    <CardContent>
-                      <Typography variant="subtitle1" fontWeight="600" color="#042E4C" gutterBottom mb={1}>
-                        Contact Preferences
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Email:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Telephone:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              SMS:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Letter:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Reason:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.reason?.name || 'N/A'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Contact purposes:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.contactPurposes?.name || 'N/A'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Preferred Method of Contact:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.preferredMethod?.name || 'N/A'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" mb={1}>
-                            <Typography className="heading" variant="body1">
-                              Date of confirmation:{' '}
-                              <Typography component="span" className="text">
-                                {contactPreferences?.dateOfConfirmation
-                                  ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
-                                  : 'N/A'}
-                              </Typography>
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
+                      </CardContent>
+                    )}
                   </Card>
                 </Grid>
               </Grid>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button, InputBase } from '@mui/material';
+import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button, InputBase, Skeleton } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
@@ -37,12 +37,13 @@ const TabbedDataGrid = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [inputError, setInputError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
     pageSize: 100
   });
+  const [loading, setLoading] = useState(true);
 
   const handleEdit = (item) => {
     setInputValue(item.name);
@@ -100,6 +101,7 @@ const TabbedDataGrid = () => {
 
   const fetchConfigurations = async () => {
     try {
+      setLoading(true);
       const queryParams = new URLSearchParams({
         page: paginationModel.page,
         limit: paginationModel.pageSize,
@@ -132,6 +134,9 @@ const TabbedDataGrid = () => {
       setTabData(grouped);
     } catch (error) {
       toast.error('Error fetching configurations');
+    } finally {
+      // setLoading(false);
+      setTimeout(()=>{setLoading(false);}, 1000)
     }
   };
 
@@ -316,36 +321,54 @@ const TabbedDataGrid = () => {
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      <Typography variant="h6" fontWeight="500">
-                        {section}
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleOpenModal(section)}
-                        sx={{
-                          backgroundColor: '#41C048',
-                          borderRadius: '50%',
-                          width: '20px',
-                          height: '20px',
-                          color: 'white',
-                          '&:hover': { backgroundColor: '#41C048' }
-                        }}
-                      >
-                        <Add sx={{ fontSize: 16 }} />
-                      </IconButton>
+                      {loading ? (
+                        <Skeleton variant="text" width="60%" height={28} />
+                      ) : (
+                        <Typography variant="h6" fontWeight="500">
+                          {section}
+                        </Typography>
+                      )}
+                      {!loading && (
+                        <IconButton
+                          onClick={() => handleOpenModal(section)}
+                          sx={{
+                            backgroundColor: '#41C048',
+                            borderRadius: '50%',
+                            width: '20px',
+                            height: '20px',
+                            color: 'white',
+                            '&:hover': { backgroundColor: '#41C048' }
+                          }}
+                        >
+                          <Add sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      )}
                     </Box>
                   </Box>
                   <Box sx={{ px: 2, py: 1, backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="subtitle2" fontWeight="medium">
-                        Configuration
-                      </Typography>
-                      <Typography variant="subtitle2" fontWeight="medium">
-                        Status
-                      </Typography>
-                    </Box>
+                    {loading ? (
+                      <Skeleton variant="text" width="80%" height={20} />
+                    ) : (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="subtitle2" fontWeight="medium">
+                          Configuration
+                        </Typography>
+                        <Typography variant="subtitle2" fontWeight="medium">
+                          Status
+                        </Typography>
+                      </Box>
+                    )}
                   </Box>
                   <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
-                    {items.length > 0 ? (
+                    {loading ? (
+                      // Show a few skeleton rows
+                      [...Array(3)].map((_, i) => (
+                        <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                          <Skeleton variant="text" width="60%" height={20} />
+                          <Skeleton variant="circular" width={24} height={24} />
+                        </Box>
+                      ))
+                    ) : items.length > 0 ? (
                       items.map((item) => (
                         <Box
                           key={item.id}

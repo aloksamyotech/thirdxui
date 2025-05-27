@@ -25,6 +25,7 @@ import { getApi } from 'common/apiClient';
 import { imageUrl } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { toast } from 'react-hot-toast';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ const UserProfile = () => {
   const [serviceData, setServiceData] = useState(null);
   const [sessionData, setSessionData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(true);
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
@@ -103,12 +105,18 @@ const UserProfile = () => {
   }, [serviceId]);
 
   const fetchSessionlist = async (serviceId) => {
-    if (!serviceId) return;
-   const response = await getApi(urls.session.getById.replace(':id', serviceId));
+    try {
+      setLoading2(true);
+      if (!serviceId) return;
+      const response = await getApi(urls.session.getById.replace(':id', serviceId));
       if (response?.data?.userData) {
         setSessionData(response.data.userData);
       }
-   
+    } catch (error) {
+      console.log("error:", error);
+    } finally {
+      setLoading2(false);
+    }
   };
 
   const handleFilter = async () => {
@@ -192,97 +200,108 @@ const UserProfile = () => {
 
         <Grid item xs={12} md={9}>
           <Card sx={{ borderRadius: 3, mb: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
-                <Box
-                  component="img"
-                  src={
-                    loading
-                      ? Background
-                      : serviceData?.file
-                      ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                      : Background
-                  }
-                  alt="Service"
-                  sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
-                />
-              </Grid>
+            {
+              loading ? (
+                <Box sx={{
+                  margin: "5px"
+                }}>
+                  <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
+                </Box>
 
-              <Grid item xs={12} md={8}>
-                <Stack>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box sx={{ maxWidth: '60%' }}>
-                      <Tooltip title={(serviceData?.name || '').toUpperCase()}>
-                        <Typography
-                          variant="h4"
-                          sx={{
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            maxWidth: '100%',
-                            color: '#808191'
-                          }}
-                          fontSize={18}
-                          fontWeight={500}
-                        >
-                          {(serviceData?.name || '').toUpperCase()}
-                        </Typography>
-                      </Tooltip>
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <Box
+                      component="img"
+                      src={
+                        loading
+                          ? Background
+                          : serviceData?.file
+                            ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                            : Background
+                      }
+                      alt="Service"
+                      sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                    />
+                  </Grid>
 
-                      <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
-                        <Box sx={{ position: 'relative', width: 16, height: 16 }}>
-                          <Box
-                            sx={{
-                              width: 16,
-                              height: 16,
-                              borderRadius: '50%',
-                              border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
-                              position: 'absolute',
-                              top: 0,
-                              left: 0
-                            }}
-                          />
-                          <Box
-                            sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: '50%',
-                              backgroundColor: serviceData?.isActive ? 'green' : 'red',
-                              position: 'absolute',
-                              top: '4px',
-                              left: '4px'
-                            }}
-                          />
+                  <Grid item xs={12} md={8}>
+                    <Stack>
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box sx={{ maxWidth: '60%' }}>
+                          <Tooltip title={(serviceData?.name || '').toUpperCase()}>
+                            <Typography
+                              variant="h4"
+                              sx={{
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '100%',
+                                color: '#808191'
+                              }}
+                              fontSize={18}
+                              fontWeight={500}
+                            >
+                              {(serviceData?.name || '').toUpperCase()}
+                            </Typography>
+                          </Tooltip>
+
+                          <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
+                            <Box sx={{ position: 'relative', width: 16, height: 16 }}>
+                              <Box
+                                sx={{
+                                  width: 16,
+                                  height: 16,
+                                  borderRadius: '50%',
+                                  border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0
+                                }}
+                              />
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  backgroundColor: serviceData?.isActive ? 'green' : 'red',
+                                  position: 'absolute',
+                                  top: '4px',
+                                  left: '4px'
+                                }}
+                              />
+                            </Box>
+
+                            <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
+                              {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
+                            </Typography>
+                          </Stack>
                         </Box>
 
-                        <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
-                          {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
-                        </Typography>
-                      </Stack>
-                    </Box>
+                        <Button
+                          variant="contained"
+                          sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2, whiteSpace: 'nowrap' }}
+                          onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
+                        >
+                          Add New Session {<AddIcon />}
+                        </Button>
+                      </Box>
 
-                    <Button
-                      variant="contained"
-                      sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2, whiteSpace: 'nowrap' }}
-                      onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
-                    >
-                      Add New Session {<AddIcon />}
-                    </Button>
-                  </Box>
-
-                  <Typography variant="body2" color="textSecondary" mb={1}>
-                    Service Code - {serviceData?.code}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" mb={1}>
-                    Start Date - {formatDate(serviceData?.createdAt)}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Service Description - </strong>
-                    {serviceData?.description}
-                  </Typography>
-                </Stack>
-              </Grid>
-            </Grid>
+                      <Typography variant="body2" color="textSecondary" mb={1}>
+                        Service Code - {serviceData?.code}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" mb={1}>
+                        Start Date - {formatDate(serviceData?.createdAt)}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Service Description - </strong>
+                        {serviceData?.description}
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                </Grid>
+              )
+            }
           </Card>
 
           <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400 }}>
@@ -363,11 +382,11 @@ const UserProfile = () => {
               ))}
             </Stack> */}
             <Stack spacing={1} mt={2} >
-              {loading ? (
-           
+              {loading2 ? (
+
                 <Box
                   sx={{
-                    minHeight: 200, 
+                    minHeight: 200,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',

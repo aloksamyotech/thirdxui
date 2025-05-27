@@ -35,7 +35,7 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
     <Grid item>
       <img
         src={userView || userProfile}
-        alt={user.name}
+        alt={user?.name}
         style={{ width: 64, height: 64, borderRadius: '50%' }}
       />
     </Grid>
@@ -44,8 +44,8 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
       <Typography mb={1} variant="h5">
         {user.name}
       </Typography>
-      <Typography mb={1} sx={{fontSize:'10px'}}>{user.email}</Typography>
-      <Typography mb={1} sx={{fontSize:'10px'}}>{user.phone}</Typography>
+      <Typography mb={1} sx={{fontSize:'10px'}}>{user?.email}</Typography>
+      <Typography mb={1} sx={{fontSize:'10px'}}>{user?.phone}</Typography>
     </Grid>
 
     <Grid item xs={4}>
@@ -53,10 +53,10 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
         Address
       </Typography>
       <Typography mb={1} align="right"  sx={{fontSize:'10px'}}>
-        {user.address}
+        {user?.address}
       </Typography>
       <Typography mb={1} align="right"  sx={{fontSize:'10px'}}>
-        {user.country}
+        {user?.country}
       </Typography>
     </Grid>
   </Grid>
@@ -88,12 +88,12 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
     <Grid container spacing={2}>
       <Grid item xs={6}>
         {[
-          ['User ID', user.userId],
-          ['Name', user.name],
-          ['DOB', user.dob],
-          ['Age', user.age],
-          ['Contact', user.phone],
-          ['Email', user.email],
+          ['User ID', user?.userId],
+          ['Name', user?.name],
+          ['DOB', user?.dob],
+          ['Age', user?.age],
+          ['Contact', user?.phone],
+          ['Email', user?.email],
         ].map(([label, value]) => (
           <Typography key={label} mb={2}>
             <strong style={{ fontSize: '12px', color: '#7f7f7f' }}>{label}:</strong>{' '}
@@ -104,12 +104,12 @@ export default function UserProfileDialog({ open, handleClose, user ,userView}) 
 
       <Grid item xs={6}>
         {[
-          ['Gender', user.gender],
-          ['Ethnicity', user.ethnicity],
-          ['Country of Origin', user.country],
-          ['Alternate User ID', user.altUserId],
-          ['Name of Service', user.service],
-          ['Referred Date', user.referredDate],
+          ['Gender', user?.gender],
+          ['Ethnicity', user?.ethnicity],
+          ['Country of Origin', user?.country],
+          ['Alternate User ID', user?.altUserId],
+          ['Name of Service', user?.service],
+          ['Referred Date', user?.referredDate],
         ].map(([label, value]) => (
           <Typography key={label} mb={2}>
             <strong style={{ fontSize: '12px', color: '#7f7f7f' }}>{label}:</strong>{' '}

@@ -16,15 +16,7 @@ import { urls } from 'common/urls';
 import dayjs from 'dayjs';
 import { imageUrl } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -41,9 +33,8 @@ const CaseDetailsPage = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 10
+    pageSize: 5
   });
-
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -120,7 +111,7 @@ const CaseDetailsPage = () => {
   //   { value: 'year', label: 'Last 1 Year' }
   // ];
 
- const columnsCase = [
+  const columnsCase = [
     { field: 'caseId', headerName: 'Case Id', width: 100 },
     {
       field: 'serviceUser',
@@ -211,18 +202,13 @@ const CaseDetailsPage = () => {
 
   const columns = [
     { field: 'date', headerName: 'Date', flex: 1 },
- {
-  field: 'subject',
-  headerName: 'Subject',
-  flex: 1,
-  renderCell: (params) => (
-    <Box sx={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>
-      {params.value}
-    </Box>
-  )
-}
-,
-    { field: 'contactType', headerName: 'Contact Type', flex: 1 },
+    {
+      field: 'subject',
+      headerName: 'Subject',
+      flex: 1,
+      renderCell: (params) => <Box sx={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>{params.value}</Box>
+    },
+    { field: 'configurationName', headerName: 'Contact Type', flex: 1 },
     { field: 'createdBy', headerName: 'Created By', flex: 1 },
     {
       field: 'hours',
@@ -230,7 +216,7 @@ const CaseDetailsPage = () => {
       flex: 0.5,
       renderCell: (params) => (
         <Chip
-          label={params.value || "-"}
+          label={params.value || '-'}
           sx={{
             color: '#0798bd',
             backgroundColor: '#e5f8fe',
@@ -279,7 +265,7 @@ const CaseDetailsPage = () => {
           id: user?._id,
           date: formatDate(user?.date),
           subject: user?.subject || '',
-          contactType: user?.configurationId?.name || '',
+          contactType: user?.configurationId?.name || ''
         };
       });
 
@@ -323,25 +309,35 @@ const CaseDetailsPage = () => {
 
   const fetchdata = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await getApi(
         `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
       );
+
       const allCasesNotes = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
+      const formattedData = allCasesNotes.map((note, index) => {
+        let configName = '-';
 
-      const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
-        id: item._id || index,
-        date: item.date ? new Date(item.date).toLocaleDateString() : '',
-        subject: item?.subject || '',
-        contactType: item?.configurationId?.name || '',
+        if (note?.configurationId && typeof note.configurationId === 'object') {
+          configName = note.configurationId.name || '-';
+        } else if (note?.name) {
+          configName = note.name;
+        }
 
-      }));
+        return {
+          id: note._id,
+          date: note.date ? dayjs(note.date).format('DD-MM-YYYY') : '-',
+          subject: note.subject || '-',
+          createdBy: note.createdBy || '-',
+          configurationName: configName,
+          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+        };
 
-      setRows(formattedCasesNotes);
-
+      });
+      
+  setRows(formattedData);
       setTotalRows(pagination?.total);
-
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
@@ -350,7 +346,6 @@ const CaseDetailsPage = () => {
   };
 
   useEffect(() => {
-
     fetchdata();
   }, [paginationModel]);
 
@@ -469,91 +464,87 @@ const CaseDetailsPage = () => {
             </Card>
           </Grid>
 
-     <Grid item xs={12} md={9}>
-  <Box sx={{ backgroundColor: '#fff', width: '100%' ,borderRadius:'4px'}}>
-    <TableContainer component={Paper} elevation={0}>
-      <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
-        <TableHead sx={{ backgroundColor: '#f5f5f5',padding:'20px'}}>
-          <TableRow>
-            {[
-              'Case Id',
-              'Service User',
-              'Owner',
-              'Date Opened',
-              'Date Closed',
-              'Attachments',
-              'Total Hours',
-              'Status',
-            ].map((header) => (
-              <TableCell
-                key={header}
-                sx={{
-                  fontSize: '12px',
-                  whiteSpace: 'nowrap',
-                  padding: '6px',
-                  borderBottom: 'none',
-                  height:'50px'
-                }}
-              >
-                {header}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody sx={{height: '73px'}}>
-          {rows.map((row, index) => (
-            <TableRow key={row.caseId}>
-              <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.caseId}</TableCell>
-              <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-  <Typography variant="body2" sx={{ fontSize: '12px' }}>
-    {serviceuserDetails?.personalInfo?.firstName || ''}
-  </Typography>
-  <Typography variant="body2" sx={{ fontSize: '12px' }}>
-    {serviceuserDetails?.personalInfo?.lastName || ''}
-  </Typography>
-</TableCell>
+          <Grid item xs={12} md={9}>
+            <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
+              <TableContainer component={Paper} elevation={0}>
+                <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+                  <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
+                    <TableRow>
+                      {['Case Id', 'Service User', 'Owner', 'Date Opened', 'Date Closed', 'Attachments', 'Total Hours', 'Status'].map(
+                        (header) => (
+                          <TableCell
+                            key={header}
+                            sx={{
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap',
+                              padding: '6px',
+                              borderBottom: 'none',
+                              height: '50px'
+                            }}
+                          >
+                            {header}
+                          </TableCell>
+                        )
+                      )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody sx={{ height: '73px' }}>
+                    {rows.map((row, index) => (
+                      <TableRow key={row.caseId}>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.caseId}</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {serviceuserDetails?.personalInfo?.firstName || ''}
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {serviceuserDetails?.personalInfo?.lastName || ''}
+                          </Typography>
+                        </TableCell>
 
-             <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none', whiteSpace: 'normal' }}>
-  <Typography variant="body2" sx={{ fontSize: '12px' }}>
-    {`${serviceuserDetails?.personalInfo?.firstName || ''}`}<br />
-    {`${serviceuserDetails?.personalInfo?.lastName || ''}`}
-  </Typography>
-</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none', whiteSpace: 'normal' }}>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {`${serviceuserDetails?.personalInfo?.firstName || ''}`}
+                            <br />
+                            {`${serviceuserDetails?.personalInfo?.lastName || ''}`}
+                          </Typography>
+                        </TableCell>
 
-              <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{formatDate(caseData?.caseOpened || '')}</TableCell>
-              <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{formatDate(caseData?.caseClosed || '')}</TableCell>
-              <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.attachments}</TableCell>
-              <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.totalHours}</TableCell>
-              <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
-                <Chip
-                  label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
-                  icon={
-                    row.serviceStatus === 'Active' ? (
-                      <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                    ) : (
-                      <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                    )
-                  }
-                  variant="outlined"
-                  sx={{
-                    borderColor: 'gray',
-                    color: 'gray',
-                    backgroundColor: 'transparent',
-                    fontSize: '10px',
-                    height: '20px',
-                    paddingRight: '4px',
-                  }}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Box>
-</Grid>
-
-
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {formatDate(caseData?.caseOpened || '')}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {formatDate(caseData?.caseClosed || '')}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.attachments}</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.totalHours}</TableCell>
+                        <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
+                          <Chip
+                            label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
+                            icon={
+                              row.serviceStatus === 'Active' ? (
+                                <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
+                              ) : (
+                                <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
+                              )
+                            }
+                            variant="outlined"
+                            sx={{
+                              borderColor: 'gray',
+                              color: 'gray',
+                              backgroundColor: 'transparent',
+                              fontSize: '10px',
+                              height: '20px',
+                              paddingRight: '4px'
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </Grid>
         </Grid>
 
         <Grid container spacing={2}>
@@ -565,12 +556,27 @@ const CaseDetailsPage = () => {
             onReset={handleReset}
           />
 
-          <Grid item xs={12} md={9} >
-            <Box sx={{ height: '400px', width: '100%', backgroundColor: '#ffff' }}>
+          <Grid item xs={12} md={9}>
+            <Box sx={{ height: '430px', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
                 loading={loading}
-                rows={row}
+                rows={
+                  loading
+                    ? []
+                    : row.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
+                rowHeight={70}
+                getRowId={(row) => row.id}
                 slots={{
                   toolbar: () => <CustomHeader />,
                   loadingOverlay: () => (
@@ -580,41 +586,41 @@ const CaseDetailsPage = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
                       }}
                     >
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 disableSelectionOnClick
-                  rowHeight={80} 
-              sx={{
-    '& .MuiDataGrid-columnHeaders': {
-      backgroundColor: '#f9fafb',
-      fontWeight: 'bold'
-    },
-    '& .MuiDataGrid-virtualScroller': {
-      overflow: 'hidden !important' 
-    },
-    '& .MuiDataGrid-main': {
-      overflow: 'hidden' 
-    }
-  }}
+                sx={{
+                  '& .MuiDataGrid-columnHeaders': {
+                    backgroundColor: '#f9fafb',
+                    fontWeight: 'bold'
+                  },
+                  '& .MuiDataGrid-virtualScroller': {
+                    overflow: 'hidden !important'
+                  },
+                  '& .MuiDataGrid-main': {
+                    overflow: 'hidden'
+                  }
+                }}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
 
-      <CaseNoteDialog open={openDialog} fetchdata={fetchdata} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
+      <CaseNoteDialog
+        open={openDialog}
+        fetchdata={fetchdata}
+        handleClose={() => setOpenDialog(false)}
+        onSubmit={handleSave}
+        title="Add Case Note"
+        caseid={id}
+      />
       <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>
   );

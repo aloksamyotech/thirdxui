@@ -1,6 +1,19 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { Grid, TextField, Box, Paper, Button, MenuItem, InputAdornment, FormControlLabel, Card, Typography } from '@mui/material';
+import {
+  Grid,
+  TextField,
+  Box,
+  Paper,
+  Button,
+  MenuItem,
+  InputAdornment,
+  FormControlLabel,
+  Card,
+  Typography,
+  Autocomplete,
+  Chip
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
@@ -11,12 +24,18 @@ import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 
-const AddCaseForm = ({ onCancel }) => {
+const AddCaseForm = () => {
   const navigate = useNavigate();
   const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
   const [servicetype, setServiceType] = useState([]);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [benificiary, setBenificiary] = useState([]);
+  const [Campaigns, setCampaigns] = useState([]);
+  const [engagement, setengagement] = useState([]);
+  const [eventsAttended, seteventsAttended] = useState([]);
+  const [fundingInterests, setfundingInterests] = useState([]);
+  const [fundraisingActivities, setfundraisingActivities] = useState([]);
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -64,18 +83,81 @@ const AddCaseForm = ({ onCancel }) => {
       name: '',
       code: '',
       serviceType: '',
-      beneficiaryInformation: '',
-      campaignsSupported: '',
-      engagement: '',
-      eventsAttended: '',
-      fundingInterests: '',
-      fundraisingActivities: '',
+      benificiary: [],
+      Campaigns: [],
+      engagement: [],
+      eventsAttended: [],
+      fundingInterests: [],
+      fundraisingActivities: [],
       notes: '',
       file: null,
       restrictAccess: false
     }
   });
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
 
+        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
+        setBenificiary(benificiarydata);
+        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
+        setCampaigns(Campaignsdata);
+        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
+        setengagement(engagementdata);
+        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
+        seteventsAttended(eventsAttendeddata);
+        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
+        setfundingInterests(fundingInterestsdata);
+        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
+        setfundraisingActivities(fundraisingActivitiesdata);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+    fetchTags();
+  }, []);
+  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <Autocomplete
+          multiple
+          options={options}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value._id}
+          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
+          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                label={option.name}
+                {...getTagProps({ index })}
+                key={option._id}
+                deleteIcon={
+                  <span
+                    style={{
+                      backgroundColor: '#4C4E6442',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                  </span>
+                }
+              />
+            ))
+          }
+          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+        />
+      )}
+    />
+  );
   const onSubmit = async (data) => {
     setIsloading(true);
 
@@ -84,12 +166,35 @@ const AddCaseForm = ({ onCancel }) => {
       formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
-      formData.append('benificiary', data.beneficiaryInformation || '');
-      formData.append('campaigns', data.campaignsSupported || '');
-      formData.append('engagement', data.engagement || '');
-      formData.append('eventAttanded', data.eventsAttended || '');
-      formData.append('fundingInterest', data.fundingInterests || '');
-      formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      // formData.append('benificiary', data.beneficiaryInformation || '');
+      // formData.append('campaigns', data.campaignsSupported || '');
+      // formData.append('engagement', data.engagement || '');
+      // formData.append('eventAttanded', data.eventsAttended || '');
+      // formData.append('fundingInterest', data.fundingInterests || '');
+      // formData.append('fundraisingActivities', data.fundraisingActivities || '');
+      (data.benificiary || []).forEach((id) => {
+        formData.append('benificiary[]', id);
+      });
+
+      (data.Campaigns || []).forEach((id) => {
+        formData.append('campaigns[]', id);
+      });
+
+      (data.engagement || []).forEach((id) => {
+        formData.append('engagement[]', id);
+      });
+
+      (data.eventsAttended || []).forEach((id) => {
+        formData.append('eventAttanded[]', id);
+      });
+
+      (data.fundingInterests || []).forEach((id) => {
+        formData.append('fundingInterest[]', id);
+      });
+
+      (data.fundraisingActivities || []).forEach((id) => {
+        formData.append('fundraisingActivities[]', id);
+      });
       formData.append('description', data.notes || '');
       formData.append('isActive', restrictAccess || false);
       if (data.file) {
@@ -220,37 +325,64 @@ const AddCaseForm = ({ onCancel }) => {
                   </Typography>
 
                   <Grid container spacing={2}>
-                    {[
-                      'beneficiaryInformation',
-                      'campaignsSupported',
-                      'engagement',
-                      'eventsAttended',
-                      'fundingInterests',
-                      'fundraisingActivities'
-                    ].map((field) => (
-                      <Grid item xs={12} key={field}>
-                        <Controller
-                          name={field}
-                          control={control}
-                          rules={{
-                            minLength: { value: 2, message: 'Minimum 2 characters' },
-                            maxLength: { value: 50, message: 'Maximum 50 characters allowed' },
-                            pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                          }}
-                          render={({ field: controllerField }) => (
-                            <TextField
-                              {...controllerField}
-                              fullWidth
-                              size="small"
-                              onKeyDown={allowOnlyText}
-                              label={field.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                              error={!!errors[field]}
-                              helperText={errors[field]?.message}
-                            />
-                          )}
-                        />
-                      </Grid>
-                    ))}
+                    <Grid item xs={12}>
+                      {renderAutocomplete(
+                        'benificiary',
+                        'Beneficiary Information',
+                        benificiary,
+                        errors.benificiary,
+                        errors.benificiary?.message,
+                        control
+                      )}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      {renderAutocomplete(
+                        'Campaigns',
+                        'Campaigns Supported',
+                        Campaigns,
+                        errors.Campaigns,
+                        errors.Campaigns?.message,
+                        control
+                      )}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      {renderAutocomplete('engagement', 'Engagement', engagement, errors.engagement, errors.engagement?.message, control)}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      {renderAutocomplete(
+                        'eventsAttended',
+                        'Events Attended',
+                        eventsAttended,
+                        errors.eventsAttended,
+                        errors.eventsAttended?.message,
+                        control
+                      )}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      {renderAutocomplete(
+                        'fundingInterests',
+                        'Funding Interests',
+                        fundingInterests,
+                        errors.fundingInterests,
+                        errors.fundingInterests?.message,
+                        control
+                      )}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      {renderAutocomplete(
+                        'fundraisingActivities',
+                        'Fundraising Activities',
+                        fundraisingActivities,
+                        errors.fundraisingActivities,
+                        errors.fundraisingActivities?.message,
+                        control
+                      )}
+                    </Grid>
                   </Grid>
                 </Paper>
               </Grid>
@@ -279,7 +411,36 @@ const AddCaseForm = ({ onCancel }) => {
                               <InputAdornment position="end">
                                 <Button component="label" sx={{ minWidth: 0, p: 0 }}>
                                   <Link component="span">Upload a file</Link>
-                                  <input type="file" hidden onChange={(e) => field.onChange(e.target.files?.[0] || null)} />
+                                  <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                      const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                      if (file) {
+                                        if (!allowedTypes.includes(file.type)) {
+                                          toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        if (file.size > maxSizeInBytes) {
+                                          toast.error('File size must be less than or equal to 25MB.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        field.onChange(file);
+                                      } else {
+                                        field.onChange(null);
+                                      }
+                                    }}
+                                  />
                                 </Button>
                               </InputAdornment>
                             )
@@ -288,6 +449,7 @@ const AddCaseForm = ({ onCancel }) => {
                       </Box>
                     )}
                   />
+
                   <Controller
                     name="notes"
                     control={control}

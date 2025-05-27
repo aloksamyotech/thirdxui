@@ -30,6 +30,8 @@ import Map from '../Map';
 import Shortcut2 from './Shortcut2';
 import EmptyCard from './EmptyCard';
 import Card from './MediaCard';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
 // import Map from 'components/Map';
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
@@ -37,8 +39,27 @@ import Card from './MediaCard';
 const Dashboard = () => {
   const theme = useTheme();
   const [isLoading, setLoading] = useState(true);
+  const [totalDonation, setTotalDonation] = useState([]);
+  const [totalSession, setTotalSession] = useState([]);
+  const [totalActiveUser, setTotalActiveUser] = useState([]);
+  const [totalOpenedCases, setTotalCaseOpened] = useState([]);
   useEffect(() => {
     setLoading(false);
+  }, []);
+
+  const fetchDashboardData = async () => {
+    const donation = await getApi(urls.dashboard.getTotalDonation);
+    const session = await getApi(urls.dashboard.getTotalSession);
+    const activeUser = await getApi(urls.dashboard.getTotalActiveUser);
+    const caseOpened = await getApi(urls.dashboard.getTotalOpenedCases);
+
+    setTotalDonation(donation?.data?.totalDonation || 0);
+    setTotalSession(session?.data?.totalSession || 0);
+    setTotalActiveUser(activeUser?.data?.totalUser || 0);
+    setTotalCaseOpened(caseOpened?.data?.totalcase || 0);
+  };
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
   return (
@@ -46,16 +67,16 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Active Service Users" num1="145 M" num2="62" />
+            <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Open Cases" num1="145 M" num2="62" />
+            <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Sessions Delivered" num1="145 M" num2="62" />
+            <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" />
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Total Donations" num1="145 M" num2="62" />
+            <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" />
           </Grid>
         </Grid>
       </Grid>

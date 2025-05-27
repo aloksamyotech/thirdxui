@@ -15,9 +15,22 @@ import { getApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
 import dayjs from 'dayjs';
 import { imageUrl } from 'common/urls';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
+} from '@mui/material';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(true);
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
@@ -32,6 +45,7 @@ const CaseDetailsPage = () => {
     page: 0,
     pageSize: 10
   });
+
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -53,13 +67,12 @@ const CaseDetailsPage = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
-              color: '#333',
+              color: '#878787',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            CASE NOTES
+            Case Notes
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -197,48 +210,29 @@ const CaseDetailsPage = () => {
 
   const userProfile = serviceuserDetails?.otherInfo?.file;
   const fullImageUrl = userProfile ? `${imageUrl}${userProfile}` : '';
-  const caseNotes = [
-    {
-      id: 1,
-      date: '08/25/2017',
-      subject: 'SUPERVISION',
-      contactType: 'Email',
-      createdBy: 'Sammy odoi',
-      hours: '2 Hr',
-      hidden: false
-    },
-    {
-      id: 2,
-      date: '08/25/2017',
-      subject: 'AA–Mum and AA–Phone Contact',
-      contactType: 'Email',
-      createdBy: 'Sammy odoi',
-      hours: '2 Hr',
-      hidden: true
-    },
-    {
-      id: 3,
-      date: '08/25/2017',
-      subject: 'SUPERVISION',
-      contactType: 'Email',
-      createdBy: 'Sammy odoi',
-      hours: '2 Hr',
-      hidden: false
-    }
-  ];
 
   const columns = [
     { field: 'date', headerName: 'Date', flex: 1 },
-    { field: 'subject', headerName: 'Subject', flex: 2 },
-    { field: 'contactType', headerName: 'Contact Type', flex: 1.5 },
-    { field: 'createdBy', headerName: 'Created By', flex: 1.5 },
+    {
+      field: 'subject',
+      headerName: 'Subject',
+      flex: 1,
+      renderCell: (params) => (
+        <Box sx={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>
+          {params.value}
+        </Box>
+      )
+    }
+    ,
+    { field: 'contactType', headerName: 'Contact Type', flex: 1 },
+    { field: 'createdBy', headerName: 'Created By', flex: 1 },
     {
       field: 'hours',
       headerName: 'Hours',
-      flex: 1,
+      flex: 0.5,
       renderCell: (params) => (
         <Chip
-          label={params.value}
+          label={params.value || "-"}
           sx={{
             color: '#0798bd',
             backgroundColor: '#e5f8fe',
@@ -314,6 +308,7 @@ const CaseDetailsPage = () => {
     if (!id) return;
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await getApi(urls.case.getById.replace(':id', id));
         const Data = response?.data?.caseData;
         setCaseData(Data);
@@ -321,6 +316,8 @@ const CaseDetailsPage = () => {
         setServiceuserDetails(Data?.userServiceDetails);
       } catch (error) {
         console.error('Error fetching case data:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -328,6 +325,7 @@ const CaseDetailsPage = () => {
 
   const fetchdata = async () => {
     try {
+      setLoading2(true)
       const response = await getApi(
         `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
       );
@@ -348,10 +346,13 @@ const CaseDetailsPage = () => {
 
     } catch (err) {
       console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading2(false);
     }
   };
 
   useEffect(() => {
+
     fetchdata();
   }, [paginationModel]);
 
@@ -410,80 +411,164 @@ const CaseDetailsPage = () => {
 
           <Grid item xs={12} md={3}>
             <Card sx={{ mb: 2, backgroundColor: '#042E4C', color: 'white' }}>
-              <CardContent>
+              {loading ? (
                 <Box
                   sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    padding: '4px 0'
+                    margin: "5px",
                   }}
                 >
-                  <Typography variant="h6" sx={{ color: 'white', fontWeight: 500 }}>
-                    Service User Summary
-                  </Typography>
-
-                  <Chip
-                    label="View"
-                    size="small"
-                    onClick={() => setOpen(true)}
+                  <SectionSkeleton lines={1} variant="rectangular" width="100%" height={120} />
+                </Box>
+              ) : (
+                <CardContent>
+                  <Box
                     sx={{
-                      backgroundColor: 'white',
-                      color: '#042E4C',
-                      fontWeight: 300,
-                      '&:hover': {
-                        backgroundColor: 'white',
-                        color: '#042E4C'
-                      }
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      padding: '4px 0'
                     }}
-                  />
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                    <strong>Name:</strong> {serviceuserDetails?.personalInfo?.firstName || ''}{' '}
-                    {serviceuserDetails?.personalInfo?.lastName || ''}
-                  </Typography>
+                  >
+                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 500 }}>
+                      Service User Summary
+                    </Typography>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                      <strong>User ID :</strong> 01231
-                    </Typography>
-                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                      <strong>Gender:</strong> {serviceuserDetails?.personalInfo?.gender || ''}
-                    </Typography>
+                    <Chip
+                      label="View"
+                      size="small"
+                      onClick={() => setOpen(true)}
+                      sx={{
+                        backgroundColor: 'white',
+                        color: '#042E4C',
+                        fontWeight: 300,
+                        '&:hover': {
+                          backgroundColor: 'white',
+                          color: '#042E4C'
+                        }
+                      }}
+                    />
                   </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                      <strong>Name:</strong> {serviceuserDetails?.personalInfo?.firstName || ''}{' '}
+                      {serviceuserDetails?.personalInfo?.lastName || ''}
+                    </Typography>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                      <strong>Contact:</strong> {serviceuserDetails?.contactInfo?.phone || ''}
-                    </Typography>
-                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                      <strong>DOB:</strong>{' '}
-                      {serviceuserDetails?.personalInfo?.dateOfBirth
-                        ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
-                        : ''}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                        <strong>User ID :</strong> 01231
+                      </Typography>
+                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                        <strong>Gender:</strong> {serviceuserDetails?.personalInfo?.gender || ''}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                        <strong>Contact:</strong> {serviceuserDetails?.contactInfo?.phone || ''}
+                      </Typography>
+                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
+                        <strong>DOB:</strong>{' '}
+                        {serviceuserDetails?.personalInfo?.dateOfBirth
+                          ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
+                          : ''}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              </CardContent>
+                </CardContent>
+              )}
             </Card>
           </Grid>
 
           <Grid item xs={12} md={9}>
-            <Box sx={{ backgroundColor: '#ffff', height: 'auto', width: '100%' }}>
-              <DataGrid
-                rows={rows}
-                columns={columnsCase}
-                hideFooter
-                rowHeight={70}
-                sx={{
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor: '#f5f5f5'
-                  }
-                }}
-              />
-            </Box>
+            {loading ? (
+              <Box>
+                <SectionSkeleton lines={1} variant="rectangular" width="100%" height={130} />
+              </Box>
+            ) : (
+              <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
+                <TableContainer component={Paper} elevation={0}>
+                  <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+                    <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
+                      <TableRow>
+                        {[
+                          'Case Id',
+                          'Service User',
+                          'Owner',
+                          'Date Opened',
+                          'Date Closed',
+                          'Attachments',
+                          'Total Hours',
+                          'Status',
+                        ].map((header) => (
+                          <TableCell
+                            key={header}
+                            sx={{
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap',
+                              padding: '6px',
+                              borderBottom: 'none',
+                              height: '50px'
+                            }}
+                          >
+                            {header}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody sx={{ height: '73px' }}>
+                      {rows.map((row, index) => (
+                        <TableRow key={row.caseId}>
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.caseId}</TableCell>
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                            <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                              {serviceuserDetails?.personalInfo?.firstName || ''}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                              {serviceuserDetails?.personalInfo?.lastName || ''}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none', whiteSpace: 'normal' }}>
+                            <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                              {`${serviceuserDetails?.personalInfo?.firstName || ''}`}<br />
+                              {`${serviceuserDetails?.personalInfo?.lastName || ''}`}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{formatDate(caseData?.caseOpened || '')}</TableCell>
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{formatDate(caseData?.caseClosed || '')}</TableCell>
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.attachments}</TableCell>
+                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.totalHours}</TableCell>
+                          <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
+                            <Chip
+                              label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
+                              icon={
+                                row.serviceStatus === 'Active' ? (
+                                  <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
+                                ) : (
+                                  <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
+                                )
+                              }
+                              variant="outlined"
+                              sx={{
+                                borderColor: 'gray',
+                                color: 'gray',
+                                backgroundColor: 'transparent',
+                                fontSize: '10px',
+                                height: '20px',
+                                paddingRight: '4px',
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            )}
           </Grid>
         </Grid>
 
@@ -496,19 +581,47 @@ const CaseDetailsPage = () => {
             onReset={handleReset}
           />
 
-          <Grid item xs={12} md={9}>
-            <Box sx={{ height: 'auto', width: '100%', backgroundColor: '#ffff' }}>
+          <Grid item xs={12} md={9} >
+            <Box sx={{ height: '400px', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
+                loading={loading2}
                 rows={row}
                 columns={columns}
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (
+                    loading2 ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                  ),
                 }}
                 disableSelectionOnClick
+                rowHeight={80}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#f9fafb',
                     fontWeight: 'bold'
+                  },
+                  '& .MuiDataGrid-virtualScroller': {
+                    overflow: 'hidden !important'
+                  },
+                  '& .MuiDataGrid-main': {
+                    overflow: 'hidden'
                   }
                 }}
               />

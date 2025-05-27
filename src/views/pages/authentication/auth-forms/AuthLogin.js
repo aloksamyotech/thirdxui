@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   Box,
@@ -14,35 +14,25 @@ import {
   Stack,
   Divider,
   Grid,
-  AccordionDetails,
   Typography
 } from '@mui/material';
 import * as Yup from 'yup';
 import Google from 'assets/images/icons/social-google.svg';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { Formik } from 'formik';
-import useScriptRef from 'hooks/useScriptRef.js';
-import AnimateButton from 'ui-component/extended/AnimateButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'; // Import the Copy Icon
+import { urls } from 'common/urls';
+import { postApi } from 'common/apiClient';
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const scriptedRef = useScriptRef();
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
-  const [expanded, setExpanded] = useState(false);
-
-  const handleAccordian = (panel) => (event, newExpanded) => {
-    setExpanded(newExpanded ? panel : false);
-  };
 
   const handleClickShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -50,17 +40,6 @@ const AuthLogin = ({ ...others }) => {
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
-  };
-
-  const handleCopyToClipboard = (text) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        toast.success('Copied to clipboard!');
-      })
-      .catch(() => {
-        toast.error('Failed to copy!');
-      });
   };
 
   return (
@@ -77,47 +56,31 @@ const AuthLogin = ({ ...others }) => {
         onSubmit={async (values, { setErrors, setStatus }) => {
           try {
             setIsSubmitting(true);
-            const res = await addApi('/user/login/', values);
 
-            if (res?.data && res?.data?.jwtToken && res?.data?.user) {
-              const storageMethod = rememberMe ? localStorage : sessionStorage;
-              storageMethod.setItem('imstoken', JSON.stringify(res.data.jwtToken));
-              storageMethod.setItem('user', JSON.stringify(res.data.user));
-              storageMethod.setItem('userId', res.data.user._id);
-              storageMethod.setItem('email', res.data.user.email);
-              storageMethod.setItem('role', res.data.user.role);
-              storageMethod.setItem('permissions', res.data.user.permissions || []);
-
-              if (res.data.user.role === 'user') {
-                navigate('/dashboard/default');
-                window.location.reload();
-              } else if (res.data.user.role === 'admin') {
-                navigate('/dashboard/admin');
-                window.location.reload();
-              } else if (res.data.user.role === 'employee') {
-                const permissions = (localStorage.getItem('permissions') || '').split(',');
-                const filteredMenu = filterMenuItems(dashboard.children, permissions);
-                const firstAvailableRoute = filteredMenu.length > 0 ? filteredMenu[0].url : '/dashboard/default';
-
-                window.location.replace(firstAvailableRoute);
-              }
-
-              toast.success('Logged in successfully');
+            const response = await postApi(`${urls.login.login}`, values);
+            if (response?.data?.statusCode == 401) {
+              toast.warn(response?.message || 'Wrong Password ');
+            } else if (response?.data?.statusCode == 404) {
+              toast.warn(response?.message || 'Email Not Registered');
             } else {
-              throw new Error('Unexpected response structure');
+              toast.success('Login successful');
+              localStorage.setItem('token', response?.data?.token);
+              setTimeout(() => {
+                navigate('/dashboard/default');
+              }, 1000);
             }
           } catch (error) {
-            console.log(error);
-            toast.error(error.response?.data?.message || 'Logged in failed');
+            toast.error(error.response?.data?.message || 'Login failed');
           } finally {
             setIsSubmitting(false);
           }
         }}
       >
-        {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldValue }) => (
+        {({ errors, handleBlur, handleChange, handleSubmit, touched, values, isValid, dirty }) => (
           <form noValidate onSubmit={handleSubmit} {...others}>
             <FormControl
               fullWidth
+              size="small"
               error={Boolean(touched.email && errors.email)}
               sx={{
                 '& .MuiFormLabel-root': {
@@ -146,13 +109,14 @@ const AuthLogin = ({ ...others }) => {
             <FormControl
               fullWidth
               error={Boolean(touched.password && errors.password)}
+              size="small"
               sx={{
                 '& .MuiFormLabel-root': {
                   color: '#000066'
                 },
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: errors.email ? '#000066' : ''
+                    borderColor: errors.password ? '#000066' : ''
                   }
                 }
               }}
@@ -182,100 +146,31 @@ const AuthLogin = ({ ...others }) => {
               />
               {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
             </FormControl>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={rememberMe}
-                    onChange={(event) => setRememberMe(event.target.checked)}
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2 }}>
+              <FormControl error={Boolean(touched.rememberMe && errors.rememberMe)}>
+                <Box display="flex" alignItems="center" mt={1}>
+                  <input
+                    type="checkbox"
                     name="rememberMe"
-                    color="primary"
+                    checked={values.rememberMe}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    style={{ marginRight: '8px' }}
                   />
-                }
-                label="Remember me"
-              />
-              <Typography variant="subtitle1" color="#009ec6" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
+                  <Typography variant="body2">Remember Me</Typography>
+                </Box>
+                {touched.rememberMe && errors.rememberMe && <FormHelperText>{errors.rememberMe}</FormHelperText>}
+              </FormControl>
+
+              <Typography
+                variant="body2"
+                color="#009ec6"
+                sx={{ textDecoration: 'none', cursor: 'pointer', marginTop: '8px' }}
+              >
                 Forgot Password?
               </Typography>
             </Stack>
 
-            {/* <Box sx={{ width: '100%' }}>
-              <Accordion expanded={expanded === 'panel1'} onChange={handleAccordian('panel1')}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
-                  <Typography variant="h5">Admin Credentials</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                      Email: admin@gmail.com
-                      <IconButton
-                        aria-label="copy email"
-                        size="small"
-                        onClick={() => {
-                          handleCopyToClipboard('admin@gmail.com');
-                          setFieldValue('email', 'admin@gmail.com');
-                        }}
-                        sx={{ marginLeft: 1 }}
-                      >
-                        <ContentCopyIcon />
-                      </IconButton>
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                      Password: admin123
-                      <IconButton
-                        aria-label="copy password"
-                        size="small"
-                        onClick={() => {
-                          handleCopyToClipboard('admin123');
-                          setFieldValue('password', 'admin123');
-                        }}
-                        sx={{ marginLeft: 1 }}
-                      >
-                        <ContentCopyIcon />
-                      </IconButton>
-                    </Typography>
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-
-              <Accordion expanded={expanded === 'panel2'} onChange={handleAccordian('panel2')}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel2-content" id="panel2-header">
-                  <Typography variant="h5">User Credentials</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                      Email: samyotech@gmail.com
-                      <IconButton
-                        aria-label="copy email"
-                        size="small"
-                        onClick={() => {
-                          handleCopyToClipboard('samyotech@gmail.com');
-                          setFieldValue('email', 'samyotech@gmail.com');
-                        }}
-                        sx={{ marginLeft: 1 }}
-                      >
-                        <ContentCopyIcon />
-                      </IconButton>
-                    </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                      Password: 123456
-                      <IconButton
-                        aria-label="copy password"
-                        size="small"
-                        onClick={() => {
-                          handleCopyToClipboard('123456');
-                          setFieldValue('password', '123456');
-                        }}
-                        sx={{ marginLeft: 1 }}
-                      >
-                        <ContentCopyIcon />
-                      </IconButton>
-                    </Typography>
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-            </Box> */}
             <Box sx={{ mt: 2 }}>
               <Button
                 disableElevation
@@ -284,21 +179,23 @@ const AuthLogin = ({ ...others }) => {
                 type="submit"
                 variant="contained"
                 sx={{
-                  backgroundColor: '#f7931e !important'
+                  backgroundColor: '#f7931e !important',
+                  padding: '8px 0',
+                  borderRadius: '8px'
                 }}
-                onClick={() => navigate('/dashboard/default')}
+                disabled={isSubmitting}
               >
                 LOGIN
               </Button>
 
               <Grid item xs={12} mt={2}>
                 <Grid item container direction="column" alignItems="center" xs={12}>
-                  <Typography variant="subtitle1" sx={{ textDecoration: 'none', color: 'black' }}>
+                  <Typography variant="body2" sx={{ textDecoration: 'none', color: '#4C4E64DE' }}>
                     New on our platform?{' '}
                     <Typography
                       component={Link}
                       to="/register"
-                      variant="subtitle1"
+                      variant="body2"
                       sx={{ textDecoration: 'none', color: '#15a6ca', display: 'inline' }}
                     >
                       Create an account
@@ -307,10 +204,12 @@ const AuthLogin = ({ ...others }) => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2 }} textAlign="center">
+                or
+              </Divider>
 
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
-                <img src={Google} alt="google" width={24} height={24} />
+                <img src={Google} alt="google" width={20} height={20} />
               </Box>
             </Box>
           </form>

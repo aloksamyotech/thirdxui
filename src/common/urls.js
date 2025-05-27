@@ -57,19 +57,21 @@ export const urls = Object.freeze({
   tag: {
     create: `${baseUrl}/tag/`,
     getAllTags: `${baseUrl}/tag/getalltag`,
-    updateStatus: `${baseUrl}/tag/updateStatus`
+    updateStatus: `${baseUrl}/tag/updateStatus`,
+    fetchWithPagination: `${baseUrl}/tag/allwithpagination`
   },
   session: {
     create: `${baseUrl}/session/addSession`,
     filter: `${baseUrl}/session/search`,
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
-    update: `${baseUrl}/session/editSession/:id`
+    update: `${baseUrl}/session/editSession/:id`,
+    fetchWithPagination:`${baseUrl}/session/allwithpagination`
+
   },
   casenote: {
     create: `${baseUrl}/caseNote/add`,
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
-
   },
   forms: {
     add: `${baseUrl}/forms`,
@@ -79,6 +81,17 @@ export const urls = Object.freeze({
     submit: `${baseUrl}/responses`
   },
   attendees: {
-    create: `${baseUrl}/attendees/addAttendee`
+    create: `${baseUrl}/attendees/addAttendee`,
+    getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`
+  },
+  dashboard:{
+    getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,
+    getTotalSession: `${baseUrl}/dashboard/totalSession`,
+    getTotalActiveUser: `${baseUrl}/dashboard/totalActiveUser`,
+    getTotalOpenedCases: `${baseUrl}/dashboard/totalOpenedCases`
+  },
+  login: {
+    login: `${baseUrl}/admin/login`,
+    register: `${baseUrl}/admin/`
   }
 });

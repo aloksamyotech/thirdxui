@@ -30,10 +30,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
-import moment from 'moment';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { useEffect } from 'react';
 
@@ -45,7 +44,7 @@ const TagForm = () => {
   const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsloading] = useState(false);
+  const [isLoading, setIsloading] = useState(true);
 
   const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
@@ -87,11 +86,14 @@ const TagForm = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
+        setIsloading(true)
         const response = await getApi(urls.tag.getAllTags);
         setTags(response?.data?.allTags);
         setFilteredTags(response?.data?.allTags);
       } catch (error) {
         console.error('Failed to fetch tags:', error);
+      } finally {
+        setIsloading(false)
       }
     };
 
@@ -110,22 +112,7 @@ const TagForm = () => {
   };
 
   const columns = [
-    // { field: 'tagCategoryName', headerName: 'Tag Category Name', flex: 1 },
-    { field: 'name', headerName: 'Configrution', flex: 1 },
-    // { field: 'tagDescription', headerName: 'Tag Description', flex: 1 },
-    // {
-    //   field: 'startDate',
-    //   headerName: 'Start Date',
-    //   flex: 1,
-    //   valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
-    // },
-    // {
-    //   field: 'endDate',
-    //   headerName: 'End Date',
-    //   flex: 1,
-    //   valueFormatter: (params) => (params.value ? moment(params.value).format('DD-MM-YYYY') : '')
-    // },
-
+    { field: 'name', headerName: 'Configuration', flex: 1 },
     {
       field: 'isActive',
       headerName: 'Status',
@@ -329,11 +316,12 @@ const TagForm = () => {
         </Grid>
 
         <Box width="100%" sx={{ mt: 1 }}>
-          <Card style={{ height: '100%', minHeight: '200' }}>
+          <Card style={{ height: '300px' }}>
             <DataGrid
               rows={filteredTags}
               columns={columns}
               getRowId={(row) => row._id}
+              loading={isLoading}
               slots={{
                 toolbar: () => <CustomHeader />,
                 loadingOverlay: () => (

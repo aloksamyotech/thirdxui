@@ -10,13 +10,24 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const Tag = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [configurationNameFilter, setConfigurationNameFilter] = useState('');
+  const [configurationNames, setconfigurationNames] = useState([]);
   const [tags, setTags] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const [loading, setLoading] = useState(true);
+  const [totalRows, setTotalRows] = useState(0);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   const statusFilter = [
     { value: 'active', label: 'Active' },
@@ -57,7 +68,18 @@ const Tag = () => {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Configrution', flex: 1 },
+    {
+      field: 'name',
+      headerName: 'Configuration',
+      flex: 1,
+      renderCell: (params) => {
+        const value = params.value;
+        const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
+        return capitalized;
+      }
+    },
+    // { field: 'tagCategoryName', headerName: 'Category', flex: 1 },
+    // { field: 'tagDescription', headerName: 'Description', flex: 1 },
     {
       field: 'isActive',
       headerName: 'Status',
@@ -73,33 +95,74 @@ const Tag = () => {
     }
   ];
 
-  const formTypes = [
-    { value: 'Self Referral form', label: 'Self Referral form' },
-    { value: 'Community Referral form', label: 'Community Referral form' },
-    { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-    { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-    { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-  ];
+  const handleFilter = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
 
-  const dateFilters = [
-    { value: 'today', label: 'All Dates' },
-    { value: 'week', label: 'Last 7 days' },
-    { value: 'month', label: 'Last 30 days' },
-    { value: 'year', label: 'Last 2 months' }
-  ];
+      if (status) queryParams.append('status', status === 'active' ? 'true' : 'false');
+      if (searchQuery) queryParams.append('search', searchQuery);
+      if (configurationNameFilter) queryParams.append('categoryName', configurationNameFilter);
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+
+      const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
+      const response = await getApi(url);
+
+      const allTags = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setTags(allTags);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      toast.error('Failed to fetch filtered tags');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setStatus('');
+    setConfigurationNameFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    fetchTags();
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearch = () => {
+    handleFilter();
+  };
+
+  const fetchTags = async () => {
+    setLoading(true);
+    try {
+      const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const allTags = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setTags(allTags);
+      setTotalRows(pagination?.total);
+
+      const uniqueList = [...new Set(allTags.map((item) => item.tagCategoryName).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+      setconfigurationNames(uniqueList);
+    } catch (error) {
+      toast.error('Failed to fetch tags');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await getApi(urls.tag.getAllTags);
-        setTags(response?.data?.allTags);
-      } catch (error) {
-        console.error('Failed to fetch tags:', error);
-      }
-    };
-
     fetchTags();
-  }, []);
+  }, [paginationModel]);
 
   const handleStatusChange = async (tagId, newStatus) => {
     try {
@@ -155,20 +218,20 @@ const Tag = () => {
           >
             <InputBase
               placeholder="Search..."
-              // value={searchQuery}
-              // onChange={handleSearchChange}
-              // onKeyPress={(e) => {
-              //   if (e.key === 'Enter') {
-              //     handleFilter();
-              //   }
-              // }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
               sx={{
                 flex: 1,
                 color: 'text.primary'
               }}
             />
             <IconButton
-              // onClick={handleFilter}
+              onClick={handleSearch}
               sx={{
                 marginRight: '8px',
                 width: 32,
@@ -184,23 +247,64 @@ const Tag = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
+            configurationNames={configurationNames}
+            configurationNameFilter={configurationNameFilter}
+            setConfigurationNameFilter={(value) => setConfigurationNameFilter(value)}
             statuses={statusFilter}
-            setStatusFilter={setStatus}
+            statusFilter={status}
+            setStatusFilter={(value) => setStatus(value)}
             selectedFilters={['configurationNameFilter', 'statusFilter']}
+            onReset={handleReset}
+            onApplyFilter={handleFilter}
           />
+
           <Grid item xs={9}>
             <TableStyle>
               <Box width="100%">
-                <Card style={{ height: 'auto' }}>
+                <Card style={{ height: '100vh' }}>
                   <DataGrid
-                    rows={tags}
+                    rows={
+                      loading
+                        ? []
+                        : tags.map((row, index) => ({
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
+                    }
                     columns={columns}
+                    rowCount={totalRows}
+                    loading={loading}
+                    pagination
+                    paginationMode="server"
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={setPaginationModel}
+                    pageSizeOptions={[10]}
                     rowHeight={65}
                     getRowId={(row) => row._id}
                     pageSize={5}
                     rowsPerPageOptions={[5, 10]}
-                    components={{
-                      Toolbar: () => <CustomHeader />
+                    slots={{
+                      toolbar: () => <CustomHeader />,
+                      loadingOverlay: () => (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'self-start',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                          }}
+                        >
+                          <SingleRowLoader />
+                        </Box>
+                      ),
+                      noRowsOverlay: () => (
+                        loading ? null : (
+                          <Box sx={{ padding: 2, textAlign: 'center' }}>
+                            No data available.
+                          </Box>
+                        )
+                      ),
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{

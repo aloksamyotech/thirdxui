@@ -16,7 +16,7 @@ const Login = () => {
 
   return (
     <AuthWrapper1>
-      <Grid container sx={{ minHeight: '100vh', backgroundColor: '#053146' }}>
+      <Grid container sx={{ height: '100vh', overflow: 'hidden', backgroundColor: '#053146' }}>
         <Grid
           item
           xs={12}
@@ -24,40 +24,48 @@ const Login = () => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            padding: 8
           }}
         >
           <AuthCardWrapper
             sx={{
-              maxWidth: 400,
+              maxWidth: 600,
               width: '100%',
               boxShadow: theme.shadows[3],
               borderRadius: 2,
-              backgroundColor: theme.palette.background.paper
+              backgroundColor: theme.palette.background.paper,
+              padding: 0
             }}
           >
             <Grid container spacing={2} alignItems="center">
-              <Grid item sx={{ mb: 2, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
+              <Grid item xs={12} sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: '2px',
-                    marginLeft: 12
+                    alignItems: 'center'
                   }}
                 >
-                  <Logo />
+                  <Logo height="60px" maxWidth="220px" />
                 </Box>
               </Grid>
 
-              <Grid item xs={12} sx={{ marginTop: '-20px' }}>
+              <Grid item xs={12}>
                 <Stack alignItems="center">
-                  <Typography variant="h3" sx={{ fontWeight: 700, textAlign: 'center', color: '#240046' }}>
-                    Welcome to Thridex!
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 600,
+                      color: '#4C4E64DE',
+                      fontSize: '22px'
+                    }}
+                  >
+                    Welcome to Thirdex!👋
                   </Typography>
                 </Stack>
               </Grid>
+
               <Grid item xs={12}>
                 <AuthLogin />
               </Grid>
@@ -84,7 +92,8 @@ const Login = () => {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              borderRadius: '0px',
+              opacity: '75%',
+              borderRadius: '0px'
             }}
           />
 
@@ -95,14 +104,14 @@ const Login = () => {
               left: '5%',
               color: 'white',
               textAlign: 'left',
-              maxWidth: '50%',
+              maxWidth: '60%',
               transform: 'translateY(-50%)'
             }}
           >
-            <Typography variant="h2" sx={{ color: 'white' }}>
+            <Typography variant="h5" sx={{ fontSize: '30px', color: 'white' }}>
               Thirdex helps you win!
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: '14px', mt: 1, color: 'white' }}>
+            <Typography variant="body2" sx={{ fontSize: '18px', mt: 1, color: 'white' }}>
               Organize your forms, events, workshops, and more with our CRM suite.
             </Typography>
           </Box>

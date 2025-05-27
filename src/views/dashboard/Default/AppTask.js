@@ -20,6 +20,10 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Iconify from '../../../ui-component/iconify';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
+import { useEffect } from 'react';
+
 AppTasks.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
@@ -32,6 +36,24 @@ export default function AppTasks({ title, subheader, list, ...other }) {
       taskCompleted: ['2']
     }
   });
+  const [myTasks, setMyTasks] = useState([]);
+   const myTask = async () => {
+      const task = await getApi(urls.dashboard.getmyTasks);
+      const allTasks = task?.data?.allTask;
+      const formattedtasks = allTasks?.map((item, index) => ({
+        id:item?._id,
+        date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+        label: item.details || '',
+       
+      }));
+    
+      
+  
+      setMyTasks(formattedtasks);
+    };
+    useEffect(() => {
+      myTask();
+    }, []);
 
   return (
     <Box
@@ -84,7 +106,7 @@ export default function AppTasks({ title, subheader, list, ...other }) {
 
           return (
             <>
-              {list.map((task) => (
+              {myTasks.map((task) => (
                 <>
                   <TaskItem
                     key={task.id}

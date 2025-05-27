@@ -43,9 +43,8 @@ const CaseDetailsPage = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 10
+    pageSize: 5
   });
-
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -224,7 +223,7 @@ const CaseDetailsPage = () => {
       )
     }
     ,
-    { field: 'contactType', headerName: 'Contact Type', flex: 1 },
+    { field: 'configurationName', headerName: 'Contact Type', flex: 1 },
     { field: 'createdBy', headerName: 'Created By', flex: 1 },
     {
       field: 'hours',
@@ -232,7 +231,7 @@ const CaseDetailsPage = () => {
       flex: 0.5,
       renderCell: (params) => (
         <Chip
-          label={params.value || "-"}
+          label={params.value || '-'}
           sx={{
             color: '#0798bd',
             backgroundColor: '#e5f8fe',
@@ -281,7 +280,7 @@ const CaseDetailsPage = () => {
           id: user?._id,
           date: formatDate(user?.date),
           subject: user?.subject || '',
-          contactType: user?.configurationId?.name || '',
+          contactType: user?.configurationId?.name || ''
         };
       });
 
@@ -329,21 +328,31 @@ const CaseDetailsPage = () => {
       const response = await getApi(
         `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
       );
+
       const allCasesNotes = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
+      const formattedData = allCasesNotes.map((note, index) => {
+        let configName = '-';
 
-      const formattedCasesNotes = allCasesNotes?.map((item, index) => ({
-        id: item._id || index,
-        date: item.date ? new Date(item.date).toLocaleDateString() : '',
-        subject: item?.subject || '',
-        contactType: item?.configurationId?.name || '',
+        if (note?.configurationId && typeof note.configurationId === 'object') {
+          configName = note.configurationId.name || '-';
+        } else if (note?.name) {
+          configName = note.name;
+        }
 
-      }));
+        return {
+          id: note._id,
+          date: note.date ? dayjs(note.date).format('DD-MM-YYYY') : '-',
+          subject: note.subject || '-',
+          createdBy: note.createdBy || '-',
+          configurationName: configName,
+          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+        };
 
-      setRows(formattedCasesNotes);
-
+      });
+      
+  setRows(formattedData);
       setTotalRows(pagination?.total);
-
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
@@ -352,7 +361,6 @@ const CaseDetailsPage = () => {
   };
 
   useEffect(() => {
-
     fetchdata();
   }, [paginationModel]);
 
@@ -581,12 +589,27 @@ const CaseDetailsPage = () => {
             onReset={handleReset}
           />
 
-          <Grid item xs={12} md={9} >
-            <Box sx={{ height: '400px', width: '100%', backgroundColor: '#ffff' }}>
+          <Grid item xs={12} md={9}>
+            <Box sx={{ height: '430px', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
                 loading={loading2}
-                rows={row}
+                rows={
+                  loading2
+                    ? []
+                    : row.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
                 columns={columns}
+                rowCount={totalRows}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
+                rowHeight={70}
+                getRowId={(row) => row.id}
                 slots={{
                   toolbar: () => <CustomHeader />,
                   loadingOverlay: () => (
@@ -596,7 +619,7 @@ const CaseDetailsPage = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
                       }}
                     >
                       <SingleRowLoader />
@@ -611,7 +634,6 @@ const CaseDetailsPage = () => {
                   ),
                 }}
                 disableSelectionOnClick
-                rowHeight={80}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#f9fafb',
@@ -630,7 +652,14 @@ const CaseDetailsPage = () => {
         </Grid>
       </Box>
 
-      <CaseNoteDialog open={openDialog} fetchdata={fetchdata} handleClose={() => setOpenDialog(false)} onSubmit={handleSave} title="Add Case Note" caseid={id} />
+      <CaseNoteDialog
+        open={openDialog}
+        fetchdata={fetchdata}
+        handleClose={() => setOpenDialog(false)}
+        onSubmit={handleSave}
+        title="Add Case Note"
+        caseid={id}
+      />
       <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>
   );

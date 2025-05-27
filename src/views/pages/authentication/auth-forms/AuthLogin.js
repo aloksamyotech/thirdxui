@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import * as Yup from 'yup';
 import Google from 'assets/images/icons/social-google.svg';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { Formik } from 'formik';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -81,6 +81,7 @@ const AuthLogin = ({ ...others }) => {
           <form noValidate onSubmit={handleSubmit} {...others}>
             <FormControl
               fullWidth
+              size="small"
               error={Boolean(touched.email && errors.email)}
               sx={{
                 '& .MuiFormLabel-root': {
@@ -109,6 +110,7 @@ const AuthLogin = ({ ...others }) => {
             <FormControl
               fullWidth
               error={Boolean(touched.password && errors.password)}
+              size="small"
               sx={{
                 '& .MuiFormLabel-root': {
                   color: '#000066'
@@ -146,18 +148,30 @@ const AuthLogin = ({ ...others }) => {
               {touched.password && errors.password && <FormHelperText error>{errors.password}</FormHelperText>}
             </FormControl>
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2 }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={rememberMe}
-                    onChange={(event) => setRememberMe(event.target.checked)}
+              <FormControl error={Boolean(touched.rememberMe && errors.rememberMe)}>
+                <Box display="flex" alignItems="center" mt={1}>
+                  <input
+                    type="checkbox"
                     name="rememberMe"
-                    color="primary"
+                    checked={values.rememberMe}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    style={{ marginRight: '8px' }}
                   />
-                }
-                label="Remember me"
-              />
-              <Typography variant="subtitle1" color="#009ec6" sx={{ textDecoration: 'none', cursor: 'pointer' }}>
+                  <Typography variant="body2">Remember Me</Typography>
+                </Box>
+                {touched.rememberMe && errors.rememberMe && <FormHelperText>{errors.rememberMe}</FormHelperText>}
+              </FormControl>
+
+              <Typography
+                variant="body2"
+                color="#009ec6"
+                sx={{ textDecoration: 'none', cursor: 'pointer', marginTop: '8px' }}
+                // onClick={() => {
+
+                //   console.log('Redirect to Forgot Password page');
+                // }}
+              >
                 Forgot Password?
               </Typography>
             </Stack>
@@ -170,7 +184,9 @@ const AuthLogin = ({ ...others }) => {
                 type="submit"
                 variant="contained"
                 sx={{
-                  backgroundColor: '#f7931e !important'
+                  backgroundColor: '#f7931e !important',
+                  padding: '8px 0',
+                  borderRadius: '8px'
                 }}
                 disabled={isSubmitting}
               >
@@ -179,12 +195,12 @@ const AuthLogin = ({ ...others }) => {
 
               <Grid item xs={12} mt={2}>
                 <Grid item container direction="column" alignItems="center" xs={12}>
-                  <Typography variant="subtitle1" sx={{ textDecoration: 'none', color: 'black' }}>
+                  <Typography variant="body2" sx={{ textDecoration: 'none', color: '#4C4E64DE' }}>
                     New on our platform?{' '}
                     <Typography
                       component={Link}
                       to="/register"
-                      variant="subtitle1"
+                      variant="body2"
                       sx={{ textDecoration: 'none', color: '#15a6ca', display: 'inline' }}
                     >
                       Create an account
@@ -193,10 +209,12 @@ const AuthLogin = ({ ...others }) => {
                 </Grid>
               </Grid>
 
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: 2 }} textAlign="center">
+                or
+              </Divider>
 
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
-                <img src={Google} alt="google" width={24} height={24} />
+                <img src={Google} alt="google" width={20} height={20} />
               </Box>
             </Box>
           </form>

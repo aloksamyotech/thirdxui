@@ -44,7 +44,7 @@ const TagForm = () => {
   const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsloading] = useState(false);
+  const [isLoading, setIsloading] = useState(true);
 
   const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
@@ -86,11 +86,14 @@ const TagForm = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
+        setIsloading(true)
         const response = await getApi(urls.tag.getAllTags);
         setTags(response?.data?.allTags);
         setFilteredTags(response?.data?.allTags);
       } catch (error) {
         console.error('Failed to fetch tags:', error);
+      } finally {
+        setIsloading(false)
       }
     };
 
@@ -313,11 +316,12 @@ const TagForm = () => {
         </Grid>
 
         <Box width="100%" sx={{ mt: 1 }}>
-          <Card style={{ height: '100%', minHeight: '200' }}>
+          <Card style={{ height: '300px' }}>
             <DataGrid
               rows={filteredTags}
               columns={columns}
               getRowId={(row) => row._id}
+              loading={isLoading}
               slots={{
                 toolbar: () => <CustomHeader />,
                 loadingOverlay: () => (

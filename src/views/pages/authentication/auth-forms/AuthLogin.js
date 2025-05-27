@@ -70,7 +70,6 @@ const AuthLogin = ({ ...others }) => {
               }, 1000);
             }
           } catch (error) {
-            console.error(error);
             toast.error(error.response?.data?.message || 'Login failed');
           } finally {
             setIsSubmitting(false);
@@ -167,10 +166,6 @@ const AuthLogin = ({ ...others }) => {
                 variant="body2"
                 color="#009ec6"
                 sx={{ textDecoration: 'none', cursor: 'pointer', marginTop: '8px' }}
-                // onClick={() => {
-
-                //   console.log('Redirect to Forgot Password page');
-                // }}
               >
                 Forgot Password?
               </Typography>

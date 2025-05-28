@@ -200,30 +200,30 @@ const UserProfile = () => {
 
         <Grid item xs={12} md={9}>
           <Card sx={{ borderRadius: 3, mb: 2 }}>
-            {
-              loading ? (
-                <Box sx={{
-                  margin: "5px"
-                }}>
-                  <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
-                </Box>
-
-              ) : (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
-                    <Box
-                      component="img"
-                      src={
-                        loading
-                          ? Background
-                          : serviceData?.file
-                            ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                            : Background
-                      }
-                      alt="Service"
-                      sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
-                    />
-                  </Grid>
+            {loading ? (
+              <Box
+                sx={{
+                  margin: '5px'
+                }}
+              >
+                <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
+              </Box>
+            ) : (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <Box
+                    component="img"
+                    src={
+                      loading
+                        ? Background
+                        : serviceData?.file
+                        ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                        : Background
+                    }
+                    alt="Service"
+                    sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                  />
+                </Grid>
 
                   <Grid item xs={12} md={8}>
                     <Stack>
@@ -402,20 +402,22 @@ const UserProfile = () => {
                     key={index}
                     sx={{
                       display: 'flex',
-                      alignItems: 'flex-start',
+                      alignItems: 'center',
                       justifyContent: 'space-between',
                       px: 2,
-                      py: 1.5,
+                      py: 2,
                       borderBottom: '1px solid #e0e0e0',
                       flexWrap: 'wrap',
+                      gap: 2
                     }}
                   >
-                    <Box minWidth={90}>
+                    {/* Date + Time */}
+                    <Box sx={{ minWidth: 90 }}>
                       <Typography variant="subtitle2" fontWeight="bold">
                         {new Date(session.date).toLocaleDateString('en-IN', {
                           day: '2-digit',
                           month: 'short',
-                          year: 'numeric',
+                          year: '2-digit'
                         })}
                       </Typography>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -423,27 +425,36 @@ const UserProfile = () => {
                       </Typography>
                     </Box>
 
-                    <Box sx={{ flexGrow: 1, px: 2, maxWidth: 200 }}>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="bold"
-                        sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
-                      >
-                        {session.campaigns}
+                    <Box sx={{ flexGrow: 1, px: 2, maxWidth: 300 }}>
+                      <Typography variant="subtitle2" fontWeight="bold" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                        {session?.serviceId?.name}
                       </Typography>
+                      <Tooltip title={session?.description || ''} placement="top" arrow>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                          }}
+                        >
+                          {session?.description}
+                        </Typography>
+                      </Tooltip>
                     </Box>
 
-                    <Box display="flex" alignItems="center" gap={1}>
+                    <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                       <Button
                         variant="contained"
                         size="small"
                         sx={{
                           backgroundColor: '#1B4B66',
                           textTransform: 'none',
-                          fontSize: '10px',
-                          py: 0.5,
-                          px: 0.5,
-                          maxHeight: '50px',
+                          fontSize: '12px',
+                          py: 0.2,
+                          px: 1.2
                         }}
                         onClick={() => navigate('/add-session', { state: { session } })}
                       >
@@ -455,21 +466,17 @@ const UserProfile = () => {
                         sx={{
                           textTransform: 'none',
                           color: '#1B4B66',
-                          fontSize: '10px',
-                          py: 0.48,
-                          px: 0.5,
-                          maxHeight: '50px',
+                          borderColor: '#1B4B66',
+                          fontSize: '12px',
+                          py: 0.2,
+                          px: 1.2
                         }}
                         onClick={() => navigate('/attendees', { state: { session } })}
                       >
                         Add Attendee
                       </Button>
-                      <IconButton size="small">
-                        <InfoIcon
-                          sx={{ color: '#49494c' }}
-                          fontSize="small"
-                          onClick={() => navigate('/view-session')}
-                        />
+                      <IconButton size="small" onClick={() => navigate('/view-session')}>
+                        <InfoIcon sx={{ color: '#49494c' }} fontSize="small" />
                       </IconButton>
                     </Box>
                   </Box>

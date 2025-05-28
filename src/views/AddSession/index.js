@@ -49,7 +49,7 @@ const AddCaseForm = ({ onCancel }) => {
       fundraisingActivities: [],
       time: dayjs().format('HH:mm'),
       description: '',
-      file: null
+      file: ''
     }
   });
 
@@ -68,7 +68,7 @@ const AddCaseForm = ({ onCancel }) => {
         fundingInterests: session.fundingInterest || [],
         fundraisingActivities: session.fundraisingActivities || [],
         serviceId: session.serviceId || '',
-        file: null
+        file: session.file || ''
       };
 
       reset(formData);
@@ -177,7 +177,8 @@ const AddCaseForm = ({ onCancel }) => {
       });
 
       if (serviceId) {
-        formData.append('serviceId', serviceId);
+        const idToSend = typeof serviceId === 'string' ? serviceId : serviceId._id;
+        formData.append('serviceId', idToSend);
       }
 
       if (data.file) {
@@ -453,7 +454,7 @@ const AddCaseForm = ({ onCancel }) => {
                               variant="outlined"
                               size="small"
                               fullWidth
-                              value={field.value ? field.value.name : ''}
+                              value={typeof field.value === 'string' ? field.value : field.value?.name || ''}
                               placeholder="Attachments"
                               InputProps={{
                                 readOnly: true,
@@ -483,20 +484,20 @@ const AddCaseForm = ({ onCancel }) => {
                                             if (!allowedTypes.includes(file.type)) {
                                               toast.error('Only PDF, DOC, or DOCX files are allowed.');
                                               e.target.value = null;
-                                              field.onChange(null);
+                                              field.onChange('');
                                               return;
                                             }
 
                                             if (file.size > maxSizeInBytes) {
                                               toast.error('File size must be less than or equal to 25MB.');
                                               e.target.value = null;
-                                              field.onChange(null);
+                                              field.onChange('');
                                               return;
                                             }
 
                                             field.onChange(file);
                                           } else {
-                                            field.onChange(null);
+                                            field.onChange('');
                                           }
                                         }}
                                       />

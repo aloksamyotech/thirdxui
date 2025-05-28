@@ -31,7 +31,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       if (data?.role === 'volunteer') {
         navigate('/add-volunteer', { state: { ...data, isEdit: true } });
       } else {
-        navigate('/add-serviceuser', { state: data });
+        navigate('/add-serviceuser', { state:{ editdata: data} });
       }
       onClose();
     } else if (label === 'Delete') {

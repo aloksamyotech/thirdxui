@@ -401,7 +401,6 @@ const AddCaseForm = ({ onCancel }) => {
 
       setIsloading(false);
       if (sessionId) {
-        console.log("attendees navigate ");
         
         navigate('/attendees',{state:{sessionId:sessionId}});
       } else {

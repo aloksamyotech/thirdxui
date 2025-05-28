@@ -18,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import InfoIcon from '@mui/icons-material/Info';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Background from 'assets/images/UserProfile.png'
+import Background from 'assets/images/UserProfile.png';
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
@@ -49,6 +49,8 @@ const UserProfile = () => {
     page: 0,
     pageSize: 10
   });
+  const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [campaign, setCampaignFilter] = useState('');
 
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
@@ -73,6 +75,25 @@ const UserProfile = () => {
         }));
         setCountriesWithFlags(countries);
       });
+  }, []);
+
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Location')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+
+        setCampaignTypeOptions(options);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchCampaign();
   }, []);
 
   useEffect(() => {
@@ -113,7 +134,7 @@ const UserProfile = () => {
         setSessionData(response.data.userData);
       }
     } catch (error) {
-      console.log("error:", error);
+      console.error('error:', error);
     } finally {
       setLoading2(false);
     }
@@ -128,8 +149,10 @@ const UserProfile = () => {
         queryParams.append('date', formattedDate);
       }
 
+      queryParams.append('name', sessionLeadFilter);
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('time', timeFilter);
 
       const url = `${urls.session.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
@@ -154,11 +177,24 @@ const UserProfile = () => {
   };
 
   const handleReset = () => {
-    setCountryOfOriginFilter('');
+    setCampaignFilter('');
     setTimeFilter('');
     setDateOpenedFilter('');
     setIsFiltered(false);
+    setSessionLeadFilter('');
+    setPaginationModel({
+      page: 0,
+      pageSize: 10
+    });
   };
+
+  useEffect(() => {
+    if (dateOpenedFilter || campaign || paginationModel || isFiltered || sessionLeadFilter || timeFilter) {
+      handleFilter();
+    } else {
+      fetchDonor();
+    }
+  }, [dateOpenedFilter, campaign, paginationModel, isFiltered, sessionLeadFilter, timeFilter]);
 
   return (
     <>
@@ -189,12 +225,15 @@ const UserProfile = () => {
           timeFilter={timeFilter}
           setTimeFilter={(value) => setTimeFilter(value)}
           timeOptions={timeOptions}
+          campaigns={campaignTypeOptions}
+          campaignFilter={campaign}
+          setCampaignFilter={setCampaignFilter}
           sessionLeads={[
-            { value: 'john_doe', label: 'John Doe' },
-            { value: 'jane_smith', label: 'Jane Smith' }
+            { value: 'Lead 1', label: 'Lead 1' },
+            { value: 'Lead 2', label: 'Lead 2' }
           ]}
           setSessionLeadFilter={setSessionLeadFilter}
-          selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
+          selectedFilters={['campaignFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
           onReset={handleReset}
         />
 
@@ -225,83 +264,82 @@ const UserProfile = () => {
                   />
                 </Grid>
 
-                  <Grid item xs={12} md={8}>
-                    <Stack>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box sx={{ maxWidth: '60%' }}>
-                          <Tooltip title={(serviceData?.name || '').toUpperCase()}>
-                            <Typography
-                              variant="h4"
+                <Grid item xs={12} md={8}>
+                  <Stack>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box sx={{ maxWidth: '60%' }}>
+                        <Tooltip title={(serviceData?.name || '').toUpperCase()}>
+                          <Typography
+                            variant="h4"
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '100%',
+                              color: '#808191'
+                            }}
+                            fontSize={18}
+                            fontWeight={500}
+                          >
+                            {(serviceData?.name || '').toUpperCase()}
+                          </Typography>
+                        </Tooltip>
+
+                        <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
+                          <Box sx={{ position: 'relative', width: 16, height: 16 }}>
+                            <Box
                               sx={{
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                maxWidth: '100%',
-                                color: '#808191'
+                                width: 16,
+                                height: 16,
+                                borderRadius: '50%',
+                                border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
+                                position: 'absolute',
+                                top: 0,
+                                left: 0
                               }}
-                              fontSize={18}
-                              fontWeight={500}
-                            >
-                              {(serviceData?.name || '').toUpperCase()}
-                            </Typography>
-                          </Tooltip>
+                            />
+                            <Box
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                backgroundColor: serviceData?.isActive ? 'green' : 'red',
+                                position: 'absolute',
+                                top: '4px',
+                                left: '4px'
+                              }}
+                            />
+                          </Box>
 
-                          <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
-                            <Box sx={{ position: 'relative', width: 16, height: 16 }}>
-                              <Box
-                                sx={{
-                                  width: 16,
-                                  height: 16,
-                                  borderRadius: '50%',
-                                  border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0
-                                }}
-                              />
-                              <Box
-                                sx={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  backgroundColor: serviceData?.isActive ? 'green' : 'red',
-                                  position: 'absolute',
-                                  top: '4px',
-                                  left: '4px'
-                                }}
-                              />
-                            </Box>
-
-                            <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
-                              {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
-                            </Typography>
-                          </Stack>
-                        </Box>
-
-                        <Button
-                          variant="contained"
-                          sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2, whiteSpace: 'nowrap' }}
-                          onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
-                        >
-                          Add New Session {<AddIcon />}
-                        </Button>
+                          <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
+                            {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
+                          </Typography>
+                        </Stack>
                       </Box>
 
-                      <Typography variant="body2" color="textSecondary" mb={1}>
-                        Service Code - {serviceData?.code}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" mb={1}>
-                        Start Date - {formatDate(serviceData?.createdAt)}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Service Description - </strong>
-                        {serviceData?.description}
-                      </Typography>
-                    </Stack>
-                  </Grid>
+                      <Button
+                        variant="contained"
+                        sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2, whiteSpace: 'nowrap' }}
+                        onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
+                      >
+                        Add New Session {<AddIcon />}
+                      </Button>
+                    </Box>
+
+                    <Typography variant="body2" color="textSecondary" mb={1}>
+                      Service Code - {serviceData?.code}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" mb={1}>
+                      Start Date - {formatDate(serviceData?.createdAt)}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Service Description - </strong>
+                      {serviceData?.description}
+                    </Typography>
+                  </Stack>
                 </Grid>
-              )
-            }
+              </Grid>
+            )}
           </Card>
 
           <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400 }}>
@@ -381,9 +419,8 @@ const UserProfile = () => {
                 </Box>
               ))}
             </Stack> */}
-            <Stack spacing={1} mt={2} >
+            <Stack spacing={1} mt={2}>
               {loading2 ? (
-
                 <Box
                   sx={{
                     minHeight: 200,
@@ -391,7 +428,7 @@ const UserProfile = () => {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    px: 2,
+                    px: 2
                   }}
                 >
                   <SingleRowLoader />

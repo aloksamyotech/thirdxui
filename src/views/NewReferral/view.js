@@ -8,39 +8,56 @@ const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
     <Dialog
       open={open}
       onClose={onClose}
+      fullWidth
+      maxWidth={false}
       PaperProps={{
-        sx: { width: '800px' }
+        sx: {
+          width: '63vw',
+          maxWidth: 'none',
+          borderRadius: 4,
+          height: '90vh',
+          overflow: 'hidden'
+        }
       }}
     >
       <DialogContent>
-        <Box display="flex" justifyContent="center" mb={2}>
+        <Box display="flex" justifyContent="center" mb={1}>
           <Stack direction="row" spacing={2}>
-            <Button variant="contained" sx={{ backgroundColor: '#009fc7' }} onClick={onAccept}>
+            <Button variant="contained" sx={{ backgroundColor: '#009fc7', py: 0.5, px: 2, borderRadius: 2 }} onClick={onAccept}>
               Accept
             </Button>
-            <Button variant="contained" color="error" onClick={onDecline}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={onDecline}
+              sx={{
+                py: 0.5,
+                px: 2,
+                borderRadius: 2
+              }}
+            >
               Decline
             </Button>
           </Stack>
         </Box>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} mb={9}>
           <Box
             sx={{
               backgroundImage: `url(${UserBg})`,
               height: 100,
-              borderTopLeftRadius: 10,
-              borderTopRightRadius: 10,
+              borderTopLeftRadius: 5,
+              borderTopRightRadius: 5,
               position: 'relative'
             }}
           >
             <Card
               sx={{
                 position: 'absolute',
-                top: 35,
+                top: 25,
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: '95%',
+                width: '98%',
                 borderRadius: 3,
                 overflow: 'hidden',
                 boxShadow: 3
@@ -57,35 +74,53 @@ const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
                 <Grid container alignItems="center" spacing={2}>
                   <img src={ServiceUser} alt="John Doe" style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }} />
                   <Grid item xs>
-                    <Typography variant="h5" fontWeight="bold">
-                      John Doe
+                    <Typography variant="h6" sx={{ fontSize: '15px', color: '#7f7f7f' }} mb={1}>
+                      Mr Edward Abbott
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      johndoe@example.com
+                    <Typography variant="body2" color="textSecondary" fontSize="13px" mb={1}>
+                      edward.@example.com
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="textSecondary" fontSize="13px">
                       #7864 | Individual | Added 09/10/2024
                     </Typography>
                   </Grid>
                 </Grid>
 
-                <Box textAlign="right" sx={{ pr: 2 }}>
-                  <Typography variant="body2" color="textSecondary">
+                <Box textAlign="right" sx={{ pr: 2, width: '70%' }}>
+                  <Typography variant="body2" color="textSecondary" sx={{ fontSize: '12px' }} mb={1}>
                     Address
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                    123 Main Street, New York, NY
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ whiteSpace: 'normal', wordBreak: 'break-word', fontSize: '10px' }}
+                    mb={2}
+                  >
+                    200 Dutch Meadows Ln, Glenville NY 12302
                   </Typography>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: '#009fc7',
+                      height: '32px',
+                      width: '50px',
+                      borderRadius: 2,
+                      fontSize: '12px',
+                      padding: 0
+                    }}
+                  >
+                    VIEW
+                  </Button>
                 </Box>
               </CardContent>
             </Card>
           </Box>
         </Grid>
 
-        <Grid item xs={12} mt={6}>
+        <Grid item xs={12} mt={6} sx={{ width: '100%' }}>
           <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
             <CardContent>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 About
               </Typography>
               <Grid container spacing={2}>
@@ -117,7 +152,7 @@ const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
 const InfoItem = ({ label, value }) => (
   <Box display="flex" alignItems="center" mb={1}>
     <Typography variant="body1">
-      <strong>{label}:</strong> <Typography component="span">{value}</Typography>
+      {label}: <span>{value}</span>
     </Typography>
   </Box>
 );

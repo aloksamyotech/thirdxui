@@ -51,7 +51,7 @@ const AddDonorForm = () => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
 
   const location = useLocation();
-  const editdata = location.state;
+  const editdata = location?.state;
 
   const fileInputRef = React.useRef(null);
 

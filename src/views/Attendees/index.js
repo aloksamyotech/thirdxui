@@ -25,9 +25,8 @@ export default function SessionRegisterPage() {
     pageSize: 5
   });
   const [totalRows, setTotalRows] = useState(0);
-
   const session = location?.state?.session || {};
-  const sessionId = session?._id || location?.state?.sessionId;
+  const sessionId = session?.id || location?.state?.sessionId;
 
   const columns = [
     {

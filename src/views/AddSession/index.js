@@ -527,7 +527,6 @@ const AddCaseForm = ({ onCancel }) => {
                         minRows={11}
                         fullWidth
                         variant="outlined"
-                        sx={{ mb: 2 }}
                         error={!!errors.description}
                         helperText={errors.description?.message}
                         {...field}

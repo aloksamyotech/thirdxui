@@ -8,6 +8,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import config from '../../../config';
 
 const ServiceList = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -33,7 +34,7 @@ const ServiceList = () => {
       flex: 1.5,
       renderCell: (params) => (
         <Typography>
-          {params.row.firstName} {params.row.lastName}
+          {params?.row?.firstName} {params?.row?.lastName}
           {params?.value}
         </Typography>
       )
@@ -100,7 +101,7 @@ const ServiceList = () => {
     }
   ];
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

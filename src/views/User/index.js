@@ -27,8 +27,8 @@ const User = () => {
   const [rows, setRows] = useState([]);
   const [allData, setAllData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [nameFilterOptions, setNameFilterOptions] = useState([]); 
-const [selectedName, setSelectedName] = useState(''); 
+  const [nameFilterOptions, setNameFilterOptions] = useState([]);
+  const [selectedName, setSelectedName] = useState('');
 
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
@@ -36,7 +36,7 @@ const [selectedName, setSelectedName] = useState('');
     pageSize: 10
   });
   const navigate = useNavigate();
- 
+
   const columns = [
     {
       field: 'name',
@@ -83,7 +83,7 @@ const [selectedName, setSelectedName] = useState('');
       )
     },
     { field: 'age', headerName: 'Age', flex: 1 },
- 
+
     {
       field: 'actions',
       headerName: 'Manage',
@@ -100,7 +100,7 @@ const [selectedName, setSelectedName] = useState('');
       )
     }
   ];
- 
+
   const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -137,19 +137,14 @@ const [selectedName, setSelectedName] = useState('');
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' }
   ];
- 
+
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
     { value: 'week', label: 'Last 7 Days' },
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
   ];
- 
-  // const nameFilter = [
-  //   { value: 'name1', label: 'Name 1' },
-  //   { value: 'name2', label: 'Name 2' }
-  // ];
- 
+  
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -162,49 +157,46 @@ const [selectedName, setSelectedName] = useState('');
         setCountriesWithFlags(countries);
       });
   }, []);
-const fetchUserName = async () => {
-  try {
-    const queryParams = new URLSearchParams({
-       page: paginationModel.page + 1,
+  const fetchUserName = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
-      archive: 'false',
-      role: 'user'
-    });
+        archive: 'false',
+        role: 'user'
+      });
 
-    const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
-    const allUser = response?.data?.data || [];
-    const pagination = response?.data?.meta || { total: 0 };
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
+      const nameOptions = allUser
+        .map((user) => ({
+          value: user._id,
+          label: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim()
+        }))
+        .filter((option) => option.value && option.label);
 
-    const nameOptions = allUser
-      .map((user) => ({
-        value: user._id,
-        label: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim()
-      }))
-      .filter((option) => option.value && option.label);
-
-           const formattedUsers = allUser?.map((user, index) => ({
+      const formattedUsers = allUser?.map((user, index) => ({
         ...user,
         serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
       }));
 
-    setNameFilterOptions(nameOptions);
-     setRows(formattedUsers);
+      setNameFilterOptions(nameOptions);
+      setRows(formattedUsers);
       setTotalRows(pagination?.total);
-  } catch (error) {
-    console.error('Error fetching user names:', error);
-  }
-};
+    } catch (error) {
+      console.error('Error fetching user names:', error);
+    }
+  };
 
-useEffect(() => {
-  fetchUserName();
-}, []);
+  useEffect(() => {
+    fetchUserName();
+  }, []);
 
-
- 
   const fetchUser = async () => {
     if (countriesWithFlags.length === 0) return;
- 
+
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
@@ -217,33 +209,32 @@ useEffect(() => {
       if (searchQuery) {
         queryParams.append('search', searchQuery);
       }
-  
+
       if (status) queryParams.append('status', status === 'active');
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
       if (countryOfOriginFilter) {
-        const selectedCountry = countriesWithFlags.find(country => country.value === countryOfOriginFilter);
+        const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
         if (selectedCountry) {
           queryParams.append('country', selectedCountry.label);
         }
       }
- if (selectedName) {
-  queryParams.append('name', selectedName);
-}
-
+      if (selectedName) {
+        queryParams.append('name', selectedName);
+      }
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
- 
+
       const allUser = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
- 
+
       setAllData(allUser);
       const formattedUsers = allUser?.map((user, index) => {
         const dob = new Date(user.personalInfo?.dateOfBirth);
         const today = new Date();
- 
+
         let age = '';
         if (!isNaN(dob)) {
           age = today.getFullYear() - dob.getFullYear();
@@ -252,10 +243,10 @@ useEffect(() => {
             age--;
           }
         }
- 
+
         const countryName = user?.contactInfo?.country || '';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
- 
+
         return {
           id: user?._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
@@ -268,7 +259,7 @@ useEffect(() => {
           status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });
- 
+
       setRows(formattedUsers);
       setTotalRows(pagination?.total);
     } catch (error) {
@@ -277,15 +268,15 @@ useEffect(() => {
       setLoading(false);
     }
   };
- 
-useEffect(() => {
-  fetchUser();
-}, [countriesWithFlags, paginationModel, status, dateOpenedFilter, selectedName, searchQuery, countryOfOriginFilter]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, selectedName, searchQuery, countryOfOriginFilter]);
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
- 
+
     try {
       const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
       fetchUser();
@@ -370,7 +361,7 @@ useEffect(() => {
               </IconButton>
             </Box>
           </Stack>
- 
+
           <Grid container spacing={2}>
             <FilterPanel
               showFilter={showFilter}
@@ -422,19 +413,13 @@ useEffect(() => {
                               display: 'flex',
                               alignItems: 'self-start',
                               justifyContent: 'center',
-                              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                              backgroundColor: 'rgba(255, 255, 255, 0.15)'
                             }}
                           >
                             <SingleRowLoader />
                           </Box>
                         ),
-                        noRowsOverlay: () => (
-                          loading ? null : (
-                            <Box sx={{ padding: 2, textAlign: 'center' }}>
-                              No data available.
-                            </Box>
-                          )
-                        ),
+                        noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                       }}
                       getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                       sx={{
@@ -485,5 +470,5 @@ useEffect(() => {
     </>
   );
 };
- 
+
 export default User;

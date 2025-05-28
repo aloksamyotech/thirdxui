@@ -498,10 +498,10 @@ const TagForm = () => {
           </DialogContent>
           <DialogActions>
             <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)}>
-              Save Changes
+             SAVE CHANGES 
             </Button>
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
-              Cancel
+             CANCEL
             </Button>
           </DialogActions>
         </Dialog>

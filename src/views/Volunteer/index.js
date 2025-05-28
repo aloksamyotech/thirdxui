@@ -316,11 +316,11 @@ const Lead = () => {
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
             dateAddedFilters={dateAddedFilters}
-            dateOpenedFilter={dateOpenedFilter}
-            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+            dateAddedFilter={dateOpenedFilter}
+            setDateAddedFilter={(value) => setDateOpenedFilter(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
+            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
           />
 
@@ -331,9 +331,9 @@ const Lead = () => {
                   loading
                     ? []
                     : rows.map((row, index) => ({
-                      ...row,
-                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                    }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -355,19 +355,13 @@ const Lead = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)'
                       }}
                     >
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {

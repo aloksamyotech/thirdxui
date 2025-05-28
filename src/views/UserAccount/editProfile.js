@@ -148,10 +148,10 @@ const EditProfileModal = ({ open, onClose, userData }) => {
 
         <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
           <Button variant="contained" sx={{backgroundColor:'#053146'}} onClick={onClose}>
-            Save Changes
+          SAVE CHANGES 
           </Button>
           <Button onClick={onClose} variant="outlined" color="error">
-            Cancel
+            CANCEL
           </Button>
         </Box>
       </Box>

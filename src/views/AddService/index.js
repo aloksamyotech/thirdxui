@@ -456,7 +456,7 @@ const AddCaseForm = () => {
                     rules={{
                       required: 'Notes are required',
                       minLength: {
-                        value: 10,
+                        value: 12,
                         message: 'Notes must be at least 10 characters long'
                       },
                       validate: {
@@ -477,7 +477,6 @@ const AddCaseForm = () => {
                         minRows={11}
                         fullWidth
                         variant="outlined"
-                        sx={{ mb: 2 }}
                         error={!!errors.notes}
                         helperText={errors.notes?.message}
                       />
@@ -488,7 +487,7 @@ const AddCaseForm = () => {
                     control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
                     label="Restrict Access?"
                     labelPlacement="start"
-                    sx={{ gap: 1 }}
+                    sx={{ gap: 1, mt:1}}
                   />
                 </Paper>
               </Grid>

@@ -17,7 +17,7 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/user/getallServiceUser`,
     getAllUser: `${baseUrl}/user/getalluser`,
     getById: `${baseUrl}/user/getUserById/:userId`,
-    getAllServices: `${baseUrl}/user/getAllServices`,
+    getAllServicesUser: `${baseUrl}/user/getallServiceUser`,
     getAllVolunteer: `${baseUrl}/user/getAllVolunteer`,
     getalldonor: `${baseUrl}/user/getalldonor`,
     getDistrict: `${baseUrl}/user/getAllUsDistricts`,

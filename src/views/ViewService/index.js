@@ -45,6 +45,7 @@ const UserProfile = () => {
   const [loading2, setLoading2] = useState(true);
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
+  const [sessionLeads, setSessionLeads] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -75,6 +76,27 @@ const UserProfile = () => {
         }));
         setCountriesWithFlags(countries);
       });
+  }, []);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getAllServicesUser);
+        const users = response.data.allUser || [];
+
+        const activeUsers = users.filter((user) => user.isActive);
+
+        const formattedLeads = activeUsers.map((user) => ({
+          value: user._id?.$oid || user._id,
+          label: `${user.personalInfo?.firstName?.trim()} ${user.personalInfo?.lastName?.trim() || ''}`.trim()
+        }));
+
+        setSessionLeads(formattedLeads);
+      } catch (error) {
+        console.error('Error fetching session leads:', error);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -231,10 +253,7 @@ const UserProfile = () => {
           locations={locationOptions}
           locationFilter={locationFilter}
           setLocationFilter={setLocationFilter}
-          sessionLeads={[
-            { value: 'Lead 1', label: 'Lead 1' },
-            { value: 'Lead 2', label: 'Lead 2' }
-          ]}
+          sessionLeads={sessionLeads}
           setSessionLeadFilter={setSessionLeadFilter}
           selectedFilters={['locationFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
           onReset={handleReset}
@@ -351,77 +370,6 @@ const UserProfile = () => {
             </Typography>
             <Divider />
 
-            {/* <Stack spacing={1} mt={2}>
-              {sessionData?.map((session, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    px: 2,
-                    py: 1.5,
-                    borderBottom: '1px solid #e0e0e0',
-                    flexWrap: 'wrap'
-                  }}
-                >
-                  <Box minWidth={90}>
-                    <Typography variant="subtitle2" fontWeight="bold">
-                      {new Date(session.date).toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </Typography>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {session.time}
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ flexGrow: 1, px: 2, minWidth: 200 }}>
-                    <Typography variant="subtitle2" fontWeight="bold" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                      {session.campaigns}
-                    </Typography>
-                  </Box>
-
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        backgroundColor: '#1B4B66',
-                        textTransform: 'none',
-                        fontSize: '10px',
-                        py: 0.5,
-                        px: 0.5,
-                        maxHeight: '50px'
-                      }}
-                      onClick={() => navigate('/add-session', { state: { session } })}
-                    >
-                      Edit Session
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        textTransform: 'none',
-                        color: '#1B4B66',
-                        fontSize: '10px',
-                        py: 0.48,
-                        px: 0.5,
-                        maxHeight: '50px'
-                      }}
-                      onClick={() => navigate('/attendees', { state: { session } })}
-                    >
-                      Add Attendee
-                    </Button>
-                    <IconButton size="small">
-                      <InfoIcon sx={{ color: '#49494c' }} fontSize="small" onClick={() => navigate('/view-session')} />
-                    </IconButton>
-                  </Box>
-                </Box>
-              ))}
-            </Stack> */}
             <Stack spacing={1} mt={2}>
               {loading2 ? (
                 <Box
@@ -477,7 +425,7 @@ const UserProfile = () => {
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            maxWidth: '100%'
+                            maxWidth: '282px'
                           }}
                         >
                           {session?.description}

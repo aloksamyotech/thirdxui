@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button, InputBase } from '@mui/material';
@@ -19,20 +20,23 @@ const User = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [name, setNameFilter] = useState('');
+  const [nameFilter, setNameFilter] = useState('');
   const [countryOfOriginFilter, setCountryOfOriginFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [allData, setAllData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [nameFilterOptions, setNameFilterOptions] = useState([]);
+  const [selectedName, setSelectedName] = useState('');
+
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
   });
   const navigate = useNavigate();
- 
+
   const columns = [
     {
       field: 'name',
@@ -79,7 +83,7 @@ const User = () => {
       )
     },
     { field: 'age', headerName: 'Age', flex: 1 },
- 
+
     {
       field: 'actions',
       headerName: 'Manage',
@@ -96,7 +100,7 @@ const User = () => {
       )
     }
   ];
- 
+
   const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -133,19 +137,14 @@ const User = () => {
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' }
   ];
- 
+
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
     { value: 'week', label: 'Last 7 Days' },
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
   ];
- 
-  const nameFilter = [
-    { value: 'name1', label: 'Name 1' },
-    { value: 'name2', label: 'Name 2' }
-  ];
- 
+  
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -158,10 +157,46 @@ const User = () => {
         setCountriesWithFlags(countries);
       });
   }, []);
- 
+  const fetchUserName = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        archive: 'false',
+        role: 'user'
+      });
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const nameOptions = allUser
+        .map((user) => ({
+          value: user._id,
+          label: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim()
+        }))
+        .filter((option) => option.value && option.label);
+
+      const formattedUsers = allUser?.map((user, index) => ({
+        ...user,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+      }));
+
+      setNameFilterOptions(nameOptions);
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      console.error('Error fetching user names:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserName();
+  }, []);
+
   const fetchUser = async () => {
     if (countriesWithFlags.length === 0) return;
- 
+
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
@@ -174,31 +209,32 @@ const User = () => {
       if (searchQuery) {
         queryParams.append('search', searchQuery);
       }
+
       if (status) queryParams.append('status', status === 'active');
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
       if (countryOfOriginFilter) {
-        const selectedCountry = countriesWithFlags.find(country => country.value === countryOfOriginFilter);
+        const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
         if (selectedCountry) {
           queryParams.append('country', selectedCountry.label);
         }
       }
-      if (name) {
-        queryParams.append('name', name);
+      if (selectedName) {
+        queryParams.append('name', selectedName);
       }
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
- 
+
       const allUser = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
- 
+
       setAllData(allUser);
       const formattedUsers = allUser?.map((user, index) => {
         const dob = new Date(user.personalInfo?.dateOfBirth);
         const today = new Date();
- 
+
         let age = '';
         if (!isNaN(dob)) {
           age = today.getFullYear() - dob.getFullYear();
@@ -207,10 +243,10 @@ const User = () => {
             age--;
           }
         }
- 
+
         const countryName = user?.contactInfo?.country || '';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
- 
+
         return {
           id: user?._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
@@ -220,10 +256,10 @@ const User = () => {
           country: countryName,
           countryFlag: matchedCountry?.flag || '',
           age: age || '',
-          status: user?.isActive === 'Active' ? 'Open' : 'Closed'
+          status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });
- 
+
       setRows(formattedUsers);
       setTotalRows(pagination?.total);
     } catch (error) {
@@ -232,15 +268,15 @@ const User = () => {
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
     fetchUser();
-  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, name, searchQuery, countryOfOriginFilter]);
+  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, selectedName, searchQuery, countryOfOriginFilter]);
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
- 
+
     try {
       const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
       fetchUser();
@@ -325,7 +361,7 @@ const User = () => {
               </IconButton>
             </Box>
           </Stack>
- 
+
           <Grid container spacing={2}>
             <FilterPanel
               showFilter={showFilter}
@@ -335,8 +371,9 @@ const User = () => {
               dateAddedFilters={dateAddedFilters}
               dateOpenedFilter={dateOpenedFilter}
               setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-              names={nameFilter}
-              setNameFilter={setNameFilter}
+              names={nameFilterOptions}
+              nameFilter={selectedName}
+              setNameFilter={setSelectedName}
               countriesWithFlags={countriesWithFlags}
               countryOfOriginFilter={countryOfOriginFilter}
               setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
@@ -376,19 +413,13 @@ const User = () => {
                               display: 'flex',
                               alignItems: 'self-start',
                               justifyContent: 'center',
-                              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                              backgroundColor: 'rgba(255, 255, 255, 0.15)'
                             }}
                           >
                             <SingleRowLoader />
                           </Box>
                         ),
-                        noRowsOverlay: () => (
-                          loading ? null : (
-                            <Box sx={{ padding: 2, textAlign: 'center' }}>
-                              No data available.
-                            </Box>
-                          )
-                        ),
+                        noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                       }}
                       getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                       sx={{
@@ -439,5 +470,5 @@ const User = () => {
     </>
   );
 };
- 
+
 export default User;

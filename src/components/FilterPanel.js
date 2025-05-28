@@ -7,6 +7,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { LocalizationProvider, DatePicker, DesktopTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const FilterPanel = ({
   showFilter,
@@ -360,45 +361,45 @@ const FilterPanel = ({
               return (
                 <>
                   <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        label={filter.label}
-                        value={filter.value || dayjs()}
-                        onChange={(newValue) => filter.onChange(newValue)}
-                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                        PopperProps={{
-                          modifiers: [
-                            {
-                              name: 'offset',
-                              options: {
-                                offset: [0, 8]
-                              }
-                            }
-                          ],
-                          sx: {
-                            '& .MuiPaper-root': {
-                              width: 220,
-                              height: 260,
-                              marginLeft:'50px'
-                            },
-                            '& .MuiPickersCalendarHeader-root': {
-                              maxWidth: '220px',
-                              fontSize: '1.2rem'
-                            },
-                            '& .MuiDayPicker-header': {
-                              maxWidth: '220px'
-                            },
-                            '& .MuiDayPicker-monthContainer': {
-                              maxWidth: '220px'
-                            },
-                            '& .MuiPickersDay-root': {
-                              maxWidth: '220px',
-                              height: '30px',
-                              margin: '0 2px',
-                              fontSize: '0.6rem'
+                    <DatePicker
+                      label={filter.label}
+                      value={filter.value || dayjs()}
+                      onChange={(newValue) => filter.onChange(newValue)}
+                      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                      PopperProps={{
+                        modifiers: [
+                          {
+                            name: 'offset',
+                            options: {
+                              offset: [0, 8]
                             }
                           }
-                        }}
-                      />
+                        ],
+                        sx: {
+                          '& .MuiPaper-root': {
+                            width: 220,
+                            height: 260,
+                            marginLeft: '50px'
+                          },
+                          '& .MuiPickersCalendarHeader-root': {
+                            maxWidth: '220px',
+                            fontSize: '1.2rem'
+                          },
+                          '& .MuiDayPicker-header': {
+                            maxWidth: '220px'
+                          },
+                          '& .MuiDayPicker-monthContainer': {
+                            maxWidth: '220px'
+                          },
+                          '& .MuiPickersDay-root': {
+                            maxWidth: '220px',
+                            height: '30px',
+                            margin: '0 2px',
+                            fontSize: '0.6rem'
+                          }
+                        }
+                      }}
+                    />
                   </LocalizationProvider>
                 </>
               );
@@ -506,7 +507,8 @@ const FilterPanel = ({
                       fullWidth
                       InputLabelProps={{ shrink: true }}
                       inputProps={{ step: 300 }}
-                      onChange={(newValue) => filter.onChange(newValue)}
+                       value={filter.value || ''}
+                    onChange={(e) => filter.onChange(e.target.value)}
                       format="hh:mm A"
                       renderInput={(params) => <TextField {...params} fullWidth size="small" />}
                       sx={{

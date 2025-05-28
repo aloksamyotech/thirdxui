@@ -25,10 +25,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const location = useLocation();
-  const session = location.state.session;
-
-  const serviceId = session?.serviceId || location.state?.serviceId;
-
+  const session = location?.state?.session;
+  const serviceId = session?.serviceId || location?.state?.serviceId;
 
   const {
     control,

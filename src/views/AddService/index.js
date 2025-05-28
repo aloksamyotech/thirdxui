@@ -72,6 +72,7 @@ const AddCaseForm = () => {
     };
     fetchData();
   }, []);
+  
   const {
     control,
     handleSubmit,
@@ -166,12 +167,6 @@ const AddCaseForm = () => {
       formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
-      // formData.append('benificiary', data.beneficiaryInformation || '');
-      // formData.append('campaigns', data.campaignsSupported || '');
-      // formData.append('engagement', data.engagement || '');
-      // formData.append('eventAttanded', data.eventsAttended || '');
-      // formData.append('fundingInterest', data.fundingInterests || '');
-      // formData.append('fundraisingActivities', data.fundraisingActivities || '');
       (data.benificiary || []).forEach((id) => {
         formData.append('benificiary[]', id);
       });

@@ -296,7 +296,7 @@ const BulkDelete = () => {
         <Grid item xs={9}>
           <Box width="100%">
             <Card style={{ height: '100vh' }}>
-              <DataGrid  
+              <DataGrid
                 rows={rows}
                 columns={columns}
                 loading={loading}

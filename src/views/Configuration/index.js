@@ -14,14 +14,14 @@ const defaultTabTypes = [
   'Contact Types',
   'Referral Types',
   'Contact Purpose',
-  'Campaign',
-  'Location',
   'Key Indicators',
   'Payment Method',
   'Archive Reason',
-  'Form Types',
+  'Campaign',
+  'Location',
   'Reason',
-  'Service Types'
+  'Service Types',
+  'Form Types'
 ];
 
 const TabbedDataGrid = () => {
@@ -136,7 +136,9 @@ const TabbedDataGrid = () => {
       toast.error('Error fetching configurations');
     } finally {
       // setLoading(false);
-      setTimeout(()=>{setLoading(false);}, 1000)
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -361,7 +363,6 @@ const TabbedDataGrid = () => {
                   </Box>
                   <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
                     {loading ? (
-                      // Show a few skeleton rows
                       [...Array(3)].map((_, i) => (
                         <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                           <Skeleton variant="text" width="60%" height={20} />

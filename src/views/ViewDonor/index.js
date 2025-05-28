@@ -185,7 +185,7 @@ const UserProfileCard = () => {
                       style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
                     />
                     <Grid item xs>
-                      <Typography component="span" fontWeight="600" lineHeight="2">
+                      <Typography component="span" fontSize={18} fontWeight="500" lineHeight="2">
                         {personalInfo.firstName || personalInfo.lastName
                           ? `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim()
                           : companyInformation.companyName || 'N/A'}
@@ -217,7 +217,7 @@ const UserProfileCard = () => {
                           />
                         </Box>
 
-                        <Typography variant="body2" color={isActive ? 'green' : 'red'} lineHeight="2">
+                        <Typography variant="body1" fontSize={12} color={isActive ? 'green' : 'red'} lineHeight="1">
                           {isActive ? 'ACTIVE DONOR' : 'INACTIVE DONOR'}
                         </Typography>
                       </Stack>

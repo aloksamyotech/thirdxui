@@ -370,7 +370,7 @@ const EmployeeDetails = () => {
                         CHANGE PASSWORD
                       </Button>
                       <Button variant="outlined" color="error" onClick={handleClear}>
-                        CLEAR
+                        CANCEL
                       </Button>
                     </Stack>
                   </Grid>

@@ -314,9 +314,9 @@ const Lead = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            serviceTypes={serviceTypeFilter}
-            serviceTypeFilter={serviceType}
-            setServiceTypeFilter={(value) => setServiceType(value)}
+            service={serviceTypeFilter}
+            serviceFilter={serviceType}
+            setServiceFilter={(value) => setServiceType(value)}
             statuses={statusFilter}
             statusFilter={status}
             setStatusFilter={(value) => setStatus(value)}
@@ -326,7 +326,7 @@ const Lead = () => {
             owners={ownerFilters}
             ownerFilter={owner}
             setOwnerFilter={(value) => setOwner(value)}
-            selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
+            selectedFilters={['serviceFilter', 'statusFilter',  'dateOpenedFilter', 'ownerFilter']}
             onReset={handleReset}
           />
 

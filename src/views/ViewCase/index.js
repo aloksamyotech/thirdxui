@@ -37,6 +37,9 @@ const CaseDetailsPage = () => {
     page: 0,
     pageSize: 5
   });
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [createdByFilter, setCreatedByFilter] = useState('');
+  const [createdByOptions, setCreatedByOptions] = useState([]);
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -113,91 +116,11 @@ const CaseDetailsPage = () => {
   //   { value: 'year', label: 'Last 1 Year' }
   // ];
 
-  const columnsCase = [
-    { field: 'caseId', headerName: 'Case Id', width: 100 },
-    {
-      field: 'serviceUser',
-      headerName: 'Service User',
-      width: 120,
-      renderCell: () => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {`${serviceuserDetails?.personalInfo?.firstName || ''} ${serviceuserDetails?.personalInfo?.lastName || ''}`}
-        </Typography>
-      )
-    },
-
-    {
-      field: 'owner',
-      headerName: 'Owner',
-      width: 110,
-      valueGetter: (params) => params.row?.owner || '',
-      renderCell: () => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {caseData?.serviceType || ''}
-        </Typography>
-      )
-    },
-
-    {
-      field: 'dateOpened',
-      headerName: 'Date Opened',
-      width: 110,
-      valueGetter: () => formatDate(caseData?.caseOpened || '')
-    },
-
-    {
-      field: 'dateClosed',
-      headerName: 'Date Closed',
-      width: 110,
-      valueGetter: () => formatDate(caseData?.caseOpened || '')
-    },
-
-    { field: 'attachments', headerName: 'Attachments', width: 110 },
-
-    { field: 'totalHours', headerName: 'Total Hours', width: 100 },
-
-    {
-      field: 'serviceStatus',
-      headerName: 'Status',
-      width: 120,
-      renderCell: () => {
-        const status = caseData?.serviceStatus;
-
-        return (
-          <Chip
-            label={status === 'Active' ? 'Open' : 'Close'}
-            icon={status === 'Active' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-            variant="outlined"
-            sx={{
-              borderColor: 'gray',
-              color: 'gray',
-              backgroundColor: 'transparent'
-            }}
-          />
-        );
-      }
-    }
-  ];
-
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     return isNaN(date) ? '' : date.toLocaleDateString('en-GB');
   };
-
-  const rows = [
-    {
-      id: 1,
-      caseId: 'RD-9477',
-      serviceUser: 'Aidan Ayonaudu',
-      owner: 'Daniel Thompson',
-      dateOpened: '31/10/2021',
-      dateClosed: '23/10/2025',
-      attachments: '1 File',
-      totalHours: '24 hrs',
-      status: 'Open'
-    }
-  ];
 
   const userProfile = serviceuserDetails?.otherInfo?.file;
   const fullImageUrl = userProfile ? `${imageUrl}${userProfile}` : '';
@@ -208,13 +131,8 @@ const CaseDetailsPage = () => {
       field: 'subject',
       headerName: 'Subject',
       flex: 1,
-      renderCell: (params) => (
-        <Box sx={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>
-          {params.value}
-        </Box>
-      )
-    }
-    ,
+      renderCell: (params) => <Box sx={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.4' }}>{params.value}</Box>
+    },
     { field: 'configurationName', headerName: 'Contact Type', flex: 1 },
     { field: 'createdBy', headerName: 'Created By', flex: 1 },
     {
@@ -240,6 +158,14 @@ const CaseDetailsPage = () => {
     }
   ];
 
+  const handleReset = () => {
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setCreatedByFilter('');
+    setIsFiltered(false);
+    fetchCaseNotes();
+  };
+
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
@@ -252,31 +178,34 @@ const CaseDetailsPage = () => {
       if (searchQuery && searchQuery !== '') {
         queryParams.append('search', searchQuery);
       }
+      if (createdByFilter && createdByFilter !== '') {
+        queryParams.append('createdBy', createdByFilter);
+      }
 
-      const queryString = queryParams.toString();
       const url = `${urls.casenote?.fetchWithPagination}?${queryParams.toString()}`;
-
       const response = await getApi(url);
-
-      const filteredCases = response?.data?.data || [];
+      const allCasesNotes = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
+      const formattedData = allCasesNotes.map((note, index) => {
+        let configName = '-';
 
-      const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB');
-      };
+        if (note?.configurationId && typeof note.configurationId === 'object') {
+          configName = note.configurationId.name || '-';
+        } else if (note?.name) {
+          configName = note.name;
+        }
 
-      const formattedUsers = filteredCases.map((user, index) => {
         return {
-          id: user?._id,
-          date: formatDate(user?.date),
-          subject: user?.subject || '',
-          contactType: user?.configurationId?.name || ''
+          id: note._id,
+          date: note.date ? dayjs(note.date).format('DD-MM-YYYY') : '-',
+          subject: note.subject || '-',
+          createdBy: note.createdBy || '-',
+          configurationName: configName,
+          sNo: paginationModel.page * paginationModel.pageSize + index + 1
         };
       });
 
-      setRows(formattedUsers);
+      setRows(formattedData);
       setTotalRows(pagination?.total);
       setIsFiltered(true);
     } catch (error) {
@@ -284,16 +213,11 @@ const CaseDetailsPage = () => {
     }
   };
 
-  const handleReset = () => {
-    setDateOpenedFilter('');
-    setSearchQuery('');
-  };
-
   useEffect(() => {
-    if (dateOpenedFilter) {
+    if (dateOpenedFilter || searchQuery || createdByFilter) {
       handleFilter();
     }
-  }, [dateOpenedFilter]);
+  }, [dateOpenedFilter, searchQuery, createdByFilter]);
 
   useEffect(() => {
     if (!id) return;
@@ -314,7 +238,28 @@ const CaseDetailsPage = () => {
     fetchData();
   }, [id]);
 
-  const fetchdata = async () => {
+  const fetchCreatedByOptions = async () => {
+    try {
+      const response = await getApi(`${urls.casenote.fetchWithPagination}?caseId=${id}`);
+      const allCasesNotes = response?.data?.data || [];
+      const uniqueCreators = [...new Set(allCasesNotes.map(note => note.createdBy))].filter(Boolean);
+      const options = uniqueCreators.map(creator => ({
+        value: creator,
+        label: creator
+      }));
+      setCreatedByOptions(options);
+    } catch (error) {
+      console.error('Error fetching created by options:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchCreatedByOptions();
+    }
+  }, [id]);
+
+  const fetchCaseNotes = async () => {
     try {
       setLoading2(true);
       const response = await getApi(
@@ -340,10 +285,9 @@ const CaseDetailsPage = () => {
           configurationName: configName,
           sNo: paginationModel.page * paginationModel.pageSize + index + 1
         };
-
       });
-      
-  setRows(formattedData);
+
+      setRows(formattedData);
       setTotalRows(pagination?.total);
     } catch (err) {
       console.error('Failed to fetch data:', err);
@@ -353,11 +297,13 @@ const CaseDetailsPage = () => {
   };
 
   useEffect(() => {
-    fetchdata();
+    fetchCaseNotes();
   }, [paginationModel]);
+
   useEffect(() => {
     handleFilter();
   }, [searchQuery]);
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -416,7 +362,7 @@ const CaseDetailsPage = () => {
               {loading ? (
                 <Box
                   sx={{
-                    margin: "5px",
+                    margin: '5px'
                   }}
                 >
                   <SectionSkeleton lines={1} variant="rectangular" width="100%" height={120} />
@@ -494,78 +440,83 @@ const CaseDetailsPage = () => {
                   <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
                     <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
                       <TableRow>
-                        {[
-                          'Case Id',
-                          'Service User',
-                          'Owner',
-                          'Date Opened',
-                          'Date Closed',
-                          'Attachments',
-                          'Total Hours',
-                          'Status',
-                        ].map((header) => (
-                          <TableCell
-                            key={header}
-                            sx={{
-                              fontSize: '12px',
-                              whiteSpace: 'nowrap',
-                              padding: '6px',
-                              borderBottom: 'none',
-                              height: '50px'
-                            }}
-                          >
-                            {header}
-                          </TableCell>
-                        ))}
+                        {['Case Id', 'Service User', 'Owner', 'Date Opened', 'Date Closed', 'Attachments', 'Total Hours', 'Status'].map(
+                          (header) => (
+                            <TableCell
+                              key={header}
+                              sx={{
+                                fontSize: '12px',
+                                whiteSpace: 'nowrap',
+                                padding: '6px',
+                                borderBottom: 'none',
+                                height: '50px'
+                              }}
+                            >
+                              {header}
+                            </TableCell>
+                          )
+                        )}
                       </TableRow>
                     </TableHead>
                     <TableBody sx={{ height: '73px' }}>
-                      {rows.map((row, index) => (
-                        <TableRow key={row.caseId}>
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.caseId}</TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                            <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                              {serviceuserDetails?.personalInfo?.firstName || ''}
-                            </Typography>
-                            <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                              {serviceuserDetails?.personalInfo?.lastName || ''}
-                            </Typography>
-                          </TableCell>
+                      <TableRow key={row.caseId}>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>RD-758</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {serviceuserDetails?.personalInfo?.firstName || ''}
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {serviceuserDetails?.personalInfo?.lastName || ''}
+                          </Typography>
+                        </TableCell>
 
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none', whiteSpace: 'normal' }}>
-                            <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                              {`${serviceuserDetails?.personalInfo?.firstName || ''}`}<br />
-                              {`${serviceuserDetails?.personalInfo?.lastName || ''}`}
-                            </Typography>
-                          </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none', whiteSpace: 'normal' }}>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {caseData?.serviceType || ''}
+                          </Typography>
+                        </TableCell>
 
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{formatDate(caseData?.caseOpened || '')}</TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{formatDate(caseData?.caseClosed || '')}</TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.attachments}</TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>{row.totalHours}</TableCell>
-                          <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
-                            <Chip
-                              label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
-                              icon={
-                                row.serviceStatus === 'Active' ? (
-                                  <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                                ) : (
-                                  <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                                )
-                              }
-                              variant="outlined"
-                              sx={{
-                                borderColor: 'gray',
-                                color: 'gray',
-                                backgroundColor: 'transparent',
-                                fontSize: '10px',
-                                height: '20px',
-                                paddingRight: '4px'
-                              }}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {formatDate(caseData?.caseOpened || '')}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {formatDate(caseData?.caseClosed || '')}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {(() => {
+                            if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
+                            const startDate = new Date(caseData.caseOpened);
+                            const endDate = new Date(caseData.caseClosed);
+                            const diffTime = Math.abs(endDate - startDate);
+                            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                            return `${diffHours} hrs`;
+                          })()}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
+                          <Chip
+                            label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
+                            icon={
+                              row.serviceStatus === 'Active' ? (
+                                <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
+                              ) : (
+                                <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
+                              )
+                            }
+                            variant="outlined"
+                            sx={{
+                              borderColor: 'gray',
+                              color: 'gray',
+                              backgroundColor: 'transparent',
+                              fontSize: '10px',
+                              height: '20px',
+                              paddingRight: '4px'
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -579,12 +530,15 @@ const CaseDetailsPage = () => {
             showFilter={showFilter}
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-            selectedFilters={['dateOpenedFilter']}
+            createdBy={createdByOptions}
+            createdByFilter={createdByFilter}
+            setCreatedByFilter={(value) => setCreatedByFilter(value)}
+            selectedFilters={['dateOpenedFilter', 'createdByFilter']}
             onReset={handleReset}
           />
 
           <Grid item xs={12} md={9}>
-            <Box sx={{ height: '430px', width: '100%', backgroundColor: '#ffff' }}>
+            <Box sx={{ height: 'auto', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
                 loading={loading2}
                 rows={
@@ -619,13 +573,7 @@ const CaseDetailsPage = () => {
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading2 ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading2 ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 disableSelectionOnClick
                 sx={{
@@ -648,7 +596,7 @@ const CaseDetailsPage = () => {
 
       <CaseNoteDialog
         open={openDialog}
-        fetchdata={fetchdata}
+        fetchdata={fetchCaseNotes}
         handleClose={() => setOpenDialog(false)}
         onSubmit={handleSave}
         title="Add Case Note"

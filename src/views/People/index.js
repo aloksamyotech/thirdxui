@@ -316,11 +316,11 @@ const Lead = () => {
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
             dateAddedFilters={dateAddedFilters}
-            dateOpenedFilter={dateOpenedFilter}
-            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+            dateAddedFilter={dateOpenedFilter}
+            setDateAddedFilter={(value) => setDateOpenedFilter(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
+            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
           />
 

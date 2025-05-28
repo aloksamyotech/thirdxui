@@ -49,8 +49,8 @@ const UserProfile = () => {
     page: 0,
     pageSize: 10
   });
-  const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
-  const [campaign, setCampaignFilter] = useState('');
+  const [locationOptions, setLocationOptions] = useState([]);
+  const [locationFilter, setLocationFilter] = useState('');
 
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
@@ -78,7 +78,7 @@ const UserProfile = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCampaign = async () => {
+    const fetchLocations = async () => {
       try {
         const response = await getApi(urls.configuration.fetch);
         const options = response?.data?.allConfiguration
@@ -88,12 +88,12 @@ const UserProfile = () => {
             label: item.name
           }));
 
-        setCampaignTypeOptions(options);
+        setLocationOptions(options);
       } catch (error) {
-        console.error('Error fetching config:', error);
+        console.error('Error fetching locations:', error);
       }
     };
-    fetchCampaign();
+    fetchLocations();
   }, []);
 
   useEffect(() => {
@@ -153,6 +153,9 @@ const UserProfile = () => {
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
       queryParams.append('time', timeFilter);
+      if (locationFilter) {
+        queryParams.append('location', locationFilter);
+      }
 
       const url = `${urls.session.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
@@ -177,7 +180,7 @@ const UserProfile = () => {
   };
 
   const handleReset = () => {
-    setCampaignFilter('');
+    setLocationFilter('');
     setTimeFilter('');
     setDateOpenedFilter('');
     setIsFiltered(false);
@@ -189,12 +192,12 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    if (dateOpenedFilter || campaign || paginationModel || isFiltered || sessionLeadFilter || timeFilter) {
+    if (dateOpenedFilter || locationFilter || paginationModel || isFiltered || sessionLeadFilter || timeFilter) {
       handleFilter();
     } else {
       fetchDonor();
     }
-  }, [dateOpenedFilter, campaign, paginationModel, isFiltered, sessionLeadFilter, timeFilter]);
+  }, [dateOpenedFilter, locationFilter, paginationModel, isFiltered, sessionLeadFilter, timeFilter]);
 
   return (
     <>
@@ -225,15 +228,15 @@ const UserProfile = () => {
           timeFilter={timeFilter}
           setTimeFilter={(value) => setTimeFilter(value)}
           timeOptions={timeOptions}
-          campaigns={campaignTypeOptions}
-          campaignFilter={campaign}
-          setCampaignFilter={setCampaignFilter}
+          locations={locationOptions}
+          locationFilter={locationFilter}
+          setLocationFilter={setLocationFilter}
           sessionLeads={[
             { value: 'Lead 1', label: 'Lead 1' },
             { value: 'Lead 2', label: 'Lead 2' }
           ]}
           setSessionLeadFilter={setSessionLeadFilter}
-          selectedFilters={['campaignFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
+          selectedFilters={['locationFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
           onReset={handleReset}
         />
 

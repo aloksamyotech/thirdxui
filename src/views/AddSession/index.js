@@ -24,6 +24,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [serviceUser, setServiceUser] = useState([]);
   const location = useLocation();
   const session = location?.state?.session;
   const serviceId = session?.serviceId || location?.state?.serviceId;
@@ -96,6 +97,24 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchTags();
   }, []);
+  useEffect(() => {
+    const fetchserviceUser = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getAllServicesUser);
+
+        if (Array.isArray(response.data.allUser)) {
+          const activeUsers = response.data.allUser.filter((user) => user.isActive);
+          setServiceUser(activeUsers);
+        } else {
+          console.warn('Expected response.data.allUser to be an array, but got:', typeof response.data.allUser);
+        }
+      } catch (error) {
+        console.error('Error fetching service user:', error);
+      }
+    };
+    fetchserviceUser();
+  }, []);
+
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -145,7 +164,7 @@ const AddCaseForm = ({ onCancel }) => {
       const formData = new FormData();
 
       formData.append('country', data.countryOfOrigin || '');
-      formData.append('name', data.type || '');
+      formData.append('serviceuser', data.type || '');
       formData.append('date', data.date || '');
       formData.append('time', data.time || '');
       formData.append('description', data.description || '');
@@ -339,8 +358,16 @@ const AddCaseForm = ({ onCancel }) => {
                         helperText={errors.type?.message}
                         {...field}
                       >
-                        <MenuItem value="Lead 1">Lead 1</MenuItem>
-                        <MenuItem value="Lead 2">Lead 2</MenuItem>
+                        {serviceUser.map((user) => {
+                          const fullName = `${user.personalInfo.firstName.trim()} ${user.personalInfo.lastName.trim()}`;
+                          const userId = user._id?.$oid || user._id || user.uniqueId;
+
+                          return (
+                            <MenuItem key={userId} value={userId}>
+                              {fullName}
+                            </MenuItem>
+                          );
+                        })}
                       </TextField>
                     )}
                   />

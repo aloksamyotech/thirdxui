@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button, InputBase } from '@mui/material';
@@ -19,13 +20,16 @@ const User = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [name, setNameFilter] = useState('');
+  const [nameFilter, setNameFilter] = useState('');
   const [countryOfOriginFilter, setCountryOfOriginFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [allData, setAllData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [nameFilterOptions, setNameFilterOptions] = useState([]); 
+const [selectedName, setSelectedName] = useState(''); 
+
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -141,10 +145,10 @@ const User = () => {
     { value: 'year', label: 'Last 1 Year' }
   ];
  
-  const nameFilter = [
-    { value: 'name1', label: 'Name 1' },
-    { value: 'name2', label: 'Name 2' }
-  ];
+  // const nameFilter = [
+  //   { value: 'name1', label: 'Name 1' },
+  //   { value: 'name2', label: 'Name 2' }
+  // ];
  
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
@@ -158,6 +162,45 @@ const User = () => {
         setCountriesWithFlags(countries);
       });
   }, []);
+const fetchUserName = async () => {
+  try {
+    const queryParams = new URLSearchParams({
+       page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+      archive: 'false',
+      role: 'user'
+    });
+
+    const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+    const allUser = response?.data?.data || [];
+    const pagination = response?.data?.meta || { total: 0 };
+
+
+    const nameOptions = allUser
+      .map((user) => ({
+        value: user._id,
+        label: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim()
+      }))
+      .filter((option) => option.value && option.label);
+
+           const formattedUsers = allUser?.map((user, index) => ({
+        ...user,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+      }));
+
+    setNameFilterOptions(nameOptions);
+     setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+  } catch (error) {
+    console.error('Error fetching user names:', error);
+  }
+};
+
+useEffect(() => {
+  fetchUserName();
+}, []);
+
+
  
   const fetchUser = async () => {
     if (countriesWithFlags.length === 0) return;
@@ -174,6 +217,7 @@ const User = () => {
       if (searchQuery) {
         queryParams.append('search', searchQuery);
       }
+  
       if (status) queryParams.append('status', status === 'active');
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
@@ -185,9 +229,10 @@ const User = () => {
           queryParams.append('country', selectedCountry.label);
         }
       }
-      if (name) {
-        queryParams.append('name', name);
-      }
+ if (selectedName) {
+  queryParams.append('name', selectedName);
+}
+
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
  
@@ -220,7 +265,7 @@ const User = () => {
           country: countryName,
           countryFlag: matchedCountry?.flag || '',
           age: age || '',
-          status: user?.isActive === 'Active' ? 'Open' : 'Closed'
+          status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });
  
@@ -233,9 +278,9 @@ const User = () => {
     }
   };
  
-  useEffect(() => {
-    fetchUser();
-  }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, name, searchQuery, countryOfOriginFilter]);
+useEffect(() => {
+  fetchUser();
+}, [countriesWithFlags, paginationModel, status, dateOpenedFilter, selectedName, searchQuery, countryOfOriginFilter]);
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this user?');
@@ -335,8 +380,9 @@ const User = () => {
               dateAddedFilters={dateAddedFilters}
               dateOpenedFilter={dateOpenedFilter}
               setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-              names={nameFilter}
-              setNameFilter={setNameFilter}
+              names={nameFilterOptions}
+              nameFilter={selectedName}
+              setNameFilter={setSelectedName}
               countriesWithFlags={countriesWithFlags}
               countryOfOriginFilter={countryOfOriginFilter}
               setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}

@@ -41,6 +41,8 @@ const BulkDelete = () => {
   const [sessionName, setSessionNameFilter] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [confirmUnarchiveOpen, setConfirmUnarchiveOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -78,15 +80,32 @@ const BulkDelete = () => {
     setConfirmUnarchiveOpen(true);
   };
 
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
+
   const fetchpeople = async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: paginationModel.page + 1,
-        limit: paginationModel.pageSize,
-        archive: 'true',
-        
-      });
+
+      const queryParams = new URLSearchParams();
+
+      if (dateOpenedFilter) {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('archive', 'true');
+      queryParams.append('role', 'service_user');
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
@@ -115,7 +134,14 @@ const BulkDelete = () => {
 
   useEffect(() => {
     fetchpeople();
-  }, [paginationModel]);
+  }, [paginationModel, searchQuery, dateOpenedFilter]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    if (!event.target.value.trim()) {
+      fetchpeople();
+    }
+  };
 
   const CustomHeader = () => {
     return (
@@ -150,6 +176,24 @@ const BulkDelete = () => {
         </GridToolbarContainer>
       </Box>
     );
+  };
+
+  const handleFilter = () => {
+    setPaginationModel({
+      page: 0,
+      pageSize: paginationModel.pageSize
+    });
+    fetchpeople();
+  };
+
+  const handleReset = () => {
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    setPaginationModel({
+      page: 0,
+      pageSize: 10
+    });
   };
 
   const columns = [
@@ -207,20 +251,20 @@ const BulkDelete = () => {
           >
             <InputBase
               placeholder="Search..."
-              // value={searchQuery}
-              // onChange={handleSearchChange}
-              // onKeyPress={(e) => {
-              //   if (e.key === 'Enter') {
-              //     handleFilter();
-              //   }
-              // }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
               sx={{
                 flex: 1,
                 color: 'text.primary'
               }}
             />
             <IconButton
-              // onClick={handleFilter}
+              onClick={handleFilter}
               sx={{
                 marginRight: '8px',
                 width: 32,
@@ -241,11 +285,13 @@ const BulkDelete = () => {
           setActivityTypeFilter={setActivityTypeFilter}
           sessionNames={sessionNames}
           setSessionNameFilter={setSessionNameFilter}
-          dateAddedFilter={dateAddedFilter}
-          setDateAddedFilter={setDateAddedFilter}
+          dateAddedFilters={dateAddedFilters}
+          dateOpenedFilter={dateOpenedFilter}
+          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
           includeArchives={includeArchives}
           setIncludeArchives={setIncludeArchives}
-          selectedFilters={['activityTypeFilter', 'dateAddedFilter', 'sessionNameFilter', 'includeArchives']}
+          selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+          onReset={handleReset}
         />
         <Grid item xs={9}>
           <Box width="100%">
@@ -265,19 +311,13 @@ const BulkDelete = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
                       }}
                     >
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 paginationMode="server"
                 rowCount={totalRows}

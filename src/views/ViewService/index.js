@@ -134,7 +134,7 @@ const UserProfile = () => {
         setSessionData(response.data.userData);
       }
     } catch (error) {
-      console.log('error:', error);
+      console.error('error:', error);
     } finally {
       setLoading2(false);
     }
@@ -160,7 +160,7 @@ const UserProfile = () => {
       const allSessions = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
-     const formattedUsers = allSessions?.map((item, index) => ({
+      const formattedUsers = allSessions?.map((item, index) => ({
         id: item._id || index,
         date: item?.date ? new Date(item.date).toLocaleDateString() : '',
         country: item?.country || '',

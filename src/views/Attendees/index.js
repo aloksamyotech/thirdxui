@@ -27,7 +27,7 @@ export default function SessionRegisterPage() {
   const [totalRows, setTotalRows] = useState(0);
 
   const session = location?.state?.session || {};
-  const sessionId = session?._id;
+  const sessionId = session?._id || location?.state?.sessionId;
 
   const columns = [
     {
@@ -60,15 +60,13 @@ export default function SessionRegisterPage() {
   const fetchpeopleAttendee = async () => {
     try {
       setLoading(true);
-    const queryParams = new URLSearchParams({
-  page: paginationModel.page + 1,
-  limit: paginationModel.pageSize,
-  role: 'service_user'
-});
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        role: 'service_user'
+      });
 
-const response = await getApi(
-  `${urls.attendees.getAttendeesBySession}/${sessionId}?${queryParams.toString()}`
-);
+      const response = await getApi(`${urls.attendees.getAttendeesBySession}/${sessionId}?${queryParams.toString()}`);
 
       const attendeesData = response?.data?.data || [];
       const formattedUsers = attendeesData.map((item, index) => ({
@@ -197,7 +195,6 @@ const response = await getApi(
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: { id: params.row.attendeeId } })}
-
                 slots={{
                   toolbar: CustomHeader,
                   loadingOverlay: () => (
@@ -228,7 +225,10 @@ const response = await getApi(
             <Card sx={{ p: 2, height: '250px' }}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Typography fontWeight="bold">Add An Attendee</Typography>
-                <AddCircleIcon sx={{ color: 'green', cursor: 'pointer' }} onClick={() => navigate('/add-serviceuser')} />
+                <AddCircleIcon
+                  sx={{ color: 'green', cursor: 'pointer' }}
+                  onClick={() => navigate('/add-serviceuser', { state: { sessionId: sessionId } })}
+                />
               </Box>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} sm={8}>

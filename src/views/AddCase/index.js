@@ -12,6 +12,8 @@ import { getApi, postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
+
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
@@ -40,7 +42,7 @@ const AddCaseForm = () => {
       serviceUserId: '',
       serviceId: '',
       serviceType: '',
-      caseOpened: null,
+      caseOpened: dayjs(),
       caseClosed: null,
       benificiary: [],
       campaigns: [],

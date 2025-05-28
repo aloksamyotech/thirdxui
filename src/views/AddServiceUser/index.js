@@ -52,7 +52,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
 
   const location = useLocation();
-  const editdata = location.state;
+  const editdata = location.state.editdata;
+  const sessionId = location.state.sessionId;  
 
   const {
     register,
@@ -399,7 +400,12 @@ const AddCaseForm = ({ onCancel }) => {
       }
 
       setIsloading(false);
-      navigate('/people');
+      if (sessionId) {
+        
+        navigate('/attendees',{state:{sessionId:sessionId}});
+      } else {
+        navigate('/people');
+      }
     } catch (error) {
       console.error('Error creating user:', error);
       setIsloading(false);

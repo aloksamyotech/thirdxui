@@ -45,6 +45,11 @@ const TagForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsloading] = useState(true);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const [totalRows, setTotalRows] = useState(0);
 
   const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
@@ -83,22 +88,75 @@ const TagForm = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        setIsloading(true)
-        const response = await getApi(urls.tag.getAllTags);
-        setTags(response?.data?.allTags);
-        setFilteredTags(response?.data?.allTags);
-      } catch (error) {
-        console.error('Failed to fetch tags:', error);
-      } finally {
-        setIsloading(false)
-      }
-    };
+  const fetchTags = async () => {
+    setIsloading(true);
+    try {
+      const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const allTags = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
 
+      setTags(allTags);
+      setFilteredTags(allTags);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      toast.error('Failed to fetch tags');
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTags();
-  }, [isModalOpen]);
+  }, [paginationModel, isModalOpen]);
+
+  const handleFilter = async () => {
+    try {
+      setIsloading(true);
+      const queryParams = new URLSearchParams();
+
+      if (searchQuery) {
+        queryParams.append('search', searchQuery);
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+
+      const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
+
+      const response = await getApi(url);
+      const allTags = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      setTags(allTags);
+      setFilteredTags(allTags);
+      setTotalRows(pagination?.total);
+    } catch (error) {
+      toast.error('Failed to fetch filtered tags');
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  const handleSearchChange = (event) => {
+    const value = event.target.value;
+    setSearchQuery(value);
+  };
+
+  const handleSearch = () => {
+    if (searchQuery) {
+      handleFilter();
+    } else {
+      fetchTags();
+    }
+  };
+
+  useEffect(() => {
+    if (searchQuery) {
+      handleFilter();
+    } else {
+      fetchTags();
+    }
+  }, [searchQuery]);
 
   const handleStatusChange = async (tagId, newStatus) => {
     try {
@@ -169,7 +227,7 @@ const TagForm = () => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: '#ffff',
                 borderRadius: '30px',
                 paddingLeft: '16px',
                 border: '1px solid #e0e0e0',
@@ -179,25 +237,29 @@ const TagForm = () => {
             >
               <InputBase
                 placeholder="Search..."
-                // value={searchQuery}
-                // onChange={handleSearchChange}
-                // onKeyPress={(e) => {
-                //   if (e.key === 'Enter') {
-                //     handleFilter();
-                //   }
-                // }}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  }
+                }}
+                fullWidth
                 sx={{
                   flex: 1,
-                  color: 'text.primary'
+                  color: 'text.primary',
+                  '& input': {
+                    padding: '8px 8px 8px 0',
+                    width: '100%'
+                  }
                 }}
               />
               <IconButton
-                // onClick={handleFilter}
+                onClick={handleSearch}
                 sx={{
                   marginRight: '8px',
                   width: 32,
-                  height: 32,
-                  cursor: 'pointer'
+                  height: 32
                 }}
               >
                 <SearchIcon />
@@ -316,12 +378,25 @@ const TagForm = () => {
         </Grid>
 
         <Box width="100%" sx={{ mt: 1 }}>
-          <Card style={{ height: '300px' }}>
+          <Card style={{ height: 'auto' }}>
             <DataGrid
-              rows={filteredTags}
+              rows={
+                isLoading
+                  ? []
+                  : filteredTags.map((row, index) => ({
+                      ...row,
+                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                    }))
+              }
               columns={columns}
-              getRowId={(row) => row._id}
+              rowCount={totalRows}
               loading={isLoading}
+              pagination
+              paginationMode="server"
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              pageSizeOptions={[10]}
+              getRowId={(row) => row._id}
               slots={{
                 toolbar: () => <CustomHeader />,
                 loadingOverlay: () => (
@@ -339,8 +414,6 @@ const TagForm = () => {
                 ),
                 noRowsOverlay: () => (isLoading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
               }}
-              pagination={false}
-              hideFooter
               sx={{
                 '& .MuiDataGrid-cell': {
                   textAlign: 'left',
@@ -364,6 +437,7 @@ const TagForm = () => {
             </Grid>
           </Grid>
         </Box>
+
         <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <DialogTitle>
             <Typography variant="h4">Add Tags</Typography>

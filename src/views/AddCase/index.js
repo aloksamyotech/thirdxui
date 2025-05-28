@@ -574,7 +574,7 @@ const AddCaseForm = () => {
                         {...field}
                         label="Notes"
                         multiline
-                        minRows={13}
+                        minRows={12}
                         fullWidth
                         variant="outlined"
                         error={!!errors.description}

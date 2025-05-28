@@ -294,9 +294,7 @@ const Lead = () => {
             tags={tagOptions}
             tagFilter={tag}
             setTagFilter={(value) => setTag(value)}
-            includeArchives={includeArchives}
-            setIncludeArchives={setIncludeArchives}
-            selectedFilters={['listNameFilter', 'tagFilter', 'includeArchives']}
+            selectedFilters={['listNameFilter', 'tagFilter', ]}
             onReset={handleReset}
           />
 

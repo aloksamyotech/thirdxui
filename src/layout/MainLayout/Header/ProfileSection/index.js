@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
 import {
   Avatar,
@@ -27,36 +24,27 @@ import {
   Typography
 } from '@mui/material';
 import TranslateIcon from '@mui/icons-material/Translate';
-// third-party
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import UpgradePlanCard from './UpgradePlanCard';
-import  User1 from 'assets/images/UserProfile.png'
-
-// assets
+import User1 from 'assets/images/UserProfile.png';
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
-
-// ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
   const navigate = useNavigate();
-
   const [sdm, setSdm] = useState(true);
   const [value, setValue] = useState('');
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
   const anchorRef = useRef(null);
   const handleLogout = async () => {
-   };
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
@@ -89,51 +77,51 @@ const ProfileSection = () => {
   return (
     <>
       <Stack direction="row" spacing={3} alignItems="center">
-      {/* <Box>
+        {/* <Box>
         <TranslateIcon />
       </Box> */}
-      <Chip
-        sx={{
-          height: '48px',
-          alignItems: 'center',
-          borderRadius: '27px',
-          transition: 'all .2s ease-in-out',
-          borderColor: 'white',
-          backgroundColor: 'white',
-          '&[aria-controls="menu-list-grow"], &:hover': {
+        <Chip
+          sx={{
+            height: '48px',
+            alignItems: 'center',
+            borderRadius: '27px',
+            transition: 'all .2s ease-in-out',
             borderColor: 'white',
-            background: `${'white'}!important`,
-            color: 'white',
-            '& svg': {
-              stroke: 'white'
+            backgroundColor: 'white',
+            '&[aria-controls="menu-list-grow"], &:hover': {
+              borderColor: 'white',
+              background: `${'white'}!important`,
+              color: 'white',
+              '& svg': {
+                stroke: 'white'
+              }
+            },
+            '& .MuiChip-label': {
+              lineHeight: 0
             }
-          },
-          '& .MuiChip-label': {
-            lineHeight: 0
+          }}
+          icon={
+            <Avatar
+              src={User1}
+              sx={{
+                ...theme.typography.mediumAvatar,
+                margin: '8px 0 8px 8px !important',
+                cursor: 'pointer'
+              }}
+              ref={anchorRef}
+              aria-controls={open ? 'menu-list-grow' : undefined}
+              aria-haspopup="true"
+              color="inherit"
+            />
           }
-        }}
-        icon={
-          <Avatar
-            src={User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: '8px 0 8px 8px !important',
-              cursor: 'pointer'
-            }}
-            ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
-        // label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
-        // variant="outlined"
-        ref={anchorRef}
-        aria-controls={open ? 'menu-list-grow' : undefined}
-        aria-haspopup="true"
-        onClick={handleToggle}
-        color="primary"
-      />
+          // label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+          // variant="outlined"
+          ref={anchorRef}
+          aria-controls={open ? 'menu-list-grow' : undefined}
+          aria-haspopup="true"
+          onClick={handleToggle}
+          color="primary"
+        />
       </Stack>
       <Popper
         placement="bottom-end"
@@ -247,7 +235,7 @@ const ProfileSection = () => {
                           }
                         }}
                       >
-                        <ListItemButton
+                        {/* <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 0}
                           onClick={(event) => handleListItemClick(event, 0, '#')}
@@ -256,7 +244,7 @@ const ProfileSection = () => {
                             <IconSettings stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
                           <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
-                        </ListItemButton>
+                        </ListItemButton> */}
                         {/* <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 1}

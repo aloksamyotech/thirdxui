@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Box, Paper, Autocomplete, Button, MenuItem, InputAdornment, Card, Typography, Chip } from '@mui/material';
+import {
+  Grid,
+  TextField,
+  Box,
+  Paper,
+  Autocomplete,
+  Button,
+  MenuItem,
+  FormControl,
+  InputAdornment,
+  Card,
+  Typography,
+  Chip
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useForm, Controller } from 'react-hook-form';
@@ -33,46 +46,50 @@ const AddCaseForm = ({ onCancel }) => {
     control,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setValue
   } = useForm({
     mode: 'all',
     defaultValues: {
       date: dayjs(),
       countryOfOrigin: '',
       type: '',
-      benificiary: [],
+      beneficiary: [],
       campaigns: [],
       engagement: [],
-      eventAttanded: [],
-      fundingInterest: [],
+      eventsAttended: [],
+      fundingInterests: [],
       fundraisingActivities: [],
       time: dayjs().format('HH:mm'),
       description: '',
-      file: ''
+      file: '',
+      serviceUserId: ''
     }
   });
 
   useEffect(() => {
     if (session && Object.keys(session).length > 0) {
       const formData = {
-        countryOfOrigin: session.country || '',
-        type: session.name || '',
-        date: session.date ? dayjs(session.date) : dayjs(),
-        time: session.time || dayjs().format('HH:mm'),
-        description: session.description || '',
-        beneficiary: session.benificiary || [],
-        campaigns: session.campaigns || [],
-        engagement: session.engagement || [],
-        eventsAttended: session.eventAttanded || [],
-        fundingInterests: session.fundingInterest || [],
-        fundraisingActivities: session.fundraisingActivities || [],
-        serviceId: session.serviceId || '',
-        file: session.file || ''
+        countryOfOrigin: session?.country || '',
+        date: session?.date ? dayjs(session.date) : dayjs(),
+        time: session?.time || dayjs().format('HH:mm'),
+        description: session?.description || '',
+        beneficiary: session?.benificiary || [],
+        campaigns: session?.campaigns || [],
+        engagement: session?.engagement || [],
+        eventsAttended: session?.eventAttanded || [],
+        fundingInterests: session?.fundingInterest || [],
+        fundraisingActivities: session?.fundraisingActivities || [],
+        serviceId: serviceId || '',
+        file: session?.file || '',
+        serviceUserId: session?.serviceuser?._id || ''
       };
 
-      reset(formData);
+      Object.entries(formData).forEach(([key, value]) => {
+        setValue(key, value);
+      });
     }
-  }, [session, reset, serviceId]);
+  }, [session, setValue]);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -97,17 +114,17 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchTags();
   }, []);
+
   useEffect(() => {
     const fetchserviceUser = async () => {
       try {
-        const response = await getApi(urls.serviceuser.getAllServicesUser);
-
-        if (Array.isArray(response.data.allUser)) {
-          const activeUsers = response.data.allUser.filter((user) => user.isActive);
-          setServiceUser(activeUsers);
-        } else {
-          console.warn('Expected response.data.allUser to be an array, but got:', typeof response.data.allUser);
-        }
+        const response = await getApi(urls.serviceuser.fetch);
+        const allUser = response?.data?.allUser || [];
+        const formattedUsers = allUser.map((user) => ({
+          id: user._id,
+          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        }));
+        setServiceUser(formattedUsers);
       } catch (error) {
         console.error('Error fetching service user:', error);
       }
@@ -122,17 +139,17 @@ const AddCaseForm = ({ onCancel }) => {
       render={({ field }) => (
         <Autocomplete
           multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          options={options || []}
+          getOptionLabel={(option) => option?.name || ''}
+          isOptionEqualToValue={(option, value) => option?._id === value?._id}
+          value={options?.filter((opt) => field.value?.includes(opt?._id)) || []}
+          onChange={(_, selectedOptions) => field.onChange(selectedOptions?.map((opt) => opt?._id) || [])}
           renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
+            value?.map((option, index) => (
               <Chip
-                label={option.name}
+                label={option?.name || ''}
                 {...getTagProps({ index })}
-                key={option._id}
+                key={option?._id}
                 deleteIcon={
                   <span
                     style={{
@@ -151,7 +168,16 @@ const AddCaseForm = ({ onCancel }) => {
               />
             ))
           }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          renderInput={(params) => (
+            <TextField 
+              {...params} 
+              label={label} 
+              size="small" 
+              error={!!error} 
+              helperText={helperText} 
+              fullWidth 
+            />
+          )}
         />
       )}
     />
@@ -164,11 +190,12 @@ const AddCaseForm = ({ onCancel }) => {
       const formData = new FormData();
 
       formData.append('country', data.countryOfOrigin || '');
-      formData.append('serviceuser', data.type || '');
-      formData.append('date', data.date || '');
+      formData.append('serviceuser', data.serviceUserId || '');
+      formData.append('date', data.date ? dayjs(data.date).format('YYYY-MM-DD') : '');
       formData.append('time', data.time || '');
       formData.append('description', data.description || '');
 
+      // Handle arrays with proper null checks
       (data.beneficiary || []).forEach((id) => {
         formData.append('benificiary[]', id);
       });
@@ -193,16 +220,35 @@ const AddCaseForm = ({ onCancel }) => {
         formData.append('fundraisingActivities[]', id);
       });
 
-      if (serviceId) {
+      // Handle serviceId properly
+      if (session?._id) {
+        // For update request, use the serviceId from the session
+        const sessionServiceId = session.serviceId?._id || session.serviceId;
+        if (!sessionServiceId) {
+          throw new Error('Service ID is required for updating session');
+        }
+        formData.append('serviceId', sessionServiceId);
+      } else if (serviceId) {
+        // For new session, use the serviceId from props
         const idToSend = typeof serviceId === 'string' ? serviceId : serviceId._id;
+        if (!idToSend) {
+          throw new Error('Service ID is required for creating session');
+        }
         formData.append('serviceId', idToSend);
+      } else {
+        throw new Error('Service ID is required');
       }
 
-      if (data.file) {
+      // Handle file upload
+      if (data.file && data.file instanceof File) {
         formData.append('file', data.file);
       }
 
       if (session?._id) {
+        // Ensure we have a valid session ID for update
+        if (!session._id) {
+          throw new Error('Session ID is required for update');
+        }
         response = await updateApi(urls.session.update.replace(':id', session._id), formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -214,10 +260,15 @@ const AddCaseForm = ({ onCancel }) => {
         toast.success('Session added successfully');
       }
 
-      navigate(`/view-service`, { state: { row: serviceId } });
+      const serviceIdToPass = session?.serviceId?._id || session?.serviceId || serviceId;
+      navigate(`/view-service`, { 
+        state: { 
+          row: serviceIdToPass,
+          serviceId: serviceIdToPass
+        } 
+      });
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error(error.response?.data?.message || 'Error submitting session');
+      toast.error(error.message || error.response?.data?.message || 'Error submitting session');
     } finally {
       setIsLoading(false);
     }
@@ -345,31 +396,32 @@ const AddCaseForm = ({ onCancel }) => {
 
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="type"
+                    name="serviceUserId"
                     control={control}
-                    rules={{ required: 'Session Lead is required' }}
-                    render={({ field }) => (
-                      <TextField
-                        select
-                        fullWidth
-                        label="Session Lead"
-                        size="small"
-                        error={!!errors.type}
-                        helperText={errors.type?.message}
-                        {...field}
-                      >
-                        {serviceUser.map((user) => {
-                          const fullName = `${user.personalInfo.firstName.trim()} ${user.personalInfo.lastName.trim()}`;
-                          const userId = user._id?.$oid || user._id || user.uniqueId;
+                    rules={{ required: 'Service user is required' }}
+                    render={({ field }) => {
+                      const selectedUser = serviceUser?.find((user) => user.id === field.value) || null;
 
-                          return (
-                            <MenuItem key={userId} value={userId}>
-                              {fullName}
-                            </MenuItem>
-                          );
-                        })}
-                      </TextField>
-                    )}
+                      return (
+                        <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
+                          <Autocomplete
+                            value={selectedUser}
+                            onChange={(_, value) => field.onChange(value ? value.id : '')}
+                            options={serviceUser || []}
+                            getOptionLabel={(option) => option.name || ''}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Service User" variant="outlined" size="small" error={!!errors.serviceUserId} />
+                            )}
+                          />
+                          {errors.serviceUserId && (
+                            <Typography color="error" variant="caption">
+                              {errors.serviceUserId.message}
+                            </Typography>
+                          )}
+                        </FormControl>
+                      );
+                    }}
                   />
                 </Grid>
               </Grid>

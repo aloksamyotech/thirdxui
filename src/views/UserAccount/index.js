@@ -46,7 +46,7 @@ import EditProfileModal from './editProfile.js';
 import ProfileLogo from 'assets/images/profile.png';
 import Background from 'assets/images/background.jpg';
 import { urls } from 'common/urls.js';
-import { getApi } from 'common/apiClient.js';
+import { getApi } from 'commo-piClient.js';
 import { useEffect } from 'react';
 import moment from 'moment';
 import { imageUrl } from 'common/urls';
@@ -202,7 +202,7 @@ const EmployeeDetails = () => {
 
                       <Box sx={{ position: 'absolute', top: 50, left: 90 }}>
                         <Typography fontSize={15} fontWeight={280} color="black">
-                          {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : 'N/A'}
+                          {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
                         </Typography>
                       </Box>
                     </Box>
@@ -226,7 +226,7 @@ const EmployeeDetails = () => {
                         <Box display="flex" alignItems="center">
                           <LocationOnIcon fontSize="5px" sx={{ color: 'text.secondary' }} />
                           <Typography fontSize="9px" color="#404040">
-                            {userData?.country ?? 'N/A'}
+                            {userData?.country ?? '-'}
                           </Typography>
                         </Box>
 
@@ -246,7 +246,7 @@ const EmployeeDetails = () => {
                           <EmailOutlinedIcon fontSize="10px" sx={{ color: '#6f7082', mr: 1 }} />
                           <Typography fontSize={12}>Email:</Typography>
                         </Box>
-                        <Typography fontSize={12}>{userData?.email || 'N/A'}</Typography>
+                        <Typography fontSize={12}>{userData?.email || '-'}</Typography>
                       </Box>
 
                       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -254,7 +254,7 @@ const EmployeeDetails = () => {
                           <PhoneIcon fontSize="10px" />
                           <Typography fontSize={12}>Contact:</Typography>
                         </Box>
-                        <Typography fontSize={12}>{userData?.phoneNumber || 'N/A'}</Typography>
+                        <Typography fontSize={12}>{userData?.phoneNumber || '-'}</Typography>
                       </Box>
 
                       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -262,7 +262,7 @@ const EmployeeDetails = () => {
                           <LocationOnIcon fontSize="10px" />
                           <Typography fontSize={12}>Location:</Typography>
                         </Box>
-                        <Typography fontSize={12}>{userData?.address || 'N/A'}</Typography>
+                        <Typography fontSize={12}>{userData?.address || '-'}</Typography>
                       </Box>
                     </CardContent>
                   </Card>
@@ -285,7 +285,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         Full Name:
                       </Box>{' '}
-                      {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : 'N/A'}
+                      {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
                     </Typography>
                   </Box>
 
@@ -297,7 +297,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         User ID:
                       </Box>
-                      {userData?.userId || 'N/A'}
+                      {userData?.userId || '-'}
                     </Typography>
                   </Box>
 
@@ -308,7 +308,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         Ethnicity:
                       </Box>{' '}
-                      {userData?.ethnicity || 'N/A'}
+                      {userData?.ethnicity || '-'}
                     </Typography>
                   </Box>
 
@@ -320,7 +320,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         Country:
                       </Box>{' '}
-                      {userData?.country || 'N/A'}
+                      {userData?.country || '-'}
                     </Typography>
                   </Box>
 
@@ -331,7 +331,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         Language:
                       </Box>{' '}
-                      {userData?.language || 'N/A'}
+                      {userData?.language || '-'}
                     </Typography>
                   </Box>
 
@@ -346,7 +346,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         Contact:
                       </Box>{' '}
-                      {userData?.phoneNumber || 'N/A'}
+                      {userData?.phoneNumber || '-'}
                     </Typography>
                   </Box>
 
@@ -358,7 +358,7 @@ const EmployeeDetails = () => {
                       <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
                         Email:
                       </Box>
-                      {userData?.email || 'N/A'}
+                      {userData?.email || '-'}
                     </Typography>
                   </Box>
                 </Box>

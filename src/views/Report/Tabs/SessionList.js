@@ -10,6 +10,7 @@ import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import CheckIcon from '@mui/icons-material/Check';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const CaseList = () => {
   const [rows, setRows] = useState([]);
@@ -39,7 +40,7 @@ const CaseList = () => {
 
           return {
             id: item._id || index,
-            caseid: item._id || '-',
+            caseid: '-',
             serviceUser: fullName || '-',
             dob: item.date ? dayjs(item.date).format('DD/MM/YYYY') : '-',
             status: item.isActive ? 'Open' : 'Closed',
@@ -282,7 +283,7 @@ const CaseList = () => {
 
   return (
     <Grid container>
-      <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="auto" width="100%">
+      <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="100vh" width="100%">
         <DataGrid
           rows={
             loading
@@ -302,6 +303,23 @@ const CaseList = () => {
           pageSizeOptions={[10]}
           rowHeight={65}
           getRowId={(row) => row.id}
+          slots={{
+            toolbar: () => <CustomHeader />,
+            loadingOverlay: () => (
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'self-start',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                }}
+              >
+                <SingleRowLoader />
+              </Box>
+            ),
+            noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
+          }}
           components={{
             Toolbar: () => <CustomHeader />
           }}

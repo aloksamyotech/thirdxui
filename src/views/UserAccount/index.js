@@ -101,8 +101,6 @@ const EmployeeDetails = () => {
         password: values.password,
         newPassword: values.newPassword
       });
-      console.log(response);
-
       if (response.message == 'Success') {
         toast.success('Password changed successfully!');
         // window.location.reload()
@@ -112,16 +110,6 @@ const EmployeeDetails = () => {
       }
     })
   })
-
-  // const handleChangePassword = async () => {
-  //   if (password !== confirmPassword) {
-  //     toast.error("New password and confirm password do not match");
-  //     return;
-  //   }
-  //   const url = urls?.login?.changePassword
-  //   await updateApiPatch(url, { password, newPassword })
-  //   console.log('Password changed!');
-  // };
 
   const empData = {
     email: 'john.doe@example.com',

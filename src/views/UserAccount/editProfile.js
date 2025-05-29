@@ -12,13 +12,31 @@ import {
   Stack
 } from '@mui/material';
 import ProfileLogo from 'assets/images/profile.png';
+import { urls } from 'common/urls';
+import { updateApi } from 'common/apiClient';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
-const EditProfileModal = ({ open, onClose, userData }) => {
+const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
   const [formData, setFormData] = useState(userData);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const onSubmit = async () => {
+    const url = urls?.login?.updateUserById
+    await updateApi(url, formData)
+    toast.success('Profile Updated Successfully')
+    getUserInfo()
+    onClose()
+  }
+
+  useEffect(() => {
+    if (userData) {
+      setFormData(userData);
+    }
+  }, [userData]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -33,14 +51,14 @@ const EditProfileModal = ({ open, onClose, userData }) => {
           p: 3,
           borderRadius: 2,
           width: 800,
-          maxHeight: 500, 
+          maxHeight: 500,
           overflowY: 'auto'
         }}
       >
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar src={ProfileLogo} sx={{ width: 50, height: 50 }} />
           <Stack direction="row" spacing={1}>
-            <Button variant="contained" component="label" sx={{backgroundColor:'#053146'}}>
+            <Button variant="contained" component="label" sx={{ backgroundColor: '#053146' }}>
               UPLOAD A NEW PHOTO
               <input hidden accept="image/*" type="file" />
             </Button>
@@ -54,20 +72,20 @@ const EditProfileModal = ({ open, onClose, userData }) => {
           {[
             { label: 'First Name', name: 'firstName' },
             { label: 'Last Name', name: 'lastName' },
-            { label: 'Phone Number', name: 'phone' },
+            { label: 'Phone Number', name: 'phoneNumber' },
             { label: 'Address', name: 'address' },
             { label: 'Email', name: 'email' },
             { label: 'Organization', name: 'organization' },
             { label: 'State', name: 'state' },
-            { label: 'Zip Code', name: 'zip' }
+            { label: 'Zip Code', name: 'zipCode' }
           ].map((field) => (
-            <Grid item xs={12} sm={6} key={field.name}>
+            <Grid item xs={12} sm={6} key={field?.name}>
               <TextField
                 fullWidth
-                label={field.label}
+                label={field?.label}
                 size='small'
-                name={field.name}
-                value={formData[field.name]}
+                name={field?.name}
+                value={formData[field?.name]}
                 onChange={handleChange}
               />
             </Grid>

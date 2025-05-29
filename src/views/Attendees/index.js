@@ -26,7 +26,8 @@ export default function SessionRegisterPage() {
   });
   const [totalRows, setTotalRows] = useState(0);
   const session = location?.state?.session || {};
-  const sessionId = session?.id || location?.state?.sessionId;
+
+  const sessionId = session?._id || location?.state?.sessionId;
 
   const columns = [
     {
@@ -83,7 +84,6 @@ export default function SessionRegisterPage() {
       setRowsAttendee(formattedUsers);
       setTotalRows(response?.data?.meta?.total || 0);
     } catch (error) {
-      console.error('Failed to fetch attendees:', error);
       toast.error('Failed to load attendees');
     } finally {
       setLoading(false);
@@ -100,7 +100,6 @@ export default function SessionRegisterPage() {
       }));
       setRows(formattedUsers);
     } catch (error) {
-      console.error('Failed to fetch available users:', error);
       toast.error('Failed to load available users');
     }
   };
@@ -122,13 +121,12 @@ export default function SessionRegisterPage() {
 
       if (response.success) {
         toast.success('Attendee added successfully');
-        fetchpeopleAttendee(); 
-        setSelectedUserId(''); 
+        fetchpeopleAttendee();
+        setSelectedUserId('');
       } else {
         toast.error(response.data.message || 'Failed to add attendee');
       }
     } catch (error) {
-      console.error('Error while adding attendee:', error);
       toast.error(error.response?.data?.message || 'Error while adding attendee');
     } finally {
       setIsSubmitting(false);
@@ -178,9 +176,11 @@ export default function SessionRegisterPage() {
         </Box>
       </Box>
 
-<Box sx={{ minHeight: 'auto', mt: '10px' }}>        <Grid container spacing={2}>
+      <Box sx={{ minHeight: 'auto', mt: '10px' }}>
+        {' '}
+        <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <Card style={{ height: 'auto'}}>
+            <Card style={{ height: 'auto' }}>
               <DataGrid
                 rows={loading ? [] : rowsAttendee}
                 columns={columns}

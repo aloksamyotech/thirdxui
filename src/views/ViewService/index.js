@@ -269,6 +269,7 @@ const ViewService = () => {
           locationFilter={locationFilter}
           setLocationFilter={setLocationFilter}
           sessionLeads={sessionLeads}
+          sessionLeadFilter={sessionLeadFilter}
           setSessionLeadFilter={setSessionLeadFilter}
           selectedFilters={['locationFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
           onReset={handleReset}
@@ -303,8 +304,8 @@ const ViewService = () => {
 
                 <Grid item xs={12} md={8}>
                   <Stack>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Box sx={{ maxWidth: '60%' }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" pt={1}>
+                      <Box sx={{ maxWidth: '60%'}}>
                         <Tooltip title={(serviceData?.name || '').toUpperCase()}>
                           <Typography
                             variant="h4"
@@ -356,6 +357,7 @@ const ViewService = () => {
 
                       <Button
                         variant="contained"
+                        size='small'
                         sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 1, whiteSpace: 'nowrap' }}
                         onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                       >

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography, IconButton, Card, Button, Select, MenuItem, FormControl, InputLabel, Tooltip, Stack } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
@@ -169,8 +169,8 @@ export default function SessionRegisterPage() {
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex" alignItems="center">
-          <IconButton onClick={() => navigate('/view-session')}>
-            <ArrowBackIcon />
+          <IconButton onClick={() => navigate('/view-session', { state: { session: session } })}>
+            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>
           <Typography fontWeight="bold">Attendee List</Typography>
         </Box>

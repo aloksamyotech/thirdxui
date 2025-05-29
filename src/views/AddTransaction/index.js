@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Grid, TextField, Card, CardContent, CardHeader, Tabs, Tab, Box, Typography, MenuItem, Button } from '@mui/material';
+import { FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +16,7 @@ const AddCaseForm = ({ onCancel }) => {
   const fileInputRef = useRef(null);
   const [serviceType, setServiceType] = useState([]);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [donorData, setDonorData] = useState([]);
 
   const {
     handleSubmit,
@@ -25,11 +27,32 @@ const AddCaseForm = ({ onCancel }) => {
   } = useForm({
     mode: 'all'
   });
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getalldonor);
+        const allDonors = response.data.allDonor || [];
+
+        const activeDonors = allDonors
+          .filter((donor) => donor.isActive)
+          .map((donor) => ({
+            label: `${donor.personalInfo.firstName || ''} ${donor.personalInfo.lastName || ''}`.trim() || 'Unnamed',
+            value: donor._id?.$oid || donor._id
+          }));
+
+        setDonorData(activeDonors);
+      } catch (error) {
+        console.error('Error fetching donors:', error);
+      }
+    };
+
+    fetchDonors();
+  }, []);
 
   const onSubmit = async (data) => {
     try {
       const payload = {
-        assignedTo: data.assignedTo || '',
+        donorId: data.assignedTo || '',
         campaign: data.campaign || '',
         amountPaid: data.amountPaid || '',
         paymentMethod: data.paymentMethod || '',
@@ -120,23 +143,23 @@ const AddCaseForm = ({ onCancel }) => {
                     <CardContent>
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Assigned To"
-                            {...register('assignedTo', {
-                              required: 'only letter Required',
-                              pattern: {
-                                value: /^[A-Za-z\s]+$/,
-                                message: 'Only letters allowed'
-                              }
-                            })}
-                            onInput={(e) => {
-                              e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, '');
-                            }}
-                            error={!!errors.assignedTo}
-                            helperText={errors.assignedTo?.message}
-                          />
+                          <FormControl fullWidth size="small" error={!!errors.assignedTo}>
+                            <InputLabel id="assigned-to-label">Assigned To</InputLabel>
+                            <Select
+                              labelId="assigned-to-label"
+                              id="assigned-to"
+                              label="Assigned To"
+                              defaultValue=""
+                              {...register('assignedTo', { required: 'Assigned donor is required' })}
+                            >
+                              {donorData.map((donor) => (
+                                <MenuItem key={donor.value} value={donor.value}>
+                                  {donor.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                            <FormHelperText>{errors.assignedTo?.message}</FormHelperText>
+                          </FormControl>
                         </Grid>
 
                         <Grid item xs={12} sm={6}>

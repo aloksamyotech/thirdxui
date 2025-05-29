@@ -36,7 +36,7 @@ const genders = [
   { value: 'Others', label: 'Prefer not to say' }
 ];
 
-const Lead = () => {
+const Volunteer = () => {
   const navigate = useNavigate();
   const [districtFilter, setDistrictFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
@@ -342,7 +342,7 @@ const Lead = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
@@ -385,4 +385,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Volunteer;

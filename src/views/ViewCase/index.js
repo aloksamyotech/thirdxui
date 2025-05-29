@@ -242,8 +242,8 @@ const CaseDetailsPage = () => {
     try {
       const response = await getApi(`${urls.casenote.fetchWithPagination}?caseId=${id}`);
       const allCasesNotes = response?.data?.data || [];
-      const uniqueCreators = [...new Set(allCasesNotes.map(note => note.createdBy))].filter(Boolean);
-      const options = uniqueCreators.map(creator => ({
+      const uniqueCreators = [...new Set(allCasesNotes.map((note) => note.createdBy))].filter(Boolean);
+      const options = uniqueCreators.map((creator) => ({
         value: creator,
         label: creator
       }));
@@ -555,7 +555,7 @@ const CaseDetailsPage = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={70}
                 getRowId={(row) => row.id}
                 slots={{

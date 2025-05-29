@@ -50,7 +50,7 @@ const CustomHeader = () => {
   );
 };
 
-const Lead = () => {
+const ServiceManagement = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
@@ -80,24 +80,18 @@ const Lead = () => {
               fontWeight: 400,
               whiteSpace: 'normal',
               wordBreak: 'break-word',
-              overflowWrap: 'break-word',
+              overflowWrap: 'break-word'
             }}
             mb={1}
           >
             {params.row.name}
           </Typography>
-          <Typography
-            variant="body2"
-            color="textSecondary"
-            sx={{ whiteSpace: 'nowrap' }}
-          >
+          <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap' }}>
             {new Date(params.row.updatedAt).toDateString()}
           </Typography>
         </Stack>
       )
-    }
-    ,
-
+    },
     {
       field: 'serviceType',
       headerName: 'Service Type',
@@ -306,7 +300,6 @@ const Lead = () => {
               <SearchIcon />
             </IconButton>
           </Box>
-
         </Stack>
 
         <Grid container spacing={2}>
@@ -331,9 +324,9 @@ const Lead = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -342,7 +335,7 @@ const Lead = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
-                    pageSizeOptions={[10]}
+                    pageSizeOptions={[5, 10, 25, 50]}
                     rowHeight={70}
                     getRowId={(row) => row._id}
                     slots={{
@@ -354,19 +347,13 @@ const Lead = () => {
                             display: 'flex',
                             alignItems: 'self-start',
                             justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)'
                           }}
                         >
                           <SingleRowLoader />
                         </Box>
                       ),
-                      noRowsOverlay: () => (
-                        loading ? null : (
-                          <Box sx={{ padding: 2, textAlign: 'center' }}>
-                            No data available.
-                          </Box>
-                        )
-                      ),
+                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                     }}
                     onRowClick={(params) => navigate('/view-service', { state: { row: params.row } })}
                     sx={{
@@ -386,4 +373,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default ServiceManagement;

@@ -50,7 +50,7 @@ const CustomHeader = () => {
   );
 };
 
-const Lead = () => {
+const Financial = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
@@ -71,7 +71,6 @@ const Lead = () => {
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [donorOptions, setDonorOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-
 
   const columns = [
     {
@@ -403,7 +402,7 @@ const Lead = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
-                    pageSizeOptions={[10]}
+                    pageSizeOptions={[5, 10, 25, 50]}
                     slots={{
                       toolbar: () => <CustomHeader />,
                       loadingOverlay: () => (
@@ -438,4 +437,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Financial;

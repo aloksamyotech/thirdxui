@@ -11,6 +11,7 @@ import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import Service from 'views/Report/Tabs/Service';
 
 const districts = [
   { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
@@ -37,7 +38,7 @@ const genders = [
   { value: 'Others', label: 'Prefer not to say' }
 ];
 
-const Lead = () => {
+const PeopleManagement = () => {
   const navigate = useNavigate();
   const [districtFilter, setDistrictFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
@@ -342,7 +343,7 @@ const Lead = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
@@ -391,4 +392,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default PeopleManagement;

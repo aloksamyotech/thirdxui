@@ -144,7 +144,7 @@ const User = () => {
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
   ];
-  
+
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
       .then((res) => res.json())
@@ -401,7 +401,7 @@ const User = () => {
                       paginationMode="server"
                       paginationModel={paginationModel}
                       onPaginationModelChange={setPaginationModel}
-                      pageSizeOptions={[10]}
+                      pageSizeOptions={[5, 10, 25, 50]}
                       checkboxSelection
                       rowHeight={65}
                       slots={{

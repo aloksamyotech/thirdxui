@@ -43,6 +43,7 @@ import { urls } from 'common/urls.js';
 import { getApi } from 'common/apiClient.js';
 import { useEffect } from 'react';
 import moment from 'moment';
+import { imageUrl } from 'common/urls';
 
 const EmployeeDetails = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -73,8 +74,10 @@ const EmployeeDetails = () => {
     language: '',
     status: '',
     currency: '',
-    profilePhoto: ''
+    profilePhoto: '',
+    file: ''
   });
+
   const handleChangePassword = () => {
     console.log('Password changed!');
   };
@@ -192,7 +195,7 @@ const EmployeeDetails = () => {
                         }}
                       >
                         <img
-                          src={ProfileLogo}
+                          src={userData.file ? `${imageUrl}${userData?.file}` : ProfileLogo}
                           alt="Profile"
                           style={{
                             width: '100%',

@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Card, CardContent, Typography, Button, Grid, Dialog, DialogTitle, DialogContent, Stack } from '@mui/material';
 import UserBg from 'assets/images/form.png';
 import ServiceUser from 'assets/images/serviceUser.png';
+import { fontSize } from '@mui/system';
 
 const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
   return (
@@ -15,7 +16,7 @@ const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
           width: '63vw',
           maxWidth: 'none',
           borderRadius: 4,
-          height: '90vh',
+          height: '88vh',
           overflow: 'hidden'
         }
       }}
@@ -118,10 +119,10 @@ const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
         </Grid>
 
         <Grid item xs={12} mt={6} sx={{ width: '100%' }}>
-          <Card sx={{ m: 1, border: '1px solid #e0e0e0' }}>
+          <Card sx={{ border: '1px solid #e0e0e0', height: '45vh' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                About
+              <Typography sx={{ fontSize: '14px' }} gutterBottom>
+                ABOUT
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
@@ -150,9 +151,12 @@ const ViewReferralDialog = ({ open, onClose, onAccept, onDecline }) => {
 };
 
 const InfoItem = ({ label, value }) => (
-  <Box display="flex" alignItems="center" mb={1}>
+  <Box display="flex" alignItems="center" mb={2}>
     <Typography variant="body1">
-      {label}: <span>{value}</span>
+      <Box component="strong" sx={{ fontSize: '12px', fontWeight: '100px', mr: 0.5, color: '#5f5f5f' }}>
+        {label}:
+      </Box>
+      <Box component="span">{value}</Box>
     </Typography>
   </Box>
 );

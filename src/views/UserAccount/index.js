@@ -46,16 +46,16 @@ import EditProfileModal from './editProfile.js';
 import ProfileLogo from 'assets/images/profile.png';
 import Background from 'assets/images/background.jpg';
 import { urls } from 'common/urls.js';
-import { getApi } from 'commo-piClient.js';
+import { getApi, updateApiPatch } from 'common/apiClient.js';
 import { useEffect } from 'react';
 import moment from 'moment';
 import { imageUrl } from 'common/urls';
+import { toast } from 'react-toastify';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const EmployeeDetails = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [oldPassword, setOldPassword] = useState('');
   const [emailNotification, setEmailNotification] = useState(true);
   const [copyToPersonalEmail, setCopyToPersonalEmail] = useState(true);
   const [newNotification, setNewNotification] = useState(true);
@@ -83,15 +83,39 @@ const EmployeeDetails = () => {
     profilePhoto: '',
     file: ''
   });
+  const formik = useFormik({
+    initialValues: {
+      password: '',
+      newPassword: '',
+      confirmPassword: ''
+    },
+    validationSchema: Yup.object({
+      password: Yup.string()
+        .required('Current password is required')
+        .min(4, 'Must be at least 4 characters'),
+      newPassword: Yup.string()
+        .required('New password is required')
+        .min(4, 'Must be at least 4 characters'),
+      confirmPassword: Yup.string()
+        .required('Please confirm your new password')
+        .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+    }),
 
-  const handleChangePassword = () => {
-   };
-
-  const handleClear = () => {
-    setPassword('');
-    setConfirmPassword('');
-    setOldPassword('');
-  };
+    onSubmit: (async (values) => {
+      const url = urls?.login?.changePassword;
+      const response = await updateApiPatch(url, {
+        password: values.password,
+        newPassword: values.newPassword
+      });
+      if (response.message == 'Success') {
+        toast.success('Password changed successfully!');
+        // window.location.reload()
+        formik.resetForm();
+      } else {
+        toast.error('Current Password Is Incorrect')
+      }
+    })
+  })
 
   const empData = {
     email: 'john.doe@example.com',
@@ -378,8 +402,11 @@ const EmployeeDetails = () => {
                     type="password"
                     fullWidth
                     margin="normal"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
+                    name='password'
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
                   />
                 </Grid>
                 <Grid container spacing={2}>
@@ -389,9 +416,11 @@ const EmployeeDetails = () => {
                       type="password"
                       fullWidth
                       margin="normal"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                      name='newPassword'
+                      value={formik.values.newPassword}
+                      onChange={formik.handleChange}
+                      error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
+                      helperText={formik.touched.newPassword && formik.errors.newPassword} />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
@@ -399,9 +428,11 @@ const EmployeeDetails = () => {
                       type="password"
                       fullWidth
                       margin="normal"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
+                      name='confirmPassword'
+                      value={formik.values.confirmPassword}
+                      onChange={formik.handleChange}
+                      error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                      helperText={formik.touched.confirmPassword && formik.errors.confirmPassword} />
                   </Grid>
                 </Grid>
                 <Box sx={{ mt: 2, fontSize: 14, color: 'gray' }}>
@@ -416,10 +447,10 @@ const EmployeeDetails = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Stack direction="row" spacing={2} justifyContent="flex-end">
-                      <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={handleChangePassword}>
+                      <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={formik.handleSubmit}>
                         CHANGE PASSWORD
                       </Button>
-                      <Button variant="outlined" color="error" onClick={handleClear}>
+                      <Button variant="outlined" color="error" onClick={formik.resetForm}>
                         CANCEL
                       </Button>
                     </Stack>

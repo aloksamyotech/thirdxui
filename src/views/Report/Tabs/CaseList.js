@@ -10,6 +10,7 @@ import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import config from '../../../config';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import CheckIcon from '@mui/icons-material/Check';
 
 const CaseList = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -26,30 +27,31 @@ const CaseList = () => {
       field: 'caseid',
       headerName: 'Case ID',
       width: 100,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'serviceUser',
       headerName: 'Service User',
       width: 150,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'dateOpened',
       headerName: 'Date Opened',
       width: 150,
-      renderCell: (params) => (
-        <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
-          {params?.value}
-        </Typography>
-      )
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'status',
       headerName: 'Status',
       width: 100,
       renderCell: (params) => (
-        <Button size="small" variant="outlined" sx={{ p: 0, m: 0, borderRadius: '10px', color: '#ff7672', border: '1px solid #ff7672' }}>
+        <Button
+          size="small"
+          variant="outlined"
+          sx={{ p: 0, m: 0, pr: 0.5, pl: 0.5, borderRadius: '15px', color: '#737586', border: '1px solid #737586', fontSize: '0.65rem' }}
+          startIcon={<CheckIcon />}
+        >
           {params.value}
         </Button>
       )
@@ -61,7 +63,7 @@ const CaseList = () => {
       renderCell: (params) => (
         <Stack direction="row">
           <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
-          <Typography sx={{ ml: '5px' }}>{params.row.country}</Typography>
+          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country}</Typography>
         </Stack>
       )
     },
@@ -69,13 +71,13 @@ const CaseList = () => {
       field: 'owner',
       headerName: 'Owner',
       width: 100,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
       width: 300,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     }
   ];
 
@@ -228,7 +230,12 @@ const CaseList = () => {
             checkboxSelection
             sx={{
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#eeeeee'
+                backgroundColor: '#eeeeee',
+                fontSize: '0.75rem'
+              },
+              '& .MuiDataGrid-checkboxInput': {
+                padding: '2px',
+                transform: 'scale(0.8)'
               }
             }}
           />

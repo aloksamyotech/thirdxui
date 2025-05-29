@@ -24,6 +24,12 @@ import {
   Paper,
   IconButton
 } from '@mui/material';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import OutlinedFlagIcon from '@mui/icons-material/OutlinedFlag';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import OpacityOutlinedIcon from '@mui/icons-material/OpacityOutlined';
+
 import AntSwitch from 'components/AntSwitch.js';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -40,7 +46,7 @@ import EditProfileModal from './editProfile.js';
 import ProfileLogo from 'assets/images/profile.png';
 import Background from 'assets/images/background.jpg';
 import { urls } from 'common/urls.js';
-import { getApi } from 'common/apiClient.js';
+import { getApi } from 'commo-piClient.js';
 import { useEffect } from 'react';
 import moment from 'moment';
 import { imageUrl } from 'common/urls';
@@ -79,8 +85,7 @@ const EmployeeDetails = () => {
   });
 
   const handleChangePassword = () => {
-    console.log('Password changed!');
-  };
+   };
 
   const handleClear = () => {
     setPassword('');
@@ -99,14 +104,13 @@ const EmployeeDetails = () => {
     language: 'English'
   };
   const getUserInfo = async () => {
-    const url = urls?.login?.getUserProfile
-    const response = await getApi(url)
+    const url = urls?.login?.getUserProfile;
+    const response = await getApi(url);
     setUserData(response?.data?.findAdmin);
-  }
+  };
   useEffect(() => {
-    getUserInfo()
-  }, [])
-
+    getUserInfo();
+  }, []);
 
   return (
     <>
@@ -155,180 +159,208 @@ const EmployeeDetails = () => {
 
           {tabValue === 0 && (
             <Grid container spacing={2}>
-              <Grid item xs={12} md={6} mt={2}>
-                <Box p={2} boxShadow={3} borderRadius={2} bgcolor="background.paper">
-                  <Card sx={{ maxWidth: 400, borderRadius: 3, overflow: 'hidden' }}>
+              <Grid item xs={12} md={4} sm={5} mt={2}>
+                <Box>
+                  <Card sx={{ maxWidth: 360, borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
                     <Box
                       sx={{
-                        height: 80,
+                        height: 70,
                         backgroundImage: `url(${Background})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat',
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        px: 15
+                        backgroundRepeat: 'no-repeat'
                       }}
                     >
-                      <Typography variant="h5" fontWeight="bold" color="#6f7082" sx={{ mt: 8, position: 'relative' }}>
-                        {userData?.firstName || userData?.lastName
-                          ? `${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`
-                          : "N/A"}
-                      </Typography>
-                    </Box>
-
-                    <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
                       <Box
                         sx={{
-                          width: 80,
-                          height: 80,
-                          border: '4px solid white',
-                          position: 'relative',
-                          top: '-50px',
-                          borderRadius: '8px',
+                          width: 60,
+                          height: 60,
+                          borderRadius: 2,
+                          border: '3px solid white',
+                          backgroundColor: '#e0e7ff',
                           overflow: 'hidden',
-                          backgroundColor: '#ADD8E6',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center'
+                          justifyContent: 'center',
+                          position: 'absolute',
+                          top: 40,
+                          left: 16,
+                          zIndex: 2
                         }}
                       >
-                        <img
-                          src={userData.file ? `${imageUrl}${userData?.file}` : ProfileLogo}
+                        <Box
+                          component="img"
+                          src={userData.file ? `${imageUrl}${userData.file}` : ProfileLogo}
                           alt="Profile"
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
+                          sx={{
+                            width: '80%',
+                            height: '80%',
+                            objectFit: 'contain'
                           }}
                         />
                       </Box>
 
-                      <Stack direction="row" alignItems="center" flexWrap="wrap" sx={{ mt: -8 }} spacing={1}>
+                      <Box sx={{ position: 'absolute', top: 50, left: 90 }}>
+                        <Typography fontSize={15} fontWeight={280} color="black">
+                          {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <CardContent>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        justifyContent="flex-start"
+                        flexWrap="wrap"
+                        sx={{ pl: '65px', pr: 1 }}
+                      >
                         <Box display="flex" alignItems="center" gap={0.5}>
-                          <WorkIcon fontSize="small" sx={{ color: '#6f7082' }} />
-                          <Typography variant="body2" color="text.secondary">
+                          <OpacityOutlinedIcon fontSize="5px" sx={{ color: '#6f7082' }} />
+                          <Typography fontSize="9px" color="#404040">
                             Role
                           </Typography>
                         </Box>
 
-                        <Box display="flex" alignItems="center" gap={0.5}>
-                          <CalendarTodayIcon fontSize="small" sx={{ color: '#6f7082' }} />
-                          <Typography variant="body2" color="text.secondary">
-                            Joined {moment(userData?.createdAt).format('MMMM YYYY')}
+                        <Box display="flex" alignItems="center">
+                          <LocationOnIcon fontSize="5px" sx={{ color: 'text.secondary' }} />
+                          <Typography fontSize="9px" color="#404040">
+                            {userData?.country ?? '-'}
                           </Typography>
                         </Box>
-                        <Box display="flex" alignItems="center" gap={0.2}>
-                          <LocationOnIcon fontSize="small" sx={{ color: '#6f7082' }} />
-                          <Typography variant="body2" color="text.secondary">
-                            {userData?.country ?? 'N/A'}
+
+                        <Box display="flex" alignItems="center">
+                          <CalendarTodayIcon fontSize="5px" />
+                          <Typography fontSize="9px" color="#404040">
+                            Joined: {moment(userData?.createdAt).format('MMMM YYYY')}
                           </Typography>
                         </Box>
                       </Stack>
                     </CardContent>
 
-                    <CardContent sx={{ mt: -9 }}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        Contact Information
-                      </Typography>
-                      <Divider sx={{ mb: 2 }} />
-
-                      <Box display="flex" alignItems="center" mb={2}>
-                        <EmailIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Email:</b> {userData?.email || 'N/A'}
-                        </Typography>
+                    <Divider />
+                    <CardContent sx={{ pt: 2 }}>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <EmailOutlinedIcon fontSize="10px" sx={{ color: '#6f7082', mr: 1 }} />
+                          <Typography fontSize={12}>Email:</Typography>
+                        </Box>
+                        <Typography fontSize={12}>{userData?.email || '-'}</Typography>
                       </Box>
 
-                      <Box display="flex" alignItems="center" mb={2}>
-                        <PhoneIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Contact:</b> {userData?.phoneNumber || 'N/A'}
-                        </Typography>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <PhoneIcon fontSize="10px" />
+                          <Typography fontSize={12}>Contact:</Typography>
+                        </Box>
+                        <Typography fontSize={12}>{userData?.phoneNumber || '-'}</Typography>
                       </Box>
 
-                      <Box display="flex" alignItems="center" mb={2}>
-                        <LocationOnIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Location:</b> {userData?.address || 'N/A'}
-                        </Typography>
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <LocationOnIcon fontSize="10px" />
+                          <Typography fontSize={12}>Location:</Typography>
+                        </Box>
+                        <Typography fontSize={12}>{userData?.address || '-'}</Typography>
                       </Box>
                     </CardContent>
                   </Card>
                 </Box>
               </Grid>
 
-              <Grid item xs={12} md={6} mt={2}>
-                <Box p={1} boxShadow={3} borderRadius={2} bgcolor="background.paper">
-                  <Card>
-                    <CardContent>
-                      <Box display="flex" alignItems="center" justifyContent="space-between">
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>
-                          About
-                        </Typography>
-                        <IconButton onClick={() => setOpen(true)}>
-                          <BorderColorIcon color="primary" />
-                        </IconButton>
-                      </Box>
-                      <Divider sx={{ mb: 1 }} />
+              <Grid item xs={12} md={8} sm={7} mt={2}>
+                <Box p={3} bgcolor="#f9f9f9" borderRadius={2} border="1px solid #e0e0e0" height="60vh" width="103%">
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Typography variant="subtitle2">ABOUT</Typography>
+                    <IconButton onClick={() => setOpen(true)} size="small">
+                      <BorderColorIcon sx={{ fontSize: 16, color: '#3f51b5' }} />
+                    </IconButton>
+                  </Box>
 
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <PersonIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Full Name:</b> {userData?.firstName || userData?.lastName
-                            ? `${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`
-                            : "N/A"}
-                        </Typography>
-                      </Box>
+                  <Box mt={2} display="flex" alignItems="center" mb={1.5}>
+                    <PersonOutlineIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
 
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <BadgeIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>User ID:</b> {userData?.userId || 'N/A'}
-                        </Typography>
-                      </Box>
+                    <Typography fontSize={13}>
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        Full Name:
+                      </Box>{' '}
+                      {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
+                    </Typography>
+                  </Box>
 
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <StarBorderIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Ethnicity:</b> {userData?.ethnicity || 'N/A'}
-                        </Typography>
-                      </Box>
+                  <Box display="flex" alignItems="center" mb={1.5}>
+                    <CheckOutlinedIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
 
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <PublicIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Country:</b> {userData?.country || 'N/A'}
-                        </Typography>
+                    <Typography fontSize={13}>
+                      {' '}
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        User ID:
                       </Box>
+                      {userData?.userId || '-'}
+                    </Typography>
+                  </Box>
 
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <TranslateIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Language:</b> {userData?.language || 'N/A'}
-                        </Typography>
-                      </Box>
+                  <Box display="flex" alignItems="center" mb={1.5}>
+                    <StarBorderIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
+                    <Typography fontSize={13}>
+                      {' '}
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        Ethnicity:
+                      </Box>{' '}
+                      {userData?.ethnicity || '-'}
+                    </Typography>
+                  </Box>
 
-                      <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>
-                        Contact
-                      </Typography>
-                      <Divider sx={{ mb: 2 }} />
+                  <Box display="flex" alignItems="center" mb={1.5}>
+                    <OutlinedFlagIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
 
-                      <Box display="flex" alignItems="center" mb={1}>
-                        <PhoneIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Phone:</b> {userData?.phoneNumber || 'N/A'}
-                        </Typography>
+                    <Typography fontSize={13}>
+                      {' '}
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        Country:
+                      </Box>{' '}
+                      {userData?.country || '-'}
+                    </Typography>
+                  </Box>
+
+                  <Box display="flex" alignItems="center" mb={3}>
+                    <TranslateIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
+                    <Typography fontSize={13}>
+                      {' '}
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        Language:
+                      </Box>{' '}
+                      {userData?.language || '-'}
+                    </Typography>
+                  </Box>
+
+                  <Typography variant="subtitle2" gutterBottom mb={2}>
+                    CONTACTS
+                  </Typography>
+
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <PhoneIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
+                    <Typography fontSize={13}>
+                      {' '}
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        Contact:
+                      </Box>{' '}
+                      {userData?.phoneNumber || '-'}
+                    </Typography>
+                  </Box>
+
+                  <Box display="flex" alignItems="center">
+                    <EmailOutlinedIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
+
+                    <Typography fontSize={13}>
+                      {' '}
+                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                        Email:
                       </Box>
-                      <Box display="flex" alignItems="center">
-                        <EmailIcon sx={{ color: '#6f7082', mr: 1 }} />
-                        <Typography variant="body1">
-                          <b>Email:</b> {userData?.email || 'N/A'}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
+                      {userData?.email || '-'}
+                    </Typography>
+                  </Box>
                 </Box>
               </Grid>
             </Grid>

@@ -23,7 +23,7 @@ const CaseList = () => {
       headerName: 'Receipt No.',
       flex: 1,
       renderCell: (params) => (
-        <Typography variant="body2" fontWeight="500">
+        <Typography variant="body2" fontWeight="500" sx={{ fontSize: '12px' }}>
           #{params.value}
         </Typography>
       )
@@ -39,7 +39,8 @@ const CaseList = () => {
             fontWeight: 'normal',
             whiteSpace: 'normal',
             wordBreak: 'break-word',
-            overflowWrap: 'break-word'
+            overflowWrap: 'break-word',
+            fontSize: '12px'
           }}
         >
           {params.value}
@@ -50,7 +51,7 @@ const CaseList = () => {
       field: 'title',
       headerName: 'Credited At',
       flex: 1,
-      renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'status',
@@ -59,7 +60,7 @@ const CaseList = () => {
       headerAlign: 'center',
       align: 'center',
       renderCell: (params) => (
-        <Typography variant="body2" fontWeight="600" sx={{ color: 'green' }}>
+        <Typography variant="body2" fontWeight="600" sx={{ color: 'green', fontSize: '12px' }}>
           {params.value}
         </Typography>
       )
@@ -70,7 +71,11 @@ const CaseList = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ fontSize: '12px' }}>
+          {params.value}
+        </Typography>
+      )
     }
   ];
   useEffect(() => {
@@ -132,7 +137,7 @@ const CaseList = () => {
             sx={{
               fontWeight: 'bold',
               color: '#333',
-              fontSize: '14px',
+              fontSize: '13px',
               lineHeight: '36px'
             }}
           >
@@ -142,39 +147,41 @@ const CaseList = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '30px',
-              paddingLeft: '16px',
-              border: '1px solid #e0e0e0',
-              width: '250px',
-              height: '30px',
-              marginLeft: '140px'
+              gap: 1
             }}
           >
-            <InputBase
-              placeholder="Search..."
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleFilter();
-                }
-              }}
+            <Box
               sx={{
-                flex: 1,
-                color: 'text.primary'
-              }}
-            />
-            <IconButton
-              sx={{
-                // marginRight: '8px',
-                width: 32,
-                height: 32,
-                cursor: 'pointer'
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: '30px',
+                paddingLeft: '16px',
+                border: '1px solid #e0e0e0',
+                width: '250px',
+                height: '30px'
               }}
             >
-              <SearchIcon />
-            </IconButton>
+              <InputBase
+                placeholder="Search..."
+                sx={{
+                  flex: 1,
+                  color: 'text.primary'
+                }}
+              />
+              <IconButton
+                sx={{
+                  marginRight: '8px',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer'
+                }}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Box>
+
+            <GridToolbarExport />
           </Box>
-          <GridToolbarExport />
         </GridToolbarContainer>
       </Box>
     );
@@ -225,6 +232,14 @@ const CaseList = () => {
             sx={{
               '& .MuiDataGrid-row': {
                 borderBottom: '1px solid #ccc'
+              },
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: '#eeeeee',
+                fontSize: '0.75rem'
+              },
+              '& .MuiDataGrid-checkboxInput': {
+                padding: '2px',
+                transform: 'scale(0.8)'
               }
             }}
           />

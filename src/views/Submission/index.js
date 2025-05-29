@@ -1,4 +1,4 @@
-import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip, InputBase } from '@mui/material';
+import { Stack, Grid, TextField, Card, Box, Typography, IconButton, Chip, Tooltip, InputBase, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -99,7 +99,8 @@ const Lead = () => {
         description: item?.formId?.title,
         campaign: item?.template,
         title: "help",
-        submissionDate
+        submissionDate,
+        status: item?.status
       }
       return data
     })
@@ -148,6 +149,21 @@ const Lead = () => {
       renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
     },
     {
+      field: 'status',
+      headerName: 'Status',
+      flex: 0.8,
+      renderCell: (params) =>
+        <Button size='small' variant='contained'
+          sx={{
+            color: (params?.value) === 'PENDING' ? '#ffc107' : ((params?.value) === 'APPROVED' ? '#00c853' : '#d84315'),
+            backgroundColor: (params?.value) === 'PENDING' ? '#fff8e1' : ((params?.value) === 'APPROVED' ? '#b9f6ca' : '#fbe9e7'), boxShadow: 'none', borderRadius: '10px', padding: '0px', fontWeight: '400',
+            '&:hover': {
+              color: (params?.value) === 'PENDING' ? '#ffc107' : ((params?.value) === 'APPROVED' ? '#00c853' : '#d84315'),
+              backgroundColor: (params?.value) === 'PENDING' ? '#fff8e1' : ((params?.value) === 'APPROVED' ? '#b9f6ca' : '#fbe9e7'), boxShadow: 'none'
+            }
+          }}>{params?.value}</Button>
+    },
+    {
       field: 'edit',
       headerName: 'Edit',
       flex: 0.3,
@@ -156,7 +172,7 @@ const Lead = () => {
       sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <ReadMoreIcon sx={{cursor:'pointer'}} onClick={() => handleNavigate(params.row.id)} />
+          <ReadMoreIcon sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.id)} />
           <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" onClick={() => handleEdit(params.row)} />
         </Box>
       )

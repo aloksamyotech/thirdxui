@@ -66,7 +66,7 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
     update: `${baseUrl}/session/editSession/:id`,
-    fetchWithPagination:`${baseUrl}/session/allwithpagination`
+    fetchWithPagination: `${baseUrl}/session/allwithpagination`
 
   },
   casenote: {
@@ -85,7 +85,7 @@ export const urls = Object.freeze({
     create: `${baseUrl}/attendees/addAttendee`,
     getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`
   },
-  dashboard:{
+  dashboard: {
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,
     getTotalSession: `${baseUrl}/dashboard/totalSession`,
     getTotalActiveUser: `${baseUrl}/dashboard/totalActiveUser`,
@@ -95,6 +95,8 @@ export const urls = Object.freeze({
   },
   login: {
     login: `${baseUrl}/admin/login`,
-    register: `${baseUrl}/admin/`
+    register: `${baseUrl}/admin/`,
+    getUserProfile: `${baseUrl}/admin/getUserById`,
+    updateUserById: `${baseUrl}/admin/updateUserById`
   }
 });

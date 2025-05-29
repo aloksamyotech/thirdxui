@@ -39,6 +39,10 @@ import BorderColorIcon from '@mui/icons-material/BorderColor';
 import EditProfileModal from './editProfile.js';
 import ProfileLogo from 'assets/images/profile.png';
 import Background from 'assets/images/background.jpg';
+import { urls } from 'common/urls.js';
+import { getApi } from 'common/apiClient.js';
+import { useEffect } from 'react';
+import moment from 'moment';
 
 const EmployeeDetails = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -56,23 +60,21 @@ const EmployeeDetails = () => {
   const [business, setBusiness] = useState(true);
   const [notificationTime, setNotificationTime] = useState('online');
   const [open, setOpen] = useState(false);
-
-  const userData = {
-    firstName: 'John',
-    lastName: 'Doe',
-    phone: '+1234567890',
-    address: '123 Main St, Vatican City',
-    email: 'johndoe@example.com',
-    organization: 'Tech Corp',
-    state: 'Rome',
-    country: 'Vatican City',
-    zip: '00120',
-    language: 'English',
-    status: 'Active',
-    currency: 'EUR',
-    profilePhoto: 'https://via.placeholder.com/100'
-  };
-
+  const [userData, setUserData] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    address: '',
+    email: '',
+    organization: '',
+    state: '',
+    country: '',
+    zipCode: '',
+    language: '',
+    status: '',
+    currency: '',
+    profilePhoto: ''
+  });
   const handleChangePassword = () => {
     console.log('Password changed!');
   };
@@ -93,6 +95,15 @@ const EmployeeDetails = () => {
     country: 'USA',
     language: 'English'
   };
+  const getUserInfo = async () => {
+    const url = urls?.login?.getUserProfile
+    const response = await getApi(url)
+    setUserData(response?.data?.findAdmin);
+  }
+  useEffect(() => {
+    getUserInfo()
+  }, [])
+
 
   return (
     <>
@@ -158,7 +169,9 @@ const EmployeeDetails = () => {
                       }}
                     >
                       <Typography variant="h5" fontWeight="bold" color="#6f7082" sx={{ mt: 8, position: 'relative' }}>
-                        John Doe
+                        {userData?.firstName || userData?.lastName
+                          ? `${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`
+                          : "N/A"}
                       </Typography>
                     </Box>
 
@@ -200,13 +213,13 @@ const EmployeeDetails = () => {
                         <Box display="flex" alignItems="center" gap={0.5}>
                           <CalendarTodayIcon fontSize="small" sx={{ color: '#6f7082' }} />
                           <Typography variant="body2" color="text.secondary">
-                            Joined April 2024
+                            Joined {moment(userData?.createdAt).format('MMMM YYYY')}
                           </Typography>
                         </Box>
                         <Box display="flex" alignItems="center" gap={0.2}>
                           <LocationOnIcon fontSize="small" sx={{ color: '#6f7082' }} />
                           <Typography variant="body2" color="text.secondary">
-                            USA
+                            {userData?.country ?? 'N/A'}
                           </Typography>
                         </Box>
                       </Stack>
@@ -221,21 +234,21 @@ const EmployeeDetails = () => {
                       <Box display="flex" alignItems="center" mb={2}>
                         <EmailIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Email:</b> {empData.email || 'N/A'}
+                          <b>Email:</b> {userData?.email || 'N/A'}
                         </Typography>
                       </Box>
 
                       <Box display="flex" alignItems="center" mb={2}>
                         <PhoneIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Contact:</b> {empData.phone || 'N/A'}
+                          <b>Contact:</b> {userData?.phoneNumber || 'N/A'}
                         </Typography>
                       </Box>
 
                       <Box display="flex" alignItems="center" mb={2}>
                         <LocationOnIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Location:</b> {empData.location || 'N/A'}
+                          <b>Location:</b> {userData?.address || 'N/A'}
                         </Typography>
                       </Box>
                     </CardContent>
@@ -260,35 +273,37 @@ const EmployeeDetails = () => {
                       <Box display="flex" alignItems="center" mb={1}>
                         <PersonIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Full Name:</b> {empData.fullName || 'N/A'}
+                          <b>Full Name:</b> {userData?.firstName || userData?.lastName
+                            ? `${userData?.firstName ?? ""} ${userData?.lastName ?? ""}`
+                            : "N/A"}
                         </Typography>
                       </Box>
 
                       <Box display="flex" alignItems="center" mb={1}>
                         <BadgeIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>User ID:</b> {empData.userId || 'N/A'}
+                          <b>User ID:</b> {userData?.userId || 'N/A'}
                         </Typography>
                       </Box>
 
                       <Box display="flex" alignItems="center" mb={1}>
                         <StarBorderIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Ethnicity:</b> {empData.ethnicity || 'N/A'}
+                          <b>Ethnicity:</b> {userData?.ethnicity || 'N/A'}
                         </Typography>
                       </Box>
 
                       <Box display="flex" alignItems="center" mb={1}>
                         <PublicIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Country:</b> {empData.country || 'N/A'}
+                          <b>Country:</b> {userData?.country || 'N/A'}
                         </Typography>
                       </Box>
 
                       <Box display="flex" alignItems="center" mb={1}>
                         <TranslateIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Language:</b> {empData.language || 'N/A'}
+                          <b>Language:</b> {userData?.language || 'N/A'}
                         </Typography>
                       </Box>
 
@@ -300,13 +315,13 @@ const EmployeeDetails = () => {
                       <Box display="flex" alignItems="center" mb={1}>
                         <PhoneIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Phone:</b> {empData.phone || 'N/A'}
+                          <b>Phone:</b> {userData?.phoneNumber || 'N/A'}
                         </Typography>
                       </Box>
                       <Box display="flex" alignItems="center">
                         <EmailIcon sx={{ color: '#6f7082', mr: 1 }} />
                         <Typography variant="body1">
-                          <b>Email:</b> {empData.email || 'N/A'}
+                          <b>Email:</b> {userData?.email || 'N/A'}
                         </Typography>
                       </Box>
                     </CardContent>
@@ -508,7 +523,7 @@ const EmployeeDetails = () => {
 
                 <Grid container spacing={2} sx={{ justifyContent: 'flex-end' }}>
                   <Grid item>
-                    <Button variant="contained" sx={{backgroundColor:'#053146'}}>
+                    <Button variant="contained" sx={{ backgroundColor: '#053146' }}>
                       SAVE CHANGES
                     </Button>
                   </Grid>
@@ -523,8 +538,7 @@ const EmployeeDetails = () => {
           )}
         </Box>
       </Grid>
-
-      <EditProfileModal open={open} onClose={() => setOpen(false)} userData={userData} />
+      <EditProfileModal open={open} onClose={() => setOpen(false)} userData={userData} getUserInfo={getUserInfo} />
     </>
   );
 };

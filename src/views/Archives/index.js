@@ -34,7 +34,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const BulkDelete = () => {
+const Archives = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [activityType, setActivityTypeFilter] = useState('');
@@ -70,7 +70,6 @@ const BulkDelete = () => {
       setConfirmUnarchiveOpen(false);
       fetchpeople();
     } catch (error) {
-      console.error('Error unarchiving user:', error);
       toast.error('Failed to unarchive the user.');
     }
   };
@@ -78,6 +77,22 @@ const BulkDelete = () => {
   const handleUnarchiveClick = (user) => {
     setSelectedUser(user);
     setConfirmUnarchiveOpen(true);
+  };
+
+  const handleViewInfo = (userId, role) => {
+    if (role === 'service_user' || role === 'volunteer') {
+      navigate('/view-people', { state: { id: userId, isArchive: true } });
+    } else if (role === 'donor') {
+      const user = rows.find(row => row.id === userId);
+      navigate('/view-donor', { 
+        state: { 
+          id: userId, 
+          serialNumber: user.serialNumber,
+          subRole: user.subRole,
+          isArchive: true 
+        } 
+      });
+    }
   };
 
   const dateAddedFilters = [
@@ -105,7 +120,6 @@ const BulkDelete = () => {
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
       queryParams.append('archive', 'true');
-      queryParams.append('role', 'service_user');
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
@@ -113,19 +127,19 @@ const BulkDelete = () => {
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
         serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`,
+        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''} ${user.companyInformation?.companyName || ''}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
         postcode: user.contactInfo?.postcode || '',
-        type: 'person'
+        type: 'person',
+        role: user.role || 'service_user'
       }));
 
       setRows(formattedUsers);
       setTotalRows(pagination?.total);
     } catch (error) {
-      console.error('Failed to fetch services:', error);
       toast.error('Failed to fetch archived users');
     } finally {
       setLoading(false);
@@ -210,7 +224,7 @@ const BulkDelete = () => {
                 {params.row.name} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}, {params.row.postcode}, {params.row.country}
+                {params.row.address} {params.row.postcode} {params.row.country}
               </Typography>
             </Box>
           </Stack>
@@ -222,7 +236,7 @@ const BulkDelete = () => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Info" arrow>
-              <IconButton>
+              <IconButton onClick={() => handleViewInfo(params.row.id, params.row.role)}>
                 <InfoIcon sx={{ color: '#49494c' }} />
               </IconButton>
             </Tooltip>
@@ -356,4 +370,4 @@ const BulkDelete = () => {
   );
 };
 
-export default BulkDelete;
+export default Archives;

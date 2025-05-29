@@ -28,14 +28,14 @@ const ServiceList = () => {
       headerName: 'Case ID',
       width: 100,
       align: 'center',
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'name',
       headerName: 'Name',
       width: 150,
       renderCell: (params) => (
-        <Typography>
+        <Typography sx={{ fontSize: '12px' }}>
           {params?.row?.firstName} {params?.row?.lastName}
           {params?.value}
         </Typography>
@@ -45,7 +45,7 @@ const ServiceList = () => {
       field: 'dob',
       headerName: 'DOB',
       width: 100,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'age',
@@ -79,7 +79,7 @@ const ServiceList = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
           )}
-          <Typography sx={{ ml: '5px' }}>{params.row.country}</Typography>
+          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country}</Typography>
         </Stack>
       )
     },
@@ -87,19 +87,19 @@ const ServiceList = () => {
       field: 'gender',
       headerName: 'Gender',
       width: 100,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
       width: 100,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     },
     {
       field: 'no',
       headerName: 'ContactNo.',
       width: 150,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
     }
   ];
   useEffect(() => {
@@ -131,13 +131,12 @@ const ServiceList = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            SERVICE USER REPORT LIST
+            Service User Report List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
@@ -263,7 +262,12 @@ const ServiceList = () => {
             }}
             sx={{
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#eeeeee'
+                backgroundColor: '#eeeeee',
+                fontSize: '0.75rem'
+              },
+              '& .MuiDataGrid-checkboxInput': {
+                padding: '2px',
+                transform: 'scale(0.8)'
               }
             }}
           />

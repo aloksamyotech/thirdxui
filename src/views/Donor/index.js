@@ -25,7 +25,7 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const Lead = () => {
+const Donor = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
@@ -157,7 +157,7 @@ const Lead = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);
@@ -253,7 +253,7 @@ const Lead = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);
@@ -332,16 +332,6 @@ const Lead = () => {
               </IconButton>
             </Box>
 
-            {/* <TextField
-              size="small"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '350px' }}
-            /> */}
           </Stack>
           <Grid container spacing={2}>
             <FilterPanel
@@ -378,11 +368,10 @@ const Lead = () => {
                   columns={columns}
                   rowCount={totalRows}
                   loading={loading}
-                  pagination
+                  pageSizeOptions={[5, 10, 25, 50]}
                   paginationMode="server"
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
-                  pageSizeOptions={[10]}
                   rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
@@ -423,4 +412,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Donor;

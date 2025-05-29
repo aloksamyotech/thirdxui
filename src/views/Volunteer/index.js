@@ -36,7 +36,7 @@ const genders = [
   { value: 'Others', label: 'Prefer not to say' }
 ];
 
-const Lead = () => {
+const Volunteer = () => {
   const navigate = useNavigate();
   const [districtFilter, setDistrictFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
@@ -158,7 +158,7 @@ const Lead = () => {
       const pagination = response?.data?.meta || { total: 0 };
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        serialNumber: `#${user?.uniqueId}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
@@ -216,7 +216,7 @@ const Lead = () => {
       const pagination = response?.data?.meta || { total: 0 };
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        serialNumber: `#${user?.uniqueId}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
@@ -342,7 +342,7 @@ const Lead = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
@@ -385,4 +385,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Volunteer;

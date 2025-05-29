@@ -190,7 +190,7 @@ export default function SessionRegisterPage() {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[5]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: { id: params.row.attendeeId } })}

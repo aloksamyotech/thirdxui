@@ -12,7 +12,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const Lead = () => {
+const Case = () => {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [serviceTypeFilter, setServiceTypeFilterOptions] = useState([]);
@@ -346,11 +346,10 @@ const Lead = () => {
                     columns={columns}
                     rowCount={totalRows}
                     loading={loading}
-                    pagination
+                    pageSizeOptions={[5, 10, 25, 50]}
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
-                    pageSizeOptions={[10]}
                     rowHeight={65}
                     getRowId={(row) => row.id}
                     slots={{
@@ -389,4 +388,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Case;

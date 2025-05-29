@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 
 const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
   const [formData, setFormData] = useState(userData);
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -37,10 +38,12 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
         form.append(key, formData[key]);
       }
     }
+    setLoading(true)
     await updateApi(url, form)
     toast.success('Profile Updated Successfully')
     getUserInfo()
     onClose()
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -183,7 +186,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
         </Grid>
 
         <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
-          <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={onSubmit}>
+          <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={onSubmit} disabled={loading}>
             SAVE CHANGES
           </Button>
           <Button onClick={onClose} variant="outlined" color="error">

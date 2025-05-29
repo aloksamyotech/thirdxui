@@ -97,6 +97,7 @@ export const urls = Object.freeze({
     login: `${baseUrl}/admin/login`,
     register: `${baseUrl}/admin/`,
     getUserProfile: `${baseUrl}/admin/`,
-    updateUserById: `${baseUrl}/admin/`
+    updateUserById: `${baseUrl}/admin/`,
+    changePassword: `${baseUrl}/admin/change-password`
   }
 });

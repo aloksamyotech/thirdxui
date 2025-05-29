@@ -5,8 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import { postApi, getApi } from 'common/apiClient';
 
@@ -77,7 +76,6 @@ const AddCaseForm = ({ onCancel }) => {
       toast.success('Transaction added successfully!');
       navigate('/financial');
     } catch (error) {
-      console.error('Submission error:', error);
       toast.error('Submission failed!');
     }
   };

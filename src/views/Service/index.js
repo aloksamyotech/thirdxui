@@ -216,7 +216,6 @@ const Lead = () => {
 
       const serviceList = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-
       setRows(serviceList);
       setTotalRows(pagination?.total);
     } catch (error) {

@@ -141,7 +141,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: `RD-${user.uniqueId}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
@@ -195,7 +195,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: user.uniqueId,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
@@ -326,7 +326,7 @@ const Lead = () => {
             owners={ownerFilters}
             ownerFilter={owner}
             setOwnerFilter={(value) => setOwner(value)}
-            selectedFilters={['serviceFilter', 'statusFilter',  'dateOpenedFilter', 'ownerFilter']}
+            selectedFilters={['serviceFilter', 'statusFilter', 'dateOpenedFilter', 'ownerFilter']}
             onReset={handleReset}
           />
 

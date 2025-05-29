@@ -39,7 +39,6 @@ const UserProfileCard = () => {
 
   const location = useLocation();
   const id = location.state._id;
-  const uniqueid = location.state.serialNumber;
   const sub_role = location.state.subRole;
 
   useEffect(() => {
@@ -64,12 +63,13 @@ const UserProfileCard = () => {
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit'
-    })
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      })
     : '';
   const isActive = userData?.isActive;
+  const uniqueId = userData?.uniqueId || '-';
   const personalInfo = userData?.personalInfo || {};
   const contactInfo = userData?.contactInfo || {};
   const emergencyContact = userData?.emergencyContact || {};
@@ -140,7 +140,7 @@ const UserProfileCard = () => {
           {loading ? (
             <Box
               sx={{
-                margin: "5px",
+                margin: '5px',
                 borderTopLeftRadius: 10,
                 borderTopRightRadius: 10,
                 position: 'relative'
@@ -226,14 +226,14 @@ const UserProfileCard = () => {
                         {contactInfo.email}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
-                        {uniqueid} |{' '}
+                        {uniqueId} |{' '}
                         {sub_role === 'donar_individual'
                           ? 'Individual'
                           : sub_role === 'donar_company'
-                            ? 'Company'
-                            : sub_role === 'donar_group'
-                              ? 'Group'
-                              : sub_role}{' '}
+                          ? 'Company'
+                          : sub_role === 'donar_group'
+                          ? 'Group'
+                          : sub_role}{' '}
                         | Added {formattedDate}
                       </Typography>
                     </Grid>
@@ -345,7 +345,7 @@ const UserProfileCard = () => {
                                   <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                     <span>Donor ID:</span>{' '}
                                     <Typography component="span" fontSize="12px">
-                                      1765
+                                      {uniqueId}
                                     </Typography>
                                   </Typography>
                                 </Box>

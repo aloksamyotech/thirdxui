@@ -235,14 +235,14 @@ const Lead = () => {
           .filter((item) => item?.donorId)
           .map((item) => {
             const donor = item.donorId;
-            const isIndividual = donor.subRole === 'donar_individual';
-
+            const hasPersonalInfo = donor?.personalInfo?.firstName || donor?.personalInfo?.lastName;
+            const label = hasPersonalInfo
+              ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
+              : donor.companyInformation?.companyName || '';
 
             return {
               value: donor._id || '',
-              label: isIndividual
-                ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
-                : donor.companyInformation?.companyName || ''
+              label
             };
           })
           .filter((option) => option.value && option.label);

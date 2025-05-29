@@ -35,10 +35,19 @@ const AddCaseForm = ({ onCancel }) => {
 
         const activeDonors = allDonors
           .filter((donor) => donor.isActive)
-          .map((donor) => ({
-            label: `${donor.personalInfo.firstName || ''} ${donor.personalInfo.lastName || ''}`.trim() || 'Unnamed',
-            value: donor._id?.$oid || donor._id
-          }));
+          .map((donor) => {
+            const fullName = `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim();
+            const companyName = donor.companyInformation?.companyName || '';
+
+            const labelParts = [];
+            if (fullName) labelParts.push(fullName);
+            if (companyName) labelParts.push(companyName);
+
+            return {
+              label: labelParts.join(' - ') || 'Unnamed',
+              value: donor._id?.$oid || donor._id
+            };
+          });
 
         setDonorData(activeDonors);
       } catch (error) {

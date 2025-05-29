@@ -27,7 +27,6 @@ const UserProfileCard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const id = location.state?._id || location.state?.id;
-  const uniqueid = location.state?.serialNumber;
   const sub_role = location.state?.subRole;
   const isArchive = location.state?.isArchive;
   const [tabValue, setTabValue] = useState(0);
@@ -42,9 +41,6 @@ const UserProfileCard = () => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
 
-  const location = useLocation();
-  const id = location.state._id;
-  const sub_role = location.state.subRole;
 
   useEffect(() => {
     const fetchUserById = async () => {

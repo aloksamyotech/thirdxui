@@ -195,7 +195,6 @@ const AddCaseForm = ({ onCancel }) => {
       formData.append('time', data.time || '');
       formData.append('description', data.description || '');
 
-      // Handle arrays with proper null checks
       (data.beneficiary || []).forEach((id) => {
         formData.append('benificiary[]', id);
       });
@@ -220,16 +219,13 @@ const AddCaseForm = ({ onCancel }) => {
         formData.append('fundraisingActivities[]', id);
       });
 
-      // Handle serviceId properly
       if (session?._id) {
-        // For update request, use the serviceId from the session
         const sessionServiceId = session.serviceId?._id || session.serviceId;
         if (!sessionServiceId) {
           throw new Error('Service ID is required for updating session');
         }
         formData.append('serviceId', sessionServiceId);
       } else if (serviceId) {
-        // For new session, use the serviceId from props
         const idToSend = typeof serviceId === 'string' ? serviceId : serviceId._id;
         if (!idToSend) {
           throw new Error('Service ID is required for creating session');
@@ -239,13 +235,11 @@ const AddCaseForm = ({ onCancel }) => {
         throw new Error('Service ID is required');
       }
 
-      // Handle file upload
       if (data.file && data.file instanceof File) {
         formData.append('file', data.file);
       }
 
       if (session?._id) {
-        // Ensure we have a valid session ID for update
         if (!session._id) {
           throw new Error('Session ID is required for update');
         }

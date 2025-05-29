@@ -33,6 +33,7 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import { ROLES } from 'common/constants';
 
 const Archives = () => {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ const Archives = () => {
   const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rows, setRows] = useState([]);
-  const [dateAddedFilter, setDateAddedFilter] = useState(dayjs());
+ const [isFiltered, setIsFiltered] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -80,15 +81,14 @@ const Archives = () => {
   };
 
   const handleViewInfo = (userId, role) => {
-    if (role === 'service_user' || role === 'volunteer') {
+    if (role === ROLES.SERVICE_USER || role === ROLES.VOLUNTEER) {
       navigate('/view-people', { state: { id: userId, isArchive: true } });
-    } else if (role === 'donor') {
+    } else if (role === ROLES.DONOR) {
       const user = rows.find(row => row.id === userId);
       navigate('/view-donor', { 
         state: { 
           id: userId, 
-          serialNumber: user.serialNumber,
-          subRole: user.subRole,
+          subRole: user?.subRole,
           isArchive: true 
         } 
       });
@@ -134,7 +134,8 @@ const Archives = () => {
         country: user.contactInfo?.country || '',
         postcode: user.contactInfo?.postcode || '',
         type: 'person',
-        role: user.role || 'service_user'
+        role: user.role || 'service_user',
+        subRole: user.subRole || ''
       }));
 
       setRows(formattedUsers);

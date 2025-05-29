@@ -9,6 +9,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import config from '../../../config';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const CaseList = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -24,19 +25,19 @@ const CaseList = () => {
     {
       field: 'caseid',
       headerName: 'Case ID',
-      flex: 1,
+      width: 100,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'serviceUser',
       headerName: 'Service User',
-      flex: 1,
+      width: 150,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'dateOpened',
       headerName: 'Date Opened',
-      flex: 1,
+      width: 150,
       renderCell: (params) => (
         <Typography color="secondary" sx={{ textDecoration: 'underline' }}>
           {params?.value}
@@ -46,7 +47,7 @@ const CaseList = () => {
     {
       field: 'status',
       headerName: 'Status',
-      flex: 1,
+      width: 100,
       renderCell: (params) => (
         <Button size="small" variant="outlined" sx={{ p: 0, m: 0, borderRadius: '10px', color: '#ff7672', border: '1px solid #ff7672' }}>
           {params.value}
@@ -56,7 +57,7 @@ const CaseList = () => {
     {
       field: 'country',
       headerName: 'Country',
-      flex: 1,
+      width: 150,
       renderCell: (params) => (
         <Stack direction="row">
           <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
@@ -67,13 +68,13 @@ const CaseList = () => {
     {
       field: 'owner',
       headerName: 'Owner',
-      flex: 1,
+      width: 100,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
-      flex: 1,
+      width: 300,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     }
   ];
@@ -184,7 +185,7 @@ const CaseList = () => {
   return (
     <>
       <Grid container>
-        <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="auto" width="100%">
+        <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="100vh" width="100%">
           <DataGrid
             rows={
               loading
@@ -204,6 +205,23 @@ const CaseList = () => {
             pageSizeOptions={[10]}
             rowHeight={65}
             getRowId={(rows) => rows?.id}
+            slots={{
+              toolbar: () => <CustomHeader />,
+              loadingOverlay: () => (
+                <Box
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'self-start',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                  }}
+                >
+                  <SingleRowLoader />
+                </Box>
+              ),
+              noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
+            }}
             components={{
               Toolbar: () => <CustomHeader />
             }}

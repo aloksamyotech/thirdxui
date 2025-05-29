@@ -157,7 +157,7 @@ const Donor = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);
@@ -253,7 +253,7 @@ const Donor = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);

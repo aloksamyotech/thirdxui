@@ -21,12 +21,23 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
   const [formData, setFormData] = useState(userData);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === 'file') {
+      setFormData({ ...formData, file: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const onSubmit = async () => {
     const url = urls?.login?.updateUserById
-    await updateApi(url, formData)
+    const form = new FormData();
+    for (const key in formData) {
+      if (formData[key] !== undefined && formData[key] !== null) {
+        form.append(key, formData[key]);
+      }
+    }
+    await updateApi(url, form)
     toast.success('Profile Updated Successfully')
     getUserInfo()
     onClose()
@@ -60,7 +71,14 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
           <Stack direction="row" spacing={1}>
             <Button variant="contained" component="label" sx={{ backgroundColor: '#053146' }}>
               UPLOAD A NEW PHOTO
-              <input hidden accept="image/*" type="file" />
+              <input
+                hidden
+                accept="image/*"
+                type="file"
+                label='file'
+                name='file'
+                // value={formData?.file}
+                onChange={handleChange} />
             </Button>
             <Button variant="outlined" color="error">
               RESET
@@ -165,8 +183,8 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
         </Grid>
 
         <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
-          <Button variant="contained" sx={{backgroundColor:'#053146'}} onClick={onClose}>
-          SAVE CHANGES 
+          <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={onSubmit}>
+            SAVE CHANGES
           </Button>
           <Button onClick={onClose} variant="outlined" color="error">
             CANCEL

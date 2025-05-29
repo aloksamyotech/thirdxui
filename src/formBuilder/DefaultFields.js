@@ -279,7 +279,7 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) =>
         },
         {
             id: 2,
-            name: 'Volenteer Form',
+            name: 'Volunteer Form',
             data: [
                 {
                     "type": "header",

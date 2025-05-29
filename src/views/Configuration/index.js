@@ -262,7 +262,7 @@ const TabbedDataGrid = () => {
       {!loading && showAddIcon && (
         <IconButton
           onClick={(event) => {
-            event.stopPropagation(); // Prevent accordion expansion when button is clicked
+            event.stopPropagation(); 
             handleOpenModal(section);
           }}
           sx={{

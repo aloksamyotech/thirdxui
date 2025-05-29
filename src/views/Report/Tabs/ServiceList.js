@@ -9,6 +9,7 @@ import { urls } from 'common/urls';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import config from '../../../config';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const ServiceList = () => {
   const [paginationModel, setPaginationModel] = useState({
@@ -25,13 +26,14 @@ const ServiceList = () => {
     {
       field: 'userid',
       headerName: 'Case ID',
-      flex: 1,
+      width: 100,
+      align: 'center',
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'name',
       headerName: 'Name',
-      flex: 1.5,
+      width: 150,
       renderCell: (params) => (
         <Typography>
           {params?.row?.firstName} {params?.row?.lastName}
@@ -42,13 +44,13 @@ const ServiceList = () => {
     {
       field: 'dob',
       headerName: 'DOB',
-      flex: 1,
+      width: 100,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'age',
       headerName: 'Age',
-      flex: 1,
+      width: 70,
       renderCell: (params) => (
         <Box
           sx={{
@@ -71,7 +73,7 @@ const ServiceList = () => {
     {
       field: 'country',
       headerName: 'Country',
-      flex: 1.5,
+      width: 150,
       renderCell: (params) => (
         <Stack direction="row">
           {params.row.countryFlag && (
@@ -84,19 +86,19 @@ const ServiceList = () => {
     {
       field: 'gender',
       headerName: 'Gender',
-      flex: 1,
+      width: 100,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
-      flex: 1,
+      width: 100,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     },
     {
       field: 'no',
       headerName: 'ContactNo.',
-      flex: 1,
+      width: 150,
       renderCell: (params) => <Typography>{params?.value}</Typography>
     }
   ];
@@ -218,7 +220,7 @@ const ServiceList = () => {
   return (
     <>
       <Grid container>
-        <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="auto" width="100%">
+        <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="100vh" width="100%">
           <DataGrid
             rows={
               loading
@@ -238,6 +240,23 @@ const ServiceList = () => {
             rowCount={totalRows}
             rowHeight={65}
             getRowId={(rows) => rows?.id}
+            slots={{
+              toolbar: () => <CustomHeader />,
+              loadingOverlay: () => (
+                <Box
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'self-start',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                  }}
+                >
+                  <SingleRowLoader />
+                </Box>
+              ),
+              noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
+            }}
             checkboxSelection
             components={{
               Toolbar: () => <CustomHeader />

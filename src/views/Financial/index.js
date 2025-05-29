@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Stack, Button, Grid, Typography, Box, Card, TextField,InputBase, IconButton, Tooltip } from '@mui/material';
+import { Stack, Button, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
@@ -10,21 +10,11 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const campaignFilter = [
-  { value: 'campaign1', label: 'Campaign 1' },
-  { value: 'campaign2', label: 'Campaign 2' }
-];
-
 const dateAddedFilters = [
   { value: 'today', label: 'Today' },
   { value: 'week', label: 'Last 7 Days' },
   { value: 'month', label: 'Last 30 Days' },
   { value: 'year', label: 'Last 1 Year' }
-];
-
-const nameFilter = [
-  { value: 'name1', label: 'Name 1' },
-  { value: 'name2', label: 'Name 2' }
 ];
 
 const CustomHeader = () => {
@@ -79,7 +69,9 @@ const Lead = () => {
   });
   const [loading, setLoading] = useState(true);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [donorOptions, setDonorOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
 
   const columns = [
     {
@@ -144,10 +136,10 @@ const Lead = () => {
 
   const handleFilter = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const queryParams = new URLSearchParams();
 
-      if (assignedTo) queryParams.append('assignedTo', assignedTo);
+      if (assignedTo) queryParams.append('donorId', assignedTo);
       if (campaignName) queryParams.append('campaign', campaignName);
 
       if (dateOpenedFilter && dateOpenedFilter !== '') {
@@ -168,14 +160,22 @@ const Lead = () => {
       const allTransaction = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
-      const formattedUsers = allTransaction.map((item, index) => ({
-        id: item._id || index,
-        title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-        type: item.assignedTo || '',
-        code: item.campaign.name || '',
-        status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
-        more: item.transactionId || ''
-      }));
+      const formattedUsers = allTransaction.map((item, index) => {
+        const donor = item?.donorId;
+        const donorName =
+          donor?.subRole === 'donar_individual'
+            ? `${donor?.personalInfo?.firstName || ''} ${donor?.personalInfo?.lastName || ''}`.trim()
+            : donor?.companyInformation?.companyName || '';
+
+        return {
+          id: item._id || index,
+          title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+          type: donorName || 'N/A',
+          code: item.campaign?.name || '',
+          status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
+          more: item.transactionId || ''
+        };
+      });
 
       setTotalRows(pagination?.total);
       setRows(formattedUsers);
@@ -183,7 +183,7 @@ const Lead = () => {
     } catch (error) {
       console.error('Failed to fetch filtered cases:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -205,17 +205,24 @@ const Lead = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const response = await getApi(
           `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
         );
         const allTransaction = response?.data?.data || [];
+
         const pagination = response?.data?.meta || { total: 0 };
 
         const formattedTransactions = allTransaction?.map((item, index) => ({
           id: item._id || index,
           title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-          type: item.assignedTo || '',
+          type:
+            [
+              item?.donorId?.personalInfo?.firstName,
+              item?.donorId?.personalInfo?.lastName,
+              item?.donorId?.companyInformation?.companyName
+            ] || '',
+
           code: item.campaign?.name || item.campaign || '',
           status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
           more: item.transactionId || ''
@@ -224,16 +231,27 @@ const Lead = () => {
         setRows(formattedTransactions);
 
         setTotalRows(pagination?.total);
-        const uniqueList = [...new Set(allTransaction.map((item) => item.assignedTo).filter(Boolean))].map((value) => ({
-          value,
-          label: value
-        }));
+        const nameOptions = allTransaction
+          .filter((item) => item?.donorId)
+          .map((item) => {
+            const donor = item.donorId;
+            const hasPersonalInfo = donor?.personalInfo?.firstName || donor?.personalInfo?.lastName;
+            const label = hasPersonalInfo
+              ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
+              : donor.companyInformation?.companyName || '';
 
-        setNameFilters(uniqueList);
+            return {
+              value: donor._id || '',
+              label
+            };
+          })
+          .filter((option) => option.value && option.label);
+
+        setNameFilters(nameOptions);
       } catch (err) {
         console.error('Failed to fetch data:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
 
@@ -258,6 +276,24 @@ const Lead = () => {
       }
     };
     fetchCampaign();
+  }, []);
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getalldonor);
+        const options = response?.data?.allDonor?.map((donor) => ({
+          value: donor._id,
+          label:
+            donor.companyInformation?.companyName || `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
+        }));
+
+        setDonorOptions(options);
+      } catch (error) {
+        console.error('Error fetching donors:', error);
+      }
+    };
+
+    fetchDonors();
   }, []);
 
   return (
@@ -289,45 +325,44 @@ const Lead = () => {
             </IconButton>
           </Tooltip>
 
-                    <Box
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '30px',
+              paddingLeft: '16px',
+              border: '1px solid #e0e0e0',
+              width: '350px',
+              height: '40px'
+            }}
+          >
+            <InputBase
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '30px',
-                paddingLeft: '16px',
-                  border: '1px solid #e0e0e0',
-                width: '350px',
-                height: '40px'
+                flex: 1,
+                color: 'text.primary'
+              }}
+            />
+            <IconButton
+              onClick={handleFilter}
+              sx={{
+                marginRight: '8px',
+                width: 32,
+                height: 32,
+                cursor: 'pointer'
               }}
             >
-            <InputBase
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleFilter();
-                  }
-                }}
-                sx={{
-                  flex: 1,
-                  color: 'text.primary'
-                }}
-              />
-            <IconButton
-                onClick={handleFilter}
-                sx={{
-                  marginRight: '8px',
-                  width: 32,
-                  height: 32,
-                  cursor: 'pointer'
-                }}
-            >
-            <SearchIcon />
+              <SearchIcon />
             </IconButton>
-            </Box>
-
+          </Box>
         </Stack>
 
         <Grid container spacing={2}>
@@ -336,7 +371,7 @@ const Lead = () => {
             dateAddedFilters={dateAddedFilters}
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-            names={nameFilters}
+            names={donorOptions}
             nameFilter={assignedTo}
             setNameFilter={(value) => setAssignedTo(value)}
             campaigns={campaignTypeOptions}
@@ -378,19 +413,13 @@ const Lead = () => {
                             display: 'flex',
                             alignItems: 'self-start',
                             justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)'
                           }}
                         >
                           <SingleRowLoader />
                         </Box>
                       ),
-                      noRowsOverlay: () => (
-                        loading ? null : (
-                          <Box sx={{ padding: 2, textAlign: 'center' }}>
-                            No data available.
-                          </Box>
-                        )
-                      ),
+                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{

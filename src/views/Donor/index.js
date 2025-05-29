@@ -157,7 +157,7 @@ const Lead = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#${donor.uniqueId}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);
@@ -253,7 +253,7 @@ const Lead = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#${donor.uniqueId}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);

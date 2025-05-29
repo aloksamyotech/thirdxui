@@ -141,7 +141,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `RD-${user.uniqueId}`,
+          serialNumber: `RD-${user?.uniqueId}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
@@ -195,7 +195,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: user.uniqueId,
+          serialNumber: user?.uniqueId,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',

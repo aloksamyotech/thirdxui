@@ -159,7 +159,7 @@ const Lead = () => {
       const pagination = response?.data?.meta || { total: 0 };
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
-        serialNumber: `#${user.uniqueId}`,
+        serialNumber: `#${user?.uniqueId}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
@@ -217,7 +217,7 @@ const Lead = () => {
       const pagination = response?.data?.meta || { total: 0 };
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
-        serialNumber: `#${user.uniqueId}`,
+        serialNumber: `#${user?.uniqueId}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',

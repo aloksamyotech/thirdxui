@@ -75,7 +75,7 @@ const CaseDetailsPage = () => {
               lineHeight: '36px'
             }}
           >
-            Case Notes priti
+            Case Notes
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

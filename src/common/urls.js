@@ -100,6 +100,7 @@ export const urls = Object.freeze({
     register: `${baseUrl}/admin/`,
     getUserProfile: `${baseUrl}/admin/`,
     updateUserById: `${baseUrl}/admin/`,
-    changePassword: `${baseUrl}/admin/change-password`
+    changePassword: `${baseUrl}/admin/change-password`,
+    googleSignin: `${baseUrl}/admin/google-auth`
   }
 });

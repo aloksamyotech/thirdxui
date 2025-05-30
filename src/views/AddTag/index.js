@@ -426,8 +426,8 @@ const TagForm = () => {
 
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
-              <Button variant="contained" sx={{ background: '#053146' }}>
-                SAVE CHANGES
+              <Button variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
               </Button>
             </Grid>
             <Grid item>
@@ -497,11 +497,11 @@ const TagForm = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)}>
-             SAVE CHANGES 
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
             </Button>
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
-             CANCEL
+              CANCEL
             </Button>
           </DialogActions>
         </Dialog>

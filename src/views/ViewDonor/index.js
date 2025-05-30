@@ -41,7 +41,6 @@ const UserProfileCard = () => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
 
-
   useEffect(() => {
     const fetchUserById = async () => {
       try {
@@ -591,6 +590,7 @@ const UserProfileCard = () => {
                   includeArchives={includeArchives}
                   setIncludeArchives={setIncludeArchives}
                   selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
+                  customDateLabel="By Date Added"
                 />
 
                 <Grid item xs={9}>

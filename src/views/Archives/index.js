@@ -30,7 +30,7 @@ import dayjs from 'dayjs';
 import { getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import ArchiveIcon from '@mui/icons-material/Archive';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { ROLES } from 'common/constants';
@@ -48,7 +48,7 @@ const Archives = () => {
   const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rows, setRows] = useState([]);
- const [isFiltered, setIsFiltered] = useState(false);
+  const [isFiltered, setIsFiltered] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -84,13 +84,13 @@ const Archives = () => {
     if (role === ROLES.SERVICE_USER || role === ROLES.VOLUNTEER) {
       navigate('/view-people', { state: { id: userId, isArchive: true } });
     } else if (role === ROLES.DONOR) {
-      const user = rows.find(row => row.id === userId);
-      navigate('/view-donor', { 
-        state: { 
-          id: userId, 
+      const user = rows.find((row) => row.id === userId);
+      navigate('/view-donor', {
+        state: {
+          id: userId,
           subRole: user?.subRole,
-          isArchive: true 
-        } 
+          isArchive: true
+        }
       });
     }
   };
@@ -306,6 +306,7 @@ const Archives = () => {
           includeArchives={includeArchives}
           setIncludeArchives={setIncludeArchives}
           selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+          customDateLabel="By Date"
           onReset={handleReset}
         />
         <Grid item xs={9}>

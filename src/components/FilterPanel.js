@@ -100,7 +100,8 @@ const FilterPanel = ({
   setSessionLeadFilter,
   includeArchives,
   setIncludeArchives,
-  selectedFilters = []
+  selectedFilters = [],
+  customDateLabel
 }) => {
   useEffect(() => {
     if (!dateAddedFilter || !setDateAddedFilter) return;
@@ -201,7 +202,7 @@ const FilterPanel = ({
     },
     dateOpenedFilter: {
       data: dateOpenedFilters,
-      label: 'Date Opened',
+      label: customDateLabel || 'Date Opened',
       onChange: setDateOpenedFilter,
       value: dateOpenedFilter,
       type: 'date'

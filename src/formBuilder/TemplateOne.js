@@ -19,8 +19,7 @@ import {
 import { urls } from 'common/urls';
 import { postApi } from 'common/apiClient';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import { toast } from 'react-toastify';
-
+import toast from 'react-hot-toast';
 const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, onClose, getAllForms, setPreset }) => {
     
     //temporary solution

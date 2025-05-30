@@ -50,7 +50,7 @@ import { getApi, updateApiPatch } from 'common/apiClient.js';
 import { useEffect } from 'react';
 import moment from 'moment';
 import { imageUrl } from 'common/urls';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 

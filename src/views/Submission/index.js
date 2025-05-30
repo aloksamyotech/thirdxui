@@ -11,14 +11,6 @@ import moment from 'moment';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import { useNavigate } from 'react-router';
 
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-];
-
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
   { value: 'campaign2', label: 'Campaign 2' }
@@ -80,18 +72,35 @@ const CustomHeader = () => {
 const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [formType, setFormType] = useState('');
+  const [formTypes, setFormTypes] = useState([])
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
   const navigate = useNavigate()
   const handleNavigate = (id) => {
     navigate(`${id}`)
   }
 
   const getAllResponse = async () => {
-    const fromUrl = urls?.responses?.submit
+    const queryParams = new URLSearchParams({
+      page: paginationModel.page + 1,
+      limit: paginationModel.pageSize,
+    });
+    if (searchQuery) {
+      queryParams.append('search', searchQuery);
+    }
+    if (formType) {
+      queryParams.append('search', formType);
+    }
+    const fromUrl = (`${urls?.responses?.submit}?${queryParams.toString()}`)
     const response = await getApi(fromUrl)
-    const formattedData = response?.data?.map((item, index) => {
+    const pagination = response?.data?.meta || { total: 0 };
+    const formattedData = response?.data?.data?.map((item, index) => {
       const submissionDate = moment(item?.submittedAt).format('L')
       let data = {
         id: item?._id,
@@ -104,10 +113,24 @@ const Lead = () => {
       }
       return data
     })
+    setTotalRows(pagination?.total);
     setRows(formattedData)
   }
   useEffect(() => {
     getAllResponse()
+  }, [searchQuery, formType, paginationModel])
+
+  const getFormTypes = async () => {
+    const url = `${urls?.responses?.submit}?limit=10000`
+    const response = await getApi(url)
+    const options = response?.data?.data?.map((item) => ({
+      value: item?.formId?.title,
+      label: item?.formId?.title
+    }))
+    setFormTypes(options)
+  }
+  useEffect(() => {
+    getFormTypes()
   }, [])
 
   const columns = [
@@ -179,6 +202,10 @@ const Lead = () => {
     }
   ];
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <>
       <Grid>
@@ -200,12 +227,8 @@ const Lead = () => {
               >
                 <InputBase
                   placeholder="Search..."
-                  // value={searchQuery}
-                  // onChange={handleSearchChange}
-                  // onKeyPress={(e) => {
-                  //   if (e.key === 'Enter') {
-                  //     handleFilter();
-                  //   }
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                   // }}
                   sx={{
                     flex: 1,
@@ -233,6 +256,7 @@ const Lead = () => {
             <FilterPanel
               showFilter={showFilter}
               formTypes={formTypes}
+              formType={formType}
               setFormType={setFormType}
               campaigns={campaignFilter}
               setCampaignFilter={setCampaignFilter}
@@ -263,6 +287,12 @@ const Lead = () => {
                       backgroundColor: '#f5f5f5'
                     }
                   }}
+                  rowCount={totalRows}
+                  pagination
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  pageSizeOptions={[10]}
                 />
               </Card>
             </Grid>

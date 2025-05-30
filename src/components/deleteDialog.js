@@ -20,7 +20,7 @@ const CommonConfirmDialog = ({
   }}
   PaperProps={{
     sx: {
-      boxShadow: '0 0 20px rgba(0,0,0,0.1)', 
+      boxShadow: '0 0 20px rgba(0, 0, 0, 0)', 
     },
   }}
     >

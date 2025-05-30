@@ -22,7 +22,7 @@ export const urls = Object.freeze({
     getalldonor: `${baseUrl}/user/getalldonor`,
     getDistrict: `${baseUrl}/user/getAllUsDistricts`,
     editUser: `${baseUrl}/user/edituser`,
-    deleteUser: `${baseUrl}/user/deleteuser`,
+    deleteUser: `${baseUrl}/user/deleteuser/:userId`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
     archive: `${baseUrl}/user/archive`,
     unarchive: `${baseUrl}/user/unarchive`

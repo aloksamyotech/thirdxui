@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
 import { getApi, updateApi } from 'common/apiClient';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import toast from 'react-hot-toast';
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
@@ -36,6 +37,9 @@ const User = () => {
     pageSize: 10
   });
   const navigate = useNavigate();
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
 
   const columns = [
     {
@@ -274,19 +278,31 @@ const User = () => {
   }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, selectedName, searchQuery, countryOfOriginFilter]);
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm('Are you sure you want to delete this user?');
-    if (!confirmed) return;
-
-    try {
-      const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
-      fetchUser();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
+    setShowDeleteModal(true);
+    setUserIdToDelete(id);
   };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setUserIdToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (userIdToDelete) {
+      try {
+        await updateApi(urls.serviceuser.deleteUser.replace(':userId', userIdToDelete));
+        toast.success('User deleted successfully!');
+        fetchUser();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      } finally {
+        handleCloseDeleteModal();
+      }
+    }
   };
 
   const handleReset = () => {
@@ -349,7 +365,6 @@ const User = () => {
                 }}
               />
               <IconButton
-                onClick={fetchUser}
                 sx={{
                   marginRight: '8px',
                   width: 32,
@@ -379,6 +394,7 @@ const User = () => {
               setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
               selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
               onReset={handleReset}
+              customDateLabel="By Date"
               onApply={fetchUser}
             />
             <Grid item xs={9}>
@@ -435,38 +451,45 @@ const User = () => {
           </Grid>
         </Grid>
       </Card>
-      {/* <Modal open={showForm} onClose={() => setShowForm(false)}>
+
+      <Modal
+        open={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
+      >
         <Box
           sx={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: 'white',
-            p: 4,
-            borderRadius: 2,
+            width: 400,
+            bgcolor: 'background.paper',
             boxShadow: 24,
-            minWidth: 400
+            p: 4,
+            borderRadius: '8px'
           }}
         >
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h4">Invite User</Typography>
-            <IconButton onClick={() => setShowForm(false)}>
-              <Close />
-            </IconButton>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Typography id="delete-modal-title" variant="h6" component="h2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              ⚠️ Delete
+            </Typography>
           </Stack>
- 
-          <TextField fullWidth label="Invite user via their email" variant="outlined" sx={{ mb: 2 }} />
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="contained" sx={{ backgroundColor: '#053146' }}>
-              Invite
-            </Button>
-            <Button variant="outlined" color="error" onClick={() => setShowForm(false)}>
+
+          <Typography id="delete-modal-description" sx={{ mt: 2 }}>
+            Are you sure you want to delete this user?
+          </Typography>
+          <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
+            <Button variant="outlined" onClick={handleCloseDeleteModal}>
               Cancel
+            </Button>
+            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+              Delete
             </Button>
           </Stack>
         </Box>
-      </Modal> */}
+      </Modal>
     </>
   );
 };

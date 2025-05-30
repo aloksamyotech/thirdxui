@@ -595,11 +595,12 @@ const UserProfileCard = () => {
                   setActivityTypeFilter={setActivityType}
                   sessionNames={sessionNames}
                   setSessionNameFilter={setSessionName}
-                  dateAddedFilters={dateAddedFilters}
-                  setDateAddedFilter={setDateOpenedFilter}
+                  dateOpenedFilter={dateOpenedFilter}
+                  setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
                   includeArchives={includeArchives}
                   setIncludeArchives={setIncludeArchives}
-                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
+                  selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+                  customDateLabel="By Date"
                 />
 
                 <Grid item xs={9}>

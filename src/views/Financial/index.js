@@ -378,6 +378,7 @@ const Financial = () => {
             setCampaignFilter={(value) => setCampaignName(value)}
             selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
             onReset={handleReset}
+            customDateLabel="Start Date"
           />
 
           <Grid item xs={9}>

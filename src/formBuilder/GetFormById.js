@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import { useParams } from 'react-router';
 import { Formik, useFormik } from "formik";
 import DescriptionIcon from '@mui/icons-material/Description';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 
 const GetFormById = () => {

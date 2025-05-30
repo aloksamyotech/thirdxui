@@ -1,8 +1,7 @@
 import { Box, Button } from '@mui/material';
 import React, { useState } from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { toast } from 'react-toastify';
-
+import toast from 'react-hot-toast';
 const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose }) => {
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const templates = [

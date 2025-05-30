@@ -12,14 +12,6 @@ import { useEffect } from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNavigate } from 'react-router';
 
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-];
-
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
   { value: 'campaign2', label: 'Campaign 2' }
@@ -72,7 +64,15 @@ const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [rows, setRows] = useState([]);
   const [formType, setFormType] = useState('');
+  const [formTypes, setFormTypes] = useState([])
   const [showFilter, setShowFilter] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+
   const navigate = useNavigate()
 
   const handleOpenAdd = () => {
@@ -89,9 +89,20 @@ const Lead = () => {
   }
 
   const getAllForms = async () => {
-    const fromUrl = urls?.forms?.getAll
+    const queryParams = new URLSearchParams({
+      page: paginationModel.page + 1,
+      limit: paginationModel.pageSize,
+    });
+    if (searchQuery) {
+      queryParams.append('search', searchQuery);
+    }
+    if (formType) {
+      queryParams.append('search', formType);
+    }
+    const fromUrl = (`${urls?.forms?.getAll}?${queryParams.toString()}`)
     const response = await getApi(fromUrl)
-    const formattedData = response?.data?.map((item, index) => {
+    const pagination = response?.data?.meta || { total: 0 };
+    const formattedData = response?.data?.data?.map((item, index) => {
       let data = {
         id: item?._id,
         index: index + 1,
@@ -102,11 +113,27 @@ const Lead = () => {
       }
       return data
     })
+    setTotalRows(pagination?.total);
     setRows(formattedData)
   }
   useEffect(() => {
     getAllForms()
+  }, [searchQuery, formType, paginationModel])
+
+  const getFormTypes = async () => {
+    const url = `${urls?.forms?.getAll}?limit=1000`
+    const response = await getApi(url)
+    const options = response?.data?.data?.map((item) => ({
+      value: item?.title,
+      label: item?.title
+    }))
+    setFormTypes(options)
+
+  }
+  useEffect(() => {
+    getFormTypes()
   }, [])
+
 
   const columns = [
     {
@@ -146,11 +173,15 @@ const Lead = () => {
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1 }}>
           <OpenInNewIcon color='primary' fontSize='small' sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.link)} />
-          <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+          <EditOutlinedIcon sx={{ color: ' #EBEBE4' }} fontSize="small" onClick={() => handleEdit(params.row)} />
         </Box>
       )
     }
   ];
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <>
@@ -198,13 +229,8 @@ const Lead = () => {
               >
                 <InputBase
                   placeholder="Search..."
-                  // value={searchQuery}
-                  // onChange={handleSearchChange}
-                  // onKeyPress={(e) => {
-                  //   if (e.key === 'Enter') {
-                  //     handleFilter();
-                  //   }
-                  // }}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                   sx={{
                     flex: 1,
                     color: 'text.primary'
@@ -230,6 +256,7 @@ const Lead = () => {
             <FilterPanel
               showFilter={showFilter}
               formTypes={formTypes}
+              formType={formType}
               setFormType={setFormType}
               campaigns={campaignFilter}
               setCampaignFilter={setCampaignFilter}
@@ -260,6 +287,12 @@ const Lead = () => {
                       backgroundColor: '#f5f5f5'
                     }
                   }}
+                  rowCount={totalRows}
+                  pagination
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  pageSizeOptions={[10]}
                 />
               </Card>
             </Grid>

@@ -135,7 +135,7 @@ const CaseList = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '450',
               color: '#333',
               fontSize: '13px',
               lineHeight: '36px'
@@ -190,7 +190,7 @@ const CaseList = () => {
   return (
     <>
       <Grid container>
-        <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="auto" width="100%">
+        <Box sx={{ backgroundColor: '#fff', borderRadius: 2 }} height="100vh" width="100%">
           <DataGrid
             rows={
               loading

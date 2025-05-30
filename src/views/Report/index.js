@@ -71,6 +71,7 @@ const Report = () => {
           setCaseIdFilter={setCaseIdFilter}
           countriesWithFlags={countriesWithFlags}
           selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter']}
+          customDateLabel="By Date"
         />
 
         <Grid item xs={9}>

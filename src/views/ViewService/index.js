@@ -272,6 +272,7 @@ const ViewService = () => {
           sessionLeadFilter={sessionLeadFilter}
           setSessionLeadFilter={setSessionLeadFilter}
           selectedFilters={['locationFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
+          customDateLabel="By Date"
           onReset={handleReset}
         />
 

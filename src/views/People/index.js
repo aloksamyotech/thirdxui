@@ -313,16 +313,16 @@ const PeopleManagement = () => {
             setDistrictFilter={(val) => {
               setDistrictFilter(val);
             }}
-            genders={gender}
+             genders={gender}
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
-            dateAddedFilters={dateAddedFilters}
-            dateAddedFilter={dateOpenedFilter}
-            setDateAddedFilter={(value) => setDateOpenedFilter(value)}
+              dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter', 'includeArchives']}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
+            customDateLabel="By Date Added"
           />
 
           <Grid item xs={9}>

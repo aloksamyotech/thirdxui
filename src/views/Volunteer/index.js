@@ -42,7 +42,7 @@ const Volunteer = () => {
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [isFiltered, setIsFiltered] = useState(false);
-  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
@@ -136,7 +136,7 @@ const Volunteer = () => {
 
       if (districtFilter) queryParams.append('district', districtFilter);
       if (genderFilter) queryParams.append('gender', genderFilter);
-      if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (dateOpenedFilter) {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
@@ -178,7 +178,7 @@ const Volunteer = () => {
     if (districtFilter || genderFilter || dateOpenedFilter || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [districtFilter, genderFilter, dateOpenedFilter || searchQuery]);
+  }, [districtFilter, genderFilter, dateOpenedFilter, searchQuery, paginationModel.page, paginationModel.pageSize]);
 
   useEffect(() => {
     handleFilter();
@@ -187,11 +187,11 @@ const Volunteer = () => {
   const handleReset = () => {
     setDistrictFilter('');
     setGenderFilter('');
-    setDateOpenedFilter('');
+    setDateOpenedFilter(null);
     setSearchQuery('');
     setIncludeArchives(false);
     setIsFiltered(false);
-    fetchpeople();
+    handleFilter();
   };
 
   const handleSearchChange = (event) => {
@@ -315,13 +315,13 @@ const Volunteer = () => {
             genders={gender}
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
-            dateAddedFilters={dateAddedFilters}
-            dateAddedFilter={dateOpenedFilter}
-            setDateAddedFilter={(value) => setDateOpenedFilter(value)}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter', 'includeArchives']}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
+            customDateLabel="By Date Added"
           />
 
           <Grid item xs={9}>

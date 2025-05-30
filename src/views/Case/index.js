@@ -121,7 +121,6 @@ const Case = () => {
         queryParams.append('search', searchQuery);
       }
 
-      const queryString = queryParams.toString();
       const url = `${urls.case.fetchWithPagination}?${queryParams.toString()}`;
 
       const response = await getApi(url);
@@ -327,6 +326,7 @@ const Case = () => {
             ownerFilter={owner}
             setOwnerFilter={(value) => setOwner(value)}
             selectedFilters={['serviceFilter', 'statusFilter', 'dateOpenedFilter', 'ownerFilter']}
+            customDateLabel="Date Opened"
             onReset={handleReset}
           />
 

@@ -157,7 +157,8 @@ const Duplicate = () => {
             setDateAddedFilter={setDateOpenedFilter}
             names={nameFilter}
             setNameFilter={setNameFilter}
-            selectedFilters={['nameFilter','dateOpenedFilter', 'statusFilter']}
+            selectedFilters={['nameFilter', 'dateOpenedFilter', 'statusFilter']}
+            customDateLabel="By Date"
           />
 
           <Grid item xs={9}>

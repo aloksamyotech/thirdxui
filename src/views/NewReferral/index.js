@@ -99,7 +99,7 @@ const ReferralTable = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [formType, setFormType] = useState('');
   const [formName, setFormName] = useState('');
-  const [dateAddedFilter, setDateAddedFilter] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleOpenDialog = () => {
@@ -169,9 +169,10 @@ const ReferralTable = () => {
           setFormType={setFormType}
           formNames={formNames}
           setFormNameFilter={setFormName}
-          dateAddedFilters={dateAddedFilters}
-          setDateAddedFilter={setDateAddedFilter}
-          selectedFilters={['formType', 'formNameFilter', 'dateAddedFilter']}
+          dateOpenedFilter={dateOpenedFilter}
+          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+          selectedFilters={['formType', 'formNameFilter', 'dateOpenedFilter']}
+          customDateLabel="By Date Submitted"
         />
         <Grid item xs={9}>
           <TableStyle>

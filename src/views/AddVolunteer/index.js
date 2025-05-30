@@ -686,9 +686,9 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.dateOfBirth"
                                 control={control}
-                                rules={{
-                                  required: 'Date of Birth is required'
-                                }}
+                                // rules={{
+                                //   required: 'Date of Birth is required'
+                                // }}
                                 render={({ field, fieldState: { error } }) => (
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
@@ -715,7 +715,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.ethnicity"
                                 control={control}
-                                rules={{ required: 'Ethnicity is required' }}
+                                // rules={{ required: 'Ethnicity is required' }}
                                 render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={ethnicityOptions}

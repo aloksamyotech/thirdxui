@@ -412,24 +412,19 @@ const FilterPanel = ({
                         sx: {
                           '& .MuiPaper-root': {
                             width: 220,
-                            height: 260,
-                            marginLeft: '50px'
+                            height: 320,
+                            marginLeft: '50px',
+                            overflow: 'hidden' 
                           },
-                          '& .MuiPickersCalendarHeader-root': {
-                            maxWidth: '220px',
-                            fontSize: '1.2rem'
+                          '& .MuiCalendarPicker-root': {
+                            width: 240,
+                            height: 320,
+                            margin: 0,
+                            overflow: 'hidden' 
                           },
-                          '& .MuiDayPicker-header': {
-                            maxWidth: '220px'
-                          },
-                          '& .MuiDayPicker-monthContainer': {
-                            maxWidth: '220px'
-                          },
-                          '& .MuiPickersDay-root': {
-                            maxWidth: '220px',
-                            height: '30px',
-                            margin: '0 2px',
-                            fontSize: '0.6rem'
+                          '& .MuiPickersFadeTransitionGroup-root': {
+                            width: 220,
+                            overflow: 'hidden'
                           }
                         }
                       }}

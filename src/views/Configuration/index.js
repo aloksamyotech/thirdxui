@@ -198,6 +198,7 @@ const TabbedDataGrid = () => {
   };
 
   const handleSaveConfiguration = async () => {
+    setLoading(true);
     if (!validateInput(inputValue)) {
       return;
     }
@@ -218,8 +219,10 @@ const TabbedDataGrid = () => {
       handleCloseModal();
       setEditMode(false);
       setEditId(null);
+      setLoading(false);
     } catch (err) {
       toast.error('Error saving configuration.');
+      setLoading(false);
     }
   };
 
@@ -262,7 +265,7 @@ const TabbedDataGrid = () => {
       {!loading && showAddIcon && (
         <IconButton
           onClick={(event) => {
-            event.stopPropagation(); 
+            event.stopPropagation();
             handleOpenModal(section);
           }}
           sx={{
@@ -585,10 +588,12 @@ const TabbedDataGrid = () => {
                   backgroundColor: '#031e2a'
                 }
               }}
+              disabled={loading}
               onClick={handleSaveConfiguration}
             >
-              {editMode ? 'UPDATE' : 'SAVE CHANGES'}
+              {loading ? 'Saving...' : editMode ? 'UPDATE' : 'SAVE CHANGES'}
             </Button>
+
             <Button
               variant="outlined"
               sx={{

@@ -35,6 +35,7 @@ import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { useEffect } from 'react';
+import { GridToolbarQuickFilter } from '@mui/x-data-grid';
 
 const TagForm = () => {
   const navigate = useNavigate();
@@ -114,8 +115,8 @@ const TagForm = () => {
       setIsloading(true);
       const queryParams = new URLSearchParams();
 
-      if (searchQuery) {
-        queryParams.append('search', searchQuery);
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
       }
 
       queryParams.append('page', paginationModel.page + 1);
@@ -138,16 +139,7 @@ const TagForm = () => {
   };
 
   const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setSearchQuery(value);
-  };
-
-  const handleSearch = () => {
-    if (searchQuery) {
-      handleFilter();
-    } else {
-      fetchTags();
-    }
+    setSearchQuery(event.target.value);
   };
 
   useEffect(() => {
@@ -222,49 +214,51 @@ const TagForm = () => {
           >
             Tag List
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fb',
+              borderRadius: '30px',
+              border: '1px solid #e0e0e0',
+              paddingLeft: '16px',
+              width: '350px',
+              height: '40px',
+              boxSizing: 'border-box'
+            }}
+          >
+            <GridToolbarQuickFilter
+              placeholder="Search..."
+              quickFilterParser={(searchInput) =>
+                searchInput
+                  .split(',')
+                  .map((value) => value.trim())
+                  .filter((value) => value !== '')
+              }
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#ffff',
-                borderRadius: '30px',
-                paddingLeft: '16px',
-                border: '1px solid #e0e0e0',
-                width: '350px',
-                height: '40px'
+                flex: 1,
+                '& .MuiInputBase-root': {
+                  paddingLeft: 0
+                },
+                '& input': {
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none !important',
+                  backgroundColor: 'transparent',
+                  padding: '8px 8px 8px 0',
+                  fontSize: '14px',
+                  color: '#666'
+                },
+                '& .MuiSvgIcon-root': {
+                  display: 'none'
+                },
+                '& .MuiInputBase-root:before, & .MuiInputBase-root:after': {
+                  display: 'none'
+                }
               }}
-            >
-              <InputBase
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearch();
-                  }
-                }}
-                fullWidth
-                sx={{
-                  flex: 1,
-                  color: 'text.primary',
-                  '& input': {
-                    padding: '8px 8px 8px 0',
-                    width: '100%'
-                  }
-                }}
-              />
-              <IconButton
-                onClick={handleSearch}
-                sx={{
-                  marginRight: '8px',
-                  width: 32,
-                  height: 32
-                }}
-              >
-                <SearchIcon />
-              </IconButton>
-            </Box>
+            />
+
+            <SearchIcon sx={{ color: '#888', marginRight: '12px' }} />
           </Box>
         </GridToolbarContainer>
       </Box>
@@ -297,7 +291,6 @@ const TagForm = () => {
       <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={6}>
-            {/* <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" /> */}
             <Controller
               name="tagDescription"
               control={control}
@@ -426,8 +419,8 @@ const TagForm = () => {
 
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
-              <Button variant="contained" sx={{ background: '#053146' }}>
-                SAVE CHANGES
+              <Button variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
               </Button>
             </Grid>
             <Grid item>
@@ -497,11 +490,11 @@ const TagForm = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)}>
-             SAVE CHANGES 
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
             </Button>
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
-             CANCEL
+              CANCEL
             </Button>
           </DialogActions>
         </Dialog>

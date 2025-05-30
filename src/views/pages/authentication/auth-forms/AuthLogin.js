@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import { urls } from 'common/urls';
 import { postApi } from 'common/apiClient';
+import { useGoogleLogin } from '@react-oauth/google';
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
@@ -41,6 +42,25 @@ const AuthLogin = ({ ...others }) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  const handleGoogleClick = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const data = { access_token: tokenResponse?.access_token };
+        const response = await postApi(`${urls.login.googleSignin}`, data);
+        if (response?.success === true) {
+          toast.success('Login successful');
+          localStorage.setItem('token', response.data.token);
+          setTimeout(() => navigate('/dashboard/default'), 1000);
+        } else {
+          toast.error(response?.message || 'Login failed');
+        }
+      } catch (error) {
+        toast.error('Login failed due to network or server error');
+      }
+    },
+    onError: () => toast.error('Login failed'),
+  });
 
   return (
     <>
@@ -209,7 +229,9 @@ const AuthLogin = ({ ...others }) => {
               </Divider>
 
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
-                <img src={Google} alt="google" width={20} height={20} />
+                <IconButton onClick={handleGoogleClick}>
+                  <img src={Google} alt="Google sign-in" width={20} height={20} style={{ cursor: 'pointer' }} />
+                </IconButton>
               </Box>
             </Box>
           </form>

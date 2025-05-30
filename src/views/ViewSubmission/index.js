@@ -4,7 +4,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserBg from 'assets/images/form.png';
 import OptionsPopover from 'components/AddFilter';
-import { getApi, postApi } from 'common/apiClient';
+import { getApi, postApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { imageUrl } from 'common/urls';
 import '../ViewServiceUser/index.css';
@@ -18,8 +18,6 @@ const ViewSubmission = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [userData, setUserData] = useState(null);
-  console.log("---------", userData);
-
   const [formData, setFormData] = useState({
     personalInfo: {
       "title": "Mr",
@@ -93,6 +91,7 @@ const ViewSubmission = () => {
   const uniqueid = location?.state?.serialNumber || 1;
   const { id } = useParams()
   const [formTitle, setFormTitle] = useState('-')
+  const [formStatus, setFormStatus] = useState('PENDING')
 
   const fetchUserById = async () => {
     try {
@@ -100,7 +99,7 @@ const ViewSubmission = () => {
       const response = await getApi(fromUrl);
       const user = response?.data?.data;
       setFormTitle(response?.data?.formId?.title)
-
+      setFormStatus(response?.data?.status)
       if (user) {
         setUserData(user);
       }
@@ -207,6 +206,8 @@ const ViewSubmission = () => {
       await postApi(url, fd, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      const urlUpdate = `${urls?.responses?.submit}/${id}`
+      await updateApiPatch(urlUpdate, { status: 'APPROVED' })
       toast.success('Added in Volunteer')
       handleClose();
     } else {
@@ -275,8 +276,9 @@ const ViewSubmission = () => {
               variant="contained"
               onClick={handleClick}
               sx={{ mr: '20px' }}
+              disabled={formStatus === 'APPROVED'}
             >
-              MANAGE
+              {formStatus == 'APPROVED' ? "APPROVED" : "MANAGE"}
             </Button>
           </Box>
         }

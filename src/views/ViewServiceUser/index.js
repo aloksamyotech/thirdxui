@@ -14,7 +14,7 @@ import FilterPanel from 'components/FilterPanel';
 import CaseNoteDialog from 'components/AddCaseNote';
 import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
-import ServiceUser from 'assets/images/UserProfile.png'
+import ServiceUser from 'assets/images/UserProfile.png';
 import OptionsPopover from 'components/AddFilter';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
@@ -37,8 +37,8 @@ const UserProfileCard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
-  const id = location.state.id;
-  const uniqueid = location.state.serialNumber;
+  const id = location?.state?.id;
+  const uniqueid = location?.state?.serialNumber;
 
   useEffect(() => {
     const fetchUserById = async () => {
@@ -62,10 +62,10 @@ const UserProfileCard = () => {
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit'
-    })
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      })
     : '';
   const personalInfo = userData?.personalInfo || {};
   const contactInfo = userData?.contactInfo || {};
@@ -119,7 +119,9 @@ const UserProfileCard = () => {
   const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
 
   const handleBackClick = () => {
-    if (userData?.role === 'volunteer') {
+    if (location.state?.isArchive) {
+      navigate('/archives');
+    } else if (userData?.role === 'volunteer') {
       navigate('/volunteer');
     } else {
       navigate('/people');
@@ -144,7 +146,7 @@ const UserProfileCard = () => {
           {loading ? (
             <Box
               sx={{
-                margin: "5px"
+                margin: '5px'
               }}
             >
               <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
@@ -263,8 +265,9 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>
-                                <Typography component="span" className="text">{`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''
-                                  }`}</Typography>
+                                <Typography component="span" className="text">{`${personalInfo?.firstName ?? ''} ${
+                                  personalInfo?.lastName ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>{' '}
                             <Box display="flex" alignItems="center" mb={1}>
@@ -421,8 +424,9 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${emergencyContact?.lastName ?? ''
-                                  }`}</Typography>
+                                <Typography component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${
+                                  emergencyContact?.lastName ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
@@ -525,7 +529,7 @@ const UserProfileCard = () => {
                               <Typography className="heading" variant="body1">
                                 Reason:{' '}
                                 <Typography component="span" className="text">
-                                  {contactPreferences?.reason?.name || 'N/A'}
+                                  {contactPreferences?.reason?.name || '-'}
                                 </Typography>
                               </Typography>
                             </Box>
@@ -533,7 +537,7 @@ const UserProfileCard = () => {
                               <Typography className="heading" variant="body1">
                                 Contact purposes:{' '}
                                 <Typography component="span" className="text">
-                                  {contactPreferences?.contactPurposes?.name || 'N/A'}
+                                  {contactPreferences?.contactPurposes?.name || '-'}
                                 </Typography>
                               </Typography>
                             </Box>
@@ -541,7 +545,7 @@ const UserProfileCard = () => {
                               <Typography className="heading" variant="body1">
                                 Preferred Method of Contact:{' '}
                                 <Typography component="span" className="text">
-                                  {contactPreferences?.preferredMethod?.name || 'N/A'}
+                                  {contactPreferences?.preferredMethod?.name || '-'}
                                 </Typography>
                               </Typography>
                             </Box>
@@ -551,7 +555,7 @@ const UserProfileCard = () => {
                                 <Typography component="span" className="text">
                                   {contactPreferences?.dateOfConfirmation
                                     ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
-                                    : 'N/A'}
+                                    : '-'}
                                 </Typography>
                               </Typography>
                             </Box>

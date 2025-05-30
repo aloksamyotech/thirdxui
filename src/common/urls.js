@@ -17,7 +17,7 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/user/getallServiceUser`,
     getAllUser: `${baseUrl}/user/getalluser`,
     getById: `${baseUrl}/user/getUserById/:userId`,
-    getAllServices: `${baseUrl}/user/getAllServices`,
+    getAllServicesUser: `${baseUrl}/user/getallServiceUser`,
     getAllVolunteer: `${baseUrl}/user/getAllVolunteer`,
     getalldonor: `${baseUrl}/user/getalldonor`,
     getDistrict: `${baseUrl}/user/getAllUsDistricts`,
@@ -66,8 +66,10 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/session/getAllSession`,
     getById: `${baseUrl}/session/getSessionById/:id`,
     update: `${baseUrl}/session/editSession/:id`,
-    fetchWithPagination:`${baseUrl}/session/allwithpagination`
-
+    fetchWithPagination: `${baseUrl}/session/allwithpagination`,
+    delete: `${baseUrl}/session/deleteSession/:id`,
+    archieve: `${baseUrl}/session/archive/:sessionId`,
+    unarchive: `${baseUrl}/session/unArchive/:sessionId`
   },
   casenote: {
     create: `${baseUrl}/caseNote/add`,
@@ -85,16 +87,19 @@ export const urls = Object.freeze({
     create: `${baseUrl}/attendees/addAttendee`,
     getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`
   },
-  dashboard:{
+  dashboard: {
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,
     getTotalSession: `${baseUrl}/dashboard/totalSession`,
     getTotalActiveUser: `${baseUrl}/dashboard/totalActiveUser`,
     getTotalOpenedCases: `${baseUrl}/dashboard/totalOpenedCases`,
     getmyTasks: `${baseUrl}/dashboard/getAllTask`,
-    getMedia: `${baseUrl}/dashboard/allMedia`,
+    getMedia: `${baseUrl}/dashboard/allMedia`
   },
   login: {
     login: `${baseUrl}/admin/login`,
-    register: `${baseUrl}/admin/`
+    register: `${baseUrl}/admin/`,
+    getUserProfile: `${baseUrl}/admin/`,
+    updateUserById: `${baseUrl}/admin/`,
+    changePassword: `${baseUrl}/admin/change-password`
   }
 });

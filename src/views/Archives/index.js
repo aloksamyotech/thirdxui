@@ -33,19 +33,22 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import { ROLES } from 'common/constants';
 
-const BulkDelete = () => {
+const Archives = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [activityType, setActivityTypeFilter] = useState('');
   const [sessionName, setSessionNameFilter] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [confirmUnarchiveOpen, setConfirmUnarchiveOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rows, setRows] = useState([]);
-  const [dateAddedFilter, setDateAddedFilter] = useState(dayjs());
+ const [isFiltered, setIsFiltered] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -68,7 +71,6 @@ const BulkDelete = () => {
       setConfirmUnarchiveOpen(false);
       fetchpeople();
     } catch (error) {
-      console.error('Error unarchiving user:', error);
       toast.error('Failed to unarchive the user.');
     }
   };
@@ -78,15 +80,46 @@ const BulkDelete = () => {
     setConfirmUnarchiveOpen(true);
   };
 
+  const handleViewInfo = (userId, role) => {
+    if (role === ROLES.SERVICE_USER || role === ROLES.VOLUNTEER) {
+      navigate('/view-people', { state: { id: userId, isArchive: true } });
+    } else if (role === ROLES.DONOR) {
+      const user = rows.find(row => row.id === userId);
+      navigate('/view-donor', { 
+        state: { 
+          id: userId, 
+          subRole: user?.subRole,
+          isArchive: true 
+        } 
+      });
+    }
+  };
+
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
+
   const fetchpeople = async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: paginationModel.page + 1,
-        limit: paginationModel.pageSize,
-        archive: 'true',
-        
-      });
+
+      const queryParams = new URLSearchParams();
+
+      if (dateOpenedFilter) {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('createdAt', formattedDate);
+      }
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('archive', 'true');
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
@@ -94,19 +127,20 @@ const BulkDelete = () => {
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
         serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
-        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`,
+        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''} ${user.companyInformation?.companyName || ''}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
         postcode: user.contactInfo?.postcode || '',
-        type: 'person'
+        type: 'person',
+        role: user.role || 'service_user',
+        subRole: user.subRole || ''
       }));
 
       setRows(formattedUsers);
       setTotalRows(pagination?.total);
     } catch (error) {
-      console.error('Failed to fetch services:', error);
       toast.error('Failed to fetch archived users');
     } finally {
       setLoading(false);
@@ -115,7 +149,14 @@ const BulkDelete = () => {
 
   useEffect(() => {
     fetchpeople();
-  }, [paginationModel]);
+  }, [paginationModel, searchQuery, dateOpenedFilter]);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    if (!event.target.value.trim()) {
+      fetchpeople();
+    }
+  };
 
   const CustomHeader = () => {
     return (
@@ -152,6 +193,24 @@ const BulkDelete = () => {
     );
   };
 
+  const handleFilter = () => {
+    setPaginationModel({
+      page: 0,
+      pageSize: paginationModel.pageSize
+    });
+    fetchpeople();
+  };
+
+  const handleReset = () => {
+    setDateOpenedFilter('');
+    setSearchQuery('');
+    setIsFiltered(false);
+    setPaginationModel({
+      page: 0,
+      pageSize: 10
+    });
+  };
+
   const columns = [
     {
       field: 'person',
@@ -166,7 +225,7 @@ const BulkDelete = () => {
                 {params.row.name} {params.row.serialNumber}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                {params.row.address}, {params.row.postcode}, {params.row.country}
+                {params.row.address} {params.row.postcode} {params.row.country}
               </Typography>
             </Box>
           </Stack>
@@ -178,7 +237,7 @@ const BulkDelete = () => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Info" arrow>
-              <IconButton>
+              <IconButton onClick={() => handleViewInfo(params.row.id, params.row.role)}>
                 <InfoIcon sx={{ color: '#49494c' }} />
               </IconButton>
             </Tooltip>
@@ -207,20 +266,20 @@ const BulkDelete = () => {
           >
             <InputBase
               placeholder="Search..."
-              // value={searchQuery}
-              // onChange={handleSearchChange}
-              // onKeyPress={(e) => {
-              //   if (e.key === 'Enter') {
-              //     handleFilter();
-              //   }
-              // }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleFilter();
+                }
+              }}
               sx={{
                 flex: 1,
                 color: 'text.primary'
               }}
             />
             <IconButton
-              // onClick={handleFilter}
+              onClick={handleFilter}
               sx={{
                 marginRight: '8px',
                 width: 32,
@@ -241,11 +300,13 @@ const BulkDelete = () => {
           setActivityTypeFilter={setActivityTypeFilter}
           sessionNames={sessionNames}
           setSessionNameFilter={setSessionNameFilter}
-          dateAddedFilter={dateAddedFilter}
-          setDateAddedFilter={setDateAddedFilter}
+          dateAddedFilters={dateAddedFilters}
+          dateOpenedFilter={dateOpenedFilter}
+          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
           includeArchives={includeArchives}
           setIncludeArchives={setIncludeArchives}
-          selectedFilters={['activityTypeFilter', 'dateAddedFilter', 'sessionNameFilter', 'includeArchives']}
+          selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+          onReset={handleReset}
         />
         <Grid item xs={9}>
           <Box width="100%">
@@ -265,19 +326,13 @@ const BulkDelete = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
                       }}
                     >
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 paginationMode="server"
                 rowCount={totalRows}
@@ -316,4 +371,4 @@ const BulkDelete = () => {
   );
 };
 
-export default BulkDelete;
+export default Archives;

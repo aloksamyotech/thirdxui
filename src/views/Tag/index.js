@@ -234,7 +234,6 @@ const Tag = () => {
               }}
             />
             <IconButton
-              onClick={handleSearch}
               sx={{
                 marginRight: '8px',
                 width: 32,
@@ -281,11 +280,9 @@ const Tag = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
-                    pageSizeOptions={[10]}
+                    pageSizeOptions={[5, 10, 25, 50]}
                     rowHeight={65}
                     getRowId={(row) => row._id}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10]}
                     slots={{
                       toolbar: () => <CustomHeader />,
                       loadingOverlay: () => (

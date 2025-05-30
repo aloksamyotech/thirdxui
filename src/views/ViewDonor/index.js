@@ -9,22 +9,26 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel';
 import CaseNoteDialog from 'components/AddCaseNote';
 import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
 import ServiceUser from 'assets/images/UserProfile.png';
 import OptionsPopover from 'components/AddFilter';
-import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import OptionsPopoverDonor from 'components/PopoverDoner';
 import { imageUrl } from 'common/urls';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+import { SUBROLES } from 'common/constants';
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const id = location.state?._id || location.state?.id;
+  const sub_role = location.state?.subRole;
+  const isArchive = location.state?.isArchive;
   const [tabValue, setTabValue] = useState(0);
   const [showFilter, setShowFilter] = useState(true);
   const [activityType, setActivityType] = useState('');
@@ -37,10 +41,6 @@ const UserProfileCard = () => {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
 
-  const location = useLocation();
-  const id = location.state._id;
-  const uniqueid = location.state.serialNumber;
-  const sub_role = location.state.subRole;
 
   useEffect(() => {
     const fetchUserById = async () => {
@@ -64,12 +64,13 @@ const UserProfileCard = () => {
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit'
-    })
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      })
     : '';
   const isActive = userData?.isActive;
+  const uniqueId = userData?.uniqueId || '-';
   const personalInfo = userData?.personalInfo || {};
   const contactInfo = userData?.contactInfo || {};
   const emergencyContact = userData?.emergencyContact || {};
@@ -122,12 +123,20 @@ const UserProfileCard = () => {
     setCaseNoteOpen(false);
   };
 
+  const handleBackClick = () => {
+    if (isArchive) {
+      navigate('/archives');
+    } else {
+      navigate('/donor');
+    }
+  };
+
   return (
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
           <Typography fontWeight="bold" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/donor')}>
+            <IconButton onClick={handleBackClick}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
             Profile
@@ -140,7 +149,7 @@ const UserProfileCard = () => {
           {loading ? (
             <Box
               sx={{
-                margin: "5px",
+                margin: '5px',
                 borderTopLeftRadius: 10,
                 borderTopRightRadius: 10,
                 position: 'relative'
@@ -185,10 +194,10 @@ const UserProfileCard = () => {
                       style={{ width: 72, height: 72, borderRadius: '50%', marginLeft: '16px' }}
                     />
                     <Grid item xs>
-                      <Typography component="span" fontWeight="600" lineHeight="2">
-                        {personalInfo.firstName || personalInfo.lastName
-                          ? `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim()
-                          : companyInformation.companyName || 'N/A'}
+                      <Typography component="span" fontSize={18} fontWeight="500" lineHeight="2">
+                        {personalInfo?.firstName || personalInfo?.lastName
+                          ? `${personalInfo?.firstName || ''} ${personalInfo?.lastName || ''}`.trim()
+                          : companyInformation?.companyName || '-'}
                       </Typography>
 
                       <Stack direction="row" alignItems="center" spacing={1}>
@@ -217,23 +226,23 @@ const UserProfileCard = () => {
                           />
                         </Box>
 
-                        <Typography variant="body2" color={isActive ? 'green' : 'red'} lineHeight="2">
+                        <Typography variant="body1" fontSize={12} color={isActive ? 'green' : 'red'} lineHeight="1">
                           {isActive ? 'ACTIVE DONOR' : 'INACTIVE DONOR'}
                         </Typography>
                       </Stack>
 
                       <Typography variant="body2" color="textSecondary" lineHeight="2">
-                        {contactInfo.email}
+                        {contactInfo?.email}
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
-                        {uniqueid} |{' '}
-                        {sub_role === 'donar_individual'
+                        {uniqueId} |{' '}
+                        {sub_role === SUBROLES.INDIVIDUAL
                           ? 'Individual'
-                          : sub_role === 'donar_company'
-                            ? 'Company'
-                            : sub_role === 'donar_group'
-                              ? 'Group'
-                              : sub_role}{' '}
+                          : sub_role === SUBROLES.COMPANY
+                          ? 'Company'
+                          : sub_role === SUBROLES.GROUP
+                          ? 'Group'
+                          : sub_role}
                         | Added {formattedDate}
                       </Typography>
                     </Grid>
@@ -247,7 +256,7 @@ const UserProfileCard = () => {
                     >
                       EDIT
                     </Button>
-                    {sub_role === 'donar_individual' && (
+                    {sub_role === SUBROLES.INDIVIDUAL && (
                       <>
                         <Typography variant="body2" color="textSecondary">
                           Address
@@ -304,7 +313,7 @@ const UserProfileCard = () => {
                           About
                         </Typography>
                         <Grid container spacing={2}>
-                          {sub_role === 'donar_individual' && (
+                          {sub_role === SUBROLES.INDIVIDUAL && (
                             <>
                               <Grid item xs={6}>
                                 <Box display="flex" alignItems="center" mb={1}>
@@ -345,7 +354,7 @@ const UserProfileCard = () => {
                                   <Typography variant="body1" fontSize="12px" fontWeight="600" lineHeight="2">
                                     <span>Donor ID:</span>{' '}
                                     <Typography component="span" fontSize="12px">
-                                      1765
+                                      {uniqueId}
                                     </Typography>
                                   </Typography>
                                 </Box>
@@ -396,7 +405,7 @@ const UserProfileCard = () => {
                             </>
                           )}
 
-                          {(sub_role === 'donar_company' || sub_role === 'donar_group') && (
+                          {(sub_role === SUBROLES.COMPANY || sub_role === SUBROLES.GROUP) && (
                             <>
                               <Grid item xs={6}>
                                 <Box display="flex" alignItems="center" mb={1}>

@@ -12,7 +12,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const Lead = () => {
+const Mail = () => {
   const navigate = useNavigate();
   const [listName, setListName] = useState('');
   const [listFilters, setListFilters] = useState([]);
@@ -294,9 +294,7 @@ const Lead = () => {
             tags={tagOptions}
             tagFilter={tag}
             setTagFilter={(value) => setTag(value)}
-            includeArchives={includeArchives}
-            setIncludeArchives={setIncludeArchives}
-            selectedFilters={['listNameFilter', 'tagFilter', 'includeArchives']}
+            selectedFilters={['listNameFilter', 'tagFilter', ]}
             onReset={handleReset}
           />
 
@@ -318,7 +316,7 @@ const Lead = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 slots={{
@@ -363,4 +361,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Mail;

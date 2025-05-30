@@ -55,8 +55,6 @@ const GetFormById = () => {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-      console.log("submit form",values);
-      
       const formUrl = `${urls?.responses?.submit}/${formid}`
       await postApi(formUrl, values)
       formik.resetForm();

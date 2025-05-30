@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Card, Grid, IconButton, Modal, Stack, TextField, Typography, Button, InputBase, Skeleton } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import {
+  Box,
+  Card,
+  Grid,
+  IconButton,
+  Modal,
+  Stack,
+  TextField,
+  Typography,
+  Button,
+  InputBase,
+  Skeleton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
+} from '@mui/material';
+import { Add, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import AntSwitch from 'components/AntSwitch';
@@ -14,14 +29,14 @@ const defaultTabTypes = [
   'Contact Types',
   'Referral Types',
   'Contact Purpose',
-  'Campaign',
-  'Location',
   'Key Indicators',
   'Payment Method',
   'Archive Reason',
-  'Form Types',
+  'Campaign',
+  'Location',
   'Reason',
-  'Service Types'
+  'Service Types',
+  'Form Types'
 ];
 
 const TabbedDataGrid = () => {
@@ -44,6 +59,11 @@ const TabbedDataGrid = () => {
     pageSize: 100
   });
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
 
   const handleEdit = (item) => {
     setInputValue(item.name);
@@ -136,7 +156,9 @@ const TabbedDataGrid = () => {
       toast.error('Error fetching configurations');
     } finally {
       // setLoading(false);
-      setTimeout(()=>{setLoading(false);}, 1000)
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -228,6 +250,125 @@ const TabbedDataGrid = () => {
     }
   };
 
+  const headerContent = (section, loading, handleOpenModal, showAddIcon = true) => (
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+      {loading ? (
+        <Skeleton variant="text" width="60%" height={28} />
+      ) : (
+        <Typography variant="h6" fontWeight="500">
+          {section}
+        </Typography>
+      )}
+      {!loading && showAddIcon && (
+        <IconButton
+          onClick={(event) => {
+            event.stopPropagation(); 
+            handleOpenModal(section);
+          }}
+          sx={{
+            backgroundColor: '#41C048',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px',
+            color: 'white',
+            '&:hover': { backgroundColor: '#41C048' }
+          }}
+        >
+          <Add sx={{ fontSize: 16 }} />
+        </IconButton>
+      )}
+    </Box>
+  );
+
+  const cardBodyContent = (
+    items,
+    loading,
+    handleStatusUpdate,
+    handleEdit,
+    handleDeleteClick,
+    confirmOpen,
+    setConfirmOpen,
+    handleConfirmDelete
+  ) => (
+    <>
+      <Box sx={{ px: 2, py: 1, backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
+        {loading ? (
+          <Skeleton variant="text" width="80%" height={20} />
+        ) : (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="subtitle2" fontWeight="medium">
+              Name
+            </Typography>
+            <Typography variant="subtitle2" fontWeight="medium">
+              Status
+            </Typography>
+          </Box>
+        )}
+      </Box>
+      <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
+        {loading ? (
+          [...Array(3)].map((_, i) => (
+            <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Skeleton variant="text" width="60%" height={20} />
+              <Skeleton variant="circular" width={24} height={24} />
+            </Box>
+          ))
+        ) : items.length > 0 ? (
+          items.map((item) => (
+            <Box
+              key={item.id}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 1,
+                pb: 1,
+                borderBottom: '1px solid #f0f0f0',
+                flexWrap: 'wrap'
+              }}
+            >
+              <Typography
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-line',
+                  pr: 2,
+                  maxWidth: '60%'
+                }}
+              >
+                {item.name}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
+                <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
+                &nbsp;
+                <IconButton onClick={() => handleEdit(item)}>
+                  <IconPencil color="orangered" size={18} />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteClick(item.id)}>
+                  <IconTrash color="orangered" size={18} />
+                </IconButton>
+                <CommonConfirmDialog
+                  open={confirmOpen}
+                  onClose={() => setConfirmOpen(false)}
+                  onConfirm={handleConfirmDelete}
+                  content="Are you sure you want to delete ?"
+                  title="⚠️ Delete"
+                  confirmText="Delete"
+                  cancelText="Cancel"
+                />
+              </Box>
+            </Box>
+          ))
+        ) : (
+          <Typography variant="body2" color="textSecondary">
+            No items found
+          </Typography>
+        )}
+      </Box>
+    </>
+  );
+
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
@@ -297,133 +438,80 @@ const TabbedDataGrid = () => {
         />
         <Grid item xs={9}>
           <Grid container spacing={2}>
-            {Object.entries(tabData).map(([section, items]) => (
-              <Grid item xs={12} sm={6} md={4} key={section}>
-                <Card
-                  sx={{
-                    p: 0,
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '8px',
-                    height: '300px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      px: 2,
-                      py: 1,
-                      borderBottom: '1px solid #e0e0e0',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      {loading ? (
-                        <Skeleton variant="text" width="60%" height={28} />
-                      ) : (
-                        <Typography variant="h6" fontWeight="500">
-                          {section}
-                        </Typography>
-                      )}
-                      {!loading && (
-                        <IconButton
-                          onClick={() => handleOpenModal(section)}
-                          sx={{
-                            backgroundColor: '#41C048',
-                            borderRadius: '50%',
-                            width: '20px',
-                            height: '20px',
-                            color: 'white',
-                            '&:hover': { backgroundColor: '#41C048' }
-                          }}
-                        >
-                          <Add sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      )}
-                    </Box>
-                  </Box>
-                  <Box sx={{ px: 2, py: 1, backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
-                    {loading ? (
-                      <Skeleton variant="text" width="80%" height={20} />
-                    ) : (
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="subtitle2" fontWeight="medium">
-                          Configuration
-                        </Typography>
-                        <Typography variant="subtitle2" fontWeight="medium">
-                          Status
-                        </Typography>
+            {Object.entries(tabData).map(([section, items], index) => {
+              const isInitialCard = index < 6;
+
+              return (
+                <Grid item xs={12} sm={6} md={4} key={section}>
+                  {isInitialCard ? (
+                    <Card
+                      sx={{
+                        p: 0,
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        height: '300px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          px: 2,
+                          py: 1,
+                          borderBottom: '1px solid #e0e0e0',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                      >
+                        {headerContent(section, loading, handleOpenModal)}
                       </Box>
-                    )}
-                  </Box>
-                  <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
-                    {loading ? (
-                      // Show a few skeleton rows
-                      [...Array(3)].map((_, i) => (
-                        <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                          <Skeleton variant="text" width="60%" height={20} />
-                          <Skeleton variant="circular" width={24} height={24} />
-                        </Box>
-                      ))
-                    ) : items.length > 0 ? (
-                      items.map((item) => (
-                        <Box
-                          key={item.id}
+                      {cardBodyContent(
+                        items,
+                        loading,
+                        handleStatusUpdate,
+                        handleEdit,
+                        handleDeleteClick,
+                        confirmOpen,
+                        setConfirmOpen,
+                        handleConfirmDelete
+                      )}
+                    </Card>
+                  ) : (
+                    <Accordion expanded={expanded === section} onChange={handleAccordionChange(section)}>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        {headerContent(section, loading, handleOpenModal, expanded === section)}
+                      </AccordionSummary>
+                      <AccordionDetails sx={{ p: 0 }}>
+                        <Card
                           sx={{
+                            p: 0,
+                            border: 'none',
+                            borderRadius: '0',
+                            height: 'auto',
                             display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            mb: 1,
-                            pb: 1,
-                            borderBottom: '1px solid #f0f0f0',
-                            flexWrap: 'wrap'
+                            flexDirection: 'column',
+                            overflow: 'hidden'
                           }}
                         >
-                          <Typography
-                            sx={{
-                              flex: 1,
-                              minWidth: 0,
-                              wordBreak: 'break-word',
-                              whiteSpace: 'pre-line',
-                              pr: 2,
-                              maxWidth: '60%'
-                            }}
-                          >
-                            {item.name}
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
-                            <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
-                            &nbsp;
-                            <IconButton onClick={() => handleEdit(item)}>
-                              <IconPencil color="orangered" size={18} />
-                            </IconButton>
-                            <IconButton onClick={() => handleDeleteClick(item.id)}>
-                              <IconTrash color="orangered" size={18} />
-                            </IconButton>
-                            <CommonConfirmDialog
-                              open={confirmOpen}
-                              onClose={() => setConfirmOpen(false)}
-                              onConfirm={handleConfirmDelete}
-                              content="Are you sure you want to delete ?"
-                              title="⚠️ Delete"
-                              confirmText="Delete"
-                              cancelText="Cancel"
-                            />
-                          </Box>
-                        </Box>
-                      ))
-                    ) : (
-                      <Typography variant="body2" color="textSecondary">
-                        No items found
-                      </Typography>
-                    )}
-                  </Box>
-                </Card>
-              </Grid>
-            ))}
+                          {cardBodyContent(
+                            items,
+                            loading,
+                            handleStatusUpdate,
+                            handleEdit,
+                            handleDeleteClick,
+                            confirmOpen,
+                            setConfirmOpen,
+                            handleConfirmDelete
+                          )}
+                        </Card>
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+                </Grid>
+              );
+            })}
           </Grid>
         </Grid>
       </Grid>

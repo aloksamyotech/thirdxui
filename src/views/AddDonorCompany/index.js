@@ -51,8 +51,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const location = useLocation();
 
-  const subRole = location.state?.subRole;
-  const editdata = location.state || {};
+  const subRole = location?.state?.subRole;
+  const editdata = location?.state || {};
 
   const {
     register,
@@ -805,10 +805,9 @@ const AddCaseForm = ({ onCancel }) => {
                                 <TextField
                                   label="Notes"
                                   multiline
-                                  minRows={11}
+                                  minRows={14}
                                   fullWidth
                                   variant="outlined"
-                                  sx={{ mb: 2 }}
                                   error={!!errors.riskNotes}
                                   helperText={errors.riskNotes?.message}
                                   inputProps={{
@@ -827,7 +826,7 @@ const AddCaseForm = ({ onCancel }) => {
                               control={<AntSwitch checked={restrictAccess} onChange={() => setRestrictAccess(!restrictAccess)} />}
                               label="Restrict Access?"
                               labelPlacement="start"
-                              sx={{ gap: 1 }}
+                              sx={{ gap: 1 , mt:1}}
                             />
                           </Paper>
                         </Grid>

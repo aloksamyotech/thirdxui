@@ -25,7 +25,7 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const Lead = () => {
+const Donor = () => {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
@@ -38,6 +38,7 @@ const Lead = () => {
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [nameFilterOptions, setNameFilterOptions] = useState([]);
   const [rows, setRows] = useState([]);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [loading, setLoading] = useState(true);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
@@ -94,8 +95,8 @@ const Lead = () => {
                 {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
-                    ? params.row.companyInformation.companyName
-                    : ''}
+                  ? params.row.companyInformation.companyName
+                  : ''}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -140,9 +141,11 @@ const Lead = () => {
         queryParams.append('search', searchQuery.trim());
       }
 
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-      queryParams.append('archive', 'false');
       queryParams.append('role', 'donor');
 
       const url = `${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`;
@@ -154,7 +157,7 @@ const Lead = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);
@@ -167,6 +170,10 @@ const Lead = () => {
     }
   };
 
+  useEffect(() => {
+    handleFilter();
+  }, [includeArchives]);
+
   const handleReset = () => {
     setStatus('');
     setCampaignFilter('');
@@ -174,6 +181,7 @@ const Lead = () => {
     setDateOpenedFilter('');
     setSearchQuery('');
     setIsFiltered(false);
+    setIncludeArchives(false);
     setPaginationModel({
       page: 0,
       pageSize: 10
@@ -214,9 +222,12 @@ const Lead = () => {
       const queryParams = new URLSearchParams({
         page: paginationModel.page + 1,
         limit: paginationModel.pageSize,
-        archive: 'false',
         role: 'donor'
       });
+
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
 
       const allDonor = response?.data?.data || [];
@@ -242,7 +253,7 @@ const Lead = () => {
 
       const formattedUsers = allDonor?.map((donor, index) => ({
         ...donor,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`
+        serialNumber: `#${donor?.uniqueId}`
       }));
 
       setRows(formattedUsers);
@@ -321,16 +332,6 @@ const Lead = () => {
               </IconButton>
             </Box>
 
-            {/* <TextField
-              size="small"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '350px' }}
-            /> */}
           </Stack>
           <Grid container spacing={2}>
             <FilterPanel
@@ -347,7 +348,9 @@ const Lead = () => {
               campaigns={campaignTypeOptions}
               campaignFilter={campaign}
               setCampaignFilter={setCampaignFilter}
-              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'campaignFilter']}
+              includeArchives={includeArchives}
+              setIncludeArchives={setIncludeArchives}
+              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'campaignFilter', 'includeArchives']}
               onReset={handleReset}
             />
 
@@ -358,18 +361,17 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
                   rowCount={totalRows}
                   loading={loading}
-                  pagination
+                  pageSizeOptions={[5, 10, 25, 50]}
                   paginationMode="server"
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
-                  pageSizeOptions={[10]}
                   rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
@@ -382,19 +384,13 @@ const Lead = () => {
                           display: 'flex',
                           alignItems: 'self-start',
                           justifyContent: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)'
                         }}
                       >
                         <SingleRowLoader />
                       </Box>
                     ),
-                    noRowsOverlay: () => (
-                      loading ? null : (
-                        <Box sx={{ padding: 2, textAlign: 'center' }}>
-                          No data available.
-                        </Box>
-                      )
-                    ),
+                    noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                   }}
                   sx={{
                     '& .MuiDataGrid-columnHeaders': { display: 'none' },
@@ -416,4 +412,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Donor;

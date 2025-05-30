@@ -12,7 +12,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const Lead = () => {
+const Case = () => {
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
   const [serviceTypeFilter, setServiceTypeFilterOptions] = useState([]);
@@ -141,7 +141,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: `RD-${user?.uniqueId}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
@@ -195,7 +195,7 @@ const Lead = () => {
 
         return {
           id: user?._id,
-          serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
+          serialNumber: user?.uniqueId,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
@@ -314,9 +314,9 @@ const Lead = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
-            serviceTypes={serviceTypeFilter}
-            serviceTypeFilter={serviceType}
-            setServiceTypeFilter={(value) => setServiceType(value)}
+            service={serviceTypeFilter}
+            serviceFilter={serviceType}
+            setServiceFilter={(value) => setServiceType(value)}
             statuses={statusFilter}
             statusFilter={status}
             setStatusFilter={(value) => setStatus(value)}
@@ -326,7 +326,7 @@ const Lead = () => {
             owners={ownerFilters}
             ownerFilter={owner}
             setOwnerFilter={(value) => setOwner(value)}
-            selectedFilters={['statusFilter', 'serviceTypeFilter', 'dateOpenedFilter', 'ownerFilter']}
+            selectedFilters={['serviceFilter', 'statusFilter', 'dateOpenedFilter', 'ownerFilter']}
             onReset={handleReset}
           />
 
@@ -346,11 +346,10 @@ const Lead = () => {
                     columns={columns}
                     rowCount={totalRows}
                     loading={loading}
-                    pagination
+                    pageSizeOptions={[5, 10, 25, 50]}
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
-                    pageSizeOptions={[10]}
                     rowHeight={65}
                     getRowId={(row) => row.id}
                     slots={{
@@ -389,4 +388,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Case;

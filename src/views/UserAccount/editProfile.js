@@ -12,13 +12,45 @@ import {
   Stack
 } from '@mui/material';
 import ProfileLogo from 'assets/images/profile.png';
+import { urls } from 'common/urls';
+import { updateApi } from 'common/apiClient';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
-const EditProfileModal = ({ open, onClose, userData }) => {
+const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
   const [formData, setFormData] = useState(userData);
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === 'file') {
+      setFormData({ ...formData, file: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+
+  const onSubmit = async () => {
+    const url = urls?.login?.updateUserById
+    const form = new FormData();
+    for (const key in formData) {
+      if (formData[key] !== undefined && formData[key] !== null) {
+        form.append(key, formData[key]);
+      }
+    }
+    setLoading(true)
+    await updateApi(url, form)
+    toast.success('Profile Updated Successfully')
+    getUserInfo()
+    onClose()
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    if (userData) {
+      setFormData(userData);
+    }
+  }, [userData]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -33,16 +65,23 @@ const EditProfileModal = ({ open, onClose, userData }) => {
           p: 3,
           borderRadius: 2,
           width: 800,
-          maxHeight: 500, 
+          maxHeight: 500,
           overflowY: 'auto'
         }}
       >
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar src={ProfileLogo} sx={{ width: 50, height: 50 }} />
           <Stack direction="row" spacing={1}>
-            <Button variant="contained" component="label" sx={{backgroundColor:'#053146'}}>
+            <Button variant="contained" component="label" sx={{ backgroundColor: '#053146' }}>
               UPLOAD A NEW PHOTO
-              <input hidden accept="image/*" type="file" />
+              <input
+                hidden
+                accept="image/*"
+                type="file"
+                label='file'
+                name='file'
+                // value={formData?.file}
+                onChange={handleChange} />
             </Button>
             <Button variant="outlined" color="error">
               RESET
@@ -54,20 +93,20 @@ const EditProfileModal = ({ open, onClose, userData }) => {
           {[
             { label: 'First Name', name: 'firstName' },
             { label: 'Last Name', name: 'lastName' },
-            { label: 'Phone Number', name: 'phone' },
+            { label: 'Phone Number', name: 'phoneNumber' },
             { label: 'Address', name: 'address' },
             { label: 'Email', name: 'email' },
             { label: 'Organization', name: 'organization' },
             { label: 'State', name: 'state' },
-            { label: 'Zip Code', name: 'zip' }
+            { label: 'Zip Code', name: 'zipCode' }
           ].map((field) => (
-            <Grid item xs={12} sm={6} key={field.name}>
+            <Grid item xs={12} sm={6} key={field?.name}>
               <TextField
                 fullWidth
-                label={field.label}
+                label={field?.label}
                 size='small'
-                name={field.name}
-                value={formData[field.name]}
+                name={field?.name}
+                value={formData[field?.name]}
                 onChange={handleChange}
               />
             </Grid>
@@ -147,11 +186,11 @@ const EditProfileModal = ({ open, onClose, userData }) => {
         </Grid>
 
         <Box display="flex" justifyContent="flex-end" gap={1} mt={2}>
-          <Button variant="contained" sx={{backgroundColor:'#053146'}} onClick={onClose}>
-            Save Changes
+          <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={onSubmit} disabled={loading}>
+            SAVE CHANGES
           </Button>
           <Button onClick={onClose} variant="outlined" color="error">
-            Cancel
+            CANCEL
           </Button>
         </Box>
       </Box>

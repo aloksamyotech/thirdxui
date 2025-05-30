@@ -18,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import InfoIcon from '@mui/icons-material/Info';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Background from 'assets/images/UserProfile.png'
+import Background from 'assets/images/UserProfile.png';
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
@@ -27,7 +27,7 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { toast } from 'react-hot-toast';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 
-const UserProfile = () => {
+const ViewService = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const serviceId = location.state?.row?._id || location.state?.row || location.state?.serviceId;
@@ -45,10 +45,13 @@ const UserProfile = () => {
   const [loading2, setLoading2] = useState(true);
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
+  const [sessionLeads, setSessionLeads] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
   });
+  const [locationOptions, setLocationOptions] = useState([]);
+  const [locationFilter, setLocationFilter] = useState('');
 
   const dateAddedFilters = [
     { value: 'today', label: 'Today' },
@@ -73,6 +76,47 @@ const UserProfile = () => {
         }));
         setCountriesWithFlags(countries);
       });
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.getAllServicesUser);
+        const users = response.data.allUser || [];
+
+        const activeUsers = users.filter((user) => user.isActive);
+
+        const formattedLeads = activeUsers.map((user) => ({
+          value: user._id,
+          label: `${user.personalInfo?.firstName?.trim()} ${user.personalInfo?.lastName?.trim() || ''}`.trim()
+        }));
+
+        setSessionLeads(formattedLeads);
+      } catch (error) {
+        console.error('Error fetching session leads:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const options = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Location')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+
+        setLocationOptions(options);
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+      }
+    };
+    fetchLocations();
   }, []);
 
   useEffect(() => {
@@ -108,16 +152,32 @@ const UserProfile = () => {
     try {
       setLoading2(true);
       if (!serviceId) return;
-      const response = await getApi(urls.session.getById.replace(':id', serviceId));
-      if (response?.data?.userData) {
-        setSessionData(response.data.userData);
-      }
+
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        serviceId: serviceId
+      });
+
+      const url = `${urls.session.fetchWithPagination}?${queryParams.toString()}`;
+      const response = await getApi(url);
+      const allSessions = response?.data?.data || [];
+      setSessionData(allSessions);
+      setTotalRows(response.data.meta?.total || 0);
     } catch (error) {
-      console.log("error:", error);
+      toast.error('Failed to fetch sessions');
+      setSessionData([]);
+      setTotalRows(0);
     } finally {
       setLoading2(false);
     }
   };
+
+  useEffect(() => {
+    if (serviceId) {
+      fetchSessionlist(serviceId);
+    }
+  }, [serviceId, paginationModel]);
 
   const handleFilter = async () => {
     try {
@@ -128,8 +188,14 @@ const UserProfile = () => {
         queryParams.append('date', formattedDate);
       }
 
+      queryParams.append('serviceuser', sessionLeadFilter);
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('time', timeFilter);
+      queryParams.append('serviceId', serviceId);
+      if (locationFilter) {
+        queryParams.append('location', locationFilter);
+      }
 
       const url = `${urls.session.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
@@ -137,28 +203,38 @@ const UserProfile = () => {
       const allSessions = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
-      const formattedUsers = allSessions?.map((item, index) => ({
-        id: item._id || index,
-        date: item?.date ? new Date(item.date).toLocaleDateString() : '',
-        country: item?.country || '',
-        time: item?.time || ''
-      }));
-
-      setSessionData(formattedUsers);
-
+      setSessionData(allSessions);
       setTotalRows(pagination?.total);
       setIsFiltered(true);
     } catch (error) {
-      console.error('Failed to fetch filtered sessions:', error);
+      toast.error('Failed to fetch filtered sessions');
+      setSessionData([]);
+      setTotalRows(0);
     }
   };
 
   const handleReset = () => {
-    setCountryOfOriginFilter('');
+    setLocationFilter('');
     setTimeFilter('');
     setDateOpenedFilter('');
     setIsFiltered(false);
+    setSessionLeadFilter('');
+    setPaginationModel({
+      page: 0,
+      pageSize: 10
+    });
+    if (serviceId) {
+      fetchSessionlist(serviceId);
+    }
   };
+
+  useEffect(() => {
+    if (dateOpenedFilter || locationFilter || paginationModel || isFiltered || sessionLeadFilter || timeFilter) {
+      handleFilter();
+    } else if (serviceId) {
+      fetchSessionlist(serviceId);
+    }
+  }, [dateOpenedFilter, locationFilter, paginationModel, isFiltered, sessionLeadFilter, timeFilter]);
 
   return (
     <>
@@ -189,248 +265,224 @@ const UserProfile = () => {
           timeFilter={timeFilter}
           setTimeFilter={(value) => setTimeFilter(value)}
           timeOptions={timeOptions}
-          sessionLeads={[
-            { value: 'john_doe', label: 'John Doe' },
-            { value: 'jane_smith', label: 'Jane Smith' }
-          ]}
+          locations={locationOptions}
+          locationFilter={locationFilter}
+          setLocationFilter={setLocationFilter}
+          sessionLeads={sessionLeads}
+          sessionLeadFilter={sessionLeadFilter}
           setSessionLeadFilter={setSessionLeadFilter}
-          selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
+          selectedFilters={['locationFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
           onReset={handleReset}
         />
 
         <Grid item xs={12} md={9}>
           <Card sx={{ borderRadius: 3, mb: 2 }}>
-            {
-              loading ? (
-                <Box sx={{
-                  margin: "5px"
-                }}>
-                  <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
-                </Box>
+            {loading ? (
+              <Box
+                sx={{
+                  margin: '5px'
+                }}
+              >
+                <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
+              </Box>
+            ) : (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={4}>
+                  <Box
+                    component="img"
+                    src={
+                      loading
+                        ? Background
+                        : serviceData?.file
+                        ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                        : Background
+                    }
+                    alt="Service"
+                    sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                  />
+                </Grid>
 
-              ) : (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
-                    <Box
-                      component="img"
-                      src={
-                        loading
-                          ? Background
-                          : serviceData?.file
-                            ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                            : Background
-                      }
-                      alt="Service"
-                      sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
-                    />
-                  </Grid>
+                <Grid item xs={12} md={8}>
+                  <Stack>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" pt={1}>
+                      <Box sx={{ maxWidth: '60%'}}>
+                        <Tooltip title={(serviceData?.name || '').toUpperCase()}>
+                          <Typography
+                            variant="h4"
+                            sx={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '100%',
+                              color: '#808191'
+                            }}
+                            fontSize={18}
+                            fontWeight={500}
+                          >
+                            {(serviceData?.name || '').toUpperCase()}
+                          </Typography>
+                        </Tooltip>
 
-                  <Grid item xs={12} md={8}>
-                    <Stack>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box sx={{ maxWidth: '60%' }}>
-                          <Tooltip title={(serviceData?.name || '').toUpperCase()}>
-                            <Typography
-                              variant="h4"
+                        <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
+                          <Box sx={{ position: 'relative', width: 16, height: 16 }}>
+                            <Box
                               sx={{
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                maxWidth: '100%',
-                                color: '#808191'
+                                width: 16,
+                                height: 16,
+                                borderRadius: '50%',
+                                border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
+                                position: 'absolute',
+                                top: 0,
+                                left: 0
                               }}
-                              fontSize={18}
-                              fontWeight={500}
-                            >
-                              {(serviceData?.name || '').toUpperCase()}
-                            </Typography>
-                          </Tooltip>
+                            />
+                            <Box
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                backgroundColor: serviceData?.isActive ? 'green' : 'red',
+                                position: 'absolute',
+                                top: '4px',
+                                left: '4px'
+                              }}
+                            />
+                          </Box>
 
-                          <Stack direction="row" alignItems="center" spacing={1} mt={0.5}>
-                            <Box sx={{ position: 'relative', width: 16, height: 16 }}>
-                              <Box
-                                sx={{
-                                  width: 16,
-                                  height: 16,
-                                  borderRadius: '50%',
-                                  border: `1.5px solid ${serviceData?.isActive ? 'green' : 'red'}`,
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0
-                                }}
-                              />
-                              <Box
-                                sx={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  backgroundColor: serviceData?.isActive ? 'green' : 'red',
-                                  position: 'absolute',
-                                  top: '4px',
-                                  left: '4px'
-                                }}
-                              />
-                            </Box>
-
-                            <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
-                              {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
-                            </Typography>
-                          </Stack>
-                        </Box>
-
-                        <Button
-                          variant="contained"
-                          sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 2, whiteSpace: 'nowrap' }}
-                          onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
-                        >
-                          Add New Session {<AddIcon />}
-                        </Button>
+                          <Typography variant="body1" color={serviceData?.isActive ? 'green' : 'red'} fontWeight={400}>
+                            {serviceData?.isActive ? 'ACTIVE' : 'INACTIVE'}
+                          </Typography>
+                        </Stack>
                       </Box>
 
-                      <Typography variant="body2" color="textSecondary" mb={1}>
-                        Service Code - {serviceData?.code}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" mb={1}>
-                        Start Date - {formatDate(serviceData?.createdAt)}
-                      </Typography>
-                      <Typography variant="body2">
-                        <strong>Service Description - </strong>
-                        {serviceData?.description}
-                      </Typography>
-                    </Stack>
-                  </Grid>
+                      <Button
+                        variant="contained"
+                        size='small'
+                        sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 1, whiteSpace: 'nowrap' }}
+                        onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
+                      >
+                        Add New Session {<AddIcon />}
+                      </Button>
+                    </Box>
+
+                    <Typography variant="body2" color="textSecondary" mb={1}>
+                      Service Code - {serviceData?.code}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" mb={1}>
+                      Start Date - {formatDate(serviceData?.createdAt)}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Service Description - </strong>
+                      {serviceData?.description}
+                    </Typography>
+                  </Stack>
                 </Grid>
-              )
-            }
+              </Grid>
+            )}
           </Card>
 
-          <Card sx={{ p: 2, borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400 }}>
-            <Typography variant="h5" mb={1}>
+          <Card sx={{ borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400, overflowY: 'auto' }}>
+            <Typography variant="h5" m={1} p={1} fontWeight="550">
               Session List
             </Typography>
             <Divider />
 
-            {/* <Stack spacing={1} mt={2}>
-              {sessionData?.map((session, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    px: 2,
-                    py: 1.5,
-                    borderBottom: '1px solid #e0e0e0',
-                    flexWrap: 'wrap'
-                  }}
-                >
-                  <Box minWidth={90}>
-                    <Typography variant="subtitle2" fontWeight="bold">
-                      {new Date(session.date).toLocaleDateString('en-IN', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </Typography>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {session.time}
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ flexGrow: 1, px: 2, minWidth: 200 }}>
-                    <Typography variant="subtitle2" fontWeight="bold" sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
-                      {session.campaigns}
-                    </Typography>
-                  </Box>
-
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        backgroundColor: '#1B4B66',
-                        textTransform: 'none',
-                        fontSize: '10px',
-                        py: 0.5,
-                        px: 0.5,
-                        maxHeight: '50px'
-                      }}
-                      onClick={() => navigate('/add-session', { state: { session } })}
-                    >
-                      Edit Session
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        textTransform: 'none',
-                        color: '#1B4B66',
-                        fontSize: '10px',
-                        py: 0.48,
-                        px: 0.5,
-                        maxHeight: '50px'
-                      }}
-                      onClick={() => navigate('/attendees', { state: { session } })}
-                    >
-                      Add Attendee
-                    </Button>
-                    <IconButton size="small">
-                      <InfoIcon sx={{ color: '#49494c' }} fontSize="small" onClick={() => navigate('/view-session')} />
-                    </IconButton>
-                  </Box>
-                </Box>
-              ))}
-            </Stack> */}
-            <Stack spacing={1} mt={2} >
+            <Stack spacing={1} mt={2}>
               {loading2 ? (
-
                 <Box
                   sx={{
                     minHeight: 200,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    alignItems: 'center',
-                    px: 2,
+                    alignItems: 'center'
                   }}
                 >
                   <SingleRowLoader />
                 </Box>
+              ) : sessionData?.length === 0 ? (
+                <Box
+                  sx={{
+                    minHeight: 200,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Typography variant="body1" color="text.secondary">
+                    No sessions available
+                  </Typography>
+                </Box>
               ) : (
                 sessionData?.map((session, index) => (
                   <Box
-                    key={index}
+                    key={session?._id || index}
                     sx={{
                       display: 'flex',
-                      alignItems: 'flex-start',
+                      alignItems: 'center',
                       justifyContent: 'space-between',
-                      px: 2,
-                      py: 1.5,
+                      p: 1,
                       borderBottom: '1px solid #e0e0e0',
-                      flexWrap: 'wrap',
+                      flexWrap: 'nowrap',
+                      gap: 1
                     }}
                   >
-                    <Box minWidth={90}>
+                    <Box sx={{ maxWidth: 90, ml: 1 }}>
                       <Typography variant="subtitle2" fontWeight="bold">
-                        {new Date(session.date).toLocaleDateString('en-IN', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        {session?.date
+                          ? new Date(session.date).toLocaleDateString('en-IN', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: '2-digit'
+                            })
+                          : '-'}
                       </Typography>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        {session.time}
+                      <Typography variant="subtitle2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                        {session?.time || '-'}
                       </Typography>
                     </Box>
 
-                    <Box sx={{ flexGrow: 1, px: 2, maxWidth: 200 }}>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="bold"
-                        sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
+                    <Box sx={{ flexGrow: 1, px: 2, maxWidth: 300 }}>
+                      <Tooltip title={session?.serviceId?.name || serviceData?.name || ''} placement="top" arrow>
+                        <Typography
+                          variant="subtitle2"
+                          fontSize="14px"
+                          fontWeight="550"
+                          sx={{
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word',
+                            maxWidth: '100%'
+                          }}
+                        >
+                          {session?.serviceId?.name || serviceData?.name || '-'}
+                        </Typography>
+                      </Tooltip>
+                      <Tooltip
+                        title={session?.description || session?.serviceId?.description || serviceData?.description || ''}
+                        placement="top"
+                        arrow
                       >
-                        {session.campaigns}
-                      </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontSize="10px"
+                          sx={{
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '282px'
+                          }}
+                        >
+                          {session?.description || session?.serviceId?.description || serviceData?.description || '-'}
+                        </Typography>
+                      </Tooltip>
                     </Box>
 
                     <Box display="flex" alignItems="center" gap={1}>
@@ -440,12 +492,18 @@ const UserProfile = () => {
                         sx={{
                           backgroundColor: '#1B4B66',
                           textTransform: 'none',
-                          fontSize: '10px',
-                          py: 0.5,
+                          fontSize: '8px',
+                          py: 0.6,
                           px: 0.5,
-                          maxHeight: '50px',
+                          maxHeight: '45px'
                         }}
-                        onClick={() => navigate('/add-session', { state: { session } })}
+                        onClick={() =>
+                          navigate('/add-session', {
+                            state: {
+                              session
+                            }
+                          })
+                        }
                       >
                         Edit Session
                       </Button>
@@ -455,21 +513,33 @@ const UserProfile = () => {
                         sx={{
                           textTransform: 'none',
                           color: '#1B4B66',
-                          fontSize: '10px',
-                          py: 0.48,
+                          fontSize: '8px',
+                          py: 0.45,
                           px: 0.5,
-                          maxHeight: '50px',
+                          maxHeight: '45px',
+                          borderColor: '#1B4B66'
                         }}
-                        onClick={() => navigate('/attendees', { state: { session } })}
+                        onClick={() =>
+                          navigate('/attendees', {
+                            state: {
+                              session
+                            }
+                          })
+                        }
                       >
                         Add Attendee
                       </Button>
-                      <IconButton size="small">
-                        <InfoIcon
-                          sx={{ color: '#49494c' }}
-                          fontSize="small"
-                          onClick={() => navigate('/view-session')}
-                        />
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          navigate('/view-session', {
+                            state: {
+                              session
+                            }
+                          })
+                        }
+                      >
+                        <InfoIcon sx={{ color: '#49494c' }} fontSize="small" />
                       </IconButton>
                     </Box>
                   </Box>
@@ -483,4 +553,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default ViewService;

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography, IconButton, Card, Button, Select, MenuItem, FormControl, InputLabel, Tooltip, Stack } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
@@ -25,9 +25,9 @@ export default function SessionRegisterPage() {
     pageSize: 5
   });
   const [totalRows, setTotalRows] = useState(0);
-
   const session = location?.state?.session || {};
-  const sessionId = session?._id;
+
+  const sessionId = session?._id || location?.state?.sessionId;
 
   const columns = [
     {
@@ -60,15 +60,13 @@ export default function SessionRegisterPage() {
   const fetchpeopleAttendee = async () => {
     try {
       setLoading(true);
-    const queryParams = new URLSearchParams({
-  page: paginationModel.page + 1,
-  limit: paginationModel.pageSize,
-  role: 'service_user'
-});
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize,
+        role: 'service_user'
+      });
 
-const response = await getApi(
-  `${urls.attendees.getAttendeesBySession}/${sessionId}?${queryParams.toString()}`
-);
+      const response = await getApi(`${urls.attendees.getAttendeesBySession}/${sessionId}?${queryParams.toString()}`);
 
       const attendeesData = response?.data?.data || [];
       const formattedUsers = attendeesData.map((item, index) => ({
@@ -86,7 +84,6 @@ const response = await getApi(
       setRowsAttendee(formattedUsers);
       setTotalRows(response?.data?.meta?.total || 0);
     } catch (error) {
-      console.error('Failed to fetch attendees:', error);
       toast.error('Failed to load attendees');
     } finally {
       setLoading(false);
@@ -103,7 +100,6 @@ const response = await getApi(
       }));
       setRows(formattedUsers);
     } catch (error) {
-      console.error('Failed to fetch available users:', error);
       toast.error('Failed to load available users');
     }
   };
@@ -125,13 +121,12 @@ const response = await getApi(
 
       if (response.success) {
         toast.success('Attendee added successfully');
-        fetchpeopleAttendee(); 
-        setSelectedUserId(''); 
+        fetchpeopleAttendee();
+        setSelectedUserId('');
       } else {
         toast.error(response.data.message || 'Failed to add attendee');
       }
     } catch (error) {
-      console.error('Error while adding attendee:', error);
       toast.error(error.response?.data?.message || 'Error while adding attendee');
     } finally {
       setIsSubmitting(false);
@@ -174,16 +169,18 @@ const response = await getApi(
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex" alignItems="center">
-          <IconButton onClick={() => navigate('/view-session')}>
-            <ArrowBackIcon />
+          <IconButton onClick={() => navigate('/view-session', { state: { session: session } })}>
+            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>
           <Typography fontWeight="bold">Attendee List</Typography>
         </Box>
       </Box>
 
-<Box sx={{ minHeight: 'auto', mt: '10px' }}>        <Grid container spacing={2}>
+      <Box sx={{ minHeight: 'auto', mt: '10px' }}>
+        {' '}
+        <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <Card style={{ height: 'auto'}}>
+            <Card style={{ height: 'auto' }}>
               <DataGrid
                 rows={loading ? [] : rowsAttendee}
                 columns={columns}
@@ -193,11 +190,10 @@ const response = await getApi(
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[5]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: { id: params.row.attendeeId } })}
-
                 slots={{
                   toolbar: CustomHeader,
                   loadingOverlay: () => (
@@ -228,7 +224,10 @@ const response = await getApi(
             <Card sx={{ p: 2, height: '250px' }}>
               <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Typography fontWeight="bold">Add An Attendee</Typography>
-                <AddCircleIcon sx={{ color: 'green', cursor: 'pointer' }} onClick={() => navigate('/add-serviceuser')} />
+                <AddCircleIcon
+                  sx={{ color: 'green', cursor: 'pointer' }}
+                  onClick={() => navigate('/add-serviceuser', { state: { sessionId: sessionId } })}
+                />
               </Box>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} sm={8}>

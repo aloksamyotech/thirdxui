@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, TextField, Box, Paper, Autocomplete, Button, MenuItem, InputAdornment, Card, Typography, Chip } from '@mui/material';
+import {
+  Grid,
+  TextField,
+  Box,
+  Paper,
+  Autocomplete,
+  Button,
+  MenuItem,
+  FormControl,
+  InputAdornment,
+  Card,
+  Typography,
+  Chip
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useForm, Controller } from 'react-hook-form';
@@ -24,56 +37,59 @@ const AddCaseForm = ({ onCancel }) => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [serviceUser, setServiceUser] = useState([]);
   const location = useLocation();
-  const session = location.state.session;
-
-  const serviceId = session?.serviceId || location.state?.serviceId;
-
+  const session = location?.state?.session;
+  const serviceId = session?.serviceId || location?.state?.serviceId;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setValue
   } = useForm({
     mode: 'all',
     defaultValues: {
       date: dayjs(),
       countryOfOrigin: '',
       type: '',
-      benificiary: [],
+      beneficiary: [],
       campaigns: [],
       engagement: [],
-      eventAttanded: [],
-      fundingInterest: [],
+      eventsAttended: [],
+      fundingInterests: [],
       fundraisingActivities: [],
       time: dayjs().format('HH:mm'),
       description: '',
-      file: null
+      file: '',
+      serviceUserId: ''
     }
   });
 
   useEffect(() => {
     if (session && Object.keys(session).length > 0) {
       const formData = {
-        countryOfOrigin: session.country || '',
-        type: session.name || '',
-        date: session.date ? dayjs(session.date) : dayjs(),
-        time: session.time || dayjs().format('HH:mm'),
-        description: session.description || '',
-        beneficiary: session.benificiary || [],
-        campaigns: session.campaigns || [],
-        engagement: session.engagement || [],
-        eventsAttended: session.eventAttanded || [],
-        fundingInterests: session.fundingInterest || [],
-        fundraisingActivities: session.fundraisingActivities || [],
-        serviceId: session.serviceId || '',
-        file: null
+        countryOfOrigin: session?.country || '',
+        date: session?.date ? dayjs(session.date) : dayjs(),
+        time: session?.time || dayjs().format('HH:mm'),
+        description: session?.description || '',
+        beneficiary: session?.benificiary || [],
+        campaigns: session?.campaigns || [],
+        engagement: session?.engagement || [],
+        eventsAttended: session?.eventAttanded || [],
+        fundingInterests: session?.fundingInterest || [],
+        fundraisingActivities: session?.fundraisingActivities || [],
+        serviceId: serviceId || '',
+        file: session?.file || '',
+        serviceUserId: session?.serviceuser?._id || ''
       };
 
-      reset(formData);
+      Object.entries(formData).forEach(([key, value]) => {
+        setValue(key, value);
+      });
     }
-  }, [session, reset, serviceId]);
+  }, [session, setValue]);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -98,6 +114,24 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchTags();
   }, []);
+
+  useEffect(() => {
+    const fetchserviceUser = async () => {
+      try {
+        const response = await getApi(urls.serviceuser.fetch);
+        const allUser = response?.data?.allUser || [];
+        const formattedUsers = allUser.map((user) => ({
+          id: user._id,
+          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        }));
+        setServiceUser(formattedUsers);
+      } catch (error) {
+        console.error('Error fetching service user:', error);
+      }
+    };
+    fetchserviceUser();
+  }, []);
+
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -105,17 +139,17 @@ const AddCaseForm = ({ onCancel }) => {
       render={({ field }) => (
         <Autocomplete
           multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          options={options || []}
+          getOptionLabel={(option) => option?.name || ''}
+          isOptionEqualToValue={(option, value) => option?._id === value?._id}
+          value={options?.filter((opt) => field.value?.includes(opt?._id)) || []}
+          onChange={(_, selectedOptions) => field.onChange(selectedOptions?.map((opt) => opt?._id) || [])}
           renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
+            value?.map((option, index) => (
               <Chip
-                label={option.name}
+                label={option?.name || ''}
                 {...getTagProps({ index })}
-                key={option._id}
+                key={option?._id}
                 deleteIcon={
                   <span
                     style={{
@@ -134,7 +168,16 @@ const AddCaseForm = ({ onCancel }) => {
               />
             ))
           }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          renderInput={(params) => (
+            <TextField 
+              {...params} 
+              label={label} 
+              size="small" 
+              error={!!error} 
+              helperText={helperText} 
+              fullWidth 
+            />
+          )}
         />
       )}
     />
@@ -147,8 +190,8 @@ const AddCaseForm = ({ onCancel }) => {
       const formData = new FormData();
 
       formData.append('country', data.countryOfOrigin || '');
-      formData.append('name', data.type || '');
-      formData.append('date', data.date || '');
+      formData.append('serviceuser', data.serviceUserId || '');
+      formData.append('date', data.date ? dayjs(data.date).format('YYYY-MM-DD') : '');
       formData.append('time', data.time || '');
       formData.append('description', data.description || '');
 
@@ -176,15 +219,30 @@ const AddCaseForm = ({ onCancel }) => {
         formData.append('fundraisingActivities[]', id);
       });
 
-      if (serviceId) {
-        formData.append('serviceId', serviceId);
+      if (session?._id) {
+        const sessionServiceId = session.serviceId?._id || session.serviceId;
+        if (!sessionServiceId) {
+          throw new Error('Service ID is required for updating session');
+        }
+        formData.append('serviceId', sessionServiceId);
+      } else if (serviceId) {
+        const idToSend = typeof serviceId === 'string' ? serviceId : serviceId._id;
+        if (!idToSend) {
+          throw new Error('Service ID is required for creating session');
+        }
+        formData.append('serviceId', idToSend);
+      } else {
+        throw new Error('Service ID is required');
       }
 
-      if (data.file) {
+      if (data.file && data.file instanceof File) {
         formData.append('file', data.file);
       }
 
       if (session?._id) {
+        if (!session._id) {
+          throw new Error('Session ID is required for update');
+        }
         response = await updateApi(urls.session.update.replace(':id', session._id), formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
@@ -196,10 +254,15 @@ const AddCaseForm = ({ onCancel }) => {
         toast.success('Session added successfully');
       }
 
-      navigate(`/view-service`, { state: { row: serviceId } });
+      const serviceIdToPass = session?.serviceId?._id || session?.serviceId || serviceId;
+      navigate(`/view-service`, { 
+        state: { 
+          row: serviceIdToPass,
+          serviceId: serviceIdToPass
+        } 
+      });
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error(error.response?.data?.message || 'Error submitting session');
+      toast.error(error.message || error.response?.data?.message || 'Error submitting session');
     } finally {
       setIsLoading(false);
     }
@@ -327,23 +390,32 @@ const AddCaseForm = ({ onCancel }) => {
 
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="type"
+                    name="serviceUserId"
                     control={control}
-                    rules={{ required: 'Session Lead is required' }}
-                    render={({ field }) => (
-                      <TextField
-                        select
-                        fullWidth
-                        label="Session Lead"
-                        size="small"
-                        error={!!errors.type}
-                        helperText={errors.type?.message}
-                        {...field}
-                      >
-                        <MenuItem value="Lead 1">Lead 1</MenuItem>
-                        <MenuItem value="Lead 2">Lead 2</MenuItem>
-                      </TextField>
-                    )}
+                    rules={{ required: 'Service user is required' }}
+                    render={({ field }) => {
+                      const selectedUser = serviceUser?.find((user) => user.id === field.value) || null;
+
+                      return (
+                        <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
+                          <Autocomplete
+                            value={selectedUser}
+                            onChange={(_, value) => field.onChange(value ? value.id : '')}
+                            options={serviceUser || []}
+                            getOptionLabel={(option) => option.name || ''}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            renderInput={(params) => (
+                              <TextField {...params} label="Service User" variant="outlined" size="small" error={!!errors.serviceUserId} />
+                            )}
+                          />
+                          {errors.serviceUserId && (
+                            <Typography color="error" variant="caption">
+                              {errors.serviceUserId.message}
+                            </Typography>
+                          )}
+                        </FormControl>
+                      );
+                    }}
                   />
                 </Grid>
               </Grid>
@@ -453,7 +525,7 @@ const AddCaseForm = ({ onCancel }) => {
                               variant="outlined"
                               size="small"
                               fullWidth
-                              value={field.value ? field.value.name : ''}
+                              value={typeof field.value === 'string' ? field.value : field.value?.name || ''}
                               placeholder="Attachments"
                               InputProps={{
                                 readOnly: true,
@@ -483,20 +555,20 @@ const AddCaseForm = ({ onCancel }) => {
                                             if (!allowedTypes.includes(file.type)) {
                                               toast.error('Only PDF, DOC, or DOCX files are allowed.');
                                               e.target.value = null;
-                                              field.onChange(null);
+                                              field.onChange('');
                                               return;
                                             }
 
                                             if (file.size > maxSizeInBytes) {
                                               toast.error('File size must be less than or equal to 25MB.');
                                               e.target.value = null;
-                                              field.onChange(null);
+                                              field.onChange('');
                                               return;
                                             }
 
                                             field.onChange(file);
                                           } else {
-                                            field.onChange(null);
+                                            field.onChange('');
                                           }
                                         }}
                                       />
@@ -527,7 +599,6 @@ const AddCaseForm = ({ onCancel }) => {
                         minRows={11}
                         fullWidth
                         variant="outlined"
-                        sx={{ mb: 2 }}
                         error={!!errors.description}
                         helperText={errors.description?.message}
                         {...field}

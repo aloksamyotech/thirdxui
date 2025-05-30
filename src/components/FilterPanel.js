@@ -4,9 +4,10 @@ import { Grid, Card, Typography, Box, MenuItem, Chip, TextField, Button, Autocom
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { LocalizationProvider, DatePicker, DesktopTimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const FilterPanel = ({
   showFilter,
@@ -28,14 +29,23 @@ const FilterPanel = ({
   serviceTypes,
   serviceTypeFilter,
   setServiceTypeFilter,
+  createdBy,
+  createdByFilter,
+  setCreatedByFilter,
+  service,
+  serviceFilter,
+  setServiceFilter,
   dateOpenedFilters,
   dateOpenedFilter,
   setDateOpenedFilter,
   owners,
   ownerFilter,
   setOwnerFilter,
+  locations,
+  locationFilter,
+  setLocationFilter,
+  dateAddedFilters,
   dateAddedFilter,
-  dateAdded,
   setDateAddedFilter,
   listNames,
   listNameFilter,
@@ -104,11 +114,14 @@ const FilterPanel = ({
     if (setGenderFilter) setGenderFilter('');
     if (setStatusFilter) setStatusFilter('');
     if (setServiceTypeFilter) setServiceTypeFilter('');
+    if (setServiceFilter) setServiceFilter('');
     if (setDateOpenedFilter) setDateOpenedFilter('');
     if (setOwnerFilter) setOwnerFilter('');
+    if (setLocationFilter) setLocationFilter('');
     if (setDateAddedFilter) setDateAddedFilter('');
     if (setListNameFilter) setListNameFilter('');
     if (setFormNameFilter) setFormNameFilter('');
+    if (setCreatedByFilter) setCreatedByFilter('');
     if (setTagFilter) setTagFilter('');
     if (setNameFilter) setNameFilter('');
     if (setReceiptIdFilter) setReceiptIdFilter('');
@@ -172,6 +185,20 @@ const FilterPanel = ({
       value: serviceTypeFilter,
       type: 'select'
     },
+    createdByFilter: {
+      data: createdBy,
+      label: 'Created By',
+      onChange: setCreatedByFilter,
+      value: createdByFilter,
+      type: 'select'
+    },
+    serviceFilter: {
+      data: service,
+      label: 'Select Service',
+      onChange: setServiceFilter,
+      value: serviceFilter,
+      type: 'select'
+    },
     dateOpenedFilter: {
       data: dateOpenedFilters,
       label: 'Date Opened',
@@ -186,10 +213,18 @@ const FilterPanel = ({
       value: ownerFilter,
       type: 'select'
     },
+    locationFilter: {
+      data: locations,
+      label: 'By Location',
+      onChange: setLocationFilter,
+      value: locationFilter,
+      type: 'select'
+    },
     dateAddedFilter: {
+      data: dateAddedFilters,
       label: 'By Date Added',
       onChange: setDateAddedFilter,
-      value: dateAdded,
+      value: dateAddedFilter,
       type: 'date'
     },
     listNameFilter: {
@@ -292,7 +327,7 @@ const FilterPanel = ({
     },
     configurationNameFilter: {
       data: configurationNames,
-      label: 'By Configuration Name',
+      label: 'Configuration Name',
       onChange: setConfigurationNameFilter,
       value: configurationNameFilter,
       type: 'select'
@@ -360,45 +395,45 @@ const FilterPanel = ({
               return (
                 <>
                   <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        label={filter.label}
-                        value={filter.value || dayjs()}
-                        onChange={(newValue) => filter.onChange(newValue)}
-                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                        PopperProps={{
-                          modifiers: [
-                            {
-                              name: 'offset',
-                              options: {
-                                offset: [0, 8]
-                              }
-                            }
-                          ],
-                          sx: {
-                            '& .MuiPaper-root': {
-                              width: 220,
-                              height: 260,
-                              marginLeft:'50px'
-                            },
-                            '& .MuiPickersCalendarHeader-root': {
-                              maxWidth: '220px',
-                              fontSize: '1.2rem'
-                            },
-                            '& .MuiDayPicker-header': {
-                              maxWidth: '220px'
-                            },
-                            '& .MuiDayPicker-monthContainer': {
-                              maxWidth: '220px'
-                            },
-                            '& .MuiPickersDay-root': {
-                              maxWidth: '220px',
-                              height: '30px',
-                              margin: '0 2px',
-                              fontSize: '0.6rem'
+                    <DatePicker
+                      label={filter.label}
+                      value={filter.value || dayjs()}
+                      onChange={(newValue) => filter.onChange(newValue)}
+                      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                      PopperProps={{
+                        modifiers: [
+                          {
+                            name: 'offset',
+                            options: {
+                              offset: [0, 8]
                             }
                           }
-                        }}
-                      />
+                        ],
+                        sx: {
+                          '& .MuiPaper-root': {
+                            width: 220,
+                            height: 260,
+                            marginLeft: '50px'
+                          },
+                          '& .MuiPickersCalendarHeader-root': {
+                            maxWidth: '220px',
+                            fontSize: '1.2rem'
+                          },
+                          '& .MuiDayPicker-header': {
+                            maxWidth: '220px'
+                          },
+                          '& .MuiDayPicker-monthContainer': {
+                            maxWidth: '220px'
+                          },
+                          '& .MuiPickersDay-root': {
+                            maxWidth: '220px',
+                            height: '30px',
+                            margin: '0 2px',
+                            fontSize: '0.6rem'
+                          }
+                        }
+                      }}
+                    />
                   </LocalizationProvider>
                 </>
               );
@@ -506,7 +541,8 @@ const FilterPanel = ({
                       fullWidth
                       InputLabelProps={{ shrink: true }}
                       inputProps={{ step: 300 }}
-                      onChange={(newValue) => filter.onChange(newValue)}
+                      value={filter.value || ''}
+                      onChange={(e) => filter.onChange(e.target.value)}
                       format="hh:mm A"
                       renderInput={(params) => <TextField {...params} fullWidth size="small" />}
                       sx={{
@@ -524,18 +560,7 @@ const FilterPanel = ({
               return (
                 <FormControlLabel
                   key={filterKey}
-                  control={
-                    <Checkbox
-                      checked={filter.value || false}
-                      onChange={(e) => filter.onChange(e.target.checked)}
-                      // sx={{
-                      //   color: '#4ba1f8',
-                      //   '&.Mui-checked': {
-                      //     color: '#4ba1f8',
-                      //   },
-                      // }}
-                    />
-                  }
+                  control={<Checkbox checked={filter.value || false} onChange={(e) => filter.onChange(e.target.checked)} />}
                   label={filter.label}
                 />
               );

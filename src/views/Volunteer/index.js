@@ -36,7 +36,7 @@ const genders = [
   { value: 'Others', label: 'Prefer not to say' }
 ];
 
-const Lead = () => {
+const Volunteer = () => {
   const navigate = useNavigate();
   const [districtFilter, setDistrictFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
@@ -158,7 +158,7 @@ const Lead = () => {
       const pagination = response?.data?.meta || { total: 0 };
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        serialNumber: `#${user?.uniqueId}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
@@ -216,7 +216,7 @@ const Lead = () => {
       const pagination = response?.data?.meta || { total: 0 };
       const formattedUsers = allUser?.map((user, index) => ({
         id: user._id,
-        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        serialNumber: `#${user?.uniqueId}`,
         firstName: user.personalInfo?.firstName || '',
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
@@ -316,11 +316,11 @@ const Lead = () => {
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
             dateAddedFilters={dateAddedFilters}
-            dateOpenedFilter={dateOpenedFilter}
-            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+            dateAddedFilter={dateOpenedFilter}
+            setDateAddedFilter={(value) => setDateOpenedFilter(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
+            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
           />
 
@@ -331,9 +331,9 @@ const Lead = () => {
                   loading
                     ? []
                     : rows.map((row, index) => ({
-                      ...row,
-                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                    }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -342,7 +342,7 @@ const Lead = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
@@ -355,19 +355,13 @@ const Lead = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)'
                       }}
                     >
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {
@@ -391,4 +385,4 @@ const Lead = () => {
   );
 };
 
-export default Lead;
+export default Volunteer;

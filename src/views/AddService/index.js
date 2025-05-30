@@ -72,6 +72,7 @@ const AddCaseForm = () => {
     };
     fetchData();
   }, []);
+  
   const {
     control,
     handleSubmit,
@@ -166,12 +167,6 @@ const AddCaseForm = () => {
       formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
-      // formData.append('benificiary', data.beneficiaryInformation || '');
-      // formData.append('campaigns', data.campaignsSupported || '');
-      // formData.append('engagement', data.engagement || '');
-      // formData.append('eventAttanded', data.eventsAttended || '');
-      // formData.append('fundingInterest', data.fundingInterests || '');
-      // formData.append('fundraisingActivities', data.fundraisingActivities || '');
       (data.benificiary || []).forEach((id) => {
         formData.append('benificiary[]', id);
       });
@@ -456,7 +451,7 @@ const AddCaseForm = () => {
                     rules={{
                       required: 'Notes are required',
                       minLength: {
-                        value: 10,
+                        value: 12,
                         message: 'Notes must be at least 10 characters long'
                       },
                       validate: {
@@ -477,7 +472,6 @@ const AddCaseForm = () => {
                         minRows={11}
                         fullWidth
                         variant="outlined"
-                        sx={{ mb: 2 }}
                         error={!!errors.notes}
                         helperText={errors.notes?.message}
                       />
@@ -488,7 +482,7 @@ const AddCaseForm = () => {
                     control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
                     label="Restrict Access?"
                     labelPlacement="start"
-                    sx={{ gap: 1 }}
+                    sx={{ gap: 1, mt:1}}
                   />
                 </Paper>
               </Grid>

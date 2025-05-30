@@ -52,7 +52,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
 
   const location = useLocation();
-  const userdata = location.state;
+  const userdata = location?.state;
   const editdata = userdata?.[0] || null;
 
   const {

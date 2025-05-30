@@ -1,11 +1,11 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
-import { Card, Grid, useMediaQuery } from '@mui/material';
+import { Card, Grid, useMediaQuery,Skeleton, } from '@mui/material';
 import { Box, Container } from '@mui/system';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const DashboardCard = ({ title, num1, num2 }) => {
+const DashboardCard = ({ title, num1, num2,loading = false }) => {
   return (
     <Box
       sx={{
@@ -30,7 +30,14 @@ const DashboardCard = ({ title, num1, num2 }) => {
           width: '100%'
         }}
       >
+         {loading ? (
+          <Skeleton variant="text" width={120} height={24} />
+        ) : (
         <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>{title}</Typography>
+         )}
+            {loading ? (
+          <Skeleton variant="circular" width={32} height={32} />
+        ) : (
         <TrendingUpIcon
           sx={{
             color: '#fff',
@@ -42,6 +49,7 @@ const DashboardCard = ({ title, num1, num2 }) => {
             ml: '-6px'
           }}
         />
+         )}
       </Box>
 
       <Box
@@ -53,10 +61,23 @@ const DashboardCard = ({ title, num1, num2 }) => {
           mt: 1
         }}
       >
+          {loading ? (
+          <Skeleton variant="text" width={80} height={40} />
+        ) : (
         <Typography sx={{ fontSize: '28px', fontWeight: '600' }}>{num1}</Typography>
+         )}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {loading ? (
+            <>
+              <Skeleton variant="circular" width={18} height={18} />
+              <Skeleton variant="text" width={40} height={18} />
+            </>
+          ) : (
+            <>
           <AccountCircleIcon sx={{ fontSize: 18, color: '#053146' }} />
           <Typography sx={{ fontSize: '14px', fontWeight: 500 }}>{num2}</Typography>
+           </>
+          )}
         </Box>
       </Box>
     </Box>

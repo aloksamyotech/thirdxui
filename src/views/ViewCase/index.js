@@ -20,13 +20,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 import { decodedToken } from 'utils/adminData.js';
 
-// const dateAddedFilters = [
-//   { value: 'today', label: 'Today' },
-//   { value: 'week', label: 'Last 7 Days' },
-//   { value: 'month', label: 'Last 30 Days' },
-//   { value: 'year', label: 'Last 1 Year' }
-// ];
-
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -249,27 +242,6 @@ const CaseDetailsPage = () => {
     };
     fetchData();
   }, [id]);
-
-  // const fetchCreatedByOptions = async () => {
-  //   try {
-  //     const response = await getApi(`${urls.casenote.fetchWithPagination}?caseId=${id}`);
-  //     const allCasesNotes = response?.data?.data || [];
-  //     const uniqueCreators = [...new Set(allCasesNotes.map((note) => note.createdBy))].filter(Boolean);
-  //     const options = uniqueCreators.map((creator) => ({
-  //       value: creator,
-  //       label: creator
-  //     }));
-  //     setCreatedByOptions(options);
-  //   } catch (error) {
-  //     console.error('Error fetching created by options:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (id) {
-  //     fetchCreatedByOptions();
-  //   }
-  // }, [id]);
 
   const fetchCaseNotes = async () => {
     try {

@@ -1,7 +1,10 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IconTrash, IconPencil } from '@tabler/icons';
 import {
+  Box,
+  Typography,
+  IconButton,
   Popover,
   List,
   ListItem,
@@ -22,6 +25,8 @@ import { updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 
 const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
+  const userId = data?._id;
+
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
@@ -54,7 +59,7 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await updateApi(`${urls.serviceuser.deleteUser}/${data?._id}`);
+      await updateApi(urls.serviceuser.deleteUser.replace(':userId', userId));
       toast.success('Donor user deleted successfully!');
       setConfirmOpen(false);
       onClose();
@@ -81,7 +86,7 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
   const options = [
     { label: 'Edit', icon: <EditIcon /> },
     { label: 'Archive', icon: <ArchiveIcon /> },
-    { label: 'Merge', icon: <MergeTypeIcon /> }, 
+    { label: 'Merge', icon: <MergeTypeIcon /> },
     { label: 'Delete', icon: <DeleteIcon /> }
   ];
 
@@ -104,16 +109,60 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
         </List>
       </Popover>
 
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        maxWidth={false}
+        PaperProps={{
+          sx: { width: 400, borderRadius: 5 }
+        }}
+      >
+        <Box sx={{ textAlign: 'center', pt: 3, borderRadius: '4px' }}>
+          <IconButton
+            disableRipple
+            sx={{
+              backgroundColor: '#FFE8E6',
+              color: '#FF5C5C',
+              pointerEvents: 'none',
+              '&:hover': { backgroundColor: '#FFE8E6' }
+            }}
+          >
+            <IconTrash fontSize="small" />
+          </IconButton>
+        </Box>
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete ?
+          <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
+            You want to delete this profile {'"Name"'}. <br />
+            This action can not be undone.
+          </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} variant="outlined">
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            variant="outlined"
+            sx={{
+              color: '#FF5C5C',
+              borderColor: '#FF5C5C',
+              textTransform: 'uppercase',
+              fontWeight: 480,
+              width: 120
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            sx={{
+              backgroundColor: '#053046',
+              color: '#efeceb',
+              textTransform: 'uppercase',
+              fontWeight: 380,
+              width: 120,
+              '&:hover': { backgroundColor: '#053046' }
+            }}
+          >
             Delete
           </Button>
         </DialogActions>
@@ -121,9 +170,7 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
 
       <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
-        <DialogContent>
-          Are you sure you want to archive this user?
-        </DialogContent>
+        <DialogContent>Are you sure you want to archive this user?</DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmArchiveOpen(false)} variant="outlined">
             Cancel

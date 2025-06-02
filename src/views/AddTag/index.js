@@ -52,6 +52,7 @@ const TagForm = () => {
   });
   const [totalRows, setTotalRows] = useState(0);
 
+  const [tagName, setTagName] = useState('');
   const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       tagDescription: '',
@@ -78,24 +79,14 @@ const TagForm = () => {
   };
 
   const handleTagChange = async (selectedTagCategory) => {
-    try {
-      setIsloading(true);
-      const filtered = tags.filter((item) => item.tagCategoryName === selectedTagCategory);
-      setFilteredTags(filtered);
-    } catch (error) {
-      console.error('Error fetching tags for selected category:', error);
-    } finally {
-      setIsloading(false);
-    }
+    setTagName(selectedTagCategory);
   };
-
   const fetchTags = async () => {
     setIsloading(true);
     try {
       const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-
       setTags(allTags);
       setFilteredTags(allTags);
       setTotalRows(pagination?.total);
@@ -121,6 +112,7 @@ const TagForm = () => {
 
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('categoryName', tagName);
 
       const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
 
@@ -143,12 +135,12 @@ const TagForm = () => {
   };
 
   useEffect(() => {
-    if (searchQuery) {
+    if (searchQuery || tagName) {
       handleFilter();
     } else {
       fetchTags();
     }
-  }, [searchQuery]);
+  }, [searchQuery, tagName]);
 
   const handleStatusChange = async (tagId, newStatus) => {
     try {

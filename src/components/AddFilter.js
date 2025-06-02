@@ -1,5 +1,5 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useNavigate } from 'react-router-dom';
 import {
   Popover,
@@ -11,7 +11,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button
+  Button,
+  Box,
+  Typography,
+  IconButton
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
@@ -20,8 +23,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { urls } from 'common/urls';
 import { updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
+import { IconTrash, IconPencil } from '@tabler/icons';
 
 const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
+  const UserId = data?._id;
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
@@ -31,7 +36,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       if (data?.role === 'volunteer') {
         navigate('/add-volunteer', { state: { ...data, isEdit: true } });
       } else {
-        navigate('/add-serviceuser', { state:{ editdata: data} });
+        navigate('/add-serviceuser', { state: { editdata: data } });
       }
       onClose();
     } else if (label === 'Delete') {
@@ -45,10 +50,11 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await updateApi(`${urls.serviceuser.deleteUser}/${data?._id}`);
+      await updateApi(urls.serviceuser.deleteUser.replace(':userId', UserId));
+
       setConfirmOpen(false);
       onClose();
-        if (data?.role === 'volunteer') {
+      if (data?.role === 'volunteer') {
         toast.success('Volunteer user Deleted successfully!');
         navigate('/volunteer');
       } else {
@@ -66,7 +72,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
       await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
       setConfirmArchiveOpen(false);
       onClose();
-       if (data?.role === 'volunteer') {
+      if (data?.role === 'volunteer') {
         toast.success('Volunteer user archived successfully!');
         navigate('/volunteer');
       } else {
@@ -105,17 +111,60 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
         </List>
       </Popover>
 
-     
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        maxWidth={false}
+        PaperProps={{
+          sx: { width: 400, borderRadius: 5 }
+        }}
+      >
+        <Box sx={{ textAlign: 'center', pt: 3, borderRadius: '4px' }}>
+          <IconButton
+            disableRipple
+            sx={{
+              backgroundColor: '#FFE8E6',
+              color: '#FF5C5C',
+              pointerEvents: 'none',
+              '&:hover': { backgroundColor: '#FFE8E6' }
+            }}
+          >
+            <IconTrash fontSize="small" />
+          </IconButton>
+        </Box>
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this user?
+          <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
+            You want to delete this profile {'"Name"'}. <br />
+            This action can not be undone.
+          </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} variant="outlined">
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            variant="outlined"
+            sx={{
+              color: '#FF5C5C',
+              borderColor: '#FF5C5C',
+              textTransform: 'uppercase',
+              fontWeight: 480,
+              width: 120
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            sx={{
+              backgroundColor: '#053046',
+              color: '#efeceb',
+              textTransform: 'uppercase',
+              fontWeight: 380,
+              width: 120,
+              '&:hover': { backgroundColor: '#053046' }
+            }}
+          >
             Delete
           </Button>
         </DialogActions>
@@ -123,9 +172,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
 
       <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
-        <DialogContent>
-          Are you sure you want to archive?
-        </DialogContent>
+        <DialogContent>Are you sure you want to archive?</DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmArchiveOpen(false)} variant="outlined">
             Cancel

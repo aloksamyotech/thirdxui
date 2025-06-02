@@ -186,6 +186,8 @@ const AuthLogin = ({ ...others }) => {
                 variant="body2"
                 color="#009ec6"
                 sx={{ textDecoration: 'none', cursor: 'pointer', marginTop: '8px' }}
+                component={Link}
+                to="/forgotPassword"
               >
                 Forgot Password?
               </Typography>

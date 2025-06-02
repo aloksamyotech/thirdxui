@@ -397,7 +397,6 @@ const AddCaseForm = () => {
                   <Controller
                     name="serviceStatus"
                     control={control}
-                    rules={{ required: 'Service status is required' }}
                     render={({ field }) => (
                       <FormControl fullWidth size="small" error={!!errors.serviceStatus}>
                         <InputLabel id="status-label">Service Status</InputLabel>

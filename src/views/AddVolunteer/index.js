@@ -1926,9 +1926,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="confirmationDate"
                       control={control}
-                      rules={{
-                        required: 'Confirmation Date is required'
-                      }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker

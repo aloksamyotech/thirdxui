@@ -8,7 +8,7 @@ import { gridSpacing } from 'store/constant';
 // ==============================|| SKELETON TOTAL GROWTH BAR CHART ||============================== //
 
 const TotalGrowthBarChart = () => (
-  <Card>
+  <Card sx={{ maxHeight: 428 }}>
     <CardContent>
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>

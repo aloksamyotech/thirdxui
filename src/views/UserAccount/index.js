@@ -594,9 +594,20 @@ const EmployeeDetails = () => {
                     </Button>
                   </Grid>
                   <Grid item>
-                    <Button variant="outlined" color="error">
-                      RESET
-                    </Button>
+                   <Button
+  variant="outlined"
+  sx={{
+    color: '#bbbdfa',
+    borderColor: '#bbbdfa',
+    '&:hover': {
+      borderColor: '#bbbdfa',
+      backgroundColor: 'rgba(5, 49, 70, 0.04)', 
+    },
+  }}
+>
+  CANCEL
+</Button>
+
                   </Grid>
                 </Grid>
               </CardContent>

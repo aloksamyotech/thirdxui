@@ -168,7 +168,6 @@ const TabbedDataGrid = () => {
     } catch (error) {
       toast.error('Error fetching configurations');
     } finally {
-      // setLoading(false);
       setTimeout(() => {
         setLoading(false);
       }, 1000);
@@ -364,15 +363,6 @@ const TabbedDataGrid = () => {
                 <IconButton onClick={() => handleDeleteClick(item.id)}>
                   <IconTrash color="orangered" size={18} />
                 </IconButton>
-                <CommonConfirmDialog
-                  open={confirmOpen}
-                  onClose={() => setConfirmOpen(false)}
-                  onConfirm={handleConfirmDelete}
-                  content="Are you sure you want to delete ?"
-                  title="⚠️ Delete"
-                  confirmText="Delete"
-                  cancelText="Cancel"
-                />
               </Box>
             </Box>
           ))
@@ -387,6 +377,15 @@ const TabbedDataGrid = () => {
 
   return (
     <>
+      <CommonConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        content="Are you sure you want to delete ?"
+        title="⚠️ Delete"
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
         <Typography variant="h5">Configurations</Typography>
         <Box
@@ -462,7 +461,7 @@ const TabbedDataGrid = () => {
                   sx={{
                     border: '1px solid #e0e0e0',
                     borderRadius: '8px',
-                    '&::before': { display: 'none' } 
+                    '&::before': { display: 'none' }
                   }}
                 >
                   <AccordionSummary

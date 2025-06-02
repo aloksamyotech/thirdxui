@@ -53,7 +53,14 @@ const TagForm = () => {
   const [totalRows, setTotalRows] = useState(0);
 
   const [tagName, setTagName] = useState('');
-  const { control, handleSubmit, setValue, reset } = useForm({
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors }
+  } = useForm({
     defaultValues: {
       tagDescription: '',
       tagCategoryName: '',
@@ -286,7 +293,17 @@ const TagForm = () => {
             <Controller
               name="tagDescription"
               control={control}
-              render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Description"
+                  size="small"
+                  rules={{ required: 'Tag Description is required' }}
+                  error={!!errors.tagDescription}
+                  helperText={errors.tagDescription?.message}
+                />
+              )}
             />
           </Grid>
 
@@ -315,6 +332,9 @@ const TagForm = () => {
                   fullWidth
                   label="Tags can be applied to"
                   size="small"
+                  rules={{ required: 'Tag Category is required' }}
+                  error={!!errors.tagCategoryName}
+                  helperText={errors.tagCategoryName?.message}
                   onChange={(e) => {
                     field.onChange(e);
                     handleTagChange(e.target.value);
@@ -434,7 +454,17 @@ const TagForm = () => {
                 <Controller
                   name="name"
                   control={control}
-                  render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+                  rules={{ required: 'name is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Description"
+                      size="small"
+                      error={!!errors.name}
+                      helperText={errors.name?.message}
+                    />
+                  )}
                 />
               </Grid>
 

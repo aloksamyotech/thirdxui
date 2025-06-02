@@ -61,8 +61,21 @@ const TabbedDataGrid = () => {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
+  const [expandedPanels, setExpandedPanels] = useState(() => {
+    const initialExpanded = {};
+    defaultTabTypes.forEach((type, index) => {
+      if (index < 6) {
+        initialExpanded[type] = true;
+      }
+    });
+    return initialExpanded;
+  });
+
+  const handleAccordionChange = (panel) => () => {
+    setExpandedPanels((prev) => ({
+      ...prev,
+      [panel]: !prev[panel]
+    }));
   };
 
   const handleEdit = (item) => {
@@ -441,35 +454,43 @@ const TabbedDataGrid = () => {
         />
         <Grid item xs={9}>
           <Grid container spacing={2}>
-            {Object.entries(tabData).map(([section, items], index) => {
-              const isInitialCard = index < 6;
+            {Object.entries(tabData).map(([section, items], index) => (
+              <Grid item xs={12} sm={6} md={4} key={section}>
+                <Accordion
+                  expanded={!!expandedPanels[section]}
+                  onChange={handleAccordionChange(section)}
+                  sx={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    '&::before': { display: 'none' } // remove default line
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderBottom: '1px solid #e0e0e0',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {headerContent(section, loading, handleOpenModal, !!expandedPanels[section])}
+                  </AccordionSummary>
 
-              return (
-                <Grid item xs={12} sm={6} md={4} key={section}>
-                  {isInitialCard ? (
+                  <AccordionDetails sx={{ p: 0 }}>
                     <Card
                       sx={{
                         p: 0,
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        height: '300px',
+                        border: 'none',
+                        borderRadius: '0',
+                        height: 'auto',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden'
                       }}
                     >
-                      <Box
-                        sx={{
-                          px: 2,
-                          py: 1,
-                          borderBottom: '1px solid #e0e0e0',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
-                        }}
-                      >
-                        {headerContent(section, loading, handleOpenModal)}
-                      </Box>
                       {cardBodyContent(
                         items,
                         loading,
@@ -481,40 +502,10 @@ const TabbedDataGrid = () => {
                         handleConfirmDelete
                       )}
                     </Card>
-                  ) : (
-                    <Accordion expanded={expanded === section} onChange={handleAccordionChange(section)}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        {headerContent(section, loading, handleOpenModal, expanded === section)}
-                      </AccordionSummary>
-                      <AccordionDetails sx={{ p: 0 }}>
-                        <Card
-                          sx={{
-                            p: 0,
-                            border: 'none',
-                            borderRadius: '0',
-                            height: 'auto',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {cardBodyContent(
-                            items,
-                            loading,
-                            handleStatusUpdate,
-                            handleEdit,
-                            handleDeleteClick,
-                            confirmOpen,
-                            setConfirmOpen,
-                            handleConfirmDelete
-                          )}
-                        </Card>
-                      </AccordionDetails>
-                    </Accordion>
-                  )}
-                </Grid>
-              );
-            })}
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
+            ))}
           </Grid>
         </Grid>
       </Grid>

@@ -94,7 +94,8 @@ export const urls = Object.freeze({
     getTotalOpenedCases: `${baseUrl}/dashboard/totalOpenedCases`,
     getmyTasks: `${baseUrl}/dashboard/getAllTask`,
     createTask: `${baseUrl}/dashboard/createTask`,
-    edittask:`${baseUrl}/dashboard/editTask/:id`,
+    edittask: `${baseUrl}/dashboard/editTask/:id`,
+    deleteTask: `${baseUrl}/dashboard/delete/:id`,
     getMedia: `${baseUrl}/dashboard/allMedia`
   },
   login: {
@@ -104,7 +105,6 @@ export const urls = Object.freeze({
     updateUserById: `${baseUrl}/admin/`,
     changePassword: `${baseUrl}/admin/change-password`,
     googleSignin: `${baseUrl}/admin/google-auth`,
-    getAllAdmin : `${baseUrl}/admin/getAllAdmin`,
-
+    getAllAdmin: `${baseUrl}/admin/getAllAdmin`
   }
 });

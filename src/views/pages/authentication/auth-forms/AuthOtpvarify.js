@@ -12,22 +12,13 @@ const ForgotPassword3 = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSendOtp = async (values) => {
     setIsSubmitting(true);
-
     try {
       const res = await postApi(urls.login.forgotPassword, { email: values.email });
-
-      const statusCode = res?.data?.statusCode;
-      const errorCode = res?.data?.errorCode;
-
-      if (statusCode === 404 && errorCode === 'USER_NOT_FOUND') {
-        toast.error('Email not registered');
-        return;
-      }
-
       toast.success('OTP sent to your email');
-      navigate('/otpvarify', { state: { email: values.email } });
+      navigate('/verify-otp', { state: { email: values.email } });
     } catch (err) {
       toast.error(err?.message || 'Failed to send OTP');
     } finally {

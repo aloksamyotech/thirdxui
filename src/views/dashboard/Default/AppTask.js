@@ -401,7 +401,7 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
     >
       <FormControlLabel control={<Checkbox checked={checked} onChange={onChange} />} label={task.label} sx={{ flexGrow: 1, m: 0 }} />
 
-      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
+      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit}>
         <Iconify icon={'eva:edit-fill'} />
       </IconButton>
       <IconButton size="large" color="error" onClick={onDelete}>

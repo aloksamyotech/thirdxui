@@ -141,7 +141,8 @@ const CaseList = () => {
               lineHeight: '36px'
             }}
           >
-            DONOR REPORT LIST
+            {' '}
+            Donor Report List
           </Typography>
           <Box
             sx={{

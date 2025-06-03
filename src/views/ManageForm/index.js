@@ -35,7 +35,7 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '400',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'

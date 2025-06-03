@@ -278,8 +278,8 @@ const AddCaseForm = ({ onCancel }) => {
                                 fullWidth
                                 label="Payment Method"
                                 size="small"
-                                error={!!errors.serviceType}
-                                helperText={errors.serviceType?.message}
+                                error={!!errors.paymentMethod}
+                                helperText={errors.paymentMethod?.message}
                               >
                                 {serviceType?.map((option) => (
                                   <MenuItem key={option._id} value={option._id}>

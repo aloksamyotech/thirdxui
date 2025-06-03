@@ -27,19 +27,19 @@ const CaseList = () => {
       field: 'caseid',
       headerName: 'Case ID',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'serviceUser',
       headerName: 'Service User',
       width: 150,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'dateOpened',
       headerName: 'Date Opened',
       width: 150,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'status',
@@ -52,7 +52,7 @@ const CaseList = () => {
           sx={{ p: 0, m: 0, pr: 0.5, pl: 0.5, borderRadius: '15px', color: '#737586', border: '1px solid #737586', fontSize: '0.65rem' }}
           startIcon={<CheckIcon />}
         >
-          {params.value}
+          {params.value || '-'}
         </Button>
       )
     },
@@ -63,7 +63,7 @@ const CaseList = () => {
       renderCell: (params) => (
         <Stack direction="row">
           <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
-          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country}</Typography>
+          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country || '-'}</Typography>
         </Stack>
       )
     },
@@ -71,13 +71,13 @@ const CaseList = () => {
       field: 'owner',
       headerName: 'Owner',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
       width: 300,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     }
   ];
 

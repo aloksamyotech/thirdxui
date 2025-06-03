@@ -48,25 +48,25 @@ const Duplicate = () => {
       field: 'name',
       headerName: 'Name',
       flex: 1,
-      renderCell: (params) => <Typography>{params?.row?.name}</Typography>
+      renderCell: (params) => <Typography>{params?.row?.name || '-'}</Typography>
     },
     {
       field: 'email',
       headerName: 'Email',
       flex: 1,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
     },
     {
       field: 'no',
       headerName: 'Contact No.',
       flex: 1,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
     },
     {
       field: 'dob',
       headerName: 'Date',
       flex: 1,
-      renderCell: (params) => <Typography>{params?.value}</Typography>
+      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
     }
   ];
 

@@ -88,7 +88,7 @@ const Tag = () => {
           handleStatusChange(params.row._id, newStatus);
         };
 
-        return <AntSwitch defaultChecked={params.value} color="primary" onChange={handleToggle} />;
+        return <AntSwitch defaultChecked={params.value || '-'} color="primary" onChange={handleToggle} />;
       }
     }
   ];

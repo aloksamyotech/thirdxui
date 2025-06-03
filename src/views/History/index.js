@@ -25,7 +25,7 @@ const columns = [
     field: 'title',
     headerName: 'Name',
     flex: 1.5,
-    renderCell: (params) => <Typography variant="body1">{params.value}</Typography>
+    renderCell: (params) => <Typography variant="body1">{params.value || '-'}</Typography>
   },
   {
     field: 'date',
@@ -33,7 +33,7 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Typography variant="body2" color="textSecondary">
-        {params.value}
+        {params.value || '-'}
       </Typography>
     )
   },
@@ -41,7 +41,7 @@ const columns = [
     field: 'age',
     headerName: 'Age',
     flex: 1,
-    renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+    renderCell: (params) => <Typography variant="body2">{params.value || '-'}</Typography>
   },
   {
     field: 'status',
@@ -49,7 +49,7 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Chip
-        label={params.value}
+        label={params.value || '-'}
         sx={{
           color: params.value === 'APPROVED' ? '#41c048' : 'red',
           backgroundColor: params.value === 'APPROVED' ? '#eefbe5' : '#ffeae9'

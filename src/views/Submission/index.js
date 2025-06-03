@@ -50,26 +50,6 @@ const CustomHeader = () => {
   );
 };
 
-// const initialRows = [
-//   {
-//     id: 1,
-//     description: 'Self Referral form',
-//     date: '08/05/2017',
-//     campaign: 'Beach Cleaning -Corporate volunteer project 2019',
-//     title: 'Satisfaction Survey'
-//   },
-//   { id: 2, description: 'Community Referral form', date: '08/05/2017', campaign: 'Form Campaign', title: 'Community Referral' },
-//   {
-//     id: 3,
-//     description: 'Satisfaction survey',
-//     date: '08/05/2017',
-//     campaign: 'Beach Cleaning -Corporate volunteer project 2019',
-//     title: 'Volunteer Signup'
-//   },
-//   { id: 4, description: 'Volunteer sign up form', date: '08/05/2017', campaign: 'Form Campaign' },
-//   { id: 5, description: 'Workshop sign up form', date: '08/05/2017', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
-// ];
-
 const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [formType, setFormType] = useState('');
@@ -144,7 +124,7 @@ const Lead = () => {
       flex: 0.8,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -154,7 +134,7 @@ const Lead = () => {
       flex: 0.8,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -196,7 +176,7 @@ const Lead = () => {
             }
           }}
         >
-          {params?.value}
+          {params?.value || '-'}
         </Button>
       )
     },

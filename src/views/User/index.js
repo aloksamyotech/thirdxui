@@ -49,13 +49,18 @@ const User = () => {
       renderCell: (params) => (
         <Box>
           <Typography sx={{ fontWeight: '450' }} mb={1}>
-            {params.row.name}
+            {params.row.name || '-'}
           </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
+          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'date', headerName: 'Date', flex: 1.2 },
+    {
+      field: 'date',
+      headerName: 'Date',
+      flex: 1.2,
+      valueGetter: (params) => params.value || '-'
+    },
     {
       field: 'status',
       headerName: 'Status',
@@ -82,12 +87,16 @@ const User = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
           )}
-          <Typography>{params.row.country}</Typography>
+          <Typography>{params.row.country || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'age', headerName: 'Age', flex: 1 },
-
+    {
+      field: 'age',
+      headerName: 'Age',
+      flex: 1,
+      valueGetter: (params) => (params.value != null ? params.value : '-')
+    },
     {
       field: 'actions',
       headerName: 'Manage',

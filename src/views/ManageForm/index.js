@@ -11,6 +11,7 @@ import { getApi } from 'common/apiClient.js';
 import { useEffect } from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNavigate } from 'react-router';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
@@ -72,6 +73,7 @@ const Lead = () => {
     page: 0,
     pageSize: 10
   });
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate()
 
@@ -89,6 +91,7 @@ const Lead = () => {
   }
 
   const getAllForms = async () => {
+    setLoading(true);
     const queryParams = new URLSearchParams({
       page: paginationModel.page + 1,
       limit: paginationModel.pageSize,
@@ -115,6 +118,7 @@ const Lead = () => {
     })
     setTotalRows(pagination?.total);
     setRows(formattedData)
+    setLoading(false);
   }
   useEffect(() => {
     getAllForms()
@@ -128,7 +132,6 @@ const Lead = () => {
       label: item?.title
     }))
     setFormTypes(options)
-
   }
   useEffect(() => {
     getFormTypes()
@@ -264,29 +267,51 @@ const Lead = () => {
             />
 
             <Grid item xs={9}>
-              <Card style={{ height: 'auto' }}>
+              <Card style={{ height: '100vh' }}>
                 <DataGrid
-                  rows={rows}
+                  rows={
+                    loading
+                      ? []
+                      : rows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                  }
                   columns={columns}
-                  components={{
-                    Toolbar: () => <CustomHeader />
+                  loading={loading}
+                  slots={{
+                    toolbar: () => <CustomHeader />,
+                    loadingOverlay: () => (
+                      <Box
+                        sx={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'self-start',
+                          justifyContent: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                        }}
+                      >
+                        <SingleRowLoader />
+                      </Box>
+                    ),
+                    noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                   }}
                   getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                  autoHeight
-                  getRowHeight={() => 'auto'}
-                  sx={{
-                    '& .MuiDataGrid-cell': {
-                      whiteSpace: 'normal',
-                      lineHeight: '1.4rem',
-                      py: 1
-                    },
-                    '& .MuiDataGrid-row': {
-                      borderBottom: '1px solid #ccc'
-                    },
-                    '& .MuiDataGrid-columnHeader': {
-                      backgroundColor: '#f5f5f5'
-                    }
-                  }}
+                  rowHeight={65}
+                  // getRowHeight={() => 'auto'}
+                  // sx={{
+                  //   '& .MuiDataGrid-cell': {
+                  //     whiteSpace: 'normal',
+                  //     lineHeight: '1.4rem',
+                  //     py: 1
+                  //   },
+                  //   '& .MuiDataGrid-row': {
+                  //     borderBottom: '1px solid #ccc'
+                  //   },
+                  //   '& .MuiDataGrid-columnHeader': {
+                  //     backgroundColor: '#f5f5f5'
+                  //   }
+                  // }}
                   rowCount={totalRows}
                   pagination
                   paginationMode="server"

@@ -180,7 +180,7 @@ export default function SessionRegisterPage() {
         {' '}
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <Card style={{ height: 'auto' }}>
+            <Card style={{ height: '500px' }}>
               <DataGrid
                 rows={loading ? [] : rowsAttendee}
                 columns={columns}

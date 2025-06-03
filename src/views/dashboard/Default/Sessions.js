@@ -8,6 +8,7 @@ import { getApi } from 'common/apiClient';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const sessionsData = [
   {
@@ -132,19 +133,21 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
 
 const Sessions = () => {
   const [allSession, setAllSession] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fetchDashboardData = async () => {
+    setLoading(true);
     const session = await getApi(urls.session.fetch);
     const currentSessions = session?.data?.allSession;
     const formattedSessions = currentSessions?.map((item, index) => ({
       id: item._id || index,
       date: item?.date
         ? new Date(item.date)
-            .toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: '2-digit'
-            })
-            .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
+          .toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: '2-digit'
+          })
+          .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
         : '',
 
       title: item?.serviceId?.name || '',
@@ -154,6 +157,7 @@ const Sessions = () => {
     }));
 
     setAllSession(formattedSessions);
+    setLoading(false);
   };
   useEffect(() => {
     fetchDashboardData();
@@ -200,10 +204,14 @@ const Sessions = () => {
       </Stack>
 
       <Divider />
-      <Box sx={{ maxHeight: 328, overflowY: 'auto', pr: 1 }}>
-        {allSession.map((session, index) => (
-          <SessionItem key={index} {...session} id={session.serviceId} />
-        ))}
+      <Box sx={{ maxHeight: 328, overflowY: 'auto', pr: 1, height: 328 }}>
+        {loading ? (
+          <SingleRowLoader />
+        ) : (
+          allSession.map((session, index) => (
+            <SessionItem key={index} {...session} id={session.serviceId} />
+          ))
+        )}
       </Box>
 
       <Typography

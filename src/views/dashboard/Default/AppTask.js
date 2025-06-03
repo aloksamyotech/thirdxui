@@ -120,7 +120,6 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
     fetchTasks();
   }, []);
   useEffect(() => {
-    console.log(location.state?.taskAdded);
 
     if (location.state?.taskAdded) {
       fetchTasks();

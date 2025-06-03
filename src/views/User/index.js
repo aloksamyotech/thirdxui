@@ -351,7 +351,7 @@ const User = () => {
                 borderRadius: '30px',
                 paddingLeft: '16px',
                 border: '1px solid #e0e0e0',
-                width: '350px',
+                width: '489px',
                 height: '40px'
               }}
             >
@@ -360,6 +360,19 @@ const User = () => {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{
+                  '& .MuiInputBase-input::placeholder': {
+                    fontSize: '12 px',
+                    opacity: 1
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '14px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '13px'
+                  },
+                  '& .MuiInputBase-root.Mui-focused': {
+                    backgroundColor: '#e0e0e0'
+                  },
                   flex: 1,
                   color: 'text.primary'
                 }}
@@ -367,8 +380,8 @@ const User = () => {
               <IconButton
                 sx={{
                   marginRight: '8px',
-                  width: 32,
-                  height: 32,
+                  width: 18,
+                  height: 18,
                   cursor: 'pointer'
                 }}
               >

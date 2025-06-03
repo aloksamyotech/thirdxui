@@ -102,6 +102,7 @@ const ServiceList = () => {
       renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     }
   ];
+
   useEffect(() => {
     fetch(config.country)
       .then((res) => res.json())
@@ -133,7 +134,8 @@ const ServiceList = () => {
             sx={{
               color: '#333',
               fontSize: '14px',
-              lineHeight: '36px'
+              lineHeight: '36px',
+              fontWeight: '400'
             }}
           >
             Service User Report List

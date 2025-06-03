@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, Button, Grid, Stack, Box, TextField, Typography, InputBase, IconButton } from '@mui/material';
+import { Avatar, Button, Grid, Stack, Box, TextField, Typography, InputBase, IconButton, Checkbox } from '@mui/material';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
@@ -28,6 +28,11 @@ const Duplicate = () => {
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const handleCheckboxChange = (id) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+  };
 
   const rows = [
     {
@@ -67,6 +72,25 @@ const Duplicate = () => {
       headerName: 'Date',
       flex: 1,
       renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
+    },
+    {
+      field: 'select',
+      headerName: '',
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderHeader: () => (
+        <Checkbox
+          // checked={isAllSelected}
+          // indeterminate={isIndeterminate}
+          // onChange={handleSelectAllChange}
+          size="small"
+        />
+      ),
+      renderCell: (params) => (
+        <Checkbox checked={selectedIds.includes(params.row.id)} onChange={() => handleCheckboxChange(params.row.id)} size="small" />
+      )
     }
   ];
 
@@ -179,7 +203,6 @@ const Duplicate = () => {
               <DataGrid
                 rows={rows}
                 columns={columns}
-                checkboxSelection
                 getRowId={(row) => row.id}
                 pagination={false}
                 hideFooterPagination

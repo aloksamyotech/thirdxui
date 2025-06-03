@@ -49,13 +49,18 @@ const User = () => {
       renderCell: (params) => (
         <Box>
           <Typography sx={{ fontWeight: '450' }} mb={1}>
-            {params.row.name}
+            {params.row.name || '-'}
           </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
+          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'date', headerName: 'Date', flex: 1.2 },
+    {
+      field: 'date',
+      headerName: 'Date',
+      flex: 1.2,
+      valueGetter: (params) => params.value || '-'
+    },
     {
       field: 'status',
       headerName: 'Status',
@@ -82,12 +87,16 @@ const User = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
           )}
-          <Typography>{params.row.country}</Typography>
+          <Typography>{params.row.country || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'age', headerName: 'Age', flex: 1 },
-
+    {
+      field: 'age',
+      headerName: 'Age',
+      flex: 1,
+      valueGetter: (params) => (params.value != null ? params.value : '-')
+    },
     {
       field: 'actions',
       headerName: 'Manage',
@@ -351,7 +360,7 @@ const User = () => {
                 borderRadius: '30px',
                 paddingLeft: '16px',
                 border: '1px solid #e0e0e0',
-                width: '350px',
+                width: '489px',
                 height: '40px'
               }}
             >
@@ -360,6 +369,19 @@ const User = () => {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{
+                  '& .MuiInputBase-input::placeholder': {
+                    fontSize: '12 px',
+                    opacity: 1
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '14px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '13px'
+                  },
+                  '& .MuiInputBase-root.Mui-focused': {
+                    backgroundColor: '#e0e0e0'
+                  },
                   flex: 1,
                   color: 'text.primary'
                 }}
@@ -367,8 +389,8 @@ const User = () => {
               <IconButton
                 sx={{
                   marginRight: '8px',
-                  width: 32,
-                  height: 32,
+                  width: 18,
+                  height: 18,
                   cursor: 'pointer'
                 }}
               >

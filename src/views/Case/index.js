@@ -79,18 +79,33 @@ const Case = () => {
   };
 
   const columns = [
-    { field: 'serialNumber', headerName: 'Case Id', width: 80 },
-    { field: 'serviceUser', headerName: 'Service User', width: 130 },
-    { field: 'owner', headerName: 'Owner', width: 90 },
+    {
+      field: 'serialNumber',
+      headerName: 'Case Id',
+      width: 80,
+      valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'serviceUser',
+      headerName: 'Service User',
+      width: 130,
+      valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'owner',
+      headerName: 'Owner',
+      width: 90,
+      valueGetter: (params) => params.value || '-'
+    },
     {
       field: 'status',
       headerName: 'Status',
       width: 120,
       renderCell: (params) => (
         <Chip
-          label={params.value}
+          label={params.value || '-'}
           variant="outlined"
-          icon={params.value === 'Open' ? <CheckIcon /> : <LoopIcon />}
+          icon={params.value === 'Open' ? <CheckIcon /> : params.value ? <LoopIcon /> : null}
           sx={{
             padding: '0px',
             height: '24px',
@@ -104,8 +119,18 @@ const Case = () => {
         />
       )
     },
-    { field: 'service', headerName: 'Service', width: 120 },
-    { field: 'dateOpened', headerName: 'Date Opened', width: 105 }
+    {
+      field: 'service',
+      headerName: 'Service',
+      width: 120,
+      valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'dateOpened',
+      headerName: 'Date Opened',
+      width: 105,
+      valueGetter: (params) => params.value || '-'
+    }
   ];
 
   const handleFilter = async () => {

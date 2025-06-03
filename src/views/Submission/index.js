@@ -50,30 +50,10 @@ const CustomHeader = () => {
   );
 };
 
-// const initialRows = [
-//   {
-//     id: 1,
-//     description: 'Self Referral form',
-//     date: '08/05/2017',
-//     campaign: 'Beach Cleaning -Corporate volunteer project 2019',
-//     title: 'Satisfaction Survey'
-//   },
-//   { id: 2, description: 'Community Referral form', date: '08/05/2017', campaign: 'Form Campaign', title: 'Community Referral' },
-//   {
-//     id: 3,
-//     description: 'Satisfaction survey',
-//     date: '08/05/2017',
-//     campaign: 'Beach Cleaning -Corporate volunteer project 2019',
-//     title: 'Volunteer Signup'
-//   },
-//   { id: 4, description: 'Volunteer sign up form', date: '08/05/2017', campaign: 'Form Campaign' },
-//   { id: 5, description: 'Workshop sign up form', date: '08/05/2017', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
-// ];
-
 const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [formType, setFormType] = useState('');
-  const [formTypes, setFormTypes] = useState([])
+  const [formTypes, setFormTypes] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,17 +62,17 @@ const Lead = () => {
     page: 0,
     pageSize: 10
   });
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const handleNavigate = (id) => {
-    navigate(`${id}`)
-  }
+    navigate(`${id}`);
+  };
 
   const getAllResponse = async () => {
-    setLoading(true)
+    setLoading(true);
     const queryParams = new URLSearchParams({
       page: paginationModel.page + 1,
-      limit: paginationModel.pageSize,
+      limit: paginationModel.pageSize
     });
     if (searchQuery) {
       queryParams.append('search', searchQuery);
@@ -100,42 +80,42 @@ const Lead = () => {
     if (formType) {
       queryParams.append('search', formType);
     }
-    const fromUrl = (`${urls?.responses?.submit}?${queryParams.toString()}`)
-    const response = await getApi(fromUrl)
+    const fromUrl = `${urls?.responses?.submit}?${queryParams.toString()}`;
+    const response = await getApi(fromUrl);
     const pagination = response?.data?.meta || { total: 0 };
     const formattedData = response?.data?.data?.map((item, index) => {
-      const submissionDate = moment(item?.submittedAt).format('L')
+      const submissionDate = moment(item?.submittedAt).format('L');
       let data = {
         id: item?._id,
         index: index + 1,
         description: item?.formId?.title,
         campaign: item?.template,
-        title: "help",
+        title: 'help',
         submissionDate,
         status: item?.status
-      }
-      return data
-    })
+      };
+      return data;
+    });
     setTotalRows(pagination?.total);
-    setRows(formattedData)
+    setRows(formattedData);
     setLoading(false);
-  }
+  };
   useEffect(() => {
-    getAllResponse()
-  }, [searchQuery, formType, paginationModel])
+    getAllResponse();
+  }, [searchQuery, formType, paginationModel]);
 
   const getFormTypes = async () => {
-    const url = `${urls?.responses?.submit}?limit=10000`
-    const response = await getApi(url)
+    const url = `${urls?.responses?.submit}?limit=10000`;
+    const response = await getApi(url);
     const options = response?.data?.data?.map((item) => ({
       value: item?.formId?.title,
       label: item?.formId?.title
-    }))
-    setFormTypes(options)
-  }
+    }));
+    setFormTypes(options);
+  };
   useEffect(() => {
-    getFormTypes()
-  }, [])
+    getFormTypes();
+  }, []);
 
   const columns = [
     {
@@ -144,7 +124,7 @@ const Lead = () => {
       flex: 0.8,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -154,7 +134,7 @@ const Lead = () => {
       flex: 0.8,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -164,8 +144,7 @@ const Lead = () => {
       flex: 1,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */}
-          -
+          {/* {params.value} */}-
         </Typography>
       )
     },
@@ -179,16 +158,27 @@ const Lead = () => {
       field: 'status',
       headerName: 'Status',
       flex: 0.8,
-      renderCell: (params) =>
-        <Button size='small' variant='contained'
+      renderCell: (params) => (
+        <Button
+          size="small"
+          variant="contained"
           sx={{
-            color: (params?.value) === 'PENDING' ? '#ffc107' : ((params?.value) === 'APPROVED' ? '#00c853' : '#d84315'),
-            backgroundColor: (params?.value) === 'PENDING' ? '#fff8e1' : ((params?.value) === 'APPROVED' ? '#b9f6ca' : '#fbe9e7'), boxShadow: 'none', borderRadius: '10px', padding: '0px', fontWeight: '400',
+            color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
+            backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
+            boxShadow: 'none',
+            borderRadius: '10px',
+            padding: '0px',
+            fontWeight: '400',
             '&:hover': {
-              color: (params?.value) === 'PENDING' ? '#ffc107' : ((params?.value) === 'APPROVED' ? '#00c853' : '#d84315'),
-              backgroundColor: (params?.value) === 'PENDING' ? '#fff8e1' : ((params?.value) === 'APPROVED' ? '#b9f6ca' : '#fbe9e7'), boxShadow: 'none'
+              color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
+              backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
+              boxShadow: 'none'
             }
-          }}>{params?.value}</Button>
+          }}
+        >
+          {params?.value || '-'}
+        </Button>
+      )
     },
     {
       field: 'edit',
@@ -225,7 +215,7 @@ const Lead = () => {
                   borderRadius: '30px',
                   paddingLeft: '16px',
                   border: '1px solid #e0e0e0',
-                  width: '350px',
+                  width: '489px',
                   height: '40px'
                 }}
               >
@@ -235,6 +225,19 @@ const Lead = () => {
                   onChange={handleSearchChange}
                   // }}
                   sx={{
+                    '& .MuiInputBase-input::placeholder': {
+                      fontSize: '12 px',
+                      opacity: 1
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: '14px'
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '13px'
+                    },
+                    '& .MuiInputBase-root.Mui-focused': {
+                      backgroundColor: '#e0e0e0'
+                    },
                     flex: 1,
                     color: 'text.primary'
                   }}
@@ -243,16 +246,14 @@ const Lead = () => {
                   // onClick={handleFilter}
                   sx={{
                     marginRight: '8px',
-                    width: 32,
-                    height: 32,
+                    width: 18,
+                    height: 18,
                     cursor: 'pointer'
                   }}
                 >
                   <SearchIcon />
                 </IconButton>
               </Box>
-
-
             </Stack>
           </Grid>
 
@@ -274,9 +275,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
                   loading={loading}

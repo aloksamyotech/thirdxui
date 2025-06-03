@@ -28,7 +28,7 @@ const ServiceList = () => {
       headerName: 'Case ID',
       width: 100,
       align: 'center',
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'name',
@@ -36,8 +36,8 @@ const ServiceList = () => {
       width: 150,
       renderCell: (params) => (
         <Typography sx={{ fontSize: '12px' }}>
-          {params?.row?.firstName} {params?.row?.lastName}
-          {params?.value}
+          {params?.row?.firstName || '-'} {params?.row?.lastName || '-'}
+          {params?.value || '-'}
         </Typography>
       )
     },
@@ -45,7 +45,7 @@ const ServiceList = () => {
       field: 'dob',
       headerName: 'DOB',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'age',
@@ -66,7 +66,7 @@ const ServiceList = () => {
             border: '1px solid #d4d4d4'
           }}
         >
-          {params.value}
+          {params.value || '-'}
         </Box>
       )
     },
@@ -79,7 +79,7 @@ const ServiceList = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
           )}
-          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country}</Typography>
+          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country || '-'}</Typography>
         </Stack>
       )
     },
@@ -87,19 +87,19 @@ const ServiceList = () => {
       field: 'gender',
       headerName: 'Gender',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'no',
       headerName: 'ContactNo.',
       width: 150,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     }
   ];
   useEffect(() => {

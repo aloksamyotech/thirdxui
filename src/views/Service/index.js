@@ -84,10 +84,10 @@ const ServiceManagement = () => {
             }}
             mb={1}
           >
-            {params.row.name}
+            {params.row.name || '-'}
           </Typography>
           <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap' }}>
-            {new Date(params.row.updatedAt).toDateString()}
+            {new Date(params.row.updatedAt || '-').toDateString()}
           </Typography>
         </Stack>
       )
@@ -102,7 +102,7 @@ const ServiceManagement = () => {
       field: 'code',
       headerName: 'Service Code',
       flex: 0.8,
-      renderCell: (params) => `#${params.value}`
+      renderCell: (params) => `#${params.value || '-'}`
     },
 
     {

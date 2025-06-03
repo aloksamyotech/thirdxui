@@ -24,7 +24,7 @@ const CaseList = () => {
       flex: 1,
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="500" sx={{ fontSize: '12px' }}>
-          #{params.value}
+          #{params.value || '-'}
         </Typography>
       )
     },
@@ -43,7 +43,7 @@ const CaseList = () => {
             fontSize: '12px'
           }}
         >
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -51,7 +51,7 @@ const CaseList = () => {
       field: 'title',
       headerName: 'Credited At',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'status',
@@ -61,7 +61,7 @@ const CaseList = () => {
       align: 'center',
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="600" sx={{ color: 'green', fontSize: '12px' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -73,7 +73,7 @@ const CaseList = () => {
       align: 'center',
       renderCell: (params) => (
         <Typography variant="body2" sx={{ fontSize: '12px' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     }

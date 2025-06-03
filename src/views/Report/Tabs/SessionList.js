@@ -140,19 +140,19 @@ const CaseList = () => {
       field: 'caseid',
       headerName: 'Case ID',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'serviceUser',
       headerName: 'Service User',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'dob',
       headerName: 'Date Opened',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'status',
@@ -176,7 +176,7 @@ const CaseList = () => {
             minWidth: 0
           }}
         >
-          {params.value}
+          {params.value || '-'}
         </Button>
       )
     },
@@ -187,7 +187,7 @@ const CaseList = () => {
       renderCell: (params) => (
         <Stack direction="row" alignItems="center">
           <img src={flag} alt="flag" style={{ width: 20, height: 20, objectFit: 'contain' }} />
-          <Typography sx={{ ml: '5px', fontSize: '12px' }}>{params?.value}</Typography>
+          <Typography sx={{ ml: '5px', fontSize: '12px' }}>{params?.value || '-'}</Typography>
         </Stack>
       )
     },
@@ -195,13 +195,13 @@ const CaseList = () => {
       field: 'owner',
       headerName: 'Owner',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     }
   ];
 

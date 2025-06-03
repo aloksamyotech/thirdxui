@@ -1394,8 +1394,13 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
+                        CANCEL
+                      </Button>
+                    </Grid>
+                    <Grid item>
                       <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
-                        Next
+                        SAVE CHANGES
                       </Button>
                     </Grid>
                   </Grid>
@@ -1865,8 +1870,13 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
+                        CANCEL
+                      </Button>
+                    </Grid>
+                    <Grid item>
                       <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
-                        Next
+                        SAVE CHANGES
                       </Button>
                     </Grid>
                   </Grid>

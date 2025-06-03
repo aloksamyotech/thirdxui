@@ -27,7 +27,6 @@ import { urls } from 'common/urls';
 import { getApi, updateApi, updateApiPatch } from 'common/apiClient';
 import AddIcon from '@mui/icons-material/Add';
 import DialogActions from '@mui/material/DialogActions';
-// import { ReactComponent as IconTrash } from '../../../assets/icons/trash.svg';
 
 AppTasks.propTypes = {
   title: PropTypes.string,
@@ -120,6 +119,13 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   useEffect(() => {
     fetchTasks();
   }, []);
+  useEffect(() => {
+    console.log(location.state?.taskAdded);
+
+    if (location.state?.taskAdded) {
+      fetchTasks();
+    }
+  }, [location.state]);
 
   const filteredTasks = myTasks.filter((task) => task.label.toLowerCase().includes(search.toLowerCase()));
   const handleDelete = (taskId) => {

@@ -27,6 +27,8 @@ import { Link } from 'react-router-dom';
 import { urls } from 'common/urls';
 import { postApi } from 'common/apiClient';
 import { useGoogleLogin } from '@react-oauth/google';
+import { ToastContainer, toast as toastify } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
@@ -59,15 +61,16 @@ const AuthLogin = ({ ...others }) => {
         toast.error('Login failed due to network or server error');
       }
     },
-    onError: () => toast.error('Login failed'),
+    onError: () => toast.error('Login failed')
   });
 
   return (
     <>
       <Formik
         initialValues={{
-          email: '',
-          password: ''
+          email: localStorage.getItem('savedEmail') || '',
+          password: localStorage.getItem('savedPassword') || '',
+          rememberMe: localStorage.getItem('rememberMe') === 'true'
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
@@ -76,21 +79,31 @@ const AuthLogin = ({ ...others }) => {
         onSubmit={async (values, { setErrors, setStatus }) => {
           try {
             setIsSubmitting(true);
-
             const response = await postApi(`${urls.login.login}`, values);
-            if (response?.data?.statusCode == 401) {
-              toast.warn(response?.message || 'Wrong Password ');
-            } else if (response?.data?.statusCode == 404) {
-              toast.warn(response?.message || 'Email Not Registered');
-            } else {
+
+            if (response?.data?.statusCode === 401) {
+              toastify.warn(response?.message || 'Wrong Password');
+            } else if (response?.data?.statusCode === 404) {
+              toastify.warn(response?.message || 'Email Not Registered');
+            } else if (response?.success) {
               toast.success('Login successful');
               localStorage.setItem('token', response?.data?.token);
+              if (values.rememberMe) {
+                console.log('values.rememberMe  ------->', values.rememberMe);
+                localStorage.setItem('savedEmail', values.email);
+                localStorage.setItem('savedPassword', values.password);
+                localStorage.setItem('rememberMe', 'true');
+              } else {
+                localStorage.removeItem('savedEmail');
+                localStorage.removeItem('savedPassword');
+                localStorage.removeItem('rememberMe');
+              }
               setTimeout(() => {
                 navigate('/dashboard/default');
               }, 1000);
             }
           } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            toast.error(error.response?.data?.message || 'Login failed due to network or server error');
           } finally {
             setIsSubmitting(false);
           }

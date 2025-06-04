@@ -7,6 +7,7 @@ import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import { useEffect } from 'react';
 import moment from 'moment';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -73,6 +74,7 @@ export default function TabbedDataGrid() {
     page: 0,
     pageSize: 10
   });
+  const [loading, setLoading] = useState(true);
 
   const filteredRows = allRows.filter((row) => (tabValue === 0 ? row.status === 'APPROVED' : row.status === 'REJECTED'));
 
@@ -113,6 +115,7 @@ export default function TabbedDataGrid() {
         : formattedData?.filter((item) => item?.status === 'REJECTED')?.length
     );
     setRows(formattedData);
+    setLoading(false);
   };
   useEffect(() => {
     getAllResponse();
@@ -233,18 +236,38 @@ export default function TabbedDataGrid() {
         />
         <Grid item xs={9}>
           <Box sx={{ width: '100%' }}>
-            <Card sx={{ height: 'auto' }}>
+            <Card sx={{ height: '100vh' }}>
               <DataGrid
-                rows={filteredRows}
+                rows={
+                  loading
+                    ? []
+                    : filteredRows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
+                loading={loading}
                 columns={columns}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                pageSize={5}
                 checkboxSelection
-                components={{
-                  Toolbar: () => <CustomHeader tabValue={tabValue} setTabValue={setTabValue} />
+                slots={{
+                  toolbar: () => <CustomHeader tabValue={tabValue} setTabValue={setTabValue} />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
-                rowsPerPageOptions={[5, 10]}
                 getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                 sx={{
                   '& .MuiDataGrid-row': {
@@ -259,7 +282,7 @@ export default function TabbedDataGrid() {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
-                pageSizeOptions={[10]}
+                pageSizeOptions={[5, 10, 25, 50]}
               />
             </Card>
           </Box>

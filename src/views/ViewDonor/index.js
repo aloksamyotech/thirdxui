@@ -77,7 +77,7 @@ const UserProfileCard = () => {
   const otherInfo = userData?.otherInfo || {};
   const companyInformation = userData?.companyInformation || {};
   const imagePath = userData?.otherInfo?.file;
-  const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
+  const fullImageUrl = imagePath ? (imagePath.startsWith('https://') ? imagePath : `${imageUrl}${imagePath}`) : '';
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

@@ -56,7 +56,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 const EmployeeDetails = () => {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
   const [emailNotification, setEmailNotification] = useState(true);
   const [copyToPersonalEmail, setCopyToPersonalEmail] = useState(true);
@@ -92,18 +92,14 @@ const EmployeeDetails = () => {
       confirmPassword: ''
     },
     validationSchema: Yup.object({
-      password: Yup.string()
-        .required('Current password is required')
-        .min(4, 'Must be at least 4 characters'),
-      newPassword: Yup.string()
-        .required('New password is required')
-        .min(4, 'Must be at least 4 characters'),
+      password: Yup.string().required('Current password is required').min(4, 'Must be at least 4 characters'),
+      newPassword: Yup.string().required('New password is required').min(4, 'Must be at least 4 characters'),
       confirmPassword: Yup.string()
         .required('Please confirm your new password')
         .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
     }),
 
-    onSubmit: (async (values) => {
+    onSubmit: async (values) => {
       const url = urls?.login?.changePassword;
       const response = await updateApiPatch(url, {
         password: values.password,
@@ -114,10 +110,10 @@ const EmployeeDetails = () => {
         // window.location.reload()
         formik.resetForm();
       } else {
-        toast.error('Current Password Is Incorrect')
+        toast.error('Current Password Is Incorrect');
       }
-    })
-  })
+    }
+  });
 
   const empData = {
     email: 'john.doe@example.com',
@@ -222,7 +218,13 @@ const EmployeeDetails = () => {
                         ) : (
                           <Box
                             component="img"
-                            src={userData.file ? `${imageUrl}${userData.file}` : ProfileLogo}
+                            src={
+                              userData.file
+                                ? userData.file.startsWith('https://')
+                                  ? userData.file
+                                  : `${imageUrl}${userData.file}`
+                                : ProfileLogo
+                            }
                             alt="Profile"
                             sx={{
                               width: '80%',
@@ -290,14 +292,14 @@ const EmployeeDetails = () => {
                             {key === 'email' && <EmailOutlinedIcon fontSize="10px" sx={{ color: '#6f7082', mr: 1 }} />}
                             {key === 'phoneNumber' && <PhoneIcon fontSize="10px" />}
                             {key === 'address' && <LocationOnIcon fontSize="10px" />}
-                            <Typography fontSize={12}>{key === 'phoneNumber' ? 'Contact:' : key.charAt(0).toUpperCase() + key.slice(1) + ':'}</Typography>
+                            <Typography fontSize={12}>
+                              {key === 'phoneNumber' ? 'Contact:' : key.charAt(0).toUpperCase() + key.slice(1) + ':'}
+                            </Typography>
                           </Box>
                           {loading ? (
                             <Skeleton variant="text" width={100} height={20} />
                           ) : (
-                            <Typography fontSize={12}>
-                              {userData?.[key] || '-'}
-                            </Typography>
+                            <Typography fontSize={12}>{userData?.[key] || '-'}</Typography>
                           )}
                         </Box>
                       ))}
@@ -433,7 +435,7 @@ const EmployeeDetails = () => {
                     type="password"
                     fullWidth
                     margin="normal"
-                    name='password'
+                    name="password"
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     error={formik.touched.password && Boolean(formik.errors.password)}
@@ -447,11 +449,12 @@ const EmployeeDetails = () => {
                       type="password"
                       fullWidth
                       margin="normal"
-                      name='newPassword'
+                      name="newPassword"
                       value={formik.values.newPassword}
                       onChange={formik.handleChange}
                       error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
-                      helperText={formik.touched.newPassword && formik.errors.newPassword} />
+                      helperText={formik.touched.newPassword && formik.errors.newPassword}
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
@@ -459,11 +462,12 @@ const EmployeeDetails = () => {
                       type="password"
                       fullWidth
                       margin="normal"
-                      name='confirmPassword'
+                      name="confirmPassword"
                       value={formik.values.confirmPassword}
                       onChange={formik.handleChange}
                       error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                      helperText={formik.touched.confirmPassword && formik.errors.confirmPassword} />
+                      helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                    />
                   </Grid>
                 </Grid>
                 <Box sx={{ mt: 2, fontSize: 14, color: 'gray' }}>
@@ -632,13 +636,12 @@ const EmployeeDetails = () => {
                         borderColor: '#bbbdfa',
                         '&:hover': {
                           borderColor: '#bbbdfa',
-                          backgroundColor: 'rgba(5, 49, 70, 0.04)',
-                        },
+                          backgroundColor: 'rgba(5, 49, 70, 0.04)'
+                        }
                       }}
                     >
                       CANCEL
                     </Button>
-
                   </Grid>
                 </Grid>
               </CardContent>

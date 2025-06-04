@@ -116,7 +116,11 @@ const UserProfileCard = () => {
   };
 
   const imagePath = userData?.otherInfo?.file;
-  const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
+  const fullImageUrl = imagePath
+    ? imagePath.startsWith('https://')
+      ? imagePath
+      : `${imageUrl.replace(/\/$/, '')}/${imagePath.replace(/^\//, '')}`
+    : '';
 
   const handleBackClick = () => {
     if (location.state?.isArchive) {

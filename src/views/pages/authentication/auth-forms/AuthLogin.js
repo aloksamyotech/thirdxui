@@ -89,7 +89,6 @@ const AuthLogin = ({ ...others }) => {
               toast.success('Login successful');
               localStorage.setItem('token', response?.data?.token);
               if (values.rememberMe) {
-                console.log('values.rememberMe  ------->', values.rememberMe);
                 localStorage.setItem('savedEmail', values.email);
                 localStorage.setItem('savedPassword', values.password);
                 localStorage.setItem('rememberMe', 'true');

@@ -11,8 +11,7 @@ const TemplateTwo = ({ formData, setPreview, setSelectedTemplate }) => {
     const formik = useFormik({
         initialValues,
         onSubmit: async (values) => {
-            console.log('form :-', values);
-            formik?.resetForm();
+     formik?.resetForm();
         }
     });
 

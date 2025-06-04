@@ -163,7 +163,8 @@ const Volunteer = () => {
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
-        postcode: user.contactInfo?.postcode || ''
+        postcode: user.contactInfo?.postcode || '',
+        role: user?.role || ''
       }));
 
       setRows(formattedUsers);
@@ -221,7 +222,8 @@ const Volunteer = () => {
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
-        postcode: user.contactInfo?.postcode || ''
+        postcode: user.contactInfo?.postcode || '',
+        role: user?.role || ''
       }));
 
       setRows(formattedUsers);
@@ -286,7 +288,7 @@ const Volunteer = () => {
                   handleFilter();
                 }
               }}
-             sx={{
+              sx={{
                 '& .MuiInputBase-input::placeholder': {
                   fontSize: '12 px',
                   opacity: 1

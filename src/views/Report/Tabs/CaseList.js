@@ -12,7 +12,7 @@ import config from '../../../config';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import CheckIcon from '@mui/icons-material/Check';
 
-const CaseList = () => {
+const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -26,25 +26,25 @@ const CaseList = () => {
     {
       field: 'caseid',
       headerName: 'Case ID',
-      width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      width: 80,
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'serviceUser',
       headerName: 'Service User',
-      width: 150,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      width: 120,
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'dateOpened',
       headerName: 'Date Opened',
-      width: 150,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      width: 100,
+      renderCell: (params) => <Typography sx={{ fontSize: '10px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'status',
       headerName: 'Status',
-      width: 100,
+      width: 80,
       renderCell: (params) => (
         <Button
           size="small"
@@ -52,32 +52,32 @@ const CaseList = () => {
           sx={{ p: 0, m: 0, pr: 0.5, pl: 0.5, borderRadius: '15px', color: '#737586', border: '1px solid #737586', fontSize: '0.65rem' }}
           startIcon={<CheckIcon />}
         >
-          {params.value}
+          {params.value || '-'}
         </Button>
       )
     },
     {
       field: 'country',
       headerName: 'Country',
-      width: 150,
+      width: 90,
       renderCell: (params) => (
         <Stack direction="row">
           <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
-          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country}</Typography>
+          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country || '-'}</Typography>
         </Stack>
       )
     },
     {
       field: 'owner',
       headerName: 'Owner',
-      width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      width: 80,
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
-      width: 300,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      width: 160,
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     }
   ];
 
@@ -98,13 +98,14 @@ const CaseList = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: '400',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
             }}
           >
-            CASE REPORT LIST
+            {' '}
+            Case Report List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
@@ -134,10 +135,34 @@ const CaseList = () => {
       });
   }, []);
   const fetchInitialData = async () => {
-    setLoading(true);
-
     try {
-      const response = await getApi(`${urls.case.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize
+      });
+
+      if (countryOfOriginFilter) {
+        const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
+        if (selectedCountry) {
+          queryParams.append('country', selectedCountry.label);
+        }
+      }
+
+      if (selectedName) {
+        queryParams.append('name', selectedName);
+      }
+
+      if (status) queryParams.append('status', status === 'active');
+
+      if (caseId) queryParams.append('uniqueId', caseId);
+
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('caseOpened', formattedDate);
+      }
+
+      const response = await getApi(`${urls.case.fetchWithPagination}?${queryParams.toString()}`);
 
       const allCases = response?.data?.data || [];
 
@@ -156,7 +181,7 @@ const CaseList = () => {
         return {
           id: user?._id,
           serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
-          caseid: '-',
+          caseid: user?.uniqueId || '',
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
@@ -182,7 +207,7 @@ const CaseList = () => {
 
   useEffect(() => {
     fetchInitialData();
-  }, [paginationModel]);
+  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
 
   return (
     <>

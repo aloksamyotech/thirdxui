@@ -25,7 +25,7 @@ const columns = [
     field: 'title',
     headerName: 'Name',
     flex: 1.5,
-    renderCell: (params) => <Typography variant="body1">{params.value}</Typography>
+    renderCell: (params) => <Typography variant="body1">{params.value || '-'}</Typography>
   },
   {
     field: 'date',
@@ -33,7 +33,7 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Typography variant="body2" color="textSecondary">
-        {params.value}
+        {params.value || '-'}
       </Typography>
     )
   },
@@ -41,7 +41,7 @@ const columns = [
     field: 'age',
     headerName: 'Age',
     flex: 1,
-    renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+    renderCell: (params) => <Typography variant="body2">{params.value || '-'}</Typography>
   },
   {
     field: 'status',
@@ -49,7 +49,7 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Chip
-        label={params.value}
+        label={params.value || '-'}
         sx={{
           color: params.value === 'APPROVED' ? '#41c048' : 'red',
           backgroundColor: params.value === 'APPROVED' ? '#eefbe5' : '#ffeae9'
@@ -67,7 +67,7 @@ export default function TabbedDataGrid() {
   const [namesFilter, setNamesFilter] = useState([]);
   const [nameFilter, setNameFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [allRows, setRows] = useState([])
+  const [allRows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -79,7 +79,7 @@ export default function TabbedDataGrid() {
   const getAllResponse = async () => {
     const queryParams = new URLSearchParams({
       page: paginationModel.page + 1,
-      limit: paginationModel.pageSize,
+      limit: paginationModel.pageSize
     });
     if (searchQuery) {
       queryParams.append('search', searchQuery);
@@ -91,43 +91,48 @@ export default function TabbedDataGrid() {
       const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
       queryParams.append('date', formattedDate);
     }
-    const fromUrl = (`${urls?.responses?.submit}?${queryParams.toString()}`)
-    const response = await getApi(fromUrl)
+    const fromUrl = `${urls?.responses?.submit}?${queryParams.toString()}`;
+    const response = await getApi(fromUrl);
     const pagination = response?.data?.meta || { total: 0 };
-    const formattedData = response?.data?.data?.map((item, index) => {
-      const submissionDate = moment(item?.submittedAt).format('L')
-      let data = {
-        id: index + 1,
-        title: item?.formId?.title,
-        status: item?.status,
-        date: submissionDate,
-        age: '-'
-      }
-      return data
-    })?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED');
+    const formattedData = response?.data?.data
+      ?.map((item, index) => {
+        const submissionDate = moment(item?.submittedAt).format('L');
+        let data = {
+          id: index + 1,
+          title: item?.formId?.title,
+          status: item?.status,
+          date: submissionDate,
+          age: '-'
+        };
+        return data;
+      })
+      ?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED');
     setTotalRows(
-      tabValue === 0 ?
-        formattedData?.filter((item) => item?.status === 'APPROVED')?.length :
-        formattedData?.filter((item) => item?.status === 'REJECTED')?.length);
-    setRows(formattedData)
-  }
+      tabValue === 0
+        ? formattedData?.filter((item) => item?.status === 'APPROVED')?.length
+        : formattedData?.filter((item) => item?.status === 'REJECTED')?.length
+    );
+    setRows(formattedData);
+  };
   useEffect(() => {
-    getAllResponse()
-  }, [nameFilter, searchQuery, dateOpenedFilter, paginationModel, tabValue])
+    getAllResponse();
+  }, [nameFilter, searchQuery, dateOpenedFilter, paginationModel, tabValue]);
 
   const getResponse = async () => {
-    const url = `${urls?.responses?.submit}?limit=10000`
-    const response = await getApi(url)
-    const options = response?.data?.data?.map((item) => ({
-      value: item?.formId?.title,
-      label: item?.formId?.title,
-      status: item?.status
-    }))?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED')
-    setNamesFilter(options)
-  }
+    const url = `${urls?.responses?.submit}?limit=10000`;
+    const response = await getApi(url);
+    const options = response?.data?.data
+      ?.map((item) => ({
+        value: item?.formId?.title,
+        label: item?.formId?.title,
+        status: item?.status
+      }))
+      ?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED');
+    setNamesFilter(options);
+  };
   useEffect(() => {
-    getResponse()
-  }, [])
+    getResponse();
+  }, []);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -165,7 +170,7 @@ export default function TabbedDataGrid() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">History</Typography>
+        <Typography sx={{ fontsize: '14px', fontWeight: '400', color: '#636365' }}>History</Typography>
         <Box
           sx={{
             display: 'flex',
@@ -174,7 +179,7 @@ export default function TabbedDataGrid() {
             borderRadius: '30px',
             paddingLeft: '16px',
             border: '1px solid #e0e0e0',
-            width: '350px',
+            width: '489px',
             height: '40px'
           }}
         >
@@ -183,6 +188,19 @@ export default function TabbedDataGrid() {
             value={searchQuery}
             onChange={handleSearchChange}
             sx={{
+              '& .MuiInputBase-input::placeholder': {
+                fontSize: '12 px',
+                opacity: 1
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '14px'
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: '13px'
+              },
+              '& .MuiInputBase-root.Mui-focused': {
+                backgroundColor: '#e0e0e0'
+              },
               flex: 1,
               color: 'text.primary'
             }}
@@ -191,15 +209,14 @@ export default function TabbedDataGrid() {
             // onClick={handleFilter}
             sx={{
               marginRight: '8px',
-              width: 32,
-              height: 32,
+              width: 18,
+              height: 18,
               cursor: 'pointer'
             }}
           >
             <SearchIcon />
           </IconButton>
         </Box>
-
       </Stack>
       <Grid container spacing={2}>
         <FilterPanel

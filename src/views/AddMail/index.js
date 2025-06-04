@@ -22,6 +22,7 @@ import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import { useEffect } from 'react';
+import { Autocomplete } from '@mui/material';
 
 const MailingListForm = () => {
   const navigate = useNavigate();
@@ -99,10 +100,10 @@ const MailingListForm = () => {
     fetchtTagData();
   }, []);
 
- const onSubmit = async (data) => {
+  const onSubmit = async (data) => {
     setIsloading(true);
     let hasError = false;
-   
+
     const validatedFilters = filters.map((filter) => {
       const newErrors = {
         field: !filter.field?.trim(),
@@ -119,14 +120,12 @@ const MailingListForm = () => {
         errors: newErrors
       };
     });
-  
 
     if (hasError) {
       setFilters(validatedFilters);
       const firstErrorIndex = validatedFilters.findIndex(
         (filter) => filter.errors.field || filter.errors.comparison || filter.errors.value
       );
-   
 
       setIsloading(false);
       return;
@@ -153,7 +152,6 @@ const MailingListForm = () => {
     }
   };
   const onError = () => {
-    
     const validatedFilters = filters.map((filter) => {
       const newErrors = {
         field: !filter.field?.trim(),
@@ -217,17 +215,23 @@ const MailingListForm = () => {
               name="tags"
               control={control}
               rules={{ required: 'This field is required' }}
-          
               render={({ field, fieldState }) => (
-                <TextField {...field} select fullWidth label="Include People with these Tags" size="small"  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}>
-                  {tagOptions?.map((option) => (
-                    <MenuItem key={option._id} value={option._id}>
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                 
-                </TextField>
+                <Autocomplete
+                  {...field}
+                  options={tagOptions || []}
+                  getOptionLabel={(option) => option?.name || ''}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  onChange={(_, value) => field.onChange(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Include People with these Tags"
+                      size="small"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    />
+                  )}
+                />
               )}
             />
           </Grid>
@@ -270,9 +274,9 @@ const MailingListForm = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Paper variant="outlined" sx={{ p: 2, }}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
               {filters.map((filter) => (
-                <Grid container spacing={1} alignItems="center" key={filter.id}  sx={{ mb: 1 }}>
+                <Grid container spacing={1} alignItems="center" key={filter.id} sx={{ mb: 1 }}>
                   <Grid item xs={2}>
                     <Select
                       fullWidth

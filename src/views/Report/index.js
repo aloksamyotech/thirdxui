@@ -7,6 +7,8 @@ import Session from './Tabs/Session';
 import Survey from './Tabs/Survey';
 import Donor from './Tabs/Donor';
 import FilterPanel from 'components/FilterPanel';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -38,9 +40,18 @@ const Report = () => {
   const [name, setNameFilter] = useState('');
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
   const [caseId, setCaseIdFilter] = useState('');
+  const [countryOfOriginFilter, setCountryOfOriginFilter] = useState('');
+  const [nameFilterOptions, setNameFilterOptions] = useState([]);
+  const [selectedName, setSelectedName] = useState('');
+  const [uniqueIds, setUniqueIds] = useState([]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    setCountryOfOriginFilter('');
+    setSelectedName('');
+    setStatus('');
+    setCaseIdFilter('');
+    setDateOpenedFilter('');
   };
 
   useEffect(() => {
@@ -56,20 +67,54 @@ const Report = () => {
       });
   }, []);
 
+  const fetchUserName = async () => {
+    try {
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}`);
+
+      const users = response?.data?.data || [];
+
+      const nameOptions = users.map((user) => ({
+        value: user._id,
+        label: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim()
+      }));
+
+      const uniqueIdList = users.map((user) => ({
+        value: user._id,
+        label: user.uniqueId
+      }));
+
+      setUniqueIds(uniqueIdList);
+
+      setNameFilterOptions(nameOptions);
+    } catch (error) {
+      console.error('Error fetching user names:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserName();
+  }, []);
+
   return (
     <>
       <Grid container spacing={2}>
         <FilterPanel
           showFilter={showFilter}
           statuses={statusFilter}
+          statusFilter={status}
           setStatusFilter={setStatus}
           dateAddedFilters={dateAddedFilters}
-          setDateAddedFilter={setDateOpenedFilter}
-          names={nameFilter}
-          setNameFilter={setNameFilter}
-          caseIds={caseIds}
+          dateOpenedFilter={dateOpenedFilter}
+          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+          names={nameFilterOptions}
+          nameFilter={selectedName}
+          setNameFilter={setSelectedName}
+          caseIds={uniqueIds}
+          caseIdFilter={caseId}
           setCaseIdFilter={setCaseIdFilter}
           countriesWithFlags={countriesWithFlags}
+          countryOfOriginFilter={countryOfOriginFilter}
+          setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
           selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter']}
           customDateLabel="By Date"
         />
@@ -88,7 +133,9 @@ const Report = () => {
                 sx={(theme) => ({
                   backgroundColor: value === '1' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
-                  marginRight: 2
+                  marginRight: 2,
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
 
@@ -98,7 +145,9 @@ const Report = () => {
                 sx={(theme) => ({
                   backgroundColor: value === '2' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
-                  marginRight: 2
+                  marginRight: 2,
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
 
@@ -108,7 +157,9 @@ const Report = () => {
                 sx={(theme) => ({
                   backgroundColor: value === '3' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
-                  marginRight: 2
+                  marginRight: 2,
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
 
@@ -117,7 +168,9 @@ const Report = () => {
                 value="4"
                 sx={(theme) => ({
                   backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease'
+                  transition: 'background-color 0.3s ease',
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
               <Tab
@@ -125,25 +178,45 @@ const Report = () => {
                 value="5"
                 sx={(theme) => ({
                   backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease'
+                  transition: 'background-color 0.3s ease',
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
             </TabList>
 
             <TabPanel value="1" sx={{ px: 0 }}>
-              <Service />
+              <Service
+                countryOfOriginFilter={countryOfOriginFilter}
+                selectedName={selectedName}
+                status={status}
+                caseId={caseId}
+                dateOpenedFilter={dateOpenedFilter}
+              />
             </TabPanel>
             <TabPanel value="2" sx={{ px: 0 }}>
-              <Cases />
+              <Cases
+                countryOfOriginFilter={countryOfOriginFilter}
+                selectedName={selectedName}
+                status={status}
+                caseId={caseId}
+                dateOpenedFilter={dateOpenedFilter}
+              />
             </TabPanel>
             <TabPanel value="3" sx={{ px: 0 }}>
-              <Session />
+              <Session
+                countryOfOriginFilter={countryOfOriginFilter}
+                selectedName={selectedName}
+                status={status}
+                caseId={caseId}
+                dateOpenedFilter={dateOpenedFilter}
+              />
             </TabPanel>
             <TabPanel value="4" sx={{ px: 0 }}>
               <Survey />
             </TabPanel>
             <TabPanel value="5" sx={{ px: 0 }}>
-              <Donor />
+              <Donor selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />
             </TabPanel>
           </TabContext>
         </Grid>

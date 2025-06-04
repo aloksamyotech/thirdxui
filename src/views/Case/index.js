@@ -64,7 +64,8 @@ const Case = () => {
             sx={{
               color: '#333',
               fontSize: '14px',
-              lineHeight: '36px'
+              lineHeight: '36px',
+              fontWeight: '400'
             }}
           >
             Case List
@@ -78,27 +79,58 @@ const Case = () => {
   };
 
   const columns = [
-    { field: 'serialNumber', headerName: 'Case Id', width: 100 },
-    { field: 'serviceUser', headerName: 'Service User', width: 150 },
-    { field: 'owner', headerName: 'Owner', width: 120 },
+    {
+      field: 'serialNumber',
+      headerName: 'Case Id',
+      width: 80,
+      valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'serviceUser',
+      headerName: 'Service User',
+      width: 130,
+      valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'owner',
+      headerName: 'Owner',
+      width: 90,
+      valueGetter: (params) => params.value || '-'
+    },
     {
       field: 'status',
       headerName: 'Status',
       width: 120,
       renderCell: (params) => (
         <Chip
-          label={params.value}
+          label={params.value || '-'}
           variant="outlined"
-          icon={params.value === 'Open' ? <CheckIcon /> : <LoopIcon />}
+          icon={params.value === 'Open' ? <CheckIcon /> : params.value ? <LoopIcon /> : null}
           sx={{
-            borderColor: params.value === 'gray',
+            padding: '0px',
+            height: '24px',
+            minHeight: 'unset',
+            margin: '0px',
+            fontSize: '12px',
+            borderRadius: '12px',
+            borderColor: 'gray',
             backgroundColor: 'transparent'
           }}
         />
       )
     },
-    { field: 'service', headerName: 'Service', width: 120 },
-    { field: 'dateOpened', headerName: 'Date Opened', width: 150 }
+    {
+      field: 'service',
+      headerName: 'Service',
+      width: 120,
+      valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'dateOpened',
+      headerName: 'Date Opened',
+      width: 105,
+      valueGetter: (params) => params.value || '-'
+    }
   ];
 
   const handleFilter = async () => {
@@ -279,7 +311,7 @@ const Case = () => {
               borderRadius: '30px',
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
-              width: '350px',
+              width: '489px',
               height: '40px'
             }}
           >
@@ -293,6 +325,19 @@ const Case = () => {
                 }
               }}
               sx={{
+                '& .MuiInputBase-input::placeholder': {
+                  fontSize: '12 px',
+                  opacity: 1
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '14px'
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px'
+                },
+                '& .MuiInputBase-root.Mui-focused': {
+                  backgroundColor: '#e0e0e0'
+                },
                 flex: 1,
                 color: 'text.primary'
               }}
@@ -301,8 +346,8 @@ const Case = () => {
               onClick={handleFilter}
               sx={{
                 marginRight: '8px',
-                width: 32,
-                height: 32,
+                width: 18,
+                height: 18,
                 cursor: 'pointer'
               }}
             >
@@ -375,6 +420,20 @@ const Case = () => {
                       '& .MuiDataGrid-row': {
                         borderBottom: '1px solid #ccc',
                         cursor: 'pointer'
+                      },
+                      '& .MuiDataGrid-columnHeaders': {
+                        fontSize: '14px'
+                      },
+                      '& .MuiDataGrid-cell': {
+                        fontSize: '12px'
+                      },
+
+                      '& .MuiDataGrid-cellCheckbox, & .MuiDataGrid-columnHeaderCheckbox': {
+                        padding: '0px'
+                      },
+                      '& .MuiCheckbox-root': {
+                        padding: '4px',
+                        transform: 'scale(0.8)'
                       }
                     }}
                   />

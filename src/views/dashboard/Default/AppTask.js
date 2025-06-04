@@ -27,7 +27,6 @@ import { urls } from 'common/urls';
 import { getApi, updateApi, updateApiPatch } from 'common/apiClient';
 import AddIcon from '@mui/icons-material/Add';
 import DialogActions from '@mui/material/DialogActions';
-// import { ReactComponent as IconTrash } from '../../../assets/icons/trash.svg';
 
 AppTasks.propTypes = {
   title: PropTypes.string,
@@ -120,6 +119,12 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   useEffect(() => {
     fetchTasks();
   }, []);
+  useEffect(() => {
+
+    if (location.state?.taskAdded) {
+      fetchTasks();
+    }
+  }, [location.state]);
 
   const filteredTasks = myTasks.filter((task) => task.label.toLowerCase().includes(search.toLowerCase()));
   const handleDelete = (taskId) => {
@@ -295,13 +300,13 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
             onClick={handleSubmit}
             startIcon={<AddIcon />}
             sx={{
-              backgroundColor: '#f9f9f9',
-              color: '#666',
+              backgroundColor: '#1976d2',
+              color: '#fff',
               borderRadius: 1,
               textTransform: 'none',
               fontWeight: 500,
               '&:hover': {
-                backgroundColor: '#f0f0f0'
+                backgroundColor: '#1565c0'
               }
             }}
           >
@@ -385,11 +390,17 @@ TaskItem.propTypes = {
     label: PropTypes.string
   })
 };
-
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB');
+};
 function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
   return (
     <Stack
       direction="row"
+      alignItems="center"
+      justifyContent="space-between"
       sx={{
         px: 2,
         py: 0.75,
@@ -399,14 +410,23 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
         })
       }}
     >
-      <FormControlLabel control={<Checkbox checked={checked} onChange={onChange} />} label={task.label} sx={{ flexGrow: 1, m: 0 }} />
+      <FormControlLabel
+        control={<Checkbox checked={checked} onChange={onChange} />}
+        label={
+          <Typography variant="body2" sx={{ m: 0 }}>
+            Call due for {task?.assignedTo?.userName} on <strong>{formatDate(task?.dueDate)}</strong>
+          </Typography>
+        }
+      />
 
-      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
-        <Iconify icon={'eva:edit-fill'} />
-      </IconButton>
-      <IconButton size="large" color="error" onClick={onDelete}>
-        <Iconify icon={'eva:trash-2-outline'} />
-      </IconButton>
+      <Box>
+        <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit}>
+          <Iconify icon={'eva:edit-fill'} />
+        </IconButton>
+        <IconButton size="large" color="error" onClick={onDelete}>
+          <Iconify icon={'eva:trash-2-outline'} />
+        </IconButton>
+      </Box>
     </Stack>
   );
 }

@@ -53,7 +53,7 @@ const Mail = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: '',
+              fontWeight: '400',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
@@ -254,7 +254,7 @@ const Mail = () => {
               borderRadius: '30px',
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
-              width: '350px',
+              width: '489px',
               height: '40px'
             }}
           >
@@ -268,6 +268,19 @@ const Mail = () => {
                 }
               }}
               sx={{
+                '& .MuiInputBase-input::placeholder': {
+                  fontSize: '12 px',
+                  opacity: 1
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '14px'
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px'
+                },
+                '& .MuiInputBase-root.Mui-focused': {
+                  backgroundColor: '#e0e0e0'
+                },
                 flex: 1,
                 color: 'text.primary'
               }}
@@ -276,8 +289,8 @@ const Mail = () => {
               onClick={handleFilter}
               sx={{
                 marginRight: '8px',
-                width: 32,
-                height: 32,
+                width: 18,
+                height: 18,
                 cursor: 'pointer'
               }}
             >
@@ -294,7 +307,7 @@ const Mail = () => {
             tags={tagOptions}
             tagFilter={tag}
             setTagFilter={(value) => setTag(value)}
-            selectedFilters={['listNameFilter', 'tagFilter', ]}
+            selectedFilters={['listNameFilter', 'tagFilter']}
             onReset={handleReset}
           />
 
@@ -328,19 +341,13 @@ const Mail = () => {
                         display: 'flex',
                         alignItems: 'self-start',
                         justifyContent: 'center',
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
                       }}
                     >
                       <SingleRowLoader />
                     </Box>
                   ),
-                  noRowsOverlay: () => (
-                    loading ? null : (
-                      <Box sx={{ padding: 2, textAlign: 'center' }}>
-                        No data available.
-                      </Box>
-                    )
-                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 sx={{
                   '& .MuiDataGrid-columnHeaders': {

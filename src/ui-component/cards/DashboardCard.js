@@ -1,11 +1,11 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
-import { Card, Grid, useMediaQuery,Skeleton, } from '@mui/material';
+import { Card, Grid, useMediaQuery, Skeleton } from '@mui/material';
 import { Box, Container } from '@mui/system';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const DashboardCard = ({ title, num1, num2,loading = false }) => {
+const DashboardCard = ({ title, num1, num2, loading = false }) => {
   return (
     <Box
       sx={{
@@ -30,26 +30,26 @@ const DashboardCard = ({ title, num1, num2,loading = false }) => {
           width: '100%'
         }}
       >
-         {loading ? (
+        {loading ? (
           <Skeleton variant="text" width={120} height={24} />
         ) : (
-        <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>{title}</Typography>
-         )}
-            {loading ? (
+          <Typography sx={{ fontSize: '16px', fontWeight: 500 }}>{title}</Typography>
+        )}
+        {loading ? (
           <Skeleton variant="circular" width={32} height={32} />
         ) : (
-        <TrendingUpIcon
-          sx={{
-            color: '#fff',
-            backgroundColor: '#053146',
-            borderRadius: '45%',
-            padding: '4px',
-            fontSize: 28,
-            mt: '-6px',
-            ml: '-6px'
-          }}
-        />
-         )}
+          <TrendingUpIcon
+            sx={{
+              color: '#fff',
+              backgroundColor: '#053146',
+              borderRadius: '45%',
+              padding: '4px',
+              fontSize: 28,
+              mt: '-6px',
+              ml: '-6px'
+            }}
+          />
+        )}
       </Box>
 
       <Box
@@ -61,11 +61,11 @@ const DashboardCard = ({ title, num1, num2,loading = false }) => {
           mt: 1
         }}
       >
-          {loading ? (
+        {loading ? (
           <Skeleton variant="text" width={80} height={40} />
         ) : (
-        <Typography sx={{ fontSize: '28px', fontWeight: '600' }}>{num1}</Typography>
-         )}
+          <Typography sx={{ fontSize: '28px', fontWeight: '600' }}>{num1}</Typography>
+        )}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {loading ? (
             <>
@@ -74,9 +74,9 @@ const DashboardCard = ({ title, num1, num2,loading = false }) => {
             </>
           ) : (
             <>
-          <AccountCircleIcon sx={{ fontSize: 18, color: '#053146' }} />
-          <Typography sx={{ fontSize: '14px', fontWeight: 500 }}>{num2}</Typography>
-           </>
+              <AccountCircleIcon sx={{ fontSize: 18, color: '#053146' }} />
+              <Typography sx={{ fontSize: '14px', fontWeight: 500 }}>{num2}</Typography>
+            </>
           )}
         </Box>
       </Box>

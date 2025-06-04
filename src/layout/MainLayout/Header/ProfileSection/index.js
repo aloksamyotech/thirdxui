@@ -57,7 +57,8 @@ const ProfileSection = () => {
   const [adminList, setAdminList] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-
+  const [admin, setAdmin] = useState();
+  const [searchTerm, setSearchTerm] = useState('');
   const anchorRef = useRef(null);
   const handleLogout = async () => {
     localStorage.removeItem('token');
@@ -74,7 +75,7 @@ const ProfileSection = () => {
 
   const [task, setTask] = useState(initialTaskState);
   useEffect(() => {
-    const fetchAdmins = async () => {
+    const fetchAdminslist = async () => {
       try {
         const response = await getApi(urls.login.getAllAdmin);
         const admins = response?.data?.allAdmins;
@@ -87,7 +88,7 @@ const ProfileSection = () => {
         console.error('Error fetching admins', error);
       }
     };
-    fetchAdmins();
+    fetchAdminslist();
   }, []);
 
   const fetchTask = async () => {
@@ -99,11 +100,20 @@ const ProfileSection = () => {
       console.error('Error fetching tasks:', error);
     }
   };
-
+  const fetchAdmin = async () => {
+    try {
+      const res = await getApi(urls.login.getUserProfile);
+      const User = res?.data?.findAdmin;
+      setAdmin(User);
+    } catch (error) {
+      console.error('Error fetching admin:', error);
+    }
+  };
   useEffect(() => {
     fetchTask();
+    fetchAdmin();
   }, []);
-
+  const filteredTasks = taskList.filter((task) => task?.assignedTo?.userName?.toLowerCase().includes(searchTerm.toLowerCase()));
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
@@ -130,6 +140,7 @@ const ProfileSection = () => {
       } else {
         await postApi(urls.dashboard.createTask, payload);
       }
+      navigate('/default', { state: { taskAdded: true } });
       fetchTask();
       setOpenAddForm(false);
       setTask(initialTaskState);
@@ -242,10 +253,10 @@ const ProfileSection = () => {
 
                       <Box sx={{ mb: 2 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                          Joe Bloggs
+                          {admin?.userName}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
-                          joe.bloggs@email.example
+                          {admin?.email}
                         </Typography>
                       </Box>
 
@@ -358,6 +369,8 @@ const ProfileSection = () => {
                 placeholder="Type to filter"
                 size="small"
                 variant="standard"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
                   disableUnderline: true,
                   endAdornment: (
@@ -376,53 +389,83 @@ const ProfileSection = () => {
           <Divider />
 
           <List dense sx={{ maxHeight: 350, overflow: 'auto' }}>
-            {taskList.map((task) => (
-              <ListItem
-                key={task._id}
-                alignItems="flex-start"
-                secondaryAction={
-                  <IconButton
-                    edge="end"
-                    onClick={() => {
-                      setTask({
-                        details: task.details,
-                        assignedTo: task.assignedTo?._id || '',
-                        dueDate: task.dueDate?.substring(0, 10),
-                        notification: task.notification,
-                        isCompleted: task.notification,
-                      });
-                      setSelectedTaskId(task._id);
-                      setEditMode(true);
-                      setOpenAddForm(true);
-                    }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                }
-              >
+            {filteredTasks.length > 0 ? (
+              filteredTasks.map((task) => (
+                <ListItem
+                  key={task._id}
+                  alignItems="flex-start"
+                  secondaryAction={
+                    <IconButton
+                      edge="end"
+                      onClick={() => {
+                        setTask({
+                          details: task.details,
+                          assignedTo: task.assignedTo?._id || '',
+                          dueDate: task.dueDate?.substring(0, 10),
+                          notification: task.notification,
+                          isCompleted: task.notification
+                        });
+                        setSelectedTaskId(task._id);
+                        setEditMode(true);
+                        setOpenAddForm(true);
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">
+                        <strong>Task</strong> call due for {task?.assignedTo?.userName} on <strong>{formatDate(task.dueDate)}</strong>
+                      </Typography>
+                    }
+                    secondary={
+                      task.comment && (
+                        <Typography variant="caption" color="textSecondary">
+                          Comment: {task.comment}
+                        </Typography>
+                      )
+                    }
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <ListItem>
                 <ListItemText
                   primary={
-                    <Typography variant="body2">
-                      <strong>Task</strong> call due for {task?.assignedTo?.userName} on <strong>{formatDate(task.dueDate)}</strong>
+                    <Typography variant="body2" color="textSecondary">
+                      No tasks available
                     </Typography>
-                  }
-                  secondary={
-                    task.comment && (
-                      <Typography variant="caption" color="textSecondary">
-                        Comment: {task.comment}
-                      </Typography>
-                    )
                   }
                 />
               </ListItem>
-            ))}
+            )}
           </List>
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button variant="text" fullWidth>
-            View all
-          </Button>
+          <Box
+            sx={{
+              backgroundColor: '#fafafa',
+              borderTop: '1px solid #eee'
+            }}
+            fullWidth
+          >
+            <Button
+              fullWidth
+              disabled
+              sx={{
+                color: '#666',
+                borderRadius: 1,
+                boxShadow: 'none',
+                textTransform: 'none',
+                fontWeight: 500
+              }}
+            >
+              View all
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -482,12 +525,12 @@ const ProfileSection = () => {
                 Due Date
               </Typography>
               <TextField
-                fullWidth
                 type="date"
                 value={task.dueDate}
                 onChange={handleChange('dueDate')}
                 size="small"
                 InputLabelProps={{ shrink: true }}
+                sx={{ width: '50%' }}
               />
             </div>
 
@@ -521,14 +564,13 @@ const ProfileSection = () => {
             onClick={handleSubmit}
             startIcon={<AddIcon />}
             sx={{
-              backgroundColor: '#f9f9f9',
-              color: '#666',
+              backgroundColor: '#1976d2',
+              color: '#fff',
               borderRadius: 1,
-              boxShadow: 'none',
               textTransform: 'none',
               fontWeight: 500,
               '&:hover': {
-                backgroundColor: '#f0f0f0'
+                backgroundColor: '#1565c0'
               }
             }}
           >

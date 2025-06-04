@@ -22,7 +22,8 @@ import {
   TableRow,
   Switch,
   Paper,
-  IconButton
+  IconButton,
+  Skeleton
 } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
@@ -55,6 +56,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 const EmployeeDetails = () => {
+  const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
   const [emailNotification, setEmailNotification] = useState(true);
   const [copyToPersonalEmail, setCopyToPersonalEmail] = useState(true);
@@ -90,18 +92,14 @@ const EmployeeDetails = () => {
       confirmPassword: ''
     },
     validationSchema: Yup.object({
-      password: Yup.string()
-        .required('Current password is required')
-        .min(4, 'Must be at least 4 characters'),
-      newPassword: Yup.string()
-        .required('New password is required')
-        .min(4, 'Must be at least 4 characters'),
+      password: Yup.string().required('Current password is required').min(4, 'Must be at least 4 characters'),
+      newPassword: Yup.string().required('New password is required').min(4, 'Must be at least 4 characters'),
       confirmPassword: Yup.string()
         .required('Please confirm your new password')
         .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
     }),
 
-    onSubmit: (async (values) => {
+    onSubmit: async (values) => {
       const url = urls?.login?.changePassword;
       const response = await updateApiPatch(url, {
         password: values.password,
@@ -112,10 +110,10 @@ const EmployeeDetails = () => {
         // window.location.reload()
         formik.resetForm();
       } else {
-        toast.error('Current Password Is Incorrect')
+        toast.error('Current Password Is Incorrect');
       }
-    })
-  })
+    }
+  });
 
   const empData = {
     email: 'john.doe@example.com',
@@ -128,9 +126,11 @@ const EmployeeDetails = () => {
     language: 'English'
   };
   const getUserInfo = async () => {
+    setLoading(true);
     const url = urls?.login?.getUserProfile;
     const response = await getApi(url);
     setUserData(response?.data?.findAdmin);
+    setLoading(false);
   };
   useEffect(() => {
     getUserInfo();
@@ -189,10 +189,11 @@ const EmployeeDetails = () => {
                     <Box
                       sx={{
                         height: 70,
-                        backgroundImage: `url(${Background})`,
+                        backgroundImage: loading ? 'none' : `url(${Background})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat'
+                        backgroundRepeat: 'no-repeat',
+                        bgcolor: loading ? '#f0f0f0' : undefined
                       }}
                     >
                       <Box
@@ -212,22 +213,36 @@ const EmployeeDetails = () => {
                           zIndex: 2
                         }}
                       >
-                        <Box
-                          component="img"
-                          src={userData.file ? `${imageUrl}${userData.file}` : ProfileLogo}
-                          alt="Profile"
-                          sx={{
-                            width: '80%',
-                            height: '80%',
-                            objectFit: 'contain'
-                          }}
-                        />
+                        {loading ? (
+                          <Skeleton variant="circular" width={40} height={40} />
+                        ) : (
+                          <Box
+                            component="img"
+                            src={
+                              userData.file
+                                ? userData.file.startsWith('https://')
+                                  ? userData.file
+                                  : `${imageUrl}${userData.file}`
+                                : ProfileLogo
+                            }
+                            alt="Profile"
+                            sx={{
+                              width: '80%',
+                              height: '80%',
+                              objectFit: 'contain'
+                            }}
+                          />
+                        )}
                       </Box>
 
                       <Box sx={{ position: 'absolute', top: 50, left: 90 }}>
-                        <Typography fontSize={15} fontWeight={280} color="black">
-                          {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
-                        </Typography>
+                        {loading ? (
+                          <Skeleton variant="text" width={100} height={20} />
+                        ) : (
+                          <Typography fontSize={15} fontWeight={280} color="black">
+                            {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
 
@@ -240,54 +255,54 @@ const EmployeeDetails = () => {
                         flexWrap="wrap"
                         sx={{ pl: '65px', pr: 1 }}
                       >
-                        <Box display="flex" alignItems="center" gap={0.5}>
-                          <OpacityOutlinedIcon fontSize="5px" sx={{ color: '#6f7082' }} />
-                          <Typography fontSize="9px" color="#404040">
-                            Role
-                          </Typography>
-                        </Box>
+                        {loading ? (
+                          <Skeleton variant="text" width={250} height={20} />
+                        ) : (
+                          <>
+                            <Box display="flex" alignItems="center" gap={0.5}>
+                              <OpacityOutlinedIcon fontSize="5px" sx={{ color: '#6f7082' }} />
+                              <Typography fontSize="9px" color="#404040">
+                                Role
+                              </Typography>
+                            </Box>
 
-                        <Box display="flex" alignItems="center">
-                          <LocationOnIcon fontSize="5px" sx={{ color: 'text.secondary' }} />
-                          <Typography fontSize="9px" color="#404040">
-                            {userData?.country ?? '-'}
-                          </Typography>
-                        </Box>
+                            <Box display="flex" alignItems="center">
+                              <LocationOnIcon fontSize="5px" sx={{ color: 'text.secondary' }} />
+                              <Typography fontSize="9px" color="#404040">
+                                {userData?.country ?? '-'}
+                              </Typography>
+                            </Box>
 
-                        <Box display="flex" alignItems="center">
-                          <CalendarTodayIcon fontSize="5px" />
-                          <Typography fontSize="9px" color="#404040">
-                            Joined: {moment(userData?.createdAt).format('MMMM YYYY')}
-                          </Typography>
-                        </Box>
+                            <Box display="flex" alignItems="center">
+                              <CalendarTodayIcon fontSize="5px" />
+                              <Typography fontSize="9px" color="#404040">
+                                Joined: {moment(userData?.createdAt).format('MMMM YYYY')}
+                              </Typography>
+                            </Box>
+                          </>
+                        )}
                       </Stack>
                     </CardContent>
 
                     <Divider />
                     <CardContent sx={{ pt: 2 }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <EmailOutlinedIcon fontSize="10px" sx={{ color: '#6f7082', mr: 1 }} />
-                          <Typography fontSize={12}>Email:</Typography>
+                      {['email', 'phoneNumber', 'address'].map((key, idx) => (
+                        <Box key={key} display="flex" justifyContent="space-between" alignItems="center" mb={idx < 2 ? 2 : 0}>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            {key === 'email' && <EmailOutlinedIcon fontSize="10px" sx={{ color: '#6f7082', mr: 1 }} />}
+                            {key === 'phoneNumber' && <PhoneIcon fontSize="10px" />}
+                            {key === 'address' && <LocationOnIcon fontSize="10px" />}
+                            <Typography fontSize={12}>
+                              {key === 'phoneNumber' ? 'Contact:' : key.charAt(0).toUpperCase() + key.slice(1) + ':'}
+                            </Typography>
+                          </Box>
+                          {loading ? (
+                            <Skeleton variant="text" width={100} height={20} />
+                          ) : (
+                            <Typography fontSize={12}>{userData?.[key] || '-'}</Typography>
+                          )}
                         </Box>
-                        <Typography fontSize={12}>{userData?.email || '-'}</Typography>
-                      </Box>
-
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <PhoneIcon fontSize="10px" />
-                          <Typography fontSize={12}>Contact:</Typography>
-                        </Box>
-                        <Typography fontSize={12}>{userData?.phoneNumber || '-'}</Typography>
-                      </Box>
-
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <LocationOnIcon fontSize="10px" />
-                          <Typography fontSize={12}>Location:</Typography>
-                        </Box>
-                        <Typography fontSize={12}>{userData?.address || '-'}</Typography>
-                      </Box>
+                      ))}
                     </CardContent>
                   </Card>
                 </Box>
@@ -304,59 +319,72 @@ const EmployeeDetails = () => {
 
                   <Box mt={2} display="flex" alignItems="center" mb={1.5}>
                     <PersonOutlineIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-
-                    <Typography fontSize={13}>
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        Full Name:
-                      </Box>{' '}
-                      {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={200} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          Full Name:
+                        </Box>{' '}
+                        {userData?.firstName || userData?.lastName ? `${userData?.firstName ?? ''} ${userData?.lastName ?? ''}` : '-'}
+                      </Typography>
+                    )}
                   </Box>
 
                   <Box display="flex" alignItems="center" mb={1.5}>
                     <CheckOutlinedIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-
-                    <Typography fontSize={13}>
-                      {' '}
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        User ID:
-                      </Box>
-                      {userData?.userId || '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={180} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          User ID:
+                        </Box>{' '}
+                        {userData?.userId || '-'}
+                      </Typography>
+                    )}
                   </Box>
 
                   <Box display="flex" alignItems="center" mb={1.5}>
                     <StarBorderIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-                    <Typography fontSize={13}>
-                      {' '}
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        Ethnicity:
-                      </Box>{' '}
-                      {userData?.ethnicity || '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={160} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          Ethnicity:
+                        </Box>{' '}
+                        {userData?.ethnicity || '-'}
+                      </Typography>
+                    )}
                   </Box>
 
                   <Box display="flex" alignItems="center" mb={1.5}>
                     <OutlinedFlagIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-
-                    <Typography fontSize={13}>
-                      {' '}
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        Country:
-                      </Box>{' '}
-                      {userData?.country || '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={160} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          Country:
+                        </Box>{' '}
+                        {userData?.country || '-'}
+                      </Typography>
+                    )}
                   </Box>
 
                   <Box display="flex" alignItems="center" mb={3}>
                     <TranslateIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-                    <Typography fontSize={13}>
-                      {' '}
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        Language:
-                      </Box>{' '}
-                      {userData?.language || '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={140} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          Language:
+                        </Box>{' '}
+                        {userData?.language || '-'}
+                      </Typography>
+                    )}
                   </Box>
 
                   <Typography variant="subtitle2" gutterBottom mb={2}>
@@ -365,25 +393,30 @@ const EmployeeDetails = () => {
 
                   <Box display="flex" alignItems="center" mb={2}>
                     <PhoneIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-                    <Typography fontSize={13}>
-                      {' '}
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        Contact:
-                      </Box>{' '}
-                      {userData?.phoneNumber || '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={160} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          Contact:
+                        </Box>{' '}
+                        {userData?.phoneNumber || '-'}
+                      </Typography>
+                    )}
                   </Box>
 
                   <Box display="flex" alignItems="center">
                     <EmailOutlinedIcon fontSize="small" sx={{ color: '#6f7082', mr: 1 }} />
-
-                    <Typography fontSize={13}>
-                      {' '}
-                      <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
-                        Email:
-                      </Box>
-                      {userData?.email || '-'}
-                    </Typography>
+                    {loading ? (
+                      <Skeleton variant="text" width={200} height={20} />
+                    ) : (
+                      <Typography fontSize={13}>
+                        <Box component="span" sx={{ color: '#3d3838', fontWeight: 500 }}>
+                          Email:
+                        </Box>{' '}
+                        {userData?.email || '-'}
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Grid>
@@ -402,7 +435,7 @@ const EmployeeDetails = () => {
                     type="password"
                     fullWidth
                     margin="normal"
-                    name='password'
+                    name="password"
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     error={formik.touched.password && Boolean(formik.errors.password)}
@@ -416,11 +449,12 @@ const EmployeeDetails = () => {
                       type="password"
                       fullWidth
                       margin="normal"
-                      name='newPassword'
+                      name="newPassword"
                       value={formik.values.newPassword}
                       onChange={formik.handleChange}
                       error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
-                      helperText={formik.touched.newPassword && formik.errors.newPassword} />
+                      helperText={formik.touched.newPassword && formik.errors.newPassword}
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
@@ -428,11 +462,12 @@ const EmployeeDetails = () => {
                       type="password"
                       fullWidth
                       margin="normal"
-                      name='confirmPassword'
+                      name="confirmPassword"
                       value={formik.values.confirmPassword}
                       onChange={formik.handleChange}
                       error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                      helperText={formik.touched.confirmPassword && formik.errors.confirmPassword} />
+                      helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                    />
                   </Grid>
                 </Grid>
                 <Box sx={{ mt: 2, fontSize: 14, color: 'gray' }}>
@@ -594,20 +629,19 @@ const EmployeeDetails = () => {
                     </Button>
                   </Grid>
                   <Grid item>
-                   <Button
-  variant="outlined"
-  sx={{
-    color: '#bbbdfa',
-    borderColor: '#bbbdfa',
-    '&:hover': {
-      borderColor: '#bbbdfa',
-      backgroundColor: 'rgba(5, 49, 70, 0.04)', 
-    },
-  }}
->
-  CANCEL
-</Button>
-
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        color: '#bbbdfa',
+                        borderColor: '#bbbdfa',
+                        '&:hover': {
+                          borderColor: '#bbbdfa',
+                          backgroundColor: 'rgba(5, 49, 70, 0.04)'
+                        }
+                      }}
+                    >
+                      CANCEL
+                    </Button>
                   </Grid>
                 </Grid>
               </CardContent>

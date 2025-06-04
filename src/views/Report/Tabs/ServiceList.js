@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import config from '../../../config';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const ServiceList = () => {
+const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -24,11 +24,11 @@ const ServiceList = () => {
 
   const columns = [
     {
-      field: 'userid',
+      field: 'uniqueId',
       headerName: 'Case ID',
       width: 100,
       align: 'center',
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'name',
@@ -36,8 +36,8 @@ const ServiceList = () => {
       width: 150,
       renderCell: (params) => (
         <Typography sx={{ fontSize: '12px' }}>
-          {params?.row?.firstName} {params?.row?.lastName}
-          {params?.value}
+          {params?.row?.firstName || '-'} {params?.row?.lastName || '-'}
+          {params?.value || '-'}
         </Typography>
       )
     },
@@ -45,7 +45,7 @@ const ServiceList = () => {
       field: 'dob',
       headerName: 'DOB',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'age',
@@ -66,7 +66,7 @@ const ServiceList = () => {
             border: '1px solid #d4d4d4'
           }}
         >
-          {params.value}
+          {params.value || '-'}
         </Box>
       )
     },
@@ -79,7 +79,7 @@ const ServiceList = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
           )}
-          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country}</Typography>
+          <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country || '-'}</Typography>
         </Stack>
       )
     },
@@ -87,21 +87,22 @@ const ServiceList = () => {
       field: 'gender',
       headerName: 'Gender',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'ethicity',
       headerName: 'Ethicity',
       width: 100,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'no',
       headerName: 'ContactNo.',
       width: 150,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     }
   ];
+
   useEffect(() => {
     fetch(config.country)
       .then((res) => res.json())
@@ -133,7 +134,8 @@ const ServiceList = () => {
             sx={{
               color: '#333',
               fontSize: '14px',
-              lineHeight: '36px'
+              lineHeight: '36px',
+              fontWeight: '400'
             }}
           >
             Service User Report List
@@ -176,9 +178,28 @@ const ServiceList = () => {
       if (!includeArchives) {
         queryParams.append('archive', 'false');
       }
+      if (countryOfOriginFilter) {
+        const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
+        if (selectedCountry) {
+          queryParams.append('country', selectedCountry.label);
+        }
+      }
+
+      if (selectedName) {
+        queryParams.append('name', selectedName);
+      }
+      if (status) queryParams.append('status', status === 'active');
+
+      if (caseId) queryParams.append('uniqueId', caseId);
+
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('dateOfBirth', formattedDate);
+      }
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
+
       const pagination = response?.data?.meta || { total: 0 };
 
       const formattedUsers = allUser?.map((user, index) => {
@@ -186,6 +207,7 @@ const ServiceList = () => {
         const age = dob !== '-' ? getAge(dob) : '-';
         const countryName = user?.contactInfo?.country || '-';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
+        const uniqueId = user?.uniqueId;
 
         return {
           id: user._id,
@@ -195,6 +217,7 @@ const ServiceList = () => {
           lastName: user.personalInfo?.lastName || '-',
           dob,
           age,
+          uniqueId,
           country: countryName,
           countryFlag: matchedCountry?.flag || '',
           ethicity: user.personalInfo?.ethnicity || '-',
@@ -214,7 +237,7 @@ const ServiceList = () => {
 
   useEffect(() => {
     fetchpeople();
-  }, [paginationModel]);
+  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
 
   return (
     <>

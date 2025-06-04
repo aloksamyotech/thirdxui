@@ -8,7 +8,7 @@ import { urls } from 'common/urls';
 import { useState, useEffect } from 'react';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const CaseList = () => {
+const CaseList = ({ selectedName, status, caseId, dateOpenedFilter }) => {
   const [loading, setLoading] = useState(true);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -24,7 +24,7 @@ const CaseList = () => {
       flex: 1,
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="500" sx={{ fontSize: '12px' }}>
-          #{params.value}
+          #{params.value || '-'}
         </Typography>
       )
     },
@@ -43,7 +43,7 @@ const CaseList = () => {
             fontSize: '12px'
           }}
         >
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -51,7 +51,7 @@ const CaseList = () => {
       field: 'title',
       headerName: 'Credited At',
       flex: 1,
-      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value}</Typography>
+      renderCell: (params) => <Typography sx={{ fontSize: '12px' }}>{params?.value || '-'}</Typography>
     },
     {
       field: 'status',
@@ -61,7 +61,7 @@ const CaseList = () => {
       align: 'center',
       renderCell: (params) => (
         <Typography variant="body2" fontWeight="600" sx={{ color: 'green', fontSize: '12px' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -73,7 +73,7 @@ const CaseList = () => {
       align: 'center',
       renderCell: (params) => (
         <Typography variant="body2" sx={{ fontSize: '12px' }}>
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     }
@@ -86,9 +86,19 @@ const CaseList = () => {
           page: paginationModel.page + 1,
           limit: paginationModel.pageSize
         });
-        const response = await getApi(
-          `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
-        );
+
+        if (selectedName) {
+          queryParams.append('name', selectedName);
+        }
+        if (status) queryParams.append('status', status === 'active');
+
+        if (caseId) queryParams.append('uniqueId', caseId);
+
+        if (dateOpenedFilter && dateOpenedFilter !== '') {
+          const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+          queryParams.append('createdAt', formattedDate);
+        }
+        const response = await getApi(`${urls.transaction.fetchWithPagination}?${queryParams.toString()}`);
 
         const allTransaction = response?.data?.data || [];
 
@@ -117,7 +127,7 @@ const CaseList = () => {
     };
 
     fetchDonor();
-  }, []);
+  }, [paginationModel, selectedName, status, caseId, dateOpenedFilter]);
   const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
@@ -141,7 +151,8 @@ const CaseList = () => {
               lineHeight: '36px'
             }}
           >
-            DONOR REPORT LIST
+            {' '}
+            Donor Report List
           </Typography>
           <Box
             sx={{

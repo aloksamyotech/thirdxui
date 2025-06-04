@@ -1,7 +1,24 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stack, Grid, Typography, Box, Card, Chip, Tooltip, IconButton, Modal, TextField, Button, InputBase } from '@mui/material';
+import {
+  Stack,
+  Grid,
+  Typography,
+  Box,
+  Card,
+  Chip,
+  Tooltip,
+  IconButton,
+  Modal,
+  TextField,
+  Button,
+  InputBase,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent
+} from '@mui/material';
 import TableStyle from '../../ui-component/TableStyle';
 import { Close } from '@mui/icons-material';
 import { IconTrash, IconPencil } from '@tabler/icons';
@@ -49,13 +66,18 @@ const User = () => {
       renderCell: (params) => (
         <Box>
           <Typography sx={{ fontWeight: '450' }} mb={1}>
-            {params.row.name}
+            {params.row.name || '-'}
           </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
+          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'date', headerName: 'Date', flex: 1.2 },
+    {
+      field: 'date',
+      headerName: 'Date',
+      flex: 1.2,
+      valueGetter: (params) => params.value || '-'
+    },
     {
       field: 'status',
       headerName: 'Status',
@@ -82,12 +104,16 @@ const User = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
           )}
-          <Typography>{params.row.country}</Typography>
+          <Typography>{params.row.country || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'age', headerName: 'Age', flex: 1 },
-
+    {
+      field: 'age',
+      headerName: 'Age',
+      flex: 1,
+      valueGetter: (params) => (params.value != null ? params.value : '-')
+    },
     {
       field: 'actions',
       headerName: 'Manage',
@@ -351,7 +377,7 @@ const User = () => {
                 borderRadius: '30px',
                 paddingLeft: '16px',
                 border: '1px solid #e0e0e0',
-                width: '350px',
+                width: '489px',
                 height: '40px'
               }}
             >
@@ -360,6 +386,19 @@ const User = () => {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{
+                  '& .MuiInputBase-input::placeholder': {
+                    fontSize: '12 px',
+                    opacity: 1
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '14px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '13px'
+                  },
+                  '& .MuiInputBase-root.Mui-focused': {
+                    backgroundColor: '#e0e0e0'
+                  },
                   flex: 1,
                   color: 'text.primary'
                 }}
@@ -367,8 +406,8 @@ const User = () => {
               <IconButton
                 sx={{
                   marginRight: '8px',
-                  width: 32,
-                  height: 32,
+                  width: 18,
+                  height: 18,
                   cursor: 'pointer'
                 }}
               >
@@ -451,45 +490,67 @@ const User = () => {
           </Grid>
         </Grid>
       </Card>
-
-      <Modal
+      <Dialog
         open={showDeleteModal}
         onClose={handleCloseDeleteModal}
-        aria-labelledby="delete-modal-title"
-        aria-describedby="delete-modal-description"
+        maxWidth={false}
+        PaperProps={{
+          sx: { width: 400, borderRadius: 2 }
+        }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-            borderRadius: '8px'
-          }}
-        >
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Typography id="delete-modal-title" variant="h6" component="h2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              ⚠️ Delete
-            </Typography>
-          </Stack>
-
-          <Typography id="delete-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete this user?
-          </Typography>
-          <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
-            <Button variant="outlined" onClick={handleCloseDeleteModal}>
-              Cancel
-            </Button>
-            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
-              Delete
-            </Button>
-          </Stack>
+        <Box sx={{ textAlign: 'center', pt: 3 }}>
+          <IconButton
+            disableRipple
+            sx={{
+              backgroundColor: '#FFE8E6',
+              color: '#FF5C5C',
+              pointerEvents: 'none',
+              '&:hover': { backgroundColor: '#FFE8E6' }
+            }}
+          >
+            <IconTrash fontSize="small" />
+          </IconButton>
         </Box>
-      </Modal>
+
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
+
+        <DialogContent>
+          <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
+            You want to delete this user. <br />
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={handleCloseDeleteModal}
+            variant="outlined"
+            sx={{
+              color: '#FF5C5C',
+              borderColor: '#FF5C5C',
+              textTransform: 'uppercase',
+              fontWeight: 480,
+              width: 120
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            sx={{
+              backgroundColor: '#053046',
+              color: '#efeceb',
+              textTransform: 'uppercase',
+              fontWeight: 380,
+              width: 120,
+              '&:hover': { backgroundColor: '#053046' }
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

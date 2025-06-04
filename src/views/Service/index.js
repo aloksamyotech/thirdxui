@@ -34,7 +34,7 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: '',
+            fontWeight: '400',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
@@ -84,10 +84,10 @@ const ServiceManagement = () => {
             }}
             mb={1}
           >
-            {params.row.name}
+            {params.row.name || '-'}
           </Typography>
           <Typography variant="body2" color="textSecondary" sx={{ whiteSpace: 'nowrap' }}>
-            {new Date(params.row.updatedAt).toDateString()}
+            {new Date(params.row.updatedAt || '-').toDateString()}
           </Typography>
         </Stack>
       )
@@ -102,7 +102,7 @@ const ServiceManagement = () => {
       field: 'code',
       headerName: 'Service Code',
       flex: 0.8,
-      renderCell: (params) => `#${params.value}`
+      renderCell: (params) => `#${params.value || '-'}`
     },
 
     {
@@ -269,7 +269,7 @@ const ServiceManagement = () => {
               borderRadius: '30px',
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
-              width: '350px',
+              width: '489px',
               height: '40px'
             }}
           >
@@ -283,6 +283,19 @@ const ServiceManagement = () => {
                 }
               }}
               sx={{
+                '& .MuiInputBase-input::placeholder': {
+                  fontSize: '12 px',
+                  opacity: 1
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '14px'
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px'
+                },
+                '& .MuiInputBase-root.Mui-focused': {
+                  backgroundColor: '#e0e0e0'
+                },
                 flex: 1,
                 color: 'text.primary'
               }}
@@ -291,8 +304,8 @@ const ServiceManagement = () => {
               onClick={handleFilter}
               sx={{
                 marginRight: '8px',
-                width: 32,
-                height: 32,
+                width: 18,
+                height: 18,
                 cursor: 'pointer'
               }}
             >

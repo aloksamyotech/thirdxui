@@ -295,7 +295,9 @@ const ViewService = () => {
                       loading
                         ? Background
                         : serviceData?.file
-                        ? `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                        ? serviceData.file.startsWith('https://')
+                          ? serviceData.file
+                          : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
                         : Background
                     }
                     alt="Service"
@@ -306,7 +308,7 @@ const ViewService = () => {
                 <Grid item xs={12} md={8}>
                   <Stack>
                     <Box display="flex" justifyContent="space-between" alignItems="center" pt={1}>
-                      <Box sx={{ maxWidth: '60%'}}>
+                      <Box sx={{ maxWidth: '60%' }}>
                         <Tooltip title={(serviceData?.name || '').toUpperCase()}>
                           <Typography
                             variant="h4"
@@ -358,7 +360,7 @@ const ViewService = () => {
 
                       <Button
                         variant="contained"
-                        size='small'
+                        size="small"
                         sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 1, whiteSpace: 'nowrap' }}
                         onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
                       >

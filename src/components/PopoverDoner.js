@@ -87,7 +87,14 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
     { label: 'Edit', icon: <EditIcon /> },
     { label: 'Archive', icon: <ArchiveIcon /> },
     { label: 'Merge', icon: <MergeTypeIcon /> },
-    { label: 'Delete', icon: <DeleteIcon /> }
+    {
+      label: 'Delete',
+      icon: (
+        <Box component="span" sx={{ color: '#F44336', display: 'flex' }}>
+          <IconTrash size={20} />
+        </Box>
+      )
+    }
   ];
 
   return (
@@ -101,9 +108,19 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
       >
         <List>
           {options.map((option) => (
-            <ListItem button key={option.label} onClick={() => handleOptionClick(option.label)}>
+            <ListItem
+              button
+              key={option.label}
+              onClick={() => handleOptionClick(option.label)}
+              sx={{
+                color: option.label === 'Delete' ? '#F44336' : 'inherit',
+                '& .MuiListItemText-root .MuiListItemText-primary': {
+                  color: option.label === 'Delete' ? '#F44336' : 'inherit'
+                }
+              }}
+            >
               <ListItemIcon>{option.icon}</ListItemIcon>
-              <ListItemText primary={option.label} />
+              <ListItemText primary={option.label} sx={{ color: option.label === 'Delete' ? '#F44336' : 'inherit' }} />
             </ListItem>
           ))}
         </List>

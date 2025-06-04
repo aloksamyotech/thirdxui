@@ -198,7 +198,6 @@ const CaseDetailsPage = () => {
         } else if (note?.name) {
           configName = note.name;
         }
-
         const createdByAdmin = note?.createdBy?.userName || '-';
         return {
           id: note._id,
@@ -264,7 +263,7 @@ const CaseDetailsPage = () => {
           id: note._id,
           date: note.date ? dayjs(note.date).format('DD-MM-YYYY') : '-',
           subject: note.subject || '-',
-          createdBy: note.createdBy || '-',
+          createdBy: note?.createdBy?.userName || '-',
           configurationName: configName,
           sNo: paginationModel.page * paginationModel.pageSize + index + 1
         };
@@ -540,7 +539,7 @@ const CaseDetailsPage = () => {
           />
 
           <Grid item xs={12} md={9}>
-            <Box sx={{ height: '500px', width: '100%', backgroundColor: '#ffff'}}>
+            <Box sx={{ height: '500px', width: '100%', backgroundColor: '#ffff' }}>
               <DataGrid
                 loading={loading2}
                 rows={

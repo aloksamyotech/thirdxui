@@ -36,6 +36,7 @@ const AddCaseForm = () => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -62,16 +63,22 @@ const AddCaseForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getApi(urls.configuration.fetch);
+        const queryParams = new URLSearchParams();
+        if (searchQuery && searchQuery !== '') {
+          queryParams.append('search', searchQuery);
+        }
+        queryParams.append('configurationType', 'Service Types');
 
-        const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Service Types');
-        setServiceType(servicetypeoption);
+        const response = await getApi(`${urls.configuration.fetchWithPagination}?${queryParams.toString()}`);
+
+        const servicetypeoption = response?.data?.data?.filter((item) => item.configurationType === 'Service Types');
+        setServiceTypeOptions(servicetypeoption);
       } catch (error) {
         console.error('Error fetching config:', error);
       }
     };
     fetchData();
-  }, []);
+  }, [searchQuery]);
 
   const {
     control,
@@ -195,6 +202,7 @@ const AddCaseForm = () => {
       if (data.file) {
         formData.append('file', data.file || '');
       }
+
       const response = await postApi(urls.service.create, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -209,6 +217,10 @@ const AddCaseForm = () => {
       setIsloading(false);
     }
   };
+  const selectList = serviceTypeOptions?.map((item, index) => ({
+    id: item?._id,
+    title: item?.name
+  }));
 
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
@@ -290,23 +302,21 @@ const AddCaseForm = () => {
                     rules={{
                       required: 'Service Type is required'
                     }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        select
-                        fullWidth
-                        label="Service Type"
-                        size="small"
-                        error={!!errors.serviceType}
-                        helperText={errors.serviceType?.message}
-                      >
-                        {servicetype?.map((option) => (
-                          <MenuItem key={option._id} value={option._id}>
-                            {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    )}
+                    render={({ field }) => {
+                      const selectedUser = selectList?.find((user) => user.id === field.value) || null;
+                      return (
+                        <Autocomplete
+                          value={selectedUser}
+                          size='small'
+                          disablePortal
+                          options={selectList}
+                          getOptionLabel={(options) => options?.title}
+                          onChange={(_, value) => field.onChange(value ? value.id : '')}
+                          onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                          isOptionEqualToValue={(option, value) => option.id === value.id}
+                          renderInput={(params) => <TextField {...params} label="Service Type" />}
+                        />)
+                    }}
                   />
                 </Grid>
               </Grid>
@@ -450,7 +460,7 @@ const AddCaseForm = () => {
                     control={control}
                     rules={{
                       validate: (value) => {
-                        if (!value) return true; 
+                        if (!value) return true;
 
                         if (value.length < 12) {
                           return 'Notes must be at least 10 characters long';

@@ -30,7 +30,8 @@ import {
   TextField,
   ListItem,
   IconButton,
-  MenuItem
+  MenuItem,
+  Autocomplete
 } from '@mui/material';
 import TranslateIcon from '@mui/icons-material/Translate';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -495,7 +496,7 @@ const ProfileSection = () => {
               <TextField
                 fullWidth
                 placeholder="Send Email Confirmation"
-                value={task.details}
+                value={task?.details}
                 onChange={handleChange('details')}
                 size="small"
               />
@@ -505,19 +506,20 @@ const ProfileSection = () => {
               <Typography fontWeight={600} mb={1}>
                 Assigned To
               </Typography>
-              <TextField
-                select
-                fullWidth
-                value={task.assignedTo}
-                onChange={(e) => setTask((prev) => ({ ...prev, assignedTo: e.target.value }))}
-                size="small"
-              >
-                {adminList.map((admin) => (
-                  <MenuItem key={admin._id} value={admin._id}>
-                    {admin.userName}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <Autocomplete
+                size='small'
+                options={adminList}
+                getOptionLabel={(option) => option?.userName}
+                onChange={(event, value) => {
+                  setTask((prev) => ({ ...prev, assignedTo: value._id }))
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                  />
+                )}
+                defaultValue={null}
+              />
             </div>
 
             <div>
@@ -526,7 +528,7 @@ const ProfileSection = () => {
               </Typography>
               <TextField
                 type="date"
-                value={task.dueDate}
+                value={task?.dueDate}
                 onChange={handleChange('dueDate')}
                 size="small"
                 InputLabelProps={{ shrink: true }}

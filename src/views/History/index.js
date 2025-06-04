@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { Stack, Typography, Box, Card, TextField, Chip, Tabs, Tab, Container,Grid, IconButton,InputBase } from '@mui/material';
+import { Stack, Typography, Box, Card, TextField, Chip, Tabs, Tab, Container, Grid, IconButton, InputBase } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
+import { useEffect } from 'react';
+import moment from 'moment';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -16,17 +20,12 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const nameFilter = [
-  { value: 'name1', label: 'Name 1' },
-  { value: 'name2', label: 'Name 2' }
-];
-
 const columns = [
   {
     field: 'title',
     headerName: 'Name',
     flex: 1.5,
-    renderCell: (params) => <Typography variant="body1">{params.value}</Typography>
+    renderCell: (params) => <Typography variant="body1">{params.value || '-'}</Typography>
   },
   {
     field: 'date',
@@ -34,7 +33,7 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Typography variant="body2" color="textSecondary">
-        {params.value}
+        {params.value || '-'}
       </Typography>
     )
   },
@@ -42,7 +41,7 @@ const columns = [
     field: 'age',
     headerName: 'Age',
     flex: 1,
-    renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+    renderCell: (params) => <Typography variant="body2">{params.value || '-'}</Typography>
   },
   {
     field: 'status',
@@ -50,27 +49,14 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Chip
-        label={params.value}
+        label={params.value || '-'}
         sx={{
-          color: params.value === 'Accepted' ? '#41c048' : 'red',
-          backgroundColor: params.value === 'Accepted' ? '#eefbe5' : '#ffeae9'
+          color: params.value === 'APPROVED' ? '#41c048' : 'red',
+          backgroundColor: params.value === 'APPROVED' ? '#eefbe5' : '#ffeae9'
         }}
       />
     )
   }
-];
-
-const allRows = [
-  { id: '1', title: 'John Doe', age: 28, date: '25/02/2024', status: 'Accepted' },
-  { id: '2', title: 'Alice Smith', age: 34, date: '10/03/2024', status: 'Rejected' },
-  { id: '3', title: 'Michael Johnson', age: 40, date: '08/04/2024', status: 'Accepted' },
-  { id: '4', title: 'Emily Brown', age: 26, date: '12/01/2024', status: 'Rejected' },
-  { id: '5', title: 'David Wilson', age: 30, date: '10/02/2024', status: 'Accepted' },
-  { id: '6', title: 'Sophia Martinez', age: 29, date: '15/02/2024', status: 'Rejected' },
-  { id: '7', title: 'James Anderson', age: 35, date: '20/03/2024', status: 'Accepted' },
-  { id: '8', title: 'Olivia Taylor', age: 31, date: '05/04/2024', status: 'Rejected' },
-  { id: '9', title: 'Daniel White', age: 27, date: '18/02/2024', status: 'Accepted' },
-  { id: '10', title: 'Emma Harris', age: 32, date: '22/03/2024', status: 'Rejected' }
 ];
 
 export default function TabbedDataGrid() {
@@ -78,9 +64,79 @@ export default function TabbedDataGrid() {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [name, setNameFilter] = useState('');
+  const [namesFilter, setNamesFilter] = useState([]);
+  const [nameFilter, setNameFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allRows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
 
-  const filteredRows = allRows.filter((row) => (tabValue === 0 ? row.status === 'Accepted' : row.status === 'Rejected'));
+  const filteredRows = allRows.filter((row) => (tabValue === 0 ? row.status === 'APPROVED' : row.status === 'REJECTED'));
+
+  const getAllResponse = async () => {
+    const queryParams = new URLSearchParams({
+      page: paginationModel.page + 1,
+      limit: paginationModel.pageSize
+    });
+    if (searchQuery) {
+      queryParams.append('search', searchQuery);
+    }
+    if (nameFilter) {
+      queryParams.append('search', nameFilter);
+    }
+    if (dateOpenedFilter) {
+      const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+      queryParams.append('date', formattedDate);
+    }
+    const fromUrl = `${urls?.responses?.submit}?${queryParams.toString()}`;
+    const response = await getApi(fromUrl);
+    const pagination = response?.data?.meta || { total: 0 };
+    const formattedData = response?.data?.data
+      ?.map((item, index) => {
+        const submissionDate = moment(item?.submittedAt).format('L');
+        let data = {
+          id: index + 1,
+          title: item?.formId?.title,
+          status: item?.status,
+          date: submissionDate,
+          age: '-'
+        };
+        return data;
+      })
+      ?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED');
+    setTotalRows(
+      tabValue === 0
+        ? formattedData?.filter((item) => item?.status === 'APPROVED')?.length
+        : formattedData?.filter((item) => item?.status === 'REJECTED')?.length
+    );
+    setRows(formattedData);
+  };
+  useEffect(() => {
+    getAllResponse();
+  }, [nameFilter, searchQuery, dateOpenedFilter, paginationModel, tabValue]);
+
+  const getResponse = async () => {
+    const url = `${urls?.responses?.submit}?limit=10000`;
+    const response = await getApi(url);
+    const options = response?.data?.data
+      ?.map((item) => ({
+        value: item?.formId?.title,
+        label: item?.formId?.title,
+        status: item?.status
+      }))
+      ?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED');
+    setNamesFilter(options);
+  };
+  useEffect(() => {
+    getResponse();
+  }, []);
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   const CustomHeader = ({ tabValue, setTabValue }) => {
     return (
@@ -114,46 +170,53 @@ export default function TabbedDataGrid() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h4">History</Typography>
+        <Typography sx={{ fontsize: '14px', fontWeight: '400', color: '#636365' }}>History</Typography>
         <Box
-                                              sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                backgroundColor: '#f8f9fa',
-                                                borderRadius: '30px',
-                                                paddingLeft: '16px',
-                                                border: '1px solid #e0e0e0',
-                                                width: '350px',
-                                                height: '40px'
-                                              }}
-                                            >
-                                              <InputBase
-                                                placeholder="Search..."
-                                                // value={searchQuery}
-                                                // onChange={handleSearchChange}
-                                                // onKeyPress={(e) => {
-                                                //   if (e.key === 'Enter') {
-                                                //     handleFilter();
-                                                //   }
-                                                // }}
-                                                sx={{
-                                                  flex: 1,
-                                                  color: 'text.primary'
-                                                }}
-                                              />
-                                              <IconButton
-                                                // onClick={handleFilter}
-                                                sx={{
-                                                  marginRight: '8px',
-                                                  width: 32,
-                                                  height: 32,
-                                                  cursor: 'pointer'
-                                                }}
-                                              >
-                                                <SearchIcon />
-                                              </IconButton>
-                                            </Box>
-
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '30px',
+            paddingLeft: '16px',
+            border: '1px solid #e0e0e0',
+            width: '489px',
+            height: '40px'
+          }}
+        >
+          <InputBase
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            sx={{
+              '& .MuiInputBase-input::placeholder': {
+                fontSize: '12 px',
+                opacity: 1
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '14px'
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: '13px'
+              },
+              '& .MuiInputBase-root.Mui-focused': {
+                backgroundColor: '#e0e0e0'
+              },
+              flex: 1,
+              color: 'text.primary'
+            }}
+          />
+          <IconButton
+            // onClick={handleFilter}
+            sx={{
+              marginRight: '8px',
+              width: 18,
+              height: 18,
+              cursor: 'pointer'
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </Box>
       </Stack>
       <Grid container spacing={2}>
         <FilterPanel
@@ -161,8 +224,10 @@ export default function TabbedDataGrid() {
           statuses={statusFilter}
           setStatusFilter={setStatus}
           dateAddedFilters={dateAddedFilters}
-          setDateAddedFilter={setDateOpenedFilter}
-          names={nameFilter}
+          dateOpenedFilter={dateOpenedFilter}
+          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+          names={namesFilter}
+          nameFilter={nameFilter}
           setNameFilter={setNameFilter}
           selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter']}
         />
@@ -189,6 +254,12 @@ export default function TabbedDataGrid() {
                     backgroundColor: '#f5f5f5'
                   }
                 }}
+                rowCount={totalRows}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10]}
               />
             </Card>
           </Box>

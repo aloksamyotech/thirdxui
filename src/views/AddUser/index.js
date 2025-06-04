@@ -1874,6 +1874,7 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="preferredContact"
                       control={control}
+                      rules={{ required: "This field is required" }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1897,6 +1898,7 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="contactPurpose"
                       control={control}
+                      rules={{ required: "This field is required" }}
                       render={({ field }) => (
                         <TextField
                           fullWidth
@@ -1944,6 +1946,7 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="reason"
                       control={control}
+                      rules={{ required: "This field is required" }}
                       render={({ field }) => (
                         <TextField
                           fullWidth

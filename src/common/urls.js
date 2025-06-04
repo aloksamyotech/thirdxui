@@ -22,7 +22,7 @@ export const urls = Object.freeze({
     getalldonor: `${baseUrl}/user/getalldonor`,
     getDistrict: `${baseUrl}/user/getAllUsDistricts`,
     editUser: `${baseUrl}/user/edituser`,
-    deleteUser: `${baseUrl}/user/deleteuser`,
+    deleteUser: `${baseUrl}/user/deleteuser/:userId`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
     archive: `${baseUrl}/user/archive`,
     unarchive: `${baseUrl}/user/unarchive`
@@ -93,6 +93,9 @@ export const urls = Object.freeze({
     getTotalActiveUser: `${baseUrl}/dashboard/totalActiveUser`,
     getTotalOpenedCases: `${baseUrl}/dashboard/totalOpenedCases`,
     getmyTasks: `${baseUrl}/dashboard/getAllTask`,
+    createTask: `${baseUrl}/dashboard/createTask`,
+    edittask: `${baseUrl}/dashboard/editTask/:id`,
+    deleteTask: `${baseUrl}/dashboard/delete/:id`,
     getMedia: `${baseUrl}/dashboard/allMedia`
   },
   login: {
@@ -100,6 +103,11 @@ export const urls = Object.freeze({
     register: `${baseUrl}/admin/`,
     getUserProfile: `${baseUrl}/admin/`,
     updateUserById: `${baseUrl}/admin/`,
-    changePassword: `${baseUrl}/admin/change-password`
+    changePassword: `${baseUrl}/admin/change-password`,
+    googleSignin: `${baseUrl}/admin/google-auth`,
+    getAllAdmin: `${baseUrl}/admin/getAllAdmin`,
+    forgotPassword: `${baseUrl}/admin/forgot-password`,
+    otpvarify: `${baseUrl}/admin/verify-otp`,
+    resetPassword:`${baseUrl}/admin/reset-password`
   }
 });

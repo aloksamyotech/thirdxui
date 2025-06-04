@@ -11,14 +11,7 @@ import { getApi } from 'common/apiClient.js';
 import { useEffect } from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNavigate } from 'react-router';
-
-const formTypes = [
-  { value: 'Self Referral form', label: 'Self Referral form' },
-  { value: 'Community Referral form', label: 'Community Referral form' },
-  { value: 'Satisfaction survey', label: 'Satisfaction survey' },
-  { value: 'Volunteer sign up form', label: 'Volunteer sign up form' },
-  { value: 'Workshop sign up form', label: 'Workshop sign up form' }
-];
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
@@ -42,7 +35,7 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: '400',
             color: '#333',
             fontSize: '14px',
             lineHeight: '36px'
@@ -58,22 +51,22 @@ const CustomHeader = () => {
   );
 };
 
-
-// const initialRows = [
-//   { id: 1, description: 'Self Referral form', campaign: 'Beach Cleaning -Corporate volunteer project 2019', title: 'Satisfaction Survey' },
-//   { id: 2, description: 'Community Referral form', campaign: 'Form Campaign', title: 'Community Referral' },
-//   { id: 3, description: 'Satisfaction survey', campaign: 'Beach Cleaning -Corporate volunteer project 2019', title: 'Volunteer Signup' },
-//   { id: 4, description: 'Volunteer sign up form', campaign: 'Form Campaign' },
-//   { id: 5, description: 'Workshop sign up form', campaign: 'Beach Cleaning -Corporate volunteer project 2019' }
-// ];
-
 const Lead = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [campaign, setCampaignFilter] = useState('');
   const [rows, setRows] = useState([]);
   const [formType, setFormType] = useState('');
+  const [formTypes, setFormTypes] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
-  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10
+  });
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -86,27 +79,54 @@ const Lead = () => {
   const handleNavigate = (id) => {
     window.open(`/surveyform/${id}`, '_blank');
     // navigate(`/surveyform/${id}`)
-  }
+  };
 
   const getAllForms = async () => {
-    const fromUrl = urls?.forms?.getAll
-    const response = await getApi(fromUrl)
-    const formattedData = response?.data?.map((item, index) => {
+    setLoading(true);
+    const queryParams = new URLSearchParams({
+      page: paginationModel.page + 1,
+      limit: paginationModel.pageSize
+    });
+    if (searchQuery) {
+      queryParams.append('search', searchQuery);
+    }
+    if (formType) {
+      queryParams.append('search', formType);
+    }
+    const fromUrl = `${urls?.forms?.getAll}?${queryParams.toString()}`;
+    const response = await getApi(fromUrl);
+    const pagination = response?.data?.meta || { total: 0 };
+    const formattedData = response?.data?.data?.map((item, index) => {
       let data = {
         id: item?._id,
         index: index + 1,
         description: item?.title,
         campaign: item?.template,
-        title: "help",
+        title: 'help',
         link: item?.publicId
-      }
-      return data
-    })
-    setRows(formattedData)
-  }
+      };
+      return data;
+    });
+    setTotalRows(pagination?.total);
+    setRows(formattedData);
+    setLoading(false);
+  };
   useEffect(() => {
-    getAllForms()
-  }, [])
+    getAllForms();
+  }, [searchQuery, formType, paginationModel]);
+
+  const getFormTypes = async () => {
+    const url = `${urls?.forms?.getAll}?limit=1000`;
+    const response = await getApi(url);
+    const options = response?.data?.data?.map((item) => ({
+      value: item?.title,
+      label: item?.title
+    }));
+    setFormTypes(options);
+  };
+  useEffect(() => {
+    getFormTypes();
+  }, []);
 
   const columns = [
     {
@@ -125,8 +145,7 @@ const Lead = () => {
       flex: 1,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */}
-          -
+          {/* {params.value} */}-
         </Typography>
       )
     },
@@ -145,12 +164,16 @@ const Lead = () => {
       sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <OpenInNewIcon color='primary' fontSize='small' sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.link)} />
-          <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+          <OpenInNewIcon color="primary" fontSize="small" sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.link)} />
+          <EditOutlinedIcon sx={{ color: ' #EBEBE4' }} fontSize="small" onClick={() => handleEdit(params.row)} />
         </Box>
       )
     }
   ];
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <>
@@ -192,20 +215,28 @@ const Lead = () => {
                   borderRadius: '30px',
                   paddingLeft: '16px',
                   border: '1px solid #e0e0e0',
-                  width: '350px',
+                  width: '489px',
                   height: '40px'
                 }}
               >
                 <InputBase
                   placeholder="Search..."
-                  // value={searchQuery}
-                  // onChange={handleSearchChange}
-                  // onKeyPress={(e) => {
-                  //   if (e.key === 'Enter') {
-                  //     handleFilter();
-                  //   }
-                  // }}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                   sx={{
+                    '& .MuiInputBase-input::placeholder': {
+                      fontSize: '12 px',
+                      opacity: 1
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: '14px'
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '13px'
+                    },
+                    '& .MuiInputBase-root.Mui-focused': {
+                      backgroundColor: '#e0e0e0'
+                    },
                     flex: 1,
                     color: 'text.primary'
                   }}
@@ -214,15 +245,14 @@ const Lead = () => {
                   // onClick={handleFilter}
                   sx={{
                     marginRight: '8px',
-                    width: 32,
-                    height: 32,
+                    width: 18,
+                    height: 18,
                     cursor: 'pointer'
                   }}
                 >
                   <SearchIcon />
                 </IconButton>
               </Box>
-
             </Stack>
           </Grid>
 
@@ -230,6 +260,7 @@ const Lead = () => {
             <FilterPanel
               showFilter={showFilter}
               formTypes={formTypes}
+              formType={formType}
               setFormType={setFormType}
               campaigns={campaignFilter}
               setCampaignFilter={setCampaignFilter}
@@ -237,29 +268,57 @@ const Lead = () => {
             />
 
             <Grid item xs={9}>
-              <Card style={{ height: 'auto' }}>
+              <Card style={{ height: '100vh' }}>
                 <DataGrid
-                  rows={rows}
+                  rows={
+                    loading
+                      ? []
+                      : rows.map((row, index) => ({
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
+                  }
                   columns={columns}
-                  components={{
-                    Toolbar: () => <CustomHeader />
+                  loading={loading}
+                  slots={{
+                    toolbar: () => <CustomHeader />,
+                    loadingOverlay: () => (
+                      <Box
+                        sx={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'self-start',
+                          justifyContent: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                        }}
+                      >
+                        <SingleRowLoader />
+                      </Box>
+                    ),
+                    noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                   }}
                   getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
-                  autoHeight
-                  getRowHeight={() => 'auto'}
-                  sx={{
-                    '& .MuiDataGrid-cell': {
-                      whiteSpace: 'normal',
-                      lineHeight: '1.4rem',
-                      py: 1
-                    },
-                    '& .MuiDataGrid-row': {
-                      borderBottom: '1px solid #ccc'
-                    },
-                    '& .MuiDataGrid-columnHeader': {
-                      backgroundColor: '#f5f5f5'
-                    }
-                  }}
+                  rowHeight={65}
+                  // getRowHeight={() => 'auto'}
+                  // sx={{
+                  //   '& .MuiDataGrid-cell': {
+                  //     whiteSpace: 'normal',
+                  //     lineHeight: '1.4rem',
+                  //     py: 1
+                  //   },
+                  //   '& .MuiDataGrid-row': {
+                  //     borderBottom: '1px solid #ccc'
+                  //   },
+                  //   '& .MuiDataGrid-columnHeader': {
+                  //     backgroundColor: '#f5f5f5'
+                  //   }
+                  // }}
+                  rowCount={totalRows}
+                  pagination
+                  paginationMode="server"
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                  pageSizeOptions={[10]}
                 />
               </Card>
             </Grid>

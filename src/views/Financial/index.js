@@ -34,9 +34,9 @@ const CustomHeader = () => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: '',
+            fontWeight: '400',
             color: '#333',
-            fontSize: '14px',
+            fontSize: '13px',
             lineHeight: '36px'
           }}
         >
@@ -77,11 +77,7 @@ const Financial = () => {
       field: 'title',
       headerName: 'Date',
       flex: 1,
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight="500">
-          {params.value}
-        </Typography>
-      )
+      renderCell: (params) => <Typography>{params.value || '-'}</Typography>
     },
     {
       field: 'type',
@@ -89,7 +85,6 @@ const Financial = () => {
       flex: 1.5,
       renderCell: (params) => (
         <Typography
-          variant="body2"
           sx={{
             fontWeight: 'normal',
             whiteSpace: 'normal',
@@ -97,7 +92,7 @@ const Financial = () => {
             overflowWrap: 'break-word'
           }}
         >
-          {params.value}
+          {params.value || '-'}
         </Typography>
       )
     },
@@ -105,7 +100,7 @@ const Financial = () => {
       field: 'code',
       headerName: 'Campaign',
       flex: 1,
-      renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+      renderCell: (params) => <Typography>{params.value || '-'}</Typography>
     },
     {
       field: 'status',
@@ -113,11 +108,7 @@ const Financial = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight="600" sx={{ color: 'green' }}>
-          {params.value}
-        </Typography>
-      )
+      renderCell: (params) => <Typography sx={{ color: 'green' }}>{params.value || '-'}</Typography>
     },
     {
       field: 'more',
@@ -125,7 +116,7 @@ const Financial = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => <Typography variant="body2">{params.value}</Typography>
+      renderCell: (params) => <Typography>{params.value || '-'}</Typography>
     }
   ];
 
@@ -332,7 +323,7 @@ const Financial = () => {
               borderRadius: '30px',
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
-              width: '350px',
+              width: '489px',
               height: '40px'
             }}
           >
@@ -346,6 +337,19 @@ const Financial = () => {
                 }
               }}
               sx={{
+                '& .MuiInputBase-input::placeholder': {
+                  fontSize: '12 px',
+                  opacity: 1
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '14px'
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px'
+                },
+                '& .MuiInputBase-root.Mui-focused': {
+                  backgroundColor: '#e0e0e0'
+                },
                 flex: 1,
                 color: 'text.primary'
               }}
@@ -354,8 +358,8 @@ const Financial = () => {
               onClick={handleFilter}
               sx={{
                 marginRight: '8px',
-                width: 32,
-                height: 32,
+                width: 18,
+                height: 18,
                 cursor: 'pointer'
               }}
             >
@@ -378,6 +382,7 @@ const Financial = () => {
             setCampaignFilter={(value) => setCampaignName(value)}
             selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
             onReset={handleReset}
+            customDateLabel="Start Date"
           />
 
           <Grid item xs={9}>
@@ -422,6 +427,10 @@ const Financial = () => {
                     }}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{
+                      '& .MuiDataGrid-columnHeaders': {
+                        fontSize: '14px',
+                        backgroundColor: '#f9f9f9'
+                      },
                       '& .MuiDataGrid-row': {
                         borderBottom: '1px solid #ccc'
                       }

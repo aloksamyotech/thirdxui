@@ -61,8 +61,21 @@ const TabbedDataGrid = () => {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
+  const [expandedPanels, setExpandedPanels] = useState(() => {
+    const initialExpanded = {};
+    defaultTabTypes.forEach((type, index) => {
+      if (index < 6) {
+        initialExpanded[type] = true;
+      }
+    });
+    return initialExpanded;
+  });
+
+  const handleAccordionChange = (panel) => () => {
+    setExpandedPanels((prev) => ({
+      ...prev,
+      [panel]: !prev[panel]
+    }));
   };
 
   const handleEdit = (item) => {
@@ -155,7 +168,6 @@ const TabbedDataGrid = () => {
     } catch (error) {
       toast.error('Error fetching configurations');
     } finally {
-      // setLoading(false);
       setTimeout(() => {
         setLoading(false);
       }, 1000);
@@ -198,6 +210,7 @@ const TabbedDataGrid = () => {
   };
 
   const handleSaveConfiguration = async () => {
+    setLoading(true);
     if (!validateInput(inputValue)) {
       return;
     }
@@ -218,8 +231,10 @@ const TabbedDataGrid = () => {
       handleCloseModal();
       setEditMode(false);
       setEditId(null);
+      setLoading(false);
     } catch (err) {
       toast.error('Error saving configuration.');
+      setLoading(false);
     }
   };
 
@@ -262,7 +277,7 @@ const TabbedDataGrid = () => {
       {!loading && showAddIcon && (
         <IconButton
           onClick={(event) => {
-            event.stopPropagation(); 
+            event.stopPropagation();
             handleOpenModal(section);
           }}
           sx={{
@@ -348,15 +363,6 @@ const TabbedDataGrid = () => {
                 <IconButton onClick={() => handleDeleteClick(item.id)}>
                   <IconTrash color="orangered" size={18} />
                 </IconButton>
-                <CommonConfirmDialog
-                  open={confirmOpen}
-                  onClose={() => setConfirmOpen(false)}
-                  onConfirm={handleConfirmDelete}
-                  content="Are you sure you want to delete ?"
-                  title="⚠️ Delete"
-                  confirmText="Delete"
-                  cancelText="Cancel"
-                />
               </Box>
             </Box>
           ))
@@ -371,6 +377,15 @@ const TabbedDataGrid = () => {
 
   return (
     <>
+      <CommonConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        content="Are you sure you want to delete ?"
+        title="⚠️ Delete"
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
         <Typography variant="h5">Configurations</Typography>
         <Box
@@ -381,7 +396,7 @@ const TabbedDataGrid = () => {
             borderRadius: '30px',
             paddingLeft: '16px',
             border: '1px solid #e0e0e0',
-            width: '350px',
+            width: '489px',
             height: '40px'
           }}
         >
@@ -395,6 +410,19 @@ const TabbedDataGrid = () => {
               }
             }}
             sx={{
+              '& .MuiInputBase-input::placeholder': {
+                fontSize: '12 px',
+                opacity: 1
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '14px'
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: '13px'
+              },
+              '& .MuiInputBase-root.Mui-focused': {
+                backgroundColor: '#e0e0e0'
+              },
               flex: 1,
               color: 'text.primary'
             }}
@@ -403,8 +431,8 @@ const TabbedDataGrid = () => {
             onClick={handleFilter}
             sx={{
               marginRight: '8px',
-              width: 32,
-              height: 32,
+              width: 18,
+              height: 18,
               cursor: 'pointer'
             }}
           >
@@ -438,35 +466,43 @@ const TabbedDataGrid = () => {
         />
         <Grid item xs={9}>
           <Grid container spacing={2}>
-            {Object.entries(tabData).map(([section, items], index) => {
-              const isInitialCard = index < 6;
+            {Object.entries(tabData).map(([section, items], index) => (
+              <Grid item xs={12} sm={6} md={4} key={section}>
+                <Accordion
+                  expanded={!!expandedPanels[section]}
+                  onChange={handleAccordionChange(section)}
+                  sx={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    '&::before': { display: 'none' }
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderBottom: '1px solid #e0e0e0',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {headerContent(section, loading, handleOpenModal, !!expandedPanels[section])}
+                  </AccordionSummary>
 
-              return (
-                <Grid item xs={12} sm={6} md={4} key={section}>
-                  {isInitialCard ? (
+                  <AccordionDetails sx={{ p: 0 }}>
                     <Card
                       sx={{
                         p: 0,
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        height: '300px',
+                        border: 'none',
+                        borderRadius: '0',
+                        height: 'auto',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden'
                       }}
                     >
-                      <Box
-                        sx={{
-                          px: 2,
-                          py: 1,
-                          borderBottom: '1px solid #e0e0e0',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
-                        }}
-                      >
-                        {headerContent(section, loading, handleOpenModal)}
-                      </Box>
                       {cardBodyContent(
                         items,
                         loading,
@@ -478,40 +514,10 @@ const TabbedDataGrid = () => {
                         handleConfirmDelete
                       )}
                     </Card>
-                  ) : (
-                    <Accordion expanded={expanded === section} onChange={handleAccordionChange(section)}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        {headerContent(section, loading, handleOpenModal, expanded === section)}
-                      </AccordionSummary>
-                      <AccordionDetails sx={{ p: 0 }}>
-                        <Card
-                          sx={{
-                            p: 0,
-                            border: 'none',
-                            borderRadius: '0',
-                            height: 'auto',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {cardBodyContent(
-                            items,
-                            loading,
-                            handleStatusUpdate,
-                            handleEdit,
-                            handleDeleteClick,
-                            confirmOpen,
-                            setConfirmOpen,
-                            handleConfirmDelete
-                          )}
-                        </Card>
-                      </AccordionDetails>
-                    </Accordion>
-                  )}
-                </Grid>
-              );
-            })}
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
+            ))}
           </Grid>
         </Grid>
       </Grid>
@@ -585,10 +591,12 @@ const TabbedDataGrid = () => {
                   backgroundColor: '#031e2a'
                 }
               }}
+              disabled={loading}
               onClick={handleSaveConfiguration}
             >
-              {editMode ? 'UPDATE' : 'SAVE CHANGES'}
+              {loading ? 'Saving...' : editMode ? 'UPDATE' : 'SAVE CHANGES'}
             </Button>
+
             <Button
               variant="outlined"
               sx={{

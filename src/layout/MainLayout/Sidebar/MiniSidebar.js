@@ -62,7 +62,7 @@ const menuItems = [
   {
     icon: <IconSettings />,
     label: 'Settings',
-    route: '/settings'
+    route: '/configuration'
   }
 ];
 

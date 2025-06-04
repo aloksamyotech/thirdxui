@@ -72,7 +72,7 @@ const AddCaseForm = () => {
     };
     fetchData();
   }, []);
-  
+
   const {
     control,
     handleSubmit,
@@ -449,19 +449,21 @@ const AddCaseForm = () => {
                     name="notes"
                     control={control}
                     rules={{
-                      required: 'Notes are required',
-                      minLength: {
-                        value: 12,
-                        message: 'Notes must be at least 10 characters long'
-                      },
-                      validate: {
-                        maxWords: (value) => {
-                          const wordCount = value.trim().split(/\s+/).length;
-                          return wordCount <= 500 || 'Notes cannot exceed 500 words';
-                        },
-                        validCharacters: (value) =>
-                          /^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value) ||
-                          'Notes can only contain letters, numbers, and common punctuation'
+                      validate: (value) => {
+                        if (!value) return true; 
+
+                        if (value.length < 12) {
+                          return 'Notes must be at least 10 characters long';
+                        }
+                        const wordCount = value.trim().split(/\s+/).length;
+                        if (wordCount > 500) {
+                          return 'Notes cannot exceed 500 words';
+                        }
+
+                        if (!/^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value)) {
+                          return 'Notes can only contain letters, numbers, and common punctuation';
+                        }
+                        return true;
                       }
                     }}
                     render={({ field }) => (
@@ -482,7 +484,7 @@ const AddCaseForm = () => {
                     control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
                     label="Restrict Access?"
                     labelPlacement="start"
-                    sx={{ gap: 1, mt:1}}
+                    sx={{ gap: 1, mt: 1 }}
                   />
                 </Paper>
               </Grid>

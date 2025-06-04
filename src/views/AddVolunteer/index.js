@@ -686,9 +686,9 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.dateOfBirth"
                                 control={control}
-                                rules={{
-                                  required: 'Date of Birth is required'
-                                }}
+                                // rules={{
+                                //   required: 'Date of Birth is required'
+                                // }}
                                 render={({ field, fieldState: { error } }) => (
                                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
@@ -715,7 +715,7 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.ethnicity"
                                 control={control}
-                                rules={{ required: 'Ethnicity is required' }}
+                                // rules={{ required: 'Ethnicity is required' }}
                                 render={({ field, fieldState: { error } }) => (
                                   <Autocomplete
                                     options={ethnicityOptions}
@@ -1389,8 +1389,13 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
+                        CANCEL
+                      </Button>
+                    </Grid>
+                    <Grid item>
                       <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
-                        Next
+                        SAVE CHANGES
                       </Button>
                     </Grid>
                   </Grid>
@@ -1860,8 +1865,13 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
+                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
+                        CANCEL
+                      </Button>
+                    </Grid>
+                    <Grid item>
                       <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
-                        Next
+                        SAVE CHANGES
                       </Button>
                     </Grid>
                   </Grid>
@@ -1926,9 +1936,6 @@ const AddCaseForm = ({ onCancel }) => {
                     <Controller
                       name="confirmationDate"
                       control={control}
-                      rules={{
-                        required: 'Confirmation Date is required'
-                      }}
                       render={({ field }) => (
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DatePicker

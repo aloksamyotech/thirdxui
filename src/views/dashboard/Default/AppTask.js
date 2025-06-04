@@ -1,8 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
-// form
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-// @mui
 import {
   Card,
   Box,
@@ -15,151 +13,394 @@ import {
   IconButton,
   Select,
   InputAdornment,
-  CardHeader,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Grid,
+  Switch,
+  Button,
   FormControlLabel
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Iconify from '../../../ui-component/iconify';
 import { urls } from 'common/urls';
-import { getApi } from 'common/apiClient';
-import { useEffect } from 'react';
+import { getApi, updateApi, updateApiPatch } from 'common/apiClient';
+import AddIcon from '@mui/icons-material/Add';
+import DialogActions from '@mui/material/DialogActions';
 
 AppTasks.propTypes = {
   title: PropTypes.string,
   subheader: PropTypes.string,
-  list: PropTypes.array.isRequired
+  list: PropTypes.array
 };
-export default function AppTasks({ title, subheader, list, ...other }) {
+
+export default function AppTasks({ title, subheader, list = [], ...other }) {
   const { control } = useForm({
     defaultValues: {
       taskCompleted: ['2']
     }
   });
 
+  const [openAddForm, setOpenAddForm] = useState(false);
+  const [adminList, setAdminList] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
-  const [search, setSearch] = useState(''); 
+  const [search, setSearch] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTask, setDeleteTask] = useState('');
+  const initialTaskState = {
+    details: '',
+    assignedTo: '',
+    dueDate: '',
+    isCompleted: false,
+    notification: false
+  };
+  const [task, setTask] = useState(initialTaskState);
 
-  const myTask = async () => {
-    const task = await getApi(urls.dashboard.getmyTasks);
-    const allTasks = task?.data?.allTask;
-    const formattedtasks = allTasks?.map((item, index) => ({
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const response = await getApi(urls.login.getAllAdmin);
+        const admins = response?.data?.allAdmins;
+        if (Array.isArray(admins)) {
+          setAdminList(admins);
+        } else if (admins) {
+          setAdminList([admins]);
+        }
+      } catch (error) {
+        console.error('Error fetching admins', error);
+      }
+    };
+    fetchAdmins();
+  }, []);
+
+  const handleChange = (field) => (e) => {
+    setTask({ ...task, [field]: e.target.value });
+  };
+
+  const handleSwitch = (field) => (e) => {
+    setTask({ ...task, [field]: e.target.checked });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        ...task,
+        assignedTo: task.assignedTo
+      };
+
+      await updateApi(urls.dashboard.edittask.replace(':id', selectedTaskId), payload);
+      fetchTasks();
+      setOpenAddForm(false);
+      setTask(initialTaskState);
+      setEditMode(false);
+      setSelectedTaskId(null);
+    } catch (error) {
+      console.error('Error saving task:', error);
+    }
+  };
+
+  const fetchTasks = async () => {
+    const res = await getApi(urls.dashboard.getmyTasks);
+    const allTasks = res?.data?.allTask;
+    const formattedTasks = allTasks?.map((item) => ({
       id: item?._id,
       date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
       label: item.details || '',
+      assignedTo: item.assignedTo || '',
+      dueDate: item.dueDate || '',
+      isCompleted: item.isCompleted || false,
+      notification: item.notification || false
     }));
-
-    setMyTasks(formattedtasks);
+    setMyTasks(formattedTasks);
   };
 
   useEffect(() => {
-    myTask();
+    fetchTasks();
   }, []);
+  useEffect(() => {
 
-  const filteredTasks = myTasks.filter((task) =>
-    task.label.toLowerCase().includes(search.toLowerCase())
-  );
+    if (location.state?.taskAdded) {
+      fetchTasks();
+    }
+  }, [location.state]);
 
+  const filteredTasks = myTasks.filter((task) => task.label.toLowerCase().includes(search.toLowerCase()));
+  const handleDelete = (taskId) => {
+    setDeleteTask(taskId);
+    setConfirmOpen(true);
+  };
+  const handleConfirmDelete = async (taskId) => {
+    try {
+      await updateApiPatch(urls.dashboard.deleteTask.replace(':id', taskId));
+      await fetchTasks();
+      setConfirmOpen(false);
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
+  const handleEditTask = (taskId) => {
+    const taskToEdit = myTasks.find((t) => t.id === taskId);
+
+    setTask({
+      details: taskToEdit?.label || '',
+      assignedTo: taskToEdit?.assignedTo?._id || '',
+      dueDate: taskToEdit?.dueDate ? taskToEdit.dueDate.split('T')[0] : '',
+      isCompleted: taskToEdit?.isCompleted || false,
+      notification: taskToEdit?.notification || false
+    });
+
+    setSelectedTaskId(taskId);
+    setEditMode(true);
+    setOpenAddForm(true);
+  };
   return (
-    <Box
-      sx={{
-        height: '400px',
-        bgcolor: '#fff',
-        borderRadius: 2,
-        boxShadow: '0 1px 6px rgba(0,0,0,0.1)'
-      }}
-    >
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
-        spacing={2}
-        sx={{ p: 2 }}
+    <>
+      <Box
+        sx={{
+          height: '400px',
+          bgcolor: '#fff',
+          borderRadius: 2,
+          boxShadow: '0 1px 6px rgba(0,0,0,0.1)'
+        }}
       >
-        <Typography variant="h5" fontWeight={600}>
-          My Task
-        </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap">
-          <Select value="This Week" size="small">
-            <MenuItem value="This Week">This Week</MenuItem>
-            <MenuItem value="This Month">This Month</MenuItem>
-            <MenuItem value="This Year">This Year</MenuItem>
-          </Select>
-          <TextField
-            variant="outlined"
-            placeholder="Search"
-            size="small"
-            sx={{ maxWidth: 120 }}
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              )
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="center" spacing={2} sx={{ p: 2 }}>
+          <Typography variant="h5" fontWeight={600}>
+            My Task
+          </Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap">
+            <Select value="This Week" size="small">
+              <MenuItem value="This Week">This Week</MenuItem>
+              <MenuItem value="This Month">This Month</MenuItem>
+              <MenuItem value="This Year">This Year</MenuItem>
+            </Select>
+            <TextField
+              variant="outlined"
+              placeholder="Search"
+              size="small"
+              sx={{ maxWidth: 120 }}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Stack>
+        </Stack>
+
+        <Divider />
+
+        <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+          <Controller
+            name="taskCompleted"
+            control={control}
+            render={({ field }) => {
+              const onSelected = (taskId) =>
+                field.value.includes(taskId) ? field.value.filter((id) => id !== taskId) : [...field.value, taskId];
+
+              return (
+                <>
+                  {filteredTasks.map((task) => (
+                    <div key={task.id}>
+                      <TaskItem
+                        task={task}
+                        checked={field.value.includes(task.id)}
+                        onChange={() => field.onChange(onSelected(task.id))}
+                        onEdit={() => handleEditTask(task.id)}
+                        onDelete={() => handleDelete(task.id)}
+                      />
+
+                      <Divider />
+                    </div>
+                  ))}
+                </>
+              );
             }}
           />
-        </Stack>
-      </Stack>
-
-      <Divider />
-
-      <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
-        <Controller
-          name="taskCompleted"
-          control={control}
-          render={({ field }) => {
-            const onSelected = (task) =>
-              field.value.includes(task)
-                ? field.value.filter((value) => value !== task)
-                : [...field.value, task];
-
-            return (
-              <>
-                {filteredTasks.map((task) => (
-                  <div key={task.id}>
-                    <TaskItem
-                      task={task}
-                      checked={field.value.includes(task.id)}
-                      onChange={() => field.onChange(onSelected(task.id))}
-                    />
-                    <Divider />
-                  </div>
-                ))}
-              </>
-            );
-          }}
-        />
+        </Box>
       </Box>
-    </Box>
+
+      <Dialog
+        open={openAddForm}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') setOpenAddForm(false);
+        }}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <DialogTitle sx={{ px: 3, py: 2, borderBottom: '1px solid #eee' }}>
+          <Typography variant="h6">Edit Task</Typography>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 3, marginTop: '10px' }}>
+          <Stack spacing={3} sx={{ marginTop: '20px' }}>
+            <TextField
+              fullWidth
+              placeholder="Send Email Confirmation"
+              label="Details"
+              value={task.details}
+              onChange={handleChange('details')}
+              size="small"
+            />
+            <TextField
+              select
+              fullWidth
+              label="Assigned To"
+              value={task.assignedTo}
+              onChange={(e) => setTask((prev) => ({ ...prev, assignedTo: e.target.value }))}
+              size="small"
+            >
+              {adminList.map((admin) => (
+                <MenuItem key={admin._id} value={admin._id}>
+                  {admin.userName}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              fullWidth
+              type="date"
+              label="Due Date"
+              value={task.dueDate}
+              onChange={handleChange('dueDate')}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+            />
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Grid item>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography fontWeight={600}>Completed</Typography>
+                  <Switch checked={task.isCompleted} onChange={handleSwitch('isCompleted')} />
+                </Stack>
+              </Grid>
+              <Grid item>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography fontWeight={600}>Send Notification</Typography>
+                  <Switch checked={task.notification} onChange={handleSwitch('notification')} />
+                </Stack>
+              </Grid>
+            </Grid>
+          </Stack>
+        </DialogContent>
+
+        <Box sx={{ backgroundColor: '#fafafa', p: 2, borderTop: '1px solid #eee' }}>
+          <Button
+            fullWidth
+            onClick={handleSubmit}
+            startIcon={<AddIcon />}
+            sx={{
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              borderRadius: 1,
+              textTransform: 'none',
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              }
+            }}
+          >
+            Update
+          </Button>
+        </Box>
+      </Dialog>
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        maxWidth={false}
+        PaperProps={{
+          sx: { width: 400, borderRadius: 5 }
+        }}
+      >
+        <Box sx={{ textAlign: 'center', pt: 3 }}>
+          <IconButton
+            disableRipple
+            sx={{
+              backgroundColor: '#FFE8E6',
+              color: '#FF5C5C',
+              pointerEvents: 'none',
+              '&:hover': { backgroundColor: '#FFE8E6' }
+            }}
+          >
+            <Iconify icon={'eva:trash-2-outline'} />
+          </IconButton>
+        </Box>
+
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
+
+        <DialogContent>
+          <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
+            You want to delete this task.
+            <br />
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setConfirmOpen(false)}
+            variant="outlined"
+            sx={{
+              color: '#FF5C5C',
+              borderColor: '#FF5C5C',
+              textTransform: 'uppercase',
+              fontWeight: 480,
+              width: 120
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleConfirmDelete(deleteTask)}
+            variant="contained"
+            sx={{
+              backgroundColor: '#053046',
+              color: '#efeceb',
+              textTransform: 'uppercase',
+              fontWeight: 380,
+              width: 120,
+              '&:hover': { backgroundColor: '#053046' }
+            }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
-
-// ----------------------------------------------------------------------
 
 TaskItem.propTypes = {
   checked: PropTypes.bool,
   onChange: PropTypes.func,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
   task: PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string
   })
 };
-
-function TaskItem({ task, checked, onChange }) {
-  const [open, setOpen] = useState(null);
-
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
-
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB');
+};
+function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
   return (
     <Stack
       direction="row"
+      alignItems="center"
+      justifyContent="space-between"
       sx={{
         px: 2,
         py: 0.75,
@@ -169,15 +410,23 @@ function TaskItem({ task, checked, onChange }) {
         })
       }}
     >
-      <FormControlLabel control={<Checkbox checked={checked} onChange={onChange} />} label={task.label} sx={{ flexGrow: 1, m: 0 }} />
+      <FormControlLabel
+        control={<Checkbox checked={checked} onChange={onChange} />}
+        label={
+          <Typography variant="body2" sx={{ m: 0 }}>
+            Call due for {task?.assignedTo?.userName} on <strong>{formatDate(task?.dueDate)}</strong>
+          </Typography>
+        }
+      />
 
-      <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={handleOpenMenu}>
-        <Iconify icon={'eva:edit-fill'} />
-      </IconButton>
-      <IconButton size="large" color="error" onClick={handleOpenMenu}>
-        <Iconify icon={'eva:trash-2-outline'} />
-      </IconButton>
+      <Box>
+        <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit}>
+          <Iconify icon={'eva:edit-fill'} />
+        </IconButton>
+        <IconButton size="large" color="error" onClick={onDelete}>
+          <Iconify icon={'eva:trash-2-outline'} />
+        </IconButton>
+      </Box>
     </Stack>
-    
   );
 }

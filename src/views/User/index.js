@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
 import { getApi, updateApi } from 'common/apiClient';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import toast from 'react-hot-toast';
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
@@ -37,6 +38,9 @@ const User = () => {
   });
   const navigate = useNavigate();
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
+
   const columns = [
     {
       field: 'name',
@@ -45,13 +49,18 @@ const User = () => {
       renderCell: (params) => (
         <Box>
           <Typography sx={{ fontWeight: '450' }} mb={1}>
-            {params.row.name}
+            {params.row.name || '-'}
           </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email}</Typography>
+          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'date', headerName: 'Date', flex: 1.2 },
+    {
+      field: 'date',
+      headerName: 'Date',
+      flex: 1.2,
+      valueGetter: (params) => params.value || '-'
+    },
     {
       field: 'status',
       headerName: 'Status',
@@ -78,12 +87,16 @@ const User = () => {
           {params.row.countryFlag && (
             <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
           )}
-          <Typography>{params.row.country}</Typography>
+          <Typography>{params.row.country || '-'}</Typography>
         </Box>
       )
     },
-    { field: 'age', headerName: 'Age', flex: 1 },
-
+    {
+      field: 'age',
+      headerName: 'Age',
+      flex: 1,
+      valueGetter: (params) => (params.value != null ? params.value : '-')
+    },
     {
       field: 'actions',
       headerName: 'Manage',
@@ -274,19 +287,31 @@ const User = () => {
   }, [countriesWithFlags, paginationModel, status, dateOpenedFilter, selectedName, searchQuery, countryOfOriginFilter]);
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm('Are you sure you want to delete this user?');
-    if (!confirmed) return;
-
-    try {
-      const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
-      fetchUser();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
+    setShowDeleteModal(true);
+    setUserIdToDelete(id);
   };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setUserIdToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (userIdToDelete) {
+      try {
+        await updateApi(urls.serviceuser.deleteUser.replace(':userId', userIdToDelete));
+        toast.success('User deleted successfully!');
+        fetchUser();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      } finally {
+        handleCloseDeleteModal();
+      }
+    }
   };
 
   const handleReset = () => {
@@ -335,7 +360,7 @@ const User = () => {
                 borderRadius: '30px',
                 paddingLeft: '16px',
                 border: '1px solid #e0e0e0',
-                width: '350px',
+                width: '489px',
                 height: '40px'
               }}
             >
@@ -344,16 +369,28 @@ const User = () => {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{
+                  '& .MuiInputBase-input::placeholder': {
+                    fontSize: '12 px',
+                    opacity: 1
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '14px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '13px'
+                  },
+                  '& .MuiInputBase-root.Mui-focused': {
+                    backgroundColor: '#e0e0e0'
+                  },
                   flex: 1,
                   color: 'text.primary'
                 }}
               />
               <IconButton
-                onClick={fetchUser}
                 sx={{
                   marginRight: '8px',
-                  width: 32,
-                  height: 32,
+                  width: 18,
+                  height: 18,
                   cursor: 'pointer'
                 }}
               >
@@ -379,6 +416,7 @@ const User = () => {
               setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
               selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
               onReset={handleReset}
+              customDateLabel="By Date"
               onApply={fetchUser}
             />
             <Grid item xs={9}>
@@ -435,38 +473,45 @@ const User = () => {
           </Grid>
         </Grid>
       </Card>
-      {/* <Modal open={showForm} onClose={() => setShowForm(false)}>
+
+      <Modal
+        open={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
+      >
         <Box
           sx={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: 'white',
-            p: 4,
-            borderRadius: 2,
+            width: 400,
+            bgcolor: 'background.paper',
             boxShadow: 24,
-            minWidth: 400
+            p: 4,
+            borderRadius: '8px'
           }}
         >
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h4">Invite User</Typography>
-            <IconButton onClick={() => setShowForm(false)}>
-              <Close />
-            </IconButton>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Typography id="delete-modal-title" variant="h6" component="h2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              ⚠️ Delete
+            </Typography>
           </Stack>
- 
-          <TextField fullWidth label="Invite user via their email" variant="outlined" sx={{ mb: 2 }} />
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="contained" sx={{ backgroundColor: '#053146' }}>
-              Invite
-            </Button>
-            <Button variant="outlined" color="error" onClick={() => setShowForm(false)}>
+
+          <Typography id="delete-modal-description" sx={{ mt: 2 }}>
+            Are you sure you want to delete this user?
+          </Typography>
+          <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'flex-end' }}>
+            <Button variant="outlined" onClick={handleCloseDeleteModal}>
               Cancel
+            </Button>
+            <Button variant="contained" color="error" onClick={handleConfirmDelete}>
+              Delete
             </Button>
           </Stack>
         </Box>
-      </Modal> */}
+      </Modal>
     </>
   );
 };

@@ -18,6 +18,7 @@ import { imageUrl } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
+import { decodedToken } from 'utils/adminData.js';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const CaseDetailsPage = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [createdByFilter, setCreatedByFilter] = useState('');
   const [createdByOptions, setCreatedByOptions] = useState([]);
+  const [AdminData, setAdminData] = useState([]);
 
   const location = useLocation();
   const { id } = location.state || {};
@@ -85,6 +87,7 @@ const CaseDetailsPage = () => {
       </Box>
     );
   };
+
   const dobRaw = serviceuserDetails?.personalInfo?.dateOfBirth;
   const dobFormatted = dobRaw ? dayjs(dobRaw).format('DD/MM/YYYY') : '';
   const age = dobRaw ? dayjs().diff(dayjs(dobRaw), 'year') : '';
@@ -109,12 +112,12 @@ const CaseDetailsPage = () => {
     setOpenDialog(false);
   };
 
-  // const dateAddedFilters = [
-  //   { value: 'today', label: 'Today' },
-  //   { value: 'week', label: 'Last 7 Days' },
-  //   { value: 'month', label: 'Last 30 Days' },
-  //   { value: 'year', label: 'Last 1 Year' }
-  // ];
+  const dateAddedFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last 1 Year' }
+  ];
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -186,6 +189,7 @@ const CaseDetailsPage = () => {
       const response = await getApi(url);
       const allCasesNotes = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
+
       const formattedData = allCasesNotes.map((note, index) => {
         let configName = '-';
 
@@ -195,11 +199,12 @@ const CaseDetailsPage = () => {
           configName = note.name;
         }
 
+        const createdByAdmin = note?.createdBy?.userName || '-';
         return {
           id: note._id,
           date: note.date ? dayjs(note.date).format('DD-MM-YYYY') : '-',
           subject: note.subject || '-',
-          createdBy: note.createdBy || '-',
+          createdBy: createdByAdmin || '-',
           configurationName: configName,
           sNo: paginationModel.page * paginationModel.pageSize + index + 1
         };
@@ -214,7 +219,7 @@ const CaseDetailsPage = () => {
   };
 
   useEffect(() => {
-    if (dateOpenedFilter || searchQuery || createdByFilter) {
+    if (dateOpenedFilter || searchQuery || createdByFilter || isFiltered) {
       handleFilter();
     }
   }, [dateOpenedFilter, searchQuery, createdByFilter]);
@@ -238,34 +243,12 @@ const CaseDetailsPage = () => {
     fetchData();
   }, [id]);
 
-  const fetchCreatedByOptions = async () => {
-    try {
-      const response = await getApi(`${urls.casenote.fetchWithPagination}?caseId=${id}`);
-      const allCasesNotes = response?.data?.data || [];
-      const uniqueCreators = [...new Set(allCasesNotes.map((note) => note.createdBy))].filter(Boolean);
-      const options = uniqueCreators.map((creator) => ({
-        value: creator,
-        label: creator
-      }));
-      setCreatedByOptions(options);
-    } catch (error) {
-      console.error('Error fetching created by options:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      fetchCreatedByOptions();
-    }
-  }, [id]);
-
   const fetchCaseNotes = async () => {
     try {
       setLoading2(true);
       const response = await getApi(
         `${urls.casenote.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&caseId=${id}`
       );
-
       const allCasesNotes = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
       const formattedData = allCasesNotes.map((note, index) => {
@@ -307,6 +290,24 @@ const CaseDetailsPage = () => {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.login.getAllAdmin);
+        const allAdmins = response?.data?.allAdmins || [];
+
+        const formattedOptions = allAdmins.map((admin) => ({
+          label: admin.userName,
+          value: admin._id
+        }));
+        setCreatedByOptions(formattedOptions);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -528,17 +529,18 @@ const CaseDetailsPage = () => {
         <Grid container spacing={2}>
           <FilterPanel
             showFilter={showFilter}
+            dateAddedFilters={dateAddedFilters}
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             createdBy={createdByOptions}
             createdByFilter={createdByFilter}
-            setCreatedByFilter={(value) => setCreatedByFilter(value)}
+            setCreatedByFilter={setCreatedByFilter}
             selectedFilters={['dateOpenedFilter', 'createdByFilter']}
             onReset={handleReset}
           />
 
           <Grid item xs={12} md={9}>
-            <Box sx={{ height: 'auto', width: '100%', backgroundColor: '#ffff' }}>
+            <Box sx={{ height: '500px', width: '100%', backgroundColor: '#ffff'}}>
               <DataGrid
                 loading={loading2}
                 rows={
@@ -580,12 +582,6 @@ const CaseDetailsPage = () => {
                   '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#f9fafb',
                     fontWeight: 'bold'
-                  },
-                  '& .MuiDataGrid-virtualScroller': {
-                    overflow: 'hidden !important'
-                  },
-                  '& .MuiDataGrid-main': {
-                    overflow: 'hidden'
                   }
                 }}
               />

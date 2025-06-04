@@ -22,13 +22,20 @@ import { postApi, getApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import { useEffect } from 'react';
+import { Autocomplete } from '@mui/material';
 
 const MailingListForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsloading] = useState(false);
   const [tagOptions, setTagOptions] = useState([]);
 
-  const { handleSubmit, control, setValue } = useForm({
+  const {
+    handleSubmit,
+    control,
+    register,
+    setValue,
+    formState: { errors }
+  } = useForm({
     mode: 'all',
     defaultValues: {
       listName: '',
@@ -39,10 +46,36 @@ const MailingListForm = () => {
     }
   });
 
-  const [filters, setFilters] = useState([{ id: 1, logic: 'AND', field: '', comparison: '', value: '' }]);
+  const [filters, setFilters] = useState([
+    {
+      id: 1,
+      logic: 'AND',
+      field: '',
+      comparison: '',
+      value: '',
+      errors: {
+        field: false,
+        comparison: false,
+        value: false
+      }
+    }
+  ]);
 
   const handleFilterChange = (id, field, value) => {
-    setFilters((prev) => prev.map((f) => (f.id === id ? { ...f, [field]: value } : f)));
+    setFilters((prev) =>
+      prev.map((f) =>
+        f.id === id
+          ? {
+              ...f,
+              [field]: value,
+              errors: {
+                ...f.errors,
+                [field]: false
+              }
+            }
+          : f
+      )
+    );
   };
 
   const addFilter = () => {
@@ -69,6 +102,35 @@ const MailingListForm = () => {
 
   const onSubmit = async (data) => {
     setIsloading(true);
+    let hasError = false;
+
+    const validatedFilters = filters.map((filter) => {
+      const newErrors = {
+        field: !filter.field?.trim(),
+        comparison: !filter.comparison?.trim(),
+        value: !filter.value?.trim()
+      };
+
+      if (newErrors?.field || newErrors?.comparison || newErrors?.value) {
+        hasError = true;
+      }
+
+      return {
+        ...filter,
+        errors: newErrors
+      };
+    });
+
+    if (hasError) {
+      setFilters(validatedFilters);
+      const firstErrorIndex = validatedFilters.findIndex(
+        (filter) => filter.errors.field || filter.errors.comparison || filter.errors.value
+      );
+
+      setIsloading(false);
+      return;
+    }
+
     try {
       const formData = {
         ...data,
@@ -76,18 +138,34 @@ const MailingListForm = () => {
         tags: data.tags || '',
         channelSettings: data.channelSettings || '',
         purposeSettings: data.purposeSettings || '',
-        filters
+        filters: validatedFilters.map(({ errors, ...rest }) => rest)
       };
 
       const response = await postApi(urls.mail.create, formData);
       toast.success('Mail added successfully');
       navigate('/mail');
-      setIsloading(false);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error('Error Adding Mail');
+    } finally {
       setIsloading(false);
     }
+  };
+  const onError = () => {
+    const validatedFilters = filters.map((filter) => {
+      const newErrors = {
+        field: !filter.field?.trim(),
+        comparison: !filter.comparison?.trim(),
+        value: !filter.value?.trim()
+      };
+
+      return {
+        ...filter,
+        errors: newErrors
+      };
+    });
+
+    setFilters(validatedFilters);
   };
 
   return (
@@ -112,13 +190,23 @@ const MailingListForm = () => {
         </Box>
       </Box>
 
-      <Card sx={{ p: 3, mt: 3 }} component="form" onSubmit={handleSubmit(onSubmit)}>
+      <Card sx={{ p: 3, mt: 3 }} component="form" onSubmit={handleSubmit(onSubmit, onError)}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Controller
               name="listName"
               control={control}
-              render={({ field }) => <TextField {...field} fullWidth label="Mailing List Name" size="small" />}
+              rules={{ required: 'This field is required' }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Mailing List Name"
+                  size="small"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
           </Grid>
 
@@ -126,20 +214,24 @@ const MailingListForm = () => {
             <Controller
               name="tags"
               control={control}
-              // render={({ field }) =>
-              // <TextField
-              // {...field}
-              // fullWidth
-              // label="Include People with these Tags"
-              // size="small" />}
-              render={({ field }) => (
-                <TextField {...field} select fullWidth label="Include People with these Tags" size="small">
-                  {tagOptions?.map((option) => (
-                    <MenuItem key={option._id} value={option._id}>
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
+              rules={{ required: 'This field is required' }}
+              render={({ field, fieldState }) => (
+                <Autocomplete
+                  {...field}
+                  options={tagOptions || []}
+                  getOptionLabel={(option) => option?.name || ''}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  onChange={(_, value) => field.onChange(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Include People with these Tags"
+                      size="small"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    />
+                  )}
+                />
               )}
             />
           </Grid>
@@ -203,6 +295,8 @@ const MailingListForm = () => {
                       size="small"
                       value={filter.field}
                       onChange={(e) => handleFilterChange(filter.id, 'field', e.target.value)}
+                      error={filter.errors?.field}
+                      helperText={filter.errors?.field ? 'Field is required' : ''}
                     />
                   </Grid>
                   <Grid item xs={3}>
@@ -212,6 +306,8 @@ const MailingListForm = () => {
                       value={filter.comparison}
                       onChange={(e) => handleFilterChange(filter.id, 'comparison', e.target.value)}
                       displayEmpty
+                      error={filter.errors?.value}
+                      helperText={filter.errors?.value ? 'Value is required' : ''}
                     >
                       <MenuItem value="" disabled>
                         Select Comparison
@@ -223,6 +319,11 @@ const MailingListForm = () => {
                       <MenuItem value="greater_than">Greater Than</MenuItem>
                       <MenuItem value="less_than">Less Than</MenuItem>
                     </Select>
+                    {filter.errors?.comparison && (
+                      <Typography variant="caption" color="error">
+                        Comparison is required
+                      </Typography>
+                    )}
                   </Grid>
 
                   <Grid item xs={2}>
@@ -232,6 +333,8 @@ const MailingListForm = () => {
                       size="small"
                       value={filter.value}
                       onChange={(e) => handleFilterChange(filter.id, 'value', e.target.value)}
+                      error={filter.errors?.value}
+                      helperText={filter.errors?.value ? 'Value is required' : ''}
                     />
                   </Grid>
                   <Grid item xs={2}>

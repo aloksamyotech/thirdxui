@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // material-ui
-import { Grid, Avatar, Divider } from '@mui/material';
+import { Grid, Avatar, Divider, Skeleton, } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // project imports
@@ -48,6 +48,8 @@ const Dashboard = () => {
   }, []);
 
   const fetchDashboardData = async () => {
+    setLoading(true); 
+    try{
     const donation = await getApi(urls.dashboard.getTotalDonation);
     const session = await getApi(urls.dashboard.getTotalSession);
     const activeUser = await getApi(urls.dashboard.getTotalActiveUser);
@@ -57,6 +59,15 @@ const Dashboard = () => {
     setTotalSession(session?.data?.totalSession || 0);
     setTotalActiveUser(activeUser?.data?.totalUser || 0);
     setTotalCaseOpened(caseOpened?.data?.totalcase || 0);
+    }
+    catch (error) {
+      toast.error('Error fetching dasboard data');
+    }
+    finally {
+    setLoading(false); 
+    
+  }
+   
   };
   useEffect(() => {
     fetchDashboardData();
@@ -67,16 +78,25 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" />
+       
+            <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" loading={isLoading} />
+            
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" />
+                
+      
+            <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" loading={isLoading} />
+            
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" />
+        
+            <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
+           
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" />
+        
+            <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" loading={isLoading} />
+            
           </Grid>
         </Grid>
       </Grid>

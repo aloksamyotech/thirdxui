@@ -71,6 +71,7 @@ const Report = () => {
           setCaseIdFilter={setCaseIdFilter}
           countriesWithFlags={countriesWithFlags}
           selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter']}
+          customDateLabel="By Date"
         />
 
         <Grid item xs={9}>
@@ -87,7 +88,9 @@ const Report = () => {
                 sx={(theme) => ({
                   backgroundColor: value === '1' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
-                  marginRight: 2
+                  marginRight: 2,
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
 
@@ -97,7 +100,9 @@ const Report = () => {
                 sx={(theme) => ({
                   backgroundColor: value === '2' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
-                  marginRight: 2
+                  marginRight: 2,
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
 
@@ -107,7 +112,9 @@ const Report = () => {
                 sx={(theme) => ({
                   backgroundColor: value === '3' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
-                  marginRight: 2
+                  marginRight: 2,
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
 
@@ -116,7 +123,9 @@ const Report = () => {
                 value="4"
                 sx={(theme) => ({
                   backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease'
+                  transition: 'background-color 0.3s ease',
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
               <Tab
@@ -124,7 +133,9 @@ const Report = () => {
                 value="5"
                 sx={(theme) => ({
                   backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease'
+                  transition: 'background-color 0.3s ease',
+                  fontWeight: '600',
+                  fontSize: '14px'
                 })}
               />
             </TabList>

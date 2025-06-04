@@ -10,6 +10,7 @@ import { getApi, postApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
+import {decodedToken} from 'utils/adminData.js';
 
 const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add Case Note', initialData = null, caseid }) => {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   const [contactPurposeEntry, setContactPurposeEntry] = useState([]);
   const [errors, setErrors] = useState({ notes: '', subject: '' });
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const fileInputRef = useRef();
   useEffect(() => {
     if (initialData) setFormData(initialData);
@@ -72,6 +73,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+
+      const UserByCreatedBy = decodedToken?.id;
       const form = new FormData();
 
       form.append('date', formData.date?.toISOString?.() || '');
@@ -81,7 +84,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
       form.append('isActive', formData.toggle);
       form.append('caseId', formData.caseId);
       form.append('configurationId', formData.contactPurpose);
-
+      form.append('createdBy',UserByCreatedBy)
+      
       if (formData.file) {
         form.append('file', formData.file);
       }

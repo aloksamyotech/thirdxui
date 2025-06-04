@@ -35,6 +35,7 @@ import { postApi, getApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { useEffect } from 'react';
+import { GridToolbarQuickFilter } from '@mui/x-data-grid';
 
 const TagForm = () => {
   const navigate = useNavigate();
@@ -51,7 +52,15 @@ const TagForm = () => {
   });
   const [totalRows, setTotalRows] = useState(0);
 
-  const { control, handleSubmit, setValue, reset } = useForm({
+  const [tagName, setTagName] = useState('');
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors }
+  } = useForm({
     defaultValues: {
       tagDescription: '',
       tagCategoryName: '',
@@ -77,24 +86,14 @@ const TagForm = () => {
   };
 
   const handleTagChange = async (selectedTagCategory) => {
-    try {
-      setIsloading(true);
-      const filtered = tags.filter((item) => item.tagCategoryName === selectedTagCategory);
-      setFilteredTags(filtered);
-    } catch (error) {
-      console.error('Error fetching tags for selected category:', error);
-    } finally {
-      setIsloading(false);
-    }
+    setTagName(selectedTagCategory);
   };
-
   const fetchTags = async () => {
     setIsloading(true);
     try {
       const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-
       setTags(allTags);
       setFilteredTags(allTags);
       setTotalRows(pagination?.total);
@@ -114,12 +113,13 @@ const TagForm = () => {
       setIsloading(true);
       const queryParams = new URLSearchParams();
 
-      if (searchQuery) {
-        queryParams.append('search', searchQuery);
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
       }
 
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
+      queryParams.append('categoryName', tagName);
 
       const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
 
@@ -138,25 +138,16 @@ const TagForm = () => {
   };
 
   const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setSearchQuery(value);
-  };
-
-  const handleSearch = () => {
-    if (searchQuery) {
-      handleFilter();
-    } else {
-      fetchTags();
-    }
+    setSearchQuery(event.target.value);
   };
 
   useEffect(() => {
-    if (searchQuery) {
+    if (searchQuery || tagName) {
       handleFilter();
     } else {
       fetchTags();
     }
-  }, [searchQuery]);
+  }, [searchQuery, tagName]);
 
   const handleStatusChange = async (tagId, newStatus) => {
     try {
@@ -222,49 +213,51 @@ const TagForm = () => {
           >
             Tag List
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f8f9fb',
+              borderRadius: '30px',
+              border: '1px solid #e0e0e0',
+              paddingLeft: '16px',
+              width: '350px',
+              height: '40px',
+              boxSizing: 'border-box'
+            }}
+          >
+            <GridToolbarQuickFilter
+              placeholder="Search..."
+              quickFilterParser={(searchInput) =>
+                searchInput
+                  .split(',')
+                  .map((value) => value.trim())
+                  .filter((value) => value !== '')
+              }
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#ffff',
-                borderRadius: '30px',
-                paddingLeft: '16px',
-                border: '1px solid #e0e0e0',
-                width: '350px',
-                height: '40px'
+                flex: 1,
+                '& .MuiInputBase-root': {
+                  paddingLeft: 0
+                },
+                '& input': {
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none !important',
+                  backgroundColor: 'transparent',
+                  padding: '8px 8px 8px 0',
+                  fontSize: '14px',
+                  color: '#666'
+                },
+                '& .MuiSvgIcon-root': {
+                  display: 'none'
+                },
+                '& .MuiInputBase-root:before, & .MuiInputBase-root:after': {
+                  display: 'none'
+                }
               }}
-            >
-              <InputBase
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearch();
-                  }
-                }}
-                fullWidth
-                sx={{
-                  flex: 1,
-                  color: 'text.primary',
-                  '& input': {
-                    padding: '8px 8px 8px 0',
-                    width: '100%'
-                  }
-                }}
-              />
-              <IconButton
-                onClick={handleSearch}
-                sx={{
-                  marginRight: '8px',
-                  width: 32,
-                  height: 32
-                }}
-              >
-                <SearchIcon />
-              </IconButton>
-            </Box>
+            />
+
+            <SearchIcon sx={{ color: '#888', marginRight: '12px' }} />
           </Box>
         </GridToolbarContainer>
       </Box>
@@ -297,11 +290,20 @@ const TagForm = () => {
       <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={6}>
-            {/* <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} size="small" /> */}
             <Controller
               name="tagDescription"
               control={control}
-              render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Description"
+                  size="small"
+                  rules={{ required: 'Tag Description is required' }}
+                  error={!!errors.tagDescription}
+                  helperText={errors.tagDescription?.message}
+                />
+              )}
             />
           </Grid>
 
@@ -330,6 +332,9 @@ const TagForm = () => {
                   fullWidth
                   label="Tags can be applied to"
                   size="small"
+                  rules={{ required: 'Tag Category is required' }}
+                  error={!!errors.tagCategoryName}
+                  helperText={errors.tagCategoryName?.message}
                   onChange={(e) => {
                     field.onChange(e);
                     handleTagChange(e.target.value);
@@ -395,7 +400,7 @@ const TagForm = () => {
               paginationMode="server"
               paginationModel={paginationModel}
               onPaginationModelChange={setPaginationModel}
-              pageSizeOptions={[10]}
+              pageSizeOptions={[5, 10, 25, 50]}
               getRowId={(row) => row._id}
               slots={{
                 toolbar: () => <CustomHeader />,
@@ -426,8 +431,8 @@ const TagForm = () => {
 
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
-              <Button variant="contained" sx={{ background: '#053146' }}>
-                SAVE CHANGES
+              <Button variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
               </Button>
             </Grid>
             <Grid item>
@@ -449,7 +454,17 @@ const TagForm = () => {
                 <Controller
                   name="name"
                   control={control}
-                  render={({ field }) => <TextField {...field} fullWidth label="Description" size="small" />}
+                  rules={{ required: 'name is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Description"
+                      size="small"
+                      error={!!errors.name}
+                      helperText={errors.name?.message}
+                    />
+                  )}
                 />
               </Grid>
 
@@ -497,11 +512,11 @@ const TagForm = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)}>
-             SAVE CHANGES 
+            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
             </Button>
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
-             CANCEL
+              CANCEL
             </Button>
           </DialogActions>
         </Dialog>

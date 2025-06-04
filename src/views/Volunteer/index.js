@@ -42,7 +42,7 @@ const Volunteer = () => {
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [isFiltered, setIsFiltered] = useState(false);
-  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [dateOpenedFilter, setDateOpenedFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
@@ -85,7 +85,7 @@ const Volunteer = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: '',
+              fontWeight: '400',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
@@ -136,7 +136,7 @@ const Volunteer = () => {
 
       if (districtFilter) queryParams.append('district', districtFilter);
       if (genderFilter) queryParams.append('gender', genderFilter);
-      if (dateOpenedFilter && dateOpenedFilter !== '') {
+      if (dateOpenedFilter) {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
       }
@@ -178,7 +178,7 @@ const Volunteer = () => {
     if (districtFilter || genderFilter || dateOpenedFilter || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [districtFilter, genderFilter, dateOpenedFilter || searchQuery]);
+  }, [districtFilter, genderFilter, dateOpenedFilter, searchQuery, paginationModel.page, paginationModel.pageSize]);
 
   useEffect(() => {
     handleFilter();
@@ -187,11 +187,11 @@ const Volunteer = () => {
   const handleReset = () => {
     setDistrictFilter('');
     setGenderFilter('');
-    setDateOpenedFilter('');
+    setDateOpenedFilter(null);
     setSearchQuery('');
     setIncludeArchives(false);
     setIsFiltered(false);
-    fetchpeople();
+    handleFilter();
   };
 
   const handleSearchChange = (event) => {
@@ -273,7 +273,7 @@ const Volunteer = () => {
               borderRadius: '30px',
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
-              width: '350px',
+              width: '489px',
               height: '40px'
             }}
           >
@@ -286,7 +286,20 @@ const Volunteer = () => {
                   handleFilter();
                 }
               }}
-              sx={{
+             sx={{
+                '& .MuiInputBase-input::placeholder': {
+                  fontSize: '12 px',
+                  opacity: 1
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '14px'
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '13px'
+                },
+                '& .MuiInputBase-root.Mui-focused': {
+                  backgroundColor: '#e0e0e0'
+                },
                 flex: 1,
                 color: 'text.primary'
               }}
@@ -295,8 +308,8 @@ const Volunteer = () => {
               onClick={handleFilter}
               sx={{
                 marginRight: '8px',
-                width: 32,
-                height: 32,
+                width: 18,
+                height: 18,
                 cursor: 'pointer'
               }}
             >
@@ -315,13 +328,13 @@ const Volunteer = () => {
             genders={gender}
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
-            dateAddedFilters={dateAddedFilters}
-            dateAddedFilter={dateOpenedFilter}
-            setDateAddedFilter={(value) => setDateOpenedFilter(value)}
+            dateOpenedFilter={dateOpenedFilter}
+            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateAddedFilter', 'genderFilter', 'includeArchives']}
+            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
+            customDateLabel="By Date Added"
           />
 
           <Grid item xs={9}>

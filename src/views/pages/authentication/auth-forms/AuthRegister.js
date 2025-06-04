@@ -55,7 +55,7 @@ const AuthRegister = ({ ...others }) => {
         toast.error('Login failed due to network or server error');
       }
     },
-    onError: () => toast.error('Login failed'),
+    onError: () => toast.error('Login failed')
   });
 
   return (
@@ -81,7 +81,7 @@ const AuthRegister = ({ ...others }) => {
           setLoading(true);
           const response = await postApi(`${urls.login.register}`, values);
           if (response?.data?.statusCode == 400) {
-            toast.warn(response?.message || 'User already exists');
+            toast.error(response?.message || 'User already exists');
           } else if (response?.success) {
             toast.success('User Registered Successfully');
             setTimeout(() => {
@@ -243,9 +243,7 @@ const AuthRegister = ({ ...others }) => {
                 onBlur={handleBlur}
                 style={{ marginRight: '8px' }}
               />
-              <Typography variant="body2">
-                I Agree to privacy policy & terms
-              </Typography>
+              <Typography variant="body2">I Agree to privacy policy & terms</Typography>
             </Box>
             {touched.acceptTerms && errors.acceptTerms && <FormHelperText>{errors.acceptTerms}</FormHelperText>}
           </FormControl>

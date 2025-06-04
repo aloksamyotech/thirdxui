@@ -79,7 +79,9 @@ const Card = () => {
                   {item?.file && !imgError ? (
                     <Box
                       component="img"
-                      src={`${imageUrl.replace(/\/$/, '')}/${item.file.replace(/^\//, '')}`}
+                      src={
+                        item.file?.startsWith('https://') ? item.file : `${imageUrl.replace(/\/$/, '')}/${item.file?.replace(/^\//, '')}`
+                      }
                       alt="Media"
                       sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       onError={() => setImgError(true)}

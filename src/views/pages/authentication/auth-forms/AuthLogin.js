@@ -90,7 +90,7 @@ const AuthLogin = ({ ...others }) => {
               }, 1000);
             }
           } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            toast.error(error.response?.data?.message || 'Invalid Passwod.Please try again');
           } finally {
             setIsSubmitting(false);
           }

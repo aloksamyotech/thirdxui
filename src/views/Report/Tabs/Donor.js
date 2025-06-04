@@ -3,7 +3,7 @@ import { Box, Tabs, Tab, Grid } from '@mui/material';
 import Chart from './Chart.js';
 import DonorList from './DonorList';
 
-const Service = () => {
+const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -33,7 +33,7 @@ const Service = () => {
 
       <Box>
         {value === 0 && <Chart />}
-        {value === 1 && <DonorList />}
+        {value === 1 && <DonorList selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />}
       </Box>
     </Grid>
   );

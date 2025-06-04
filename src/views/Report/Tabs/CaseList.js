@@ -12,7 +12,7 @@ import config from '../../../config';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import CheckIcon from '@mui/icons-material/Check';
 
-const CaseList = () => {
+const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -135,10 +135,34 @@ const CaseList = () => {
       });
   }, []);
   const fetchInitialData = async () => {
-    setLoading(true);
-
     try {
-      const response = await getApi(`${urls.case.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize
+      });
+
+      if (countryOfOriginFilter) {
+        const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
+        if (selectedCountry) {
+          queryParams.append('country', selectedCountry.label);
+        }
+      }
+
+      if (selectedName) {
+        queryParams.append('name', selectedName);
+      }
+
+      if (status) queryParams.append('status', status === 'active');
+
+      if (caseId) queryParams.append('uniqueId', caseId);
+
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('caseOpened', formattedDate);
+      }
+
+      const response = await getApi(`${urls.case.fetchWithPagination}?${queryParams.toString()}`);
 
       const allCases = response?.data?.data || [];
 
@@ -157,7 +181,7 @@ const CaseList = () => {
         return {
           id: user?._id,
           serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
-          caseid: '-',
+          caseid: user?.uniqueId || '',
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
@@ -183,7 +207,7 @@ const CaseList = () => {
 
   useEffect(() => {
     fetchInitialData();
-  }, [paginationModel]);
+  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
 
   return (
     <>

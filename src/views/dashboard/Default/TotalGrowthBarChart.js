@@ -44,7 +44,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
       {
         title: {
           text: 'Website Blog',
-          style: { color: text.primary }
+          style: { color: '#9D9D9D', fontWeight: 400 }
         },
         max: 100000,
         labels: {
@@ -56,7 +56,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
         opposite: true,
         title: {
           text: 'Social Media',
-          style: { color: text.primary }
+          style:  { color: '#9D9D9D', fontWeight: 400 }
         },
         max: 40,
         labels: {
@@ -100,16 +100,12 @@ const TotalGrowthBarChart = ({ isLoading }) => {
           <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
               <Grid container alignItems="center" justifyContent="space-between">
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ fontWeight: 400, fontSize: 14 }}>
                   Open Cases By
                 </Typography>
 
                 <Stack direction="row" spacing={2}>
-                  <Select
-                    value="Borough"
-                    size="small"
-                    sx={{ minWidth: 120 }}
-                  >
+                  <Select value="Borough" size="small" sx={{ minWidth: 120 }}>
                     <MenuItem value="Borough" disabled>
                       Borough
                     </MenuItem>

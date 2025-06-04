@@ -564,12 +564,14 @@ const ProfileSection = () => {
             onClick={handleSubmit}
             startIcon={<AddIcon />}
             sx={{
-              backgroundColor: '#f0f0f0',
-              color: '#666',
+              backgroundColor: '#1976d2',
+              color: '#fff',
               borderRadius: 1,
-              boxShadow: 'none',
               textTransform: 'none',
-              fontWeight: 500
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#1565c0'
+              }
             }}
           >
             {editMode ? 'Update' : 'Create'}

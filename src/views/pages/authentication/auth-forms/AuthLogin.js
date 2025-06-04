@@ -59,15 +59,16 @@ const AuthLogin = ({ ...others }) => {
         toast.error('Login failed due to network or server error');
       }
     },
-    onError: () => toast.error('Login failed'),
+    onError: () => toast.error('Login failed')
   });
 
   return (
     <>
       <Formik
         initialValues={{
-          email: '',
-          password: ''
+          email: localStorage.getItem('savedEmail') || '',
+          password: localStorage.getItem('savedPassword') || '',
+          rememberMe: localStorage.getItem('rememberMe') === 'true'
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
@@ -85,6 +86,16 @@ const AuthLogin = ({ ...others }) => {
             } else {
               toast.success('Login successful');
               localStorage.setItem('token', response?.data?.token);
+              if (values.rememberMe) {
+                console.log('values.rememberMe  ------->', values.rememberMe);
+                localStorage.setItem('savedEmail', values.email);
+                localStorage.setItem('savedPassword', values.password);
+                localStorage.setItem('rememberMe', 'true');
+              } else {
+                localStorage.removeItem('savedEmail');
+                localStorage.removeItem('savedPassword');
+                localStorage.removeItem('rememberMe');
+              }
               setTimeout(() => {
                 navigate('/dashboard/default');
               }, 1000);

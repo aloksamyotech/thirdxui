@@ -178,7 +178,7 @@ const Sessions = () => {
         spacing={2}
         sx={{ mb: 2 }}
       >
-        <Typography variant="h5" fontWeight={600}>
+        <Typography variant="h5" fontWeight={500} fontSize={14}>
           Current Sessions
         </Typography>
         <Stack direction="row" spacing={1} flexWrap="wrap">

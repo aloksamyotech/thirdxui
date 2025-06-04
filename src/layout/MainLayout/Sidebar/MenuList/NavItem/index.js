@@ -7,57 +7,65 @@ import { Avatar, Chip, ListItemButton, ListItemIcon, ListItemText, Typography, u
 import { MENU_OPEN, SET_MENU } from 'store/actions';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
-// ==============================|| SIDEBAR MENU LIST ITEMS ||============================== //
-
 const NavItem = ({ item, level }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   const customization = useSelector((state) => state.customization);
   const matchesSM = useMediaQuery(theme.breakpoints.down('lg'));
-
   const Icon = item.icon;
   const itemIcon = item?.icon ? (
     <Icon stroke={1.5} size="1.3rem" />
   ) : (
     <FiberManualRecordIcon
       sx={{
-        width: customization.isOpen.findIndex((id) => id === item?.id) > -1 ? 8 : 6,
-        height: customization.isOpen.findIndex((id) => id === item?.id) > -1 ? 8 : 6
+        width: customization.isOpen.includes(item?.id) ? 8 : 6,
+        height: customization.isOpen.includes(item?.id) ? 8 : 6
       }}
       fontSize={level > 0 ? 'inherit' : 'medium'}
     />
   );
 
-  let itemTarget = '_self';
-  if (item.target) {
-    itemTarget = '_blank';
-  }
+  const itemTarget = item.target ? '_blank' : '_self';
 
-  let listItemProps = {
-    component: forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url} target={itemTarget} />)
-  };
-  if (item?.external) {
-    listItemProps = { component: 'a', href: item.url, target: itemTarget };
-  }
+  const listItemProps = item?.external
+    ? { component: 'a', href: item.url, target: itemTarget }
+    : {
+        component: forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url} target={itemTarget} />)
+      };
 
   const itemHandler = (id) => {
     dispatch({ type: MENU_OPEN, id });
     if (matchesSM) dispatch({ type: SET_MENU, opened: false });
   };
 
+  const isArchive = state?.isArchive === true || state?.isArchive === 'true';
+
+  const isSelected =
+    !isArchive &&
+    (pathname === item.url ||
+      (item.childrenUrls && item.childrenUrls.includes(pathname) && (!item.role || !state?.role || item.role === state.role)) ||
+      (item.matchUrls && item.matchUrls.some((url) => pathname === url || pathname.startsWith(url.endsWith('/') ? url : url + '/'))));
+
   useEffect(() => {
-    const currentIndex = document.location.pathname
-      .toString()
-      .split('/')
-      .findIndex((id) => id === item.id);
-    if (currentIndex > -1) {
+    if (isArchive) return;
+
+    const shouldOpenParent =
+      pathname === item.url ||
+      (item.childrenUrls && item.childrenUrls.some((child) => pathname.startsWith(child))) ||
+      (item.matchUrls && item.matchUrls.some((url) => pathname.startsWith(url)));
+
+    if (shouldOpenParent) {
       dispatch({ type: MENU_OPEN, id: item.id });
+      if (item.parentId) {
+        dispatch({ type: MENU_OPEN, id: item.parentId });
+      }
     }
-  }, [pathname]);
+  }, [pathname, item, isArchive, dispatch]);
 
   return (
     <ListItemButton
+      selected={isSelected}
       {...listItemProps}
       disabled={item.disabled}
       sx={{
@@ -86,16 +94,15 @@ const NavItem = ({ item, level }) => {
           }
         }
       }}
-      selected={customization.isOpen.findIndex((id) => id === item.id) > -1}
       onClick={() => itemHandler(item.id)}
     >
       <ListItemIcon
         sx={{
           my: 'auto',
           minWidth: !item?.icon ? 18 : 36,
-          color: customization.isOpen.findIndex((id) => id === item.id) > -1 ? '#053146' : '#ffff',
+          color: isSelected ? '#053146' : '#ffff',
           '&.MuiListItemIcon-root': {
-            color: customization.isOpen.findIndex((id) => id === item.id) > -1 ? '#053146 !important' : '#ffff'
+            color: isSelected ? '#053146 !important' : '#ffff'
           }
         }}
       >
@@ -105,9 +112,9 @@ const NavItem = ({ item, level }) => {
       <ListItemText
         primary={
           <Typography
-            variant={customization.isOpen.findIndex((id) => id === item.id) > -1 ? 'h5' : 'body1'}
+            variant={isSelected ? 'h5' : 'body1'}
             sx={{
-              color: customization.isOpen.findIndex((id) => id === item.id) > -1 ? '#053146' : '#ffff',
+              color: isSelected ? '#053146' : '#ffff',
               transition: 'color 0.3s ease-in-out'
             }}
           >

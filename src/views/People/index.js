@@ -165,7 +165,8 @@ const PeopleManagement = () => {
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
-        postcode: user.contactInfo?.postcode || ''
+        postcode: user.contactInfo?.postcode || '',
+        role: user?.role || ''
       }));
 
       setRows(formattedUsers);
@@ -223,7 +224,8 @@ const PeopleManagement = () => {
         lastName: user.personalInfo?.lastName || '',
         address: user.contactInfo?.addressLine1 || '',
         country: user.contactInfo?.country || '',
-        postcode: user.contactInfo?.postcode || ''
+        postcode: user.contactInfo?.postcode || '',
+        role: user?.role || ''
       }));
 
       setRows(formattedUsers);

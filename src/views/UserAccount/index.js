@@ -85,6 +85,7 @@ const EmployeeDetails = () => {
     profilePhoto: '',
     file: ''
   });
+  const passwordRules = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
   const formik = useFormik({
     initialValues: {
       password: '',
@@ -92,8 +93,16 @@ const EmployeeDetails = () => {
       confirmPassword: ''
     },
     validationSchema: Yup.object({
-      password: Yup.string().required('Current password is required').min(4, 'Must be at least 4 characters'),
-      newPassword: Yup.string().required('New password is required').min(4, 'Must be at least 4 characters'),
+      password: Yup.string()
+        .required('Current password is required'),
+        // .min(8, 'Must be at least 8 characters'),
+      newPassword: Yup.string()
+        .required('New password is required')
+        .min(8, 'Must be at least 8 characters')
+        .matches(
+          passwordRules,
+          'Password must include uppercase, lowercase, number, and special character'
+        ),
       confirmPassword: Yup.string()
         .required('Please confirm your new password')
         .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')

@@ -38,6 +38,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [serviceUser, setServiceUser] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const location = useLocation();
   const session = location?.state?.session;
   const serviceId = session?.serviceId || location?.state?.serviceId;
@@ -118,11 +120,18 @@ const AddCaseForm = ({ onCancel }) => {
   useEffect(() => {
     const fetchserviceUser = async () => {
       try {
-        const response = await getApi(urls.serviceuser.fetch);
-        const allUser = response?.data?.allUser || [];
+        const queryParams = new URLSearchParams();
+        if (searchQuery && searchQuery !== '') {
+          queryParams.append('search', searchQuery);
+        }
+        queryParams.append('role', 'service_user');
+
+        const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+        const allUser = response?.data?.data || [];
         const formattedUsers = allUser.map((user) => ({
           id: user._id,
-          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+          // name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+          name: user.personalInfo?.firstName || ''
         }));
         setServiceUser(formattedUsers);
       } catch (error) {
@@ -130,7 +139,7 @@ const AddCaseForm = ({ onCancel }) => {
       }
     };
     fetchserviceUser();
-  }, []);
+  }, [searchQuery]);
 
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
@@ -169,13 +178,13 @@ const AddCaseForm = ({ onCancel }) => {
             ))
           }
           renderInput={(params) => (
-            <TextField 
-              {...params} 
-              label={label} 
-              size="small" 
-              error={!!error} 
-              helperText={helperText} 
-              fullWidth 
+            <TextField
+              {...params}
+              label={label}
+              size="small"
+              error={!!error}
+              helperText={helperText}
+              fullWidth
             />
           )}
         />
@@ -255,11 +264,11 @@ const AddCaseForm = ({ onCancel }) => {
       }
 
       const serviceIdToPass = session?.serviceId?._id || session?.serviceId || serviceId;
-      navigate(`/view-service`, { 
-        state: { 
+      navigate(`/view-service`, {
+        state: {
           row: serviceIdToPass,
           serviceId: serviceIdToPass
-        } 
+        }
       });
     } catch (error) {
       toast.error(error.message || error.response?.data?.message || 'Error submitting session');
@@ -401,6 +410,7 @@ const AddCaseForm = ({ onCancel }) => {
                           <Autocomplete
                             value={selectedUser}
                             onChange={(_, value) => field.onChange(value ? value.id : '')}
+                            onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
                             options={serviceUser || []}
                             getOptionLabel={(option) => option.name || ''}
                             isOptionEqualToValue={(option, value) => option.id === value.id}

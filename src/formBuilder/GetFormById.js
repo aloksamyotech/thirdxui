@@ -80,7 +80,11 @@ const GetFormById = () => {
               <FormControl sx={{
                 minWidth: { xs: '100%', sm: '50%' }
               }}>
-                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+                <FormLabel>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: 'red' }}> *</span>}
+                </FormLabel>
                 <TextField
                   variant='outlined'
                   multiline
@@ -104,7 +108,11 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: 250 }}>
-                <FormLabel htmlFor={field?.name}>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+                <FormLabel htmlFor={field?.name}>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: 'red' }}> *</span>}
+                </FormLabel>
                 <Select
                   name={field?.label}
                   value={formik?.values[field?.label]}
@@ -131,15 +139,24 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl>
-                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+                <FormLabel>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: 'red' }}> *</span>}
+                </FormLabel>
                 <RadioGroup
                   // row
                   name={field?.label}
                   value={formik?.values[field?.label]}
                   onChange={formik?.handleChange}
                 >{
-                    field?.values && field?.values?.map((checkbox, index) => (
-                      <FormControlLabel key={index} control={<Radio />} label={checkbox?.label} value={checkbox?.label} />
+                    field?.values &&
+                    field?.values?.map((checkbox, index) => (
+                      <FormControlLabel
+                        key={index}
+                        control={<Radio />}
+                        label={checkbox?.label}
+                        value={checkbox?.label} />
                     ))}
                 </RadioGroup>
                 <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
@@ -156,7 +173,11 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: '50%' }}>
-                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+                <FormLabel>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: 'red' }}> *</span>}
+                </FormLabel>
                 <TextField
                   variant='standard'
                   type='number'
@@ -178,7 +199,11 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: '50%' }}>
-                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+                <FormLabel>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: 'red' }}> *</span>}
+                </FormLabel>
                 <TextField
                   variant='standard'
                   type='file'
@@ -200,7 +225,11 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: '50%' }}>
-                <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+                <FormLabel>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: 'red' }}> *</span>}
+                </FormLabel>
                 <TextField
                   variant='standard'
                   type='date'
@@ -221,10 +250,26 @@ const GetFormById = () => {
               p: '20px',
               borderRadius: '10px'
             }}>
-              <FormLabel>{field?.label}{field?.required && <span style={{ color: 'red' }}> *</span>}</FormLabel>
+              <FormLabel>
+                {field?.label}
+                {field?.required &&
+                  <span style={{ color: 'red' }}> *</span>}
+              </FormLabel>
               <FormGroup>
-                {field?.values && field?.values?.map((checkbox, index) => (
-                  <FormControlLabel key={index} control={<Checkbox name={checkbox?.label} value={formik?.values[field?.label]} onChange={formik?.handleChange} />} label={checkbox?.label} />))}
+                {field?.values &&
+                  field.values.map((checkbox, index) => (
+                    <FormControlLabel
+                      key={index}
+                      label={checkbox.label}
+                      control={
+                        <Checkbox
+                          name={field.label}
+                          value={checkbox.label}
+                          onChange={formik.handleChange}
+                        />
+                      }
+                    />
+                  ))}
               </FormGroup>
               <FormHelperText sx={{ color: '#d93227' }}>{formik.errors[field.label]}</FormHelperText>
             </FormControl>
@@ -259,7 +304,11 @@ const GetFormById = () => {
               borderRadius: '10px'
             }}>
               <FormControl sx={{ minWidth: { xs: '100%', sm: '50%' } }}>
-                <FormLabel>{field?.label}{field?.required && <span style={{ color: '#d93227' }}> *</span>}</FormLabel>
+                <FormLabel>
+                  {field?.label}
+                  {field?.required &&
+                    <span style={{ color: '#d93227' }}> *</span>}
+                </FormLabel>
                 <TextField
                   variant='standard'
                   name={field?.label}

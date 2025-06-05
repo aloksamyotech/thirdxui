@@ -130,8 +130,8 @@ const AddCaseForm = ({ onCancel }) => {
         const allUser = response?.data?.data || [];
         const formattedUsers = allUser.map((user) => ({
           id: user._id,
-          // name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
-          name: user.personalInfo?.firstName || ''
+          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+          // name: user.personalInfo?.firstName || ''
         }));
         setServiceUser(formattedUsers);
       } catch (error) {
@@ -403,7 +403,7 @@ const AddCaseForm = ({ onCancel }) => {
                     control={control}
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
-                      const selectedUser = serviceUser?.find((user) => user.id === field.value) || null;
+                      const selectedUser = serviceUser?.find((user) => user.id === field.value);
 
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>

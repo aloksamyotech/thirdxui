@@ -12,7 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import MergeTypeIcon from '@mui/icons-material/MergeType';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 const ViewSubmission = () => {
   const navigate = useNavigate();

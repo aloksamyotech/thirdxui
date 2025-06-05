@@ -15,7 +15,7 @@ import ProfileLogo from 'assets/images/profile.png';
 import { urls } from 'common/urls';
 import { updateApi } from 'common/apiClient';
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
   const [formData, setFormData] = useState(userData);

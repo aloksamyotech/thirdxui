@@ -27,8 +27,7 @@ import { Link } from 'react-router-dom';
 import { urls } from 'common/urls';
 import { postApi } from 'common/apiClient';
 import { useGoogleLogin } from '@react-oauth/google';
-import { ToastContainer, toast as toastify } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 
 const AuthLogin = ({ ...others }) => {
   const theme = useTheme();
@@ -82,9 +81,9 @@ const AuthLogin = ({ ...others }) => {
             const response = await postApi(`${urls.login.login}`, values);
 
             if (response?.data?.statusCode === 401) {
-              toastify.warn(response?.message || 'Wrong Password');
+              toast.error(response?.message || 'Wrong Password');
             } else if (response?.data?.statusCode === 404) {
-              toastify.warn(response?.message || 'Email Not Registered');
+              toast.error(response?.message || 'Email Not Registered');
             } else if (response?.success) {
               toast.success('Login successful');
               localStorage.setItem('token', response?.data?.token);

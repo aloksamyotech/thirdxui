@@ -319,7 +319,7 @@ const Lead = () => {
                   paginationMode="server"
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
-                  pageSizeOptions={[10]}
+                  pageSizeOptions={[5, 10, 25, 50]}
                 />
               </Card>
             </Grid>

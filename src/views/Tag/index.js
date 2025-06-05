@@ -88,7 +88,7 @@ const Tag = () => {
           handleStatusChange(params.row._id, newStatus);
         };
 
-        return <AntSwitch defaultChecked={params.value || '-'} color="primary" onChange={handleToggle} />;
+        return <AntSwitch defaultChecked={params?.value} color="primary" onChange={handleToggle} />;
       }
     }
   ];
@@ -280,9 +280,9 @@ const Tag = () => {
                       loading
                         ? []
                         : tags.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                     }
                     columns={columns}
                     rowCount={totalRows}

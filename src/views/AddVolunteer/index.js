@@ -7,6 +7,7 @@ import {
   Card,
   CardHeader,
   CardContent,
+  IconButton,
   Tabs,
   Tab,
   Box,
@@ -655,7 +656,7 @@ const AddCaseForm = ({ onCancel }) => {
                               />
                             </Grid>
 
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sm={6}>
                               <Controller
                                 name="personalInfo.nickName"
                                 control={control}
@@ -666,7 +667,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
-                                    label="Preferred Known as"
+                                    label="Preferred Name as"
                                     size="small"
                                     error={!!errors?.personalInfo?.nickName}
                                     helperText={errors?.personalInfo?.nickName?.message}
@@ -677,6 +678,77 @@ const AddCaseForm = ({ onCancel }) => {
                                       }
                                     }}
                                     {...field}
+                                  />
+                                )}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="file"
+                                control={control}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    size="small"
+                                    value={field.value ? (typeof field.value === 'object' && field.value.name ? field.value.name : '') : ''}
+                                    placeholder="Profile image"
+                                    inputProps={{
+                                      readOnly: true,
+                                      sx: {
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        '&::placeholder': {
+                                          fontSize: '12px',
+                                          color: '#7a7b7c',
+                                          opacity: 1,
+                                          whiteSpace: 'nowrap',
+
+                                          textOverflow: 'ellipsis',
+                                          overflow: 'hidden'
+                                        }
+                                      }
+                                    }}
+                                    InputProps={{
+                                      endAdornment: (
+                                        <InputAdornment position="end">
+                                          <IconButton component="label" sx={{ p: 0, mr: '-10px' }}>
+                                            <AttachFileIcon sx={{ fontSize: 18, color: '#7a7b7c' }} />
+                                            <input
+                                              type="file"
+                                              hidden
+                                              accept="image/jpeg,image/png,image/jpg"
+                                              onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                                const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                                if (file) {
+                                                  if (!allowedTypes.includes(file.type)) {
+                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
+                                                    e.target.value = null;
+                                                    field.onChange(null);
+                                                    return;
+                                                  }
+
+                                                  if (file.size > maxSizeInBytes) {
+                                                    toast.error('File size must be ≤ 25MB.');
+                                                    e.target.value = null;
+                                                    field.onChange(null);
+                                                    return;
+                                                  }
+
+                                                  field.onChange(file);
+                                                } else {
+                                                  field.onChange(null);
+                                                }
+                                              }}
+                                            />
+                                          </IconButton>
+                                        </InputAdornment>
+                                      )
+                                    }}
                                   />
                                 )}
                               />

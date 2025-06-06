@@ -29,6 +29,7 @@ import { useLocation } from 'react-router-dom';
 import { updateApi, updateApiPatch } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
+import { IconTrash } from '@tabler/icons';
 
 const columns = [
   { field: 'country', headerName: 'Location', flex: 1 },
@@ -210,44 +211,83 @@ const UserProfile = () => {
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        aria-labelledby="delete-dialog-title"
+        maxWidth={false}
+        PaperProps={{
+          sx: { width: 400, borderRadius: 2 }
+        }}
       >
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'red' }}>⚠️ Delete</DialogTitle>
+        <Box sx={{ textAlign: 'center', pt: 3 }}>
+          <IconButton
+            disableRipple
+            sx={{
+              backgroundColor: '#FFE8E6',
+              color: '#FF5C5C',
+              pointerEvents: 'none',
+              '&:hover': { backgroundColor: '#FFE8E6' }
+            }}
+          >
+            <IconTrash fontSize="small" />
+          </IconButton>
+        </Box>
+
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
+
         <DialogContent>
-          <Typography>Are you sure you want to delete this session?</Typography>
+          <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
+            You want to delete this session. <br />
+            This action cannot be undone.
+          </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">Cancel</Button>
-          <Button 
+
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            variant="outlined"
+            sx={{
+              color: '#FF5C5C',
+              borderColor: '#FF5C5C',
+              textTransform: 'uppercase',
+              fontWeight: 480,
+              width: 120
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
             onClick={() => {
               handleDeleteSession(session?._id);
               setDeleteDialogOpen(false);
-            }} 
-            color="error"
+            }}
             variant="contained"
+            sx={{
+              backgroundColor: '#053046',
+              color: '#efeceb',
+              textTransform: 'uppercase',
+              fontWeight: 380,
+              width: 120,
+              '&:hover': { backgroundColor: '#053046' }
+            }}
           >
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={archiveDialogOpen}
-        onClose={() => setArchiveDialogOpen(false)}
-        aria-labelledby="archive-dialog-title"
-      >
+      <Dialog open={archiveDialogOpen} onClose={() => setArchiveDialogOpen(false)} aria-labelledby="archive-dialog-title">
         <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to archive this session?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setArchiveDialogOpen(false)} variant="outlined">Cancel</Button>
-          <Button 
+          <Button onClick={() => setArchiveDialogOpen(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button
             onClick={() => {
               handleArchiveSession(session?._id);
               setArchiveDialogOpen(false);
-            }} 
-           color="warning"
+            }}
+            color="warning"
             variant="contained"
           >
             Archive

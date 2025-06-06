@@ -484,7 +484,7 @@ const ProfileSection = () => {
         }}
       >
         <DialogTitle sx={{ px: 3, py: 2, borderBottom: '1px solid #eee' }}>
-          <Typography variant="h6">{editMode ? 'Edit Task' : 'Create a Task'}</Typography>
+          <Typography variant="h6">{editMode ? 'Edit Task ' : 'Create a Task'}</Typography>
         </DialogTitle>
 
         <DialogContent sx={{ p: 3 }}>
@@ -507,34 +507,30 @@ const ProfileSection = () => {
                 Assigned To
               </Typography>
               <Autocomplete
-                size='small'
+                size="small"
                 options={adminList}
                 getOptionLabel={(option) => option?.userName}
                 onChange={(event, value) => {
-                  setTask((prev) => ({ ...prev, assignedTo: value._id }))
+                  setTask((prev) => ({ ...prev, assignedTo: value._id }));
                 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                  />
-                )}
+                renderInput={(params) => <TextField {...params} />}
                 defaultValue={null}
               />
             </div>
 
-            <div>
-              <Typography fontWeight={600} mb={1}>
-                Due Date
-              </Typography>
-              <TextField
-                type="date"
-                value={task?.dueDate}
-                onChange={handleChange('dueDate')}
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                sx={{ width: '50%' }}
-              />
-            </div>
+            <TextField
+              type="date"
+              value={task?.dueDate}
+              onChange={handleChange('dueDate')}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+              sx={{ width: '50%' }}
+              inputProps={{
+                style: {
+                  cursor: 'pointer'
+                }
+              }}
+            />
 
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>

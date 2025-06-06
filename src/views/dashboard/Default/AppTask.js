@@ -241,7 +241,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
         }}
       >
         <DialogTitle sx={{ px: 3, py: 2, borderBottom: '1px solid #eee' }}>
-          <Typography variant="h6">Edit Task</Typography>
+          <Typography variant="h6">Edit Task </Typography>
         </DialogTitle>
 
         <DialogContent sx={{ p: 3, marginTop: '10px' }}>

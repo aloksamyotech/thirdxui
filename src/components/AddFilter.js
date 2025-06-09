@@ -74,9 +74,13 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
 
   const handleConfirmArchive = async () => {
     try {
-      await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
+      await updateApi(`${urls.serviceuser.archive}/${data?._id}`, {
+        archiveReason: archiveReason
+      });
+
       setConfirmArchiveOpen(false);
       onClose();
+
       if (data?.role === 'volunteer') {
         toast.success('Volunteer user archived successfully!');
         navigate('/volunteer');

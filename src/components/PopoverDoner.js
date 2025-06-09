@@ -77,7 +77,9 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
 
   const handleConfirmArchive = async () => {
     try {
-      await updateApi(`${urls.serviceuser.archive}/${data?._id}`);
+      await updateApi(`${urls.serviceuser.archive}/${data?._id}`, {
+        archiveReason: archiveReason
+      });
       toast.success('Donor user archived successfully!');
       setConfirmArchiveOpen(false);
       onClose();

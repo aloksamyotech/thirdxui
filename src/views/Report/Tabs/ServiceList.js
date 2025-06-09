@@ -258,7 +258,7 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
             paginationMode="server"
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[10]}
+            pageSizeOptions={[5, 10, 25, 50]}
             rowCount={totalRows}
             rowHeight={65}
             getRowId={(rows) => rows?.id}

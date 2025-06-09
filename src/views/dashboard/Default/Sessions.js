@@ -134,20 +134,23 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
 const Sessions = () => {
   const [allSession, setAllSession] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
   const fetchDashboardData = async () => {
     setLoading(true);
     const session = await getApi(urls.session.fetch);
     const currentSessions = session?.data?.allSession;
+
     const formattedSessions = currentSessions?.map((item, index) => ({
       id: item._id || index,
       date: item?.date
         ? new Date(item.date)
-          .toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: '2-digit'
-          })
-          .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
+            .toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: '2-digit'
+            })
+            .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
         : '',
 
       title: item?.serviceId?.name || '',
@@ -162,6 +165,8 @@ const Sessions = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+  const filteredData = allSession.filter((item) => item?.serviceId?.name?.toLowerCase().includes(search.toLowerCase()));
+
   return (
     <Box
       sx={{
@@ -191,7 +196,16 @@ const Sessions = () => {
             variant="outlined"
             placeholder="Search"
             size="small"
-            sx={{ maxWidth: 120 }}
+            sx={{
+              maxWidth: 120,
+              '& input::placeholder': {
+                fontSize: '12px',
+                color: 'black',
+                opacity: 1
+              }
+            }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -208,9 +222,7 @@ const Sessions = () => {
         {loading ? (
           <SingleRowLoader />
         ) : (
-          allSession.map((session, index) => (
-            <SessionItem key={index} {...session} id={session.serviceId} />
-          ))
+          filteredData.map((session, index) => <SessionItem key={index} {...session} id={session.serviceId} />)
         )}
       </Box>
 

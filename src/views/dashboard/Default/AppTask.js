@@ -180,7 +180,14 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               variant="outlined"
               placeholder="Search"
               size="small"
-              sx={{ maxWidth: 120 }}
+              sx={{
+                maxWidth: 120,
+                '& input::placeholder': {
+                  fontSize: '12px',
+                  color: 'black',
+                  opacity: 1
+                }
+              }}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               InputProps={{

@@ -43,9 +43,16 @@ const Card = () => {
             variant="outlined"
             placeholder="Search"
             size="small"
+            sx={{
+              maxWidth: 120,
+              '& input::placeholder': {
+                fontSize: '12px',
+                color: 'black',
+                opacity: 1
+              }
+            }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{ maxWidth: 150 }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">

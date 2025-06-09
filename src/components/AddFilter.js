@@ -14,7 +14,11 @@ import {
   Button,
   Box,
   Typography,
-  IconButton
+  IconButton,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
@@ -30,6 +34,7 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
+  const [archiveReason, setArchiveReason] = useState('');
 
   const handleOptionClick = (label) => {
     if (label === 'Edit') {
@@ -186,18 +191,65 @@ const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog
+        open={confirmArchiveOpen}
+        onClose={() => setConfirmArchiveOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            width: 400
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 600, textAlign: 'left', pb: 1 }}>Archive Reason</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <FormControl size="small" sx={{ flexGrow: 1 }}>
+              <InputLabel>Reason</InputLabel>
+              <Select
+                value={archiveReason}
+                onChange={(e) => setArchiveReason(e.target.value)}
+                label="Reason"
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      maxHeight: 200,
+                      zIndex: 1300
+                    }
+                  }
+                }}
+                sx={{
+                  backgroundColor: '#f4f2ff',
+                  borderRadius: 1
+                }}
+              >
+                <MenuItem value="Deceased">Deceased</MenuItem>
+                <MenuItem value="Gone away">Gone away</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
 
-      <Dialog open={confirmArchiveOpen} onClose={() => setConfirmArchiveOpen(false)}>
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'orange' }}>📦 Archive</DialogTitle>
-        <DialogContent>Are you sure you want to archive?</DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmArchiveOpen(false)} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmArchive} color="warning" variant="contained">
-            Archive
-          </Button>
-        </DialogActions>
+            <Button
+              variant="contained"
+              onClick={handleConfirmArchive}
+              sx={{
+                backgroundColor: '#6366f1',
+                textTransform: 'uppercase',
+                fontWeight: 500,
+                px: 3,
+                height: 40,
+                whiteSpace: 'nowrap',
+                minWidth: 100,
+                '&:hover': {
+                  backgroundColor: '#4f46e5'
+                }
+              }}
+            >
+              Archive
+            </Button>
+          </Box>
+        </DialogContent>
       </Dialog>
     </>
   );

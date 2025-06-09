@@ -592,7 +592,7 @@ const TabbedDataGrid = () => {
               disabled={loading}
               onClick={handleSaveConfiguration}
             >
-              {loading ? 'Saving...' : editMode ? 'UPDATE' : 'SAVE CHANGES'}
+              {loading ? 'Saving...' : 'SAVE CHANGES'}
             </Button>
 
             <Button

@@ -223,7 +223,7 @@ const dashboard = {
           title: 'Archives',
           type: 'item',
           url: '/archives',
-          breadcrumbs: false,
+          breadcrumbs: false
         }
       ]
     },
@@ -247,7 +247,8 @@ const dashboard = {
           title: 'Tags',
           type: 'item',
           url: '/tags',
-          breadcrumbs: false
+          breadcrumbs: false,
+          childrenUrls: ['/add-tag']
         },
         {
           id: '25',

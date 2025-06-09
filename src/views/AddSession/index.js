@@ -415,7 +415,7 @@ const AddCaseForm = ({ onCancel }) => {
                             getOptionLabel={(option) => option.name || ''}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                             renderInput={(params) => (
-                              <TextField {...params} label="Service User" variant="outlined" size="small" error={!!errors.serviceUserId} />
+                              <TextField {...params} label="Session Lead" variant="outlined" size="small" error={!!errors.serviceUserId} />
                             )}
                           />
                           {errors.serviceUserId && (

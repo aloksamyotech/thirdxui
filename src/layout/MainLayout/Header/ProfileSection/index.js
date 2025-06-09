@@ -59,6 +59,7 @@ const ProfileSection = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [admin, setAdmin] = useState();
+  const [isLoading, setIsloading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const anchorRef = useRef(null);
   const handleLogout = async () => {
@@ -130,6 +131,7 @@ const ProfileSection = () => {
   };
 
   const handleSubmit = async () => {
+    setIsloading(true);
     try {
       const payload = {
         ...task,
@@ -147,8 +149,10 @@ const ProfileSection = () => {
       setTask(initialTaskState);
       setEditMode(false);
       setSelectedTaskId(null);
+      setIsloading(false);
     } catch (error) {
       console.error('Error saving task:', error);
+      setIsloading(false);
     }
   };
 
@@ -511,7 +515,7 @@ const ProfileSection = () => {
                 options={adminList}
                 getOptionLabel={(option) => option?.userName}
                 onChange={(event, value) => {
-                  setTask((prev) => ({ ...prev, assignedTo: value._id }));
+                  setTask((prev) => ({ ...prev, assignedTo: value ? value._id : '' }));
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 defaultValue={null}
@@ -561,6 +565,7 @@ const ProfileSection = () => {
             fullWidth
             onClick={handleSubmit}
             startIcon={<AddIcon />}
+            disabled={isLoading}
             sx={{
               backgroundColor: '#1976d2',
               color: '#fff',
@@ -569,10 +574,14 @@ const ProfileSection = () => {
               fontWeight: 500,
               '&:hover': {
                 backgroundColor: '#1565c0'
+              },
+              '&.Mui-disabled': {
+                backgroundColor: '#90caf9',
+                color: '#fff'
               }
             }}
           >
-            {editMode ? 'Update' : 'Create'}
+            {isLoading ? (editMode ? 'Updating...' : 'Creating...') : editMode ? 'Update' : 'Create'}
           </Button>
         </Box>
       </Dialog>

@@ -1,16 +1,5 @@
 import { useState } from 'react';
-import {
-  Modal,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Avatar,
-  IconButton,
-  MenuItem,
-  Stack
-} from '@mui/material';
+import { Modal, Box, Typography, TextField, Button, Grid, Avatar, IconButton, MenuItem, Stack } from '@mui/material';
 import ProfileLogo from 'assets/images/profile.png';
 import { urls } from 'common/urls';
 import { updateApi } from 'common/apiClient';
@@ -19,32 +8,39 @@ import { toast } from 'react-hot-toast';
 
 const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
   const [formData, setFormData] = useState(userData);
-  const [loading, setLoading] = useState(false)
-
+  const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const BASE_URL = process.env.REACT_APP_IMAGE_URL;
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'file') {
-      setFormData({ ...formData, file: files[0] });
+      const file = files[0];
+      setFormData({ ...formData, file });
+
+      if (file) {
+        const previewURL = URL.createObjectURL(file);
+        setImagePreview(previewURL);
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
   const onSubmit = async () => {
-    const url = urls?.login?.updateUserById
+    const url = urls?.login?.updateUserById;
     const form = new FormData();
     for (const key in formData) {
       if (formData[key] !== undefined && formData[key] !== null) {
         form.append(key, formData[key]);
       }
     }
-    setLoading(true)
-    await updateApi(url, form)
-    toast.success('Profile Updated Successfully')
-    getUserInfo()
-    onClose()
-    setLoading(false)
-  }
+    setLoading(true);
+    await updateApi(url, form);
+    toast.success('Profile Updated Successfully');
+    getUserInfo();
+    onClose();
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (userData) {
@@ -70,7 +66,11 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
         }}
       >
         <Box display="flex" alignItems="center" gap={2} mb={2}>
-          <Avatar src={ProfileLogo} sx={{ width: 50, height: 50 }} />
+          <Avatar
+            src={imagePreview ? imagePreview : formData?.file ? `${BASE_URL}${formData?.file}` : ProfileLogo}
+            sx={{ width: 50, height: 50 }}
+          />
+
           <Stack direction="row" spacing={1}>
             <Button variant="contained" component="label" sx={{ backgroundColor: '#053146' }}>
               UPLOAD A NEW PHOTO
@@ -78,10 +78,11 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
                 hidden
                 accept="image/*"
                 type="file"
-                label='file'
-                name='file'
+                label="file"
+                name="file"
                 // value={formData?.file}
-                onChange={handleChange} />
+                onChange={handleChange}
+              />
             </Button>
             <Button variant="outlined" color="error">
               RESET
@@ -104,7 +105,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
               <TextField
                 fullWidth
                 label={field?.label}
-                size='small'
+                size="small"
                 name={field?.name}
                 value={formData[field?.name]}
                 onChange={handleChange}
@@ -113,15 +114,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
           ))}
 
           <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label="Country"
-              name="country"
-              size='small'
-              value={formData.country}
-              onChange={handleChange}
-            >
+            <TextField select fullWidth label="Country" name="country" size="small" value={formData.country} onChange={handleChange}>
               {['USA', 'India', 'Canada', 'Germany', 'France', 'UK', 'Australia'].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -131,15 +124,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label="Language"
-              name="language"
-              size='small'
-              value={formData.language}
-              onChange={handleChange}
-            >
+            <TextField select fullWidth label="Language" name="language" size="small" value={formData.language} onChange={handleChange}>
               {['English', 'Hindi', 'French', 'Spanish', 'German'].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -149,15 +134,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label="Status"
-              name="status"
-              size='small'
-              value={formData.status}
-              onChange={handleChange}
-            >
+            <TextField select fullWidth label="Status" name="status" size="small" value={formData.status} onChange={handleChange}>
               {['Active', 'Inactive'].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
@@ -167,15 +144,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              fullWidth
-              label="Currency"
-              name="currency"
-              size='small'
-              value={formData.currency}
-              onChange={handleChange}
-            >
+            <TextField select fullWidth label="Currency" name="currency" size="small" value={formData.currency} onChange={handleChange}>
               {['USD', 'INR', 'EUR', 'GBP', 'AUD', 'CAD'].map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}

@@ -105,7 +105,7 @@ const AuthRegister = ({ ...others }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Email Address"
+                label="Email"
                 margin="normal"
                 size="small"
                 name="email"
@@ -131,7 +131,7 @@ const AuthRegister = ({ ...others }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="UserName"
+                label="Username"
                 margin="normal"
                 size="small"
                 name="userName"

@@ -26,6 +26,25 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
     }
   };
 
+  const handleReset = () => {
+    setFormData({
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      address: '',
+      email: '',
+      organization: '',
+      state: '',
+      zipCode: '',
+      country: '',
+      language: '',
+      status: '',
+      currency: '',
+      file: null
+    });
+    setImagePreview(null);
+  };
+
   const onSubmit = async () => {
     const url = urls?.login?.updateUserById;
     const form = new FormData();
@@ -84,7 +103,7 @@ const EditProfileModal = ({ open, onClose, userData, getUserInfo }) => {
                 onChange={handleChange}
               />
             </Button>
-            <Button variant="outlined" color="error">
+            <Button variant="outlined" color="error" onClick={handleReset}>
               RESET
             </Button>
           </Stack>

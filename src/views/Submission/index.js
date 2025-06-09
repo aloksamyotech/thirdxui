@@ -206,7 +206,7 @@ const Lead = () => {
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
             <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-              <Typography variant="h4">Submitted Form</Typography>
+              <Typography sx={{ fontSize: '14px', fontWeight: '400px' }}>Submitted Form</Typography>
               <Box
                 sx={{
                   display: 'flex',

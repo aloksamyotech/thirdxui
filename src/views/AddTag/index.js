@@ -58,6 +58,7 @@ const TagForm = () => {
     control,
     handleSubmit,
     setValue,
+    getValues,
     reset,
     formState: { errors }
   } = useForm({
@@ -293,13 +294,13 @@ const TagForm = () => {
             <Controller
               name="tagDescription"
               control={control}
+              rules={{ required: 'Tag Description is required' }}
               render={({ field }) => (
                 <TextField
                   {...field}
                   fullWidth
                   label="Description"
                   size="small"
-                  rules={{ required: 'Tag Description is required' }}
                   error={!!errors.tagDescription}
                   helperText={errors.tagDescription?.message}
                 />
@@ -332,7 +333,6 @@ const TagForm = () => {
                   fullWidth
                   label="Tags can be applied to"
                   size="small"
-                  rules={{ required: 'Tag Category is required' }}
                   error={!!errors.tagCategoryName}
                   helperText={errors.tagCategoryName?.message}
                   onChange={(e) => {
@@ -454,7 +454,7 @@ const TagForm = () => {
                 <Controller
                   name="name"
                   control={control}
-                  rules={{ required: 'name is required' }}
+                  rules={{ required: 'Description is required' }}
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -473,12 +473,15 @@ const TagForm = () => {
                   <Controller
                     name="startDate"
                     control={control}
+                    rules={{ required: 'Start Date is required' }}
                     render={({ field }) => (
                       <DatePicker
                         label="Start Date"
                         {...field}
-                        onChange={(date) => setValue('startDate', date)}
-                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                        onChange={(date) => field.onChange(date)}
+                        renderInput={(params) => (
+                          <TextField {...params} fullWidth size="small" error={!!errors.startDate} helperText={errors.startDate?.message} />
+                        )}
                       />
                     )}
                   />
@@ -490,12 +493,24 @@ const TagForm = () => {
                   <Controller
                     name="endDate"
                     control={control}
+                    rules={{
+                      required: 'End Date is required',
+                      validate: (value) => {
+                        if (!value) return 'End Date is required';
+                        if (getValues('startDate') && value.isBefore(getValues('startDate'))) {
+                          return 'End Date must be same or after Start Date';
+                        }
+                        return true;
+                      }
+                    }}
                     render={({ field }) => (
                       <DatePicker
                         label="End Date"
                         {...field}
-                        onChange={(date) => setValue('endDate', date)}
-                        renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                        onChange={(date) => field.onChange(date)}
+                        renderInput={(params) => (
+                          <TextField {...params} fullWidth size="small" error={!!errors.endDate} helperText={errors.endDate?.message} />
+                        )}
                       />
                     )}
                   />
@@ -506,15 +521,28 @@ const TagForm = () => {
                 <Controller
                   name="note"
                   control={control}
-                  render={({ field }) => <TextField {...field} fullWidth label="Note" size="small" multiline rows={3} />}
+                  rules={{ required: 'Note is required' }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Note"
+                      size="small"
+                      multiline
+                      rows={3}
+                      error={!!errors.note}
+                      helperText={errors.note?.message}
+                    />
+                  )}
                 />
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
             <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)} disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
+              {isLoading ? 'Saving...' : 'SAVE CHANGES'}
             </Button>
+
             <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
               CANCEL
             </Button>

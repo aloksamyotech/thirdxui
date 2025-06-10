@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import config from '../../../config';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const ServiceList = () => {
+const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -24,7 +24,7 @@ const ServiceList = () => {
 
   const columns = [
     {
-      field: 'userid',
+      field: 'uniqueId',
       headerName: 'Case ID',
       width: 100,
       align: 'center',
@@ -178,9 +178,28 @@ const ServiceList = () => {
       if (!includeArchives) {
         queryParams.append('archive', 'false');
       }
+      if (countryOfOriginFilter) {
+        const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
+        if (selectedCountry) {
+          queryParams.append('country', selectedCountry.label);
+        }
+      }
+
+      if (selectedName) {
+        queryParams.append('name', selectedName);
+      }
+      if (status) queryParams.append('status', status === 'active');
+
+      if (caseId) queryParams.append('uniqueId', caseId);
+
+      if (dateOpenedFilter && dateOpenedFilter !== '') {
+        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+        queryParams.append('dateOfBirth', formattedDate);
+      }
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
+
       const pagination = response?.data?.meta || { total: 0 };
 
       const formattedUsers = allUser?.map((user, index) => {
@@ -188,6 +207,7 @@ const ServiceList = () => {
         const age = dob !== '-' ? getAge(dob) : '-';
         const countryName = user?.contactInfo?.country || '-';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
+        const uniqueId = user?.uniqueId;
 
         return {
           id: user._id,
@@ -197,6 +217,7 @@ const ServiceList = () => {
           lastName: user.personalInfo?.lastName || '-',
           dob,
           age,
+          uniqueId,
           country: countryName,
           countryFlag: matchedCountry?.flag || '',
           ethicity: user.personalInfo?.ethnicity || '-',
@@ -216,7 +237,7 @@ const ServiceList = () => {
 
   useEffect(() => {
     fetchpeople();
-  }, [paginationModel]);
+  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
 
   return (
     <>
@@ -237,7 +258,7 @@ const ServiceList = () => {
             paginationMode="server"
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[10]}
+            pageSizeOptions={[5, 10, 25, 50]}
             rowCount={totalRows}
             rowHeight={65}
             getRowId={(rows) => rows?.id}

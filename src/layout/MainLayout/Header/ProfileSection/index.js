@@ -30,7 +30,8 @@ import {
   TextField,
   ListItem,
   IconButton,
-  MenuItem
+  MenuItem,
+  Autocomplete
 } from '@mui/material';
 import TranslateIcon from '@mui/icons-material/Translate';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -58,6 +59,7 @@ const ProfileSection = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [admin, setAdmin] = useState();
+  const [isLoading, setIsloading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const anchorRef = useRef(null);
   const handleLogout = async () => {
@@ -129,6 +131,7 @@ const ProfileSection = () => {
   };
 
   const handleSubmit = async () => {
+    setIsloading(true);
     try {
       const payload = {
         ...task,
@@ -146,8 +149,10 @@ const ProfileSection = () => {
       setTask(initialTaskState);
       setEditMode(false);
       setSelectedTaskId(null);
+      setIsloading(false);
     } catch (error) {
       console.error('Error saving task:', error);
+      setIsloading(false);
     }
   };
 
@@ -483,7 +488,7 @@ const ProfileSection = () => {
         }}
       >
         <DialogTitle sx={{ px: 3, py: 2, borderBottom: '1px solid #eee' }}>
-          <Typography variant="h6">{editMode ? 'Edit Task' : 'Create a Task'}</Typography>
+          <Typography variant="h6">{editMode ? 'Edit Task ' : 'Create a Task'}</Typography>
         </DialogTitle>
 
         <DialogContent sx={{ p: 3 }}>
@@ -495,7 +500,7 @@ const ProfileSection = () => {
               <TextField
                 fullWidth
                 placeholder="Send Email Confirmation"
-                value={task.details}
+                value={task?.details}
                 onChange={handleChange('details')}
                 size="small"
               />
@@ -505,34 +510,31 @@ const ProfileSection = () => {
               <Typography fontWeight={600} mb={1}>
                 Assigned To
               </Typography>
-              <TextField
-                select
-                fullWidth
-                value={task.assignedTo}
-                onChange={(e) => setTask((prev) => ({ ...prev, assignedTo: e.target.value }))}
+              <Autocomplete
                 size="small"
-              >
-                {adminList.map((admin) => (
-                  <MenuItem key={admin._id} value={admin._id}>
-                    {admin.userName}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </div>
-
-            <div>
-              <Typography fontWeight={600} mb={1}>
-                Due Date
-              </Typography>
-              <TextField
-                type="date"
-                value={task.dueDate}
-                onChange={handleChange('dueDate')}
-                size="small"
-                InputLabelProps={{ shrink: true }}
-                sx={{ width: '50%' }}
+                options={adminList}
+                getOptionLabel={(option) => option?.userName}
+                onChange={(event, value) => {
+                  setTask((prev) => ({ ...prev, assignedTo: value ? value._id : '' }));
+                }}
+                renderInput={(params) => <TextField {...params} />}
+                defaultValue={null}
               />
             </div>
+
+            <TextField
+              type="date"
+              value={task?.dueDate}
+              onChange={handleChange('dueDate')}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+              sx={{ width: '50%' }}
+              inputProps={{
+                style: {
+                  cursor: 'pointer'
+                }
+              }}
+            />
 
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
@@ -563,6 +565,7 @@ const ProfileSection = () => {
             fullWidth
             onClick={handleSubmit}
             startIcon={<AddIcon />}
+            disabled={isLoading}
             sx={{
               backgroundColor: '#1976d2',
               color: '#fff',
@@ -571,10 +574,14 @@ const ProfileSection = () => {
               fontWeight: 500,
               '&:hover': {
                 backgroundColor: '#1565c0'
+              },
+              '&.Mui-disabled': {
+                backgroundColor: '#90caf9',
+                color: '#fff'
               }
             }}
           >
-            {editMode ? 'Update' : 'Create'}
+            {isLoading ? (editMode ? 'Updating...' : 'Creating...') : editMode ? 'Update' : 'Create'}
           </Button>
         </Box>
       </Dialog>

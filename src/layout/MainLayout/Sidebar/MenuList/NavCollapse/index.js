@@ -8,12 +8,11 @@ import NavItem from '../NavItem';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons';
 
-// ==============================|| SIDEBAR MENU LIST COLLAPSE ITEMS ||============================== //
-
 const NavCollapse = ({ menu, level }) => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -21,17 +20,20 @@ const NavCollapse = ({ menu, level }) => {
   const handleClick = () => {
     setOpen(!open);
     setSelected(!selected ? menu.id : null);
-    if (menu?.id !== 'authentication') {
-      navigate(menu.children[0]?.url);
-    }
+
+    // Optional: Navigate to first child on click (disable if not needed)
+    // if (menu?.id !== 'authentication') {
+    //   navigate(menu.children[0]?.url);
+    // }
   };
 
-  const { pathname } = useLocation();
-  const checkOpenForParent = (child, id) => {
-    child.forEach((item) => {
-      if (item.url === pathname) {
+  const checkOpenForParent = (children, parentId) => {
+    children.forEach((item) => {
+      const matchExact = item.url === pathname;
+      const matchChild = item.childrenUrls?.includes(pathname);
+      if (matchExact || matchChild) {
         setOpen(true);
-        setSelected(id);
+        setSelected(parentId);
       }
     });
   };
@@ -39,16 +41,26 @@ const NavCollapse = ({ menu, level }) => {
   useEffect(() => {
     setOpen(false);
     setSelected(null);
+
     if (menu.children) {
-      menu.children.forEach((item) => {
+      for (const item of menu.children) {
+        // Recursively check grandchildren if any
         if (item.children?.length) {
           checkOpenForParent(item.children, menu.id);
         }
-        if (item.url === pathname) {
-          setSelected(menu.id);
+
+        const matchExact = item.url === pathname;
+        const matchChild = item.childrenUrls?.includes(pathname);
+
+        // Check matchUrls with startsWith for dynamic routes
+        const matchDynamic = item.matchUrls?.some((url) => pathname.startsWith(url)) || false;
+
+        if (matchExact || matchChild || matchDynamic) {
           setOpen(true);
+          setSelected(menu.id);
+          break;
         }
-      });
+      }
     }
   }, [pathname, menu.children]);
 
@@ -68,7 +80,7 @@ const NavCollapse = ({ menu, level }) => {
   });
 
   const Icon = menu.icon;
-  const menuIcon = menu.icon ? (
+  const menuIcon = Icon ? (
     <Icon strokeWidth={1.5} size="1.3rem" style={{ marginTop: 'auto', marginBottom: 'auto' }} />
   ) : (
     <FiberManualRecordIcon
@@ -91,22 +103,14 @@ const NavCollapse = ({ menu, level }) => {
           '&:hover': {
             backgroundColor: '#ffffff !important',
             color: '#053146 !important',
-            '& .MuiListItemIcon-root': {
-              color: '#053146 !important'
-            },
-            '& .MuiTypography-root': {
-              color: '#053146 !important'
-            }
+            '& .MuiListItemIcon-root': { color: '#053146 !important' },
+            '& .MuiTypography-root': { color: '#053146 !important' }
           },
           '&.Mui-selected': {
             backgroundColor: '#ffffff !important',
             color: '#053146 !important',
-            '& .MuiListItemIcon-root': {
-              color: '#053146 !important'
-            },
-            '& .MuiTypography-root': {
-              color: '#053146 !important'
-            }
+            '& .MuiListItemIcon-root': { color: '#053146 !important' },
+            '& .MuiTypography-root': { color: '#053146 !important' }
           }
         }}
         selected={selected === menu.id}
@@ -149,13 +153,21 @@ const NavCollapse = ({ menu, level }) => {
           <IconChevronUp
             stroke={1.5}
             size="1rem"
-            style={{ marginTop: 'auto', marginBottom: 'auto', color: selected === menu.id ? '#053146' : '#ffff' }}
+            style={{
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              color: selected === menu.id ? '#053146' : '#ffff'
+            }}
           />
         ) : (
           <IconChevronDown
             stroke={1.5}
             size="1rem"
-            style={{ marginTop: 'auto', marginBottom: 'auto', color: selected === menu.id ? '#053146' : '#ffff' }}
+            style={{
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              color: selected === menu.id ? '#053146' : '#ffff'
+            }}
           />
         )}
       </ListItemButton>

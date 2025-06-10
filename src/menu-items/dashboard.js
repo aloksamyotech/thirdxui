@@ -12,7 +12,8 @@ import {
   IconNotebook,
   IconPhoneCheck,
   IconUser,
-  IconMail,IconSeeding
+  IconMail,
+  IconSeeding
 } from '@tabler/icons';
 
 // constant
@@ -29,7 +30,8 @@ const icons = {
   IconNotebook,
   IconPhoneCheck,
   IconUser,
-  IconMail,IconSeeding
+  IconMail,
+  IconSeeding
 };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -53,20 +55,27 @@ const dashboard = {
       children: [
         {
           id: '02',
+          parentId: '01',
           title: 'Service Users',
           type: 'item',
           url: '/people',
-          breadcrumbs: false
+          breadcrumbs: false,
+          role: 'service_user',
+          childrenUrls: ['/add-serviceuser', '/view-people']
         },
         {
           id: '03',
+          parentId: '01',
           title: 'Volunteers',
           type: 'item',
           url: '/volunteer',
-          breadcrumbs: false
+          breadcrumbs: false,
+          role: 'volunteer',
+          childrenUrls: ['/add-volunteer', '/view-people']
         },
         {
           id: '04',
+          parentId: '01',
           title: 'New Referral',
           type: 'item',
           url: '/referral',
@@ -74,13 +83,15 @@ const dashboard = {
         }
       ]
     },
+
     {
       id: '05',
       title: 'Services',
       type: 'item',
       url: '/services',
       icon: icons.IconSettingsAutomation,
-      breadcrumbs: false
+      breadcrumbs: false,
+      childrenUrls: ['/add-service', '/view-service', '/add-session', '/view-session', '/attendees']
     },
     {
       id: '06',
@@ -88,7 +99,8 @@ const dashboard = {
       type: 'item',
       url: '/case',
       icon: icons.IconFileInvoice,
-      breadcrumbs: false
+      breadcrumbs: false,
+      childrenUrls: ['/add-case', '/view-case']
     },
     {
       id: '07',
@@ -96,7 +108,8 @@ const dashboard = {
       type: 'item',
       url: '/mail',
       icon: icons.IconMail,
-      breadcrumbs: false
+      breadcrumbs: false,
+      childrenUrls: ['/add-mail']
     },
     {
       id: '08',
@@ -106,20 +119,25 @@ const dashboard = {
       children: [
         {
           id: '09',
+          parentId: '08',
           title: 'Donor',
           type: 'item',
           url: '/donor',
-          breadcrumbs: false
+          breadcrumbs: false,
+          childrenUrls: ['/add-donor', '/view-donor', '/add-donorCompany']
         },
         {
           id: '10',
+          parentId: '08',
           title: 'Financial',
           type: 'item',
           url: '/financial',
-          breadcrumbs: false
+          breadcrumbs: false,
+          childrenUrls: ['/add-transaction']
         },
         {
           id: '11',
+          parentId: '08',
           title: 'Mailing Lists',
           type: 'item',
           url: '/mailing-list',
@@ -136,6 +154,7 @@ const dashboard = {
       children: [
         {
           id: '13',
+          parentId: '12',
           title: 'Manage Form',
           type: 'item',
           url: '/manage-form',
@@ -143,13 +162,16 @@ const dashboard = {
         },
         {
           id: '14',
+          parentId: '12',
           title: 'Submission',
           type: 'item',
           url: '/submission',
-          breadcrumbs: false
+          breadcrumbs: false,
+          matchUrls: ['/submission']
         },
         {
           id: '15',
+          parentId: '12',
           title: 'History',
           type: 'item',
           url: '/history',
@@ -173,6 +195,7 @@ const dashboard = {
       children: [
         {
           id: '18',
+          parentId: '17',
           title: 'Bulk Upload',
           type: 'item',
           url: '/bulkupload',
@@ -180,6 +203,7 @@ const dashboard = {
         },
         {
           id: '19',
+          parentId: '17',
           title: 'Duplicate',
           type: 'item',
           url: '/duplicate',
@@ -187,6 +211,7 @@ const dashboard = {
         },
         {
           id: '20',
+          parentId: '17',
           title: 'Bulk Delete',
           type: 'item',
           url: '/bulkdelete',
@@ -194,6 +219,7 @@ const dashboard = {
         },
         {
           id: '21',
+          parentId: '17',
           title: 'Archives',
           type: 'item',
           url: '/archives',
@@ -209,6 +235,7 @@ const dashboard = {
       children: [
         {
           id: '23',
+          parentId: '22',
           title: 'Configuration',
           type: 'item',
           url: '/configuration',
@@ -216,27 +243,32 @@ const dashboard = {
         },
         {
           id: '24',
+          parentId: '22',
           title: 'Tags',
           type: 'item',
           url: '/tags',
-          breadcrumbs: false
+          breadcrumbs: false,
+          childrenUrls: ['/add-tag']
         },
         {
           id: '25',
+          parentId: '22',
           title: 'Users',
           type: 'item',
           url: '/users',
-          breadcrumbs: false
+          breadcrumbs: false,
+          childrenUrls: ['/add-user']
         },
         {
           id: '26',
+          parentId: '22',
           title: 'Account',
           type: 'item',
           url: '/account',
           breadcrumbs: false
         }
       ]
-    },
+    }
   ]
 };
 

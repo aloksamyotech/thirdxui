@@ -77,7 +77,7 @@ const UserProfileCard = () => {
   const otherInfo = userData?.otherInfo || {};
   const companyInformation = userData?.companyInformation || {};
   const imagePath = userData?.otherInfo?.file;
-  const fullImageUrl = imagePath ? `${imageUrl}${imagePath}` : '';
+  const fullImageUrl = imagePath ? (imagePath.startsWith('https://') ? imagePath : `${imageUrl}${imagePath}`) : '';
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -253,7 +253,7 @@ const UserProfileCard = () => {
                       onClick={handleClick}
                       sx={{ mb: 1, borderRadius: '6px', width: '20%', height: 'auto', fontSize: '12px', backgroundColor: '#009fc7' }}
                     >
-                      EDIT
+                      Manage
                     </Button>
                     {sub_role === SUBROLES.INDIVIDUAL && (
                       <>

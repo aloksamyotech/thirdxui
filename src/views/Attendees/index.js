@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, IconButton, Card, Button, Select, MenuItem, FormControl, InputLabel, Tooltip, Stack } from '@mui/material';
+import { Box, Grid, Typography, IconButton, Card, Button, Select, MenuItem, FormControl, InputLabel, Tooltip, Stack, Autocomplete, TextField } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -20,6 +20,7 @@ export default function SessionRegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rows, setRows] = useState([]);
   const [rowsAttendee, setRowsAttendee] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 5
@@ -92,8 +93,14 @@ export default function SessionRegisterPage() {
 
   const fetchAvailableUsers = async () => {
     try {
-      const response = await getApi(urls?.serviceuser?.fetch);
-      const allUser = response?.data?.allUser || [];
+      const queryParams = new URLSearchParams();
+      if (searchQuery && searchQuery !== '') {
+        queryParams.append('search', searchQuery);
+      }
+      queryParams.append('role', 'service_user');
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
       const formattedUsers = allUser.map((user) => ({
         id: user?._id,
         name: `${user?.personalInfo?.firstName || ''} ${user?.personalInfo?.lastName || ''}`
@@ -163,7 +170,7 @@ export default function SessionRegisterPage() {
 
   useEffect(() => {
     fetchAvailableUsers();
-  }, []);
+  }, [searchQuery]);
 
   return (
     <>
@@ -232,14 +239,22 @@ export default function SessionRegisterPage() {
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} sm={8}>
                   <FormControl fullWidth>
-                    <InputLabel>Select Attendee</InputLabel>
-                    <Select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} label="Select Attendee">
-                      {rows.map((user) => (
-                        <MenuItem key={user.id} value={user.id}>
-                          {user.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <Autocomplete
+                      size='small'
+                      options={rows}
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        setSelectedUserId(value ? value.id : '');
+                      }}
+                      onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Attendee"
+                        />
+                      )}
+                      defaultValue={null}
+                    />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={4}>

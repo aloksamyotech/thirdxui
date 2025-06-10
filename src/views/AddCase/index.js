@@ -28,6 +28,8 @@ const AddCaseForm = () => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQueryService, setSearchQueryService] = useState('');
 
   const {
     control,
@@ -191,25 +193,35 @@ const AddCaseForm = () => {
 
   useEffect(() => {
     const fetchpeople = async () => {
-      const response = await getApi(urls.serviceuser.fetch);
-      const allUser = response?.data?.allUser || [];
+      const queryParams = new URLSearchParams();
+      if (searchQuery && searchQuery !== '') {
+        queryParams.append('search', searchQuery);
+      }
+      queryParams.append('role', 'service_user');
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
       const formattedUsers = allUser.map((user) => ({
         id: user._id,
         name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        // name: user?.personalInfo?.firstName
       }));
       setRows(formattedUsers);
     };
     fetchpeople();
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchServices = async () => {
-      const response = await getApi(urls.service.fetch);
-
-      setServices(response?.data);
+      const queryParams = new URLSearchParams();
+      if (searchQueryService && searchQueryService !== '') {
+        queryParams.append('search', searchQueryService);
+      }
+      const response = await getApi(`${urls.service.fetchWithPagination}?${queryParams.toString()}`);
+      setServices(response?.data?.data);
     };
     fetchServices();
-  }, []);
+  }, [searchQueryService]);
 
   const onlyLetters = /^[A-Za-z\s]*$/;
 
@@ -246,13 +258,14 @@ const AddCaseForm = () => {
                     control={control}
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
-                      const selectedUser = rows?.find((user) => user.id === field.value) || null;
+                      const selectedUser = rows?.find((user) => user.id === field.value);
 
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                           <Autocomplete
                             value={selectedUser}
                             onChange={(_, value) => field.onChange(value ? value.id : '')}
+                            onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
                             options={rows || []}
                             getOptionLabel={(option) => option.name || ''}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -284,6 +297,7 @@ const AddCaseForm = () => {
                           <Autocomplete
                             value={selectedService}
                             onChange={(_, value) => field.onChange(value ? value._id : '')}
+                            onInputChange={(_, newInputValue) => setSearchQueryService(newInputValue)}
                             options={services || []}
                             getOptionLabel={(option) => option.name || ''}
                             isOptionEqualToValue={(option, value) => option._id === value._id}

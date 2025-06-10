@@ -497,10 +497,8 @@ const TabbedDataGrid = () => {
                         p: 0,
                         border: 'none',
                         borderRadius: '0',
-                        height: 'auto',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        overflow: 'hidden'
+                        height: '200px',
+                        overflowY: 'auto'
                       }}
                     >
                       {cardBodyContent(
@@ -594,7 +592,7 @@ const TabbedDataGrid = () => {
               disabled={loading}
               onClick={handleSaveConfiguration}
             >
-              {loading ? 'Saving...' : editMode ? 'UPDATE' : 'SAVE CHANGES'}
+              {loading ? 'Saving...' : 'SAVE CHANGES'}
             </Button>
 
             <Button

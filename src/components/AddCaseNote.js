@@ -10,7 +10,7 @@ import { getApi, postApi } from 'common/apiClient.js';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-import {decodedToken} from 'utils/adminData.js';
+import { decodedToken } from 'utils/adminData.js';
 
 const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add Case Note', initialData = null, caseid }) => {
   const [formData, setFormData] = useState({
@@ -25,9 +25,9 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   });
 
   const [contactPurposeEntry, setContactPurposeEntry] = useState([]);
-  const [errors, setErrors] = useState({ notes: '', subject: '' });
+  const [errors, setErrors] = useState({ notes: '', subject: '', time: '' });
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const fileInputRef = useRef();
   useEffect(() => {
     if (initialData) setFormData(initialData);
@@ -57,6 +57,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleFileChange = (e) => {
@@ -71,9 +72,19 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   };
 
   const handleSubmit = async () => {
+    const newErrors = {};
+
+    if (!formData.time) newErrors.time = 'Time is required';
+    if (!formData.notes?.trim()) newErrors.notes = 'Case Notes are required';
+    if (!formData.subject?.trim()) newErrors.subject = 'Subject is required';
+    if (!formData.contactPurpose) newErrors.contactPurpose = 'Contact Purpose is required';
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
     setIsLoading(true);
     try {
-
       const UserByCreatedBy = decodedToken?.id;
       const form = new FormData();
 
@@ -84,8 +95,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
       form.append('isActive', formData.toggle);
       form.append('caseId', formData.caseId);
       form.append('configurationId', formData.contactPurpose);
-      form.append('createdBy',UserByCreatedBy)
-      
+      form.append('createdBy', UserByCreatedBy);
+
       if (formData.file) {
         form.append('file', formData.file);
       }
@@ -146,7 +157,10 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
               InputLabelProps={{ shrink: true }}
               inputProps={{ step: 300 }}
               value={formData.time || ''}
-              onChange={(e) => setFormData((prev) => ({ ...prev, time: e.target.value }))}
+              name="time"
+              onChange={handleChange}
+              error={Boolean(errors.time)}
+              helperText={errors.time}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -158,6 +172,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
               name="contactPurpose"
               value={formData.contactPurpose}
               onChange={handleChange}
+              error={Boolean(errors.contactPurpose)}
+              helperText={errors.contactPurpose}
             >
               {contactPurposeEntry?.map((option) => (
                 <MenuItem key={option._id} value={option._id}>
@@ -205,7 +221,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
           onChange={handleChange}
           sx={{ mb: 2 }}
           inputProps={{ maxLength: 100 }}
-          error={formData.notes.length > 100}
+          error={Boolean(errors.notes) || formData.notes.length > 100}
+          helperText={errors.notes || (formData.notes.length > 100 ? 'Max 100 characters allowed' : '')}
         />
 
         <TextField
@@ -219,7 +236,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
           onChange={handleChange}
           sx={{ mb: 2 }}
           inputProps={{ maxLength: 50 }}
-          error={formData.subject.length > 50}
+          error={Boolean(errors.subject) || formData.subject.length > 50}
+          helperText={errors.subject || (formData.subject.length > 50 ? 'Max 50 characters allowed' : '')}
         />
 
         <Box mt={1} display="flex" justifyContent="space-between" alignItems="center">

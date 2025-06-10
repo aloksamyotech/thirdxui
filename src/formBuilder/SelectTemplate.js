@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 // import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 const templates = [
     { id: 1, src: t1, alt: "Template 1" },

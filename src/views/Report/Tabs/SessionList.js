@@ -11,8 +11,9 @@ import { useEffect } from 'react';
 import dayjs from 'dayjs';
 import CheckIcon from '@mui/icons-material/Check';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import config from '../../../config';
 
-const CaseList = () => {
+const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter1 }) => {
   const [rows, setRows] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -23,24 +24,62 @@ const CaseList = () => {
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFiltered, setIsFiltered] = useState(false);
+  const [countriesWithFlags, setCountriesWithFlags] = useState([]);
+
+  useEffect(() => {
+    fetch(config.country)
+      .then((res) => res.json())
+      .then((data) => {
+        const countries = data.map((country) => ({
+          value: country.cca2,
+          label: country.name.common,
+          flag: country.flags.png
+        }));
+        setCountriesWithFlags(countries);
+      });
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getApi(
-          `${urls.session.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
-        );
+        const queryParams = new URLSearchParams({
+          page: paginationModel.page + 1,
+          limit: paginationModel.pageSize
+        });
+
+        if (countryOfOriginFilter) {
+          const selectedCountry = countriesWithFlags.find((country) => country.value === countryOfOriginFilter);
+          if (selectedCountry) {
+            queryParams.append('country', selectedCountry.label);
+          }
+        }
+
+        if (selectedName) {
+          queryParams.append('name', selectedName);
+        }
+
+        if (status) queryParams.append('status', status === 'active');
+
+        if (caseId) queryParams.append('uniqueId', caseId);
+
+        if (dateOpenedFilter1 && dateOpenedFilter1 !== '') {
+          const formattedDate = new Date(dateOpenedFilter1).toISOString().split('T')[0];
+          queryParams.append('date', formattedDate);
+        }
+
+        const response = await getApi(`${urls.session.fetchWithPagination}?${queryParams.toString()}`);
 
         const data = response?.data?.data || [];
         const pagination = response?.data?.meta || { total: 0 };
 
         const transformedRows = data.map((item, index) => {
-          const emergencyContact = item?.serviceuser?.emergencyContact || {};
-          const fullName = `${emergencyContact.firstName || ''} ${emergencyContact.lastName || ''}`.trim();
+          const personalInfo = item?.serviceuser?.personalInfo || {};
+          const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim();
+          const caseid = item?.serviceuser?.uniqueId;
 
           return {
             id: item._id || index,
-            caseid: '-',
+            caseid: caseid || '-',
             serviceUser: fullName || '-',
             dob: item.date ? dayjs(item.date).format('DD/MM/YYYY') : '-',
             status: item.isActive ? 'Open' : 'Closed',
@@ -61,7 +100,7 @@ const CaseList = () => {
     };
 
     fetchData();
-  }, [paginationModel]);
+  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter1]);
 
   const handleFilter = async () => {
     try {
@@ -300,7 +339,7 @@ const CaseList = () => {
           paginationMode="server"
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[10]}
+          pageSizeOptions={[5, 10, 25, 50]}
           rowHeight={65}
           getRowId={(row) => row.id}
           slots={{

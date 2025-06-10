@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Grid, TextField, Card, CardContent, CardHeader, Tabs, Tab, Box, Typography, MenuItem, Button } from '@mui/material';
+import { Grid, TextField, Card, CardContent, CardHeader, Tabs, Tab, Box, Typography, MenuItem, Button, Autocomplete } from '@mui/material';
 import { FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
@@ -16,6 +16,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [serviceType, setServiceType] = useState([]);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [donorData, setDonorData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const {
     handleSubmit,
@@ -29,8 +30,14 @@ const AddCaseForm = ({ onCancel }) => {
   useEffect(() => {
     const fetchDonors = async () => {
       try {
-        const response = await getApi(urls.serviceuser.getalldonor);
-        const allDonors = response.data.allDonor || [];
+        const queryParams = new URLSearchParams();
+        if (searchQuery && searchQuery !== '') {
+          queryParams.append('search', searchQuery);
+        }
+        queryParams.append('role', 'donor');
+
+        const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+        const allDonors = response.data.data || [];
 
         const activeDonors = allDonors
           .filter((donor) => donor.isActive)
@@ -55,7 +62,7 @@ const AddCaseForm = ({ onCancel }) => {
     };
 
     fetchDonors();
-  }, []);
+  }, [searchQuery]);
 
   const onSubmit = async (data) => {
     try {
@@ -151,21 +158,34 @@ const AddCaseForm = ({ onCancel }) => {
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                           <FormControl fullWidth size="small" error={!!errors.assignedTo}>
-                            <InputLabel id="assigned-to-label">Assigned To</InputLabel>
-                            <Select
-                              labelId="assigned-to-label"
-                              id="assigned-to"
-                              label="Assigned To"
-                              defaultValue=""
-                              {...register('assignedTo', { required: 'Assigned donor is required' })}
-                            >
-                              {donorData.map((donor) => (
-                                <MenuItem key={donor.value} value={donor.value}>
-                                  {donor.label}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                            <FormHelperText>{errors.assignedTo?.message}</FormHelperText>
+                            <Controller
+                              name="assignedTo"
+                              control={control}
+                              rules={{ required: 'Campaign is required' }}
+                              render={({ field }) => (
+
+                                <Autocomplete
+                                  {...field}
+                                  size='small'
+                                  id="assigned-to"
+                                  options={donorData}
+                                  getOptionLabel={(option) => option.label}
+                                  onChange={(event, value) => {
+                                    setValue('assignedTo', value ? value.value : '');
+                                  }}
+                                  onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      label="Assigned To"
+                                      error={!!errors.assignedTo}
+                                      helperText={errors.assignedTo?.message}
+                                    />
+                                  )}
+                                  defaultValue={null}
+                                />
+                              )}
+                            />
                           </FormControl>
                         </Grid>
 

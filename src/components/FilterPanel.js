@@ -105,7 +105,7 @@ const FilterPanel = ({
 }) => {
   useEffect(() => {
     if (!dateAddedFilter || !setDateAddedFilter) return;
-    setDateAddedFilter(dayjs());
+    setDateAddedFilter(null);
   }, [dateAddedFilter, setDateAddedFilter]);
 
   const handleReset = () => {
@@ -391,47 +391,51 @@ const FilterPanel = ({
           {selectedFilters?.map((filterKey) => {
             const filter = filterMapping[filterKey];
             if (!filter) return null;
-
             if (filter.type === 'date') {
               return (
-                <>
-                  <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label={filter.label}
-                      value={filter.value || dayjs()}
-                      onChange={(newValue) => filter.onChange(newValue)}
-                      renderInput={(params) => <TextField {...params} fullWidth size="small" />}
-                      PopperProps={{
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, 8]
-                            }
-                          }
-                        ],
-                        sx: {
-                          '& .MuiPaper-root': {
-                            width: 220,
-                            height: 320,
-                            marginLeft: '50px',
-                            overflow: 'hidden' 
-                          },
-                          '& .MuiCalendarPicker-root': {
-                            width: 240,
-                            height: 320,
-                            margin: 0,
-                            overflow: 'hidden' 
-                          },
-                          '& .MuiPickersFadeTransitionGroup-root': {
-                            width: 220,
-                            overflow: 'hidden'
+                <LocalizationProvider key={filterKey} dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={filter.label}
+                    value={filter.value || null}
+                    onChange={(newValue) => {
+                      if (newValue) {
+                        const formattedDate = newValue.format('YYYY-MM-DD');
+                        filter.onChange(formattedDate);
+                      } else {
+                        filter.onChange(null);
+                      }
+                    }}
+                    renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                    PopperProps={{
+                      modifiers: [
+                        {
+                          name: 'offset',
+                          options: {
+                            offset: [0, 8]
                           }
                         }
-                      }}
-                    />
-                  </LocalizationProvider>
-                </>
+                      ],
+                      sx: {
+                        '& .MuiPaper-root': {
+                          width: 220,
+                          height: 320,
+                          marginLeft: '50px',
+                          overflow: 'hidden'
+                        },
+                        '& .MuiCalendarPicker-root': {
+                          width: 240,
+                          height: 320,
+                          margin: 0,
+                          overflow: 'hidden'
+                        },
+                        '& .MuiPickersFadeTransitionGroup-root': {
+                          width: 220,
+                          overflow: 'hidden'
+                        }
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
               );
             }
 

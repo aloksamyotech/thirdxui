@@ -15,8 +15,6 @@ import NotificationSection from './NotificationSection';
 // assets
 import { IconChevronsLeft } from '@tabler/icons';
 
-// ==============================|| MAIN NAVBAR / HEADER ||============================== //
-
 const getFormattedDate = (date) => {
   const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   let formattedDate = date.toLocaleDateString('en-GB', options);
@@ -88,7 +86,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
         </Typography>
       </Box>
       <Box sx={{ flexGrow: 1, flexDirection: 'column', alignItems: 'left', justifyContent: 'left' }}>
-        <Typography variant="h6" sx={{ fontWeight: 300, fontSize: '14px', textAlign: 'left' }}>
+        <Typography variant="h6" sx={{ fontWeight: 300, fontSize: '12px', textAlign: 'left' }}>
           Today is
         </Typography>
         <ButtonBase onClick={() => datePickerRef.current.setOpen(true)} sx={{ cursor: 'pointer', textDecoration: 'none' }}>
@@ -100,12 +98,11 @@ const Header = ({ handleLeftDrawerToggle }) => {
             id="date-picker"
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
-            customInput={<></>} 
-            ref={datePickerRef} 
+            customInput={<></>}
+            ref={datePickerRef}
           />
         </ButtonBase>
       </Box>
-      {/* Profile & Notifications */}
       <NotificationSection />
       <ProfileSection />
     </>

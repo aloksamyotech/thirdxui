@@ -55,7 +55,7 @@ const AuthRegister = ({ ...others }) => {
         toast.error('Login failed due to network or server error');
       }
     },
-    onError: () => toast.error('Login failed'),
+    onError: () => toast.error('Login failed')
   });
 
   return (
@@ -80,8 +80,8 @@ const AuthRegister = ({ ...others }) => {
         try {
           setLoading(true);
           const response = await postApi(`${urls.login.register}`, values);
-          if (response?.data?.statusCode == 404) {
-            toast.warn(response?.message || 'User already exists');
+          if (response?.data?.statusCode == 400) {
+            toast.error(response?.message || 'User already exists');
           } else if (response?.success) {
             toast.success('User Registered Successfully');
             setTimeout(() => {
@@ -105,7 +105,7 @@ const AuthRegister = ({ ...others }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Email Address"
+                label="Email"
                 margin="normal"
                 size="small"
                 name="email"
@@ -131,7 +131,7 @@ const AuthRegister = ({ ...others }) => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="UserName"
+                label="Username"
                 margin="normal"
                 size="small"
                 name="userName"
@@ -243,9 +243,7 @@ const AuthRegister = ({ ...others }) => {
                 onBlur={handleBlur}
                 style={{ marginRight: '8px' }}
               />
-              <Typography variant="body2">
-                I Agree to privacy policy & terms
-              </Typography>
+              <Typography variant="body2">I Agree to privacy policy & terms</Typography>
             </Box>
             {touched.acceptTerms && errors.acceptTerms && <FormHelperText>{errors.acceptTerms}</FormHelperText>}
           </FormControl>

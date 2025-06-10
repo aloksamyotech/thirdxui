@@ -32,6 +32,7 @@ import { urls } from 'common/urls';
 import { getApi, updateApi } from 'common/apiClient';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import toast from 'react-hot-toast';
+import config from '../../config';
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
@@ -176,7 +177,7 @@ const User = () => {
   ];
 
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

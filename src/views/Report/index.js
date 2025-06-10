@@ -9,6 +9,7 @@ import Donor from './Tabs/Donor';
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
+import config from '../../config';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -55,7 +56,7 @@ const Report = () => {
   };
 
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

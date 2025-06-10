@@ -27,7 +27,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
   const [countriesWithFlags, setCountriesWithFlags] = useState([]);
 
   useEffect(() => {
-    fetch(config.country)
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({
@@ -70,12 +70,15 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
         const response = await getApi(`${urls.session.fetchWithPagination}?${queryParams.toString()}`);
 
         const data = response?.data?.data || [];
+
         const pagination = response?.data?.meta || { total: 0 };
 
         const transformedRows = data.map((item, index) => {
           const personalInfo = item?.serviceuser?.personalInfo || {};
           const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim();
           const caseid = item?.serviceuser?.uniqueId;
+          const countryName = item?.country || '-';
+          const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
 
           return {
             id: item._id || index,
@@ -84,6 +87,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
             dob: item.date ? dayjs(item.date).format('DD/MM/YYYY') : '-',
             status: item.isActive ? 'Open' : 'Closed',
             country: item.country || '-',
+            countryFlag: matchedCountry?.flag || '',
             ethicity: item.ethnicity || '-',
             owner: item.owner || '-'
           };
@@ -100,7 +104,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
     };
 
     fetchData();
-  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter1]);
+  }, [countriesWithFlags, paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter1]);
 
   const handleFilter = async () => {
     try {
@@ -225,7 +229,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
       flex: 1,
       renderCell: (params) => (
         <Stack direction="row" alignItems="center">
-          <img src={flag} alt="flag" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+          <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
           <Typography sx={{ ml: '5px', fontSize: '12px' }}>{params?.value || '-'}</Typography>
         </Stack>
       )

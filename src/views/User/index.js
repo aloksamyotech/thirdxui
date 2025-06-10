@@ -32,6 +32,7 @@ import { urls } from 'common/urls';
 import { getApi, updateApi } from 'common/apiClient';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import toast from 'react-hot-toast';
+import config from '../../config';
 
 const User = () => {
   const [showForm, setShowForm] = useState(false);
@@ -123,7 +124,14 @@ const User = () => {
           <IconButton color="error" size="small" onClick={() => handleDelete(params.row.id)}>
             <IconTrash color="orangered" size={18} />
           </IconButton>
-          <IconButton color="error" size="small" onClick={() => navigate('/add-user', { state: allData })}>
+          <IconButton
+            color="error"
+            size="small"
+            onClick={() => {
+              const fullUser = allData.find((user) => user._id === params.row.id);
+              navigate('/add-user', { state: fullUser });
+            }}
+          >
             <IconPencil color="orangered" size={18} />
           </IconButton>
         </Box>
@@ -176,7 +184,7 @@ const User = () => {
   ];
 
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

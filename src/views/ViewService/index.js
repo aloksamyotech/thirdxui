@@ -26,6 +26,7 @@ import { imageUrl } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { toast } from 'react-hot-toast';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+import config from '../../config';
 
 const ViewService = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const ViewService = () => {
   };
 
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

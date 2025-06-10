@@ -35,6 +35,7 @@ import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
 import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import config from '../../config';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   const location = useLocation();
   const userdata = location?.state;
-  const editdata = userdata?.[0] || null;
+  const editdata = userdata || null;
 
   const {
     register,
@@ -177,7 +178,7 @@ const AddCaseForm = ({ onCancel }) => {
   ];
 
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

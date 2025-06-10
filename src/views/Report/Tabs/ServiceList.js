@@ -76,9 +76,7 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
       width: 150,
       renderCell: (params) => (
         <Stack direction="row">
-          {params.row.countryFlag && (
-            <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
-          )}
+          <img src={params.row.countryFlag} alt={params.row.country} style={{ width: 20, height: 20, objectFit: 'contain' }} />
           <Typography sx={{ fontSize: '12px', ml: '5px' }}>{params.row.country || '-'}</Typography>
         </Stack>
       )
@@ -104,7 +102,7 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
   ];
 
   useEffect(() => {
-    fetch(config.country)
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({
@@ -208,7 +206,6 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
         const countryName = user?.contactInfo?.country || '-';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
         const uniqueId = user?.uniqueId;
-
         return {
           id: user._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,

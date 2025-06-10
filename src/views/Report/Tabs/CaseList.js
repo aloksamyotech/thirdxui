@@ -123,7 +123,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
     );
   };
   useEffect(() => {
-    fetch(config.country)
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({
@@ -207,7 +207,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
 
   useEffect(() => {
     fetchInitialData();
-  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
+  }, [countriesWithFlags, paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
 
   return (
     <>

@@ -25,6 +25,7 @@ import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { useLocation } from 'react-router-dom';
+import config from '../../config';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -278,7 +279,7 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   useEffect(() => {
-    fetch('https://restcountries.com/v3.1/all')
+    fetch(config.filter_Country)
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({

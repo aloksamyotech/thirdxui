@@ -93,16 +93,12 @@ const EmployeeDetails = () => {
       confirmPassword: ''
     },
     validationSchema: Yup.object({
-      password: Yup.string()
-        .required('Current password is required'),
-        // .min(8, 'Must be at least 8 characters'),
+      password: Yup.string().required('Current password is required'),
+      // .min(8, 'Must be at least 8 characters'),
       newPassword: Yup.string()
         .required('New password is required')
         .min(8, 'Must be at least 8 characters')
-        .matches(
-          passwordRules,
-          'Password must include uppercase, lowercase, number, and special character'
-        ),
+        .matches(passwordRules, 'Password must include uppercase, lowercase, number, and special character'),
       confirmPassword: Yup.string()
         .required('Please confirm your new password')
         .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
@@ -494,7 +490,19 @@ const EmployeeDetails = () => {
                       <Button variant="contained" sx={{ backgroundColor: '#053146' }} onClick={formik.handleSubmit}>
                         CHANGE PASSWORD
                       </Button>
-                      <Button variant="outlined" color="error" onClick={formik.resetForm}>
+                      <Button
+                        variant="outlined"
+                        onClick={formik.resetForm}
+                        sx={{
+                          border: '1px solid #6467c2',
+                          color: '#6467c2',
+                          '&:hover': {
+                            border: '1px solid #4d50a0',
+                            backgroundColor: '#f4f5ff',
+                            color: '#4d50a0'
+                          }
+                        }}
+                      >
                         CANCEL
                       </Button>
                     </Stack>

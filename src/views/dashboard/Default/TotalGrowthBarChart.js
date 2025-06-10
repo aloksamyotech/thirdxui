@@ -56,7 +56,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
         opposite: true,
         title: {
           text: 'Social Media',
-          style:  { color: '#9D9D9D', fontWeight: 400 }
+          style: { color: '#9D9D9D', fontWeight: 400 }
         },
         max: 40,
         labels: {
@@ -105,20 +105,6 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                 </Typography>
 
                 <Stack direction="row" spacing={2}>
-                  <Select value="Borough" size="small" sx={{ minWidth: 120 }}>
-                    <MenuItem value="Borough" disabled>
-                      Borough
-                    </MenuItem>
-                    <MenuItem value="arun_district">Adur and Worthing Borough</MenuItem>
-                    <MenuItem value="arun_district">Adur District</MenuItem>
-                    <MenuItem value="amber_valley">Amber Valley Borough</MenuItem>
-                    <MenuItem value="arun_district">Arun District</MenuItem>
-                    <MenuItem value="ashford_borough">Ashford Borough</MenuItem>
-                    <MenuItem value="babergh_district">Babergh District</MenuItem>
-                    <MenuItem value="ashfield_district">Ashfield District</MenuItem>
-                    <MenuItem value="basildon_borough">Basildon Borough</MenuItem>
-                  </Select>
-
                   <Select value="This Week" size="small" sx={{ minWidth: 120 }}>
                     <MenuItem value="This Week">This Week</MenuItem>
                     <MenuItem value="This Month">This Month</MenuItem>

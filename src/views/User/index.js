@@ -124,7 +124,14 @@ const User = () => {
           <IconButton color="error" size="small" onClick={() => handleDelete(params.row.id)}>
             <IconTrash color="orangered" size={18} />
           </IconButton>
-          <IconButton color="error" size="small" onClick={() => navigate('/add-user', { state: allData })}>
+          <IconButton
+            color="error"
+            size="small"
+            onClick={() => {
+              const fullUser = allData.find((user) => user._id === params.row.id);
+              navigate('/add-user', { state: fullUser });
+            }}
+          >
             <IconPencil color="orangered" size={18} />
           </IconButton>
         </Box>

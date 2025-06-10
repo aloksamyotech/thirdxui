@@ -206,7 +206,6 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
         const countryName = user?.contactInfo?.country || '-';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
         const uniqueId = user?.uniqueId;
-        console.log(countryName);
         return {
           id: user._id,
           serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,

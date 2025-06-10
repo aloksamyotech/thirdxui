@@ -106,7 +106,7 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({
-          value: country.cca2,
+          value: country.name.common,
           label: country.name.common,
           flag: country.flags.png
         }));

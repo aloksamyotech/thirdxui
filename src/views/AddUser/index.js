@@ -54,7 +54,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   const location = useLocation();
   const userdata = location?.state;
-  const editdata = userdata?.[0] || null;
+  const editdata = userdata || null;
 
   const {
     register,

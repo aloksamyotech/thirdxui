@@ -60,9 +60,9 @@ const Report = () => {
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({
-          value: country.cca2,
-          label: country.name.common,
-          flag: country.flags.png
+          value: country?.name?.common,
+          label: country?.name?.common,
+          flag: country?.flags?.png
         }));
         setCountriesWithFlags(countries);
       });

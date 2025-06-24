@@ -105,7 +105,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                 </Typography>
 
                 <Stack direction="row" spacing={2}>
-                  <Select value="This Week" size="small" sx={{ minWidth: 120 }}>
+                  <Select value="This Week" size="small" sx={{ minWidth: 120 }} onPointerDown={(e) => e.stopPropagation()}>
                     <MenuItem value="This Week">This Week</MenuItem>
                     <MenuItem value="This Month">This Month</MenuItem>
                     <MenuItem value="This Year">This Year</MenuItem>

@@ -411,27 +411,62 @@ const AddCaseForm = () => {
                   <Controller
                     name="serviceStatus"
                     control={control}
+                    defaultValue="pending"
                     render={({ field }) => (
                       <FormControl fullWidth size="small" error={!!errors.serviceStatus}>
-                        <InputLabel id="status-label">Service Status</InputLabel>
-                        <Select {...field} labelId="status-label" label="Service Status">
-                          <MenuItem value="true">
+                        <InputLabel id="status-label">Case Status</InputLabel>
+                        <Select
+                          {...field}
+                          labelId="status-label"
+                          label="Case Status"
+                          value={field.value || 'pending'}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 200
+                              }
+                            }
+                          }}
+                          sx={{
+                            '.MuiSelect-select': {
+                              padding: '1px 1px',
+                              fontSize: '0.750rem'
+                            }
+                          }}
+                        >
+                          <MenuItem value="open">
                             <Chip
-                              label="Active"
+                              label="Open"
                               sx={{
-                                color: '#79dbfb',
-                                backgroundColor: '#e5f8fe',
-                                fontWeight: 500
+                                color: '#4caf50',
+                                backgroundColor: '#e8f5e9',
+                                fontWeight: 500,
+                                padding: '1px 1px',
+                                fontSize: '0.750rem'
                               }}
                             />
                           </MenuItem>
-                          <MenuItem value="false">
+                          <MenuItem value="close">
                             <Chip
-                              label="Inactive"
+                              label="Close"
                               sx={{
-                                color: '#ff6a67',
-                                backgroundColor: '#ffeae9',
-                                fontWeight: 500
+                                color: '#ff9800',
+                                backgroundColor: '#fff3e0',
+                                fontWeight: 500,
+                                padding: '1px 1px',
+                                fontSize: '0.750rem'
+                              }}
+                            />
+                          </MenuItem>
+                          <MenuItem value="pending">
+                            <Chip
+                              label="Pending"
+                              sx={{
+                                color: '#2196f3',
+                                backgroundColor: '#e3f2fd',
+                                fontWeight: 500,
+                                padding: '1px 1px',
+                                fontSize: '0.750rem'
                               }}
                             />
                           </MenuItem>

@@ -120,7 +120,6 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
     fetchTasks();
   }, []);
   useEffect(() => {
-
     if (location.state?.taskAdded) {
       fetchTasks();
     }
@@ -160,7 +159,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
     <>
       <Box
         sx={{
-          height: '400px',
+          height: '430px',
           bgcolor: '#fff',
           borderRadius: 2,
           boxShadow: '0 1px 6px rgba(0,0,0,0.1)'
@@ -171,7 +170,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
             My Task
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
-            <Select value="This Week" size="small">
+            <Select value="This Week" size="small" onPointerDown={(e) => e.stopPropagation()}>
               <MenuItem value="This Week">This Week</MenuItem>
               <MenuItem value="This Month">This Month</MenuItem>
               <MenuItem value="This Year">This Year</MenuItem>
@@ -180,6 +179,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               variant="outlined"
               placeholder="Search"
               size="small"
+              onPointerDown={(e) => e.stopPropagation()}
               sx={{
                 maxWidth: 120,
                 '& input::placeholder': {
@@ -260,6 +260,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               value={task.details}
               onChange={handleChange('details')}
               size="small"
+              onPointerDown={(e) => e.stopPropagation()}
             />
             <TextField
               select
@@ -268,6 +269,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               value={task.assignedTo}
               onChange={(e) => setTask((prev) => ({ ...prev, assignedTo: e.target.value }))}
               size="small"
+              onPointerDown={(e) => e.stopPropagation()}
             >
               {adminList.map((admin) => (
                 <MenuItem key={admin._id} value={admin._id}>
@@ -283,18 +285,19 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               onChange={handleChange('dueDate')}
               size="small"
               InputLabelProps={{ shrink: true }}
+              onPointerDown={(e) => e.stopPropagation()}
             />
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Typography fontWeight={600}>Completed</Typography>
-                  <Switch checked={task.isCompleted} onChange={handleSwitch('isCompleted')} />
+                  <Switch checked={task.isCompleted} onChange={handleSwitch('isCompleted')} onPointerDown={(e) => e.stopPropagation()} />
                 </Stack>
               </Grid>
               <Grid item>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Typography fontWeight={600}>Send Notification</Typography>
-                  <Switch checked={task.notification} onChange={handleSwitch('notification')} />
+                  <Switch checked={task.notification} onChange={handleSwitch('notification')} onPointerDown={(e) => e.stopPropagation()} />
                 </Stack>
               </Grid>
             </Grid>
@@ -306,6 +309,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
             fullWidth
             onClick={handleSubmit}
             startIcon={<AddIcon />}
+            onPointerDown={(e) => e.stopPropagation()}
             sx={{
               backgroundColor: '#1976d2',
               color: '#fff',
@@ -357,6 +361,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
           <Button
             onClick={() => setConfirmOpen(false)}
             variant="outlined"
+            onPointerDown={(e) => e.stopPropagation()}
             sx={{
               color: '#FF5C5C',
               borderColor: '#FF5C5C',
@@ -370,6 +375,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
           <Button
             onClick={() => handleConfirmDelete(deleteTask)}
             variant="contained"
+            onPointerDown={(e) => e.stopPropagation()}
             sx={{
               backgroundColor: '#053046',
               color: '#efeceb',
@@ -418,7 +424,7 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
       }}
     >
       <FormControlLabel
-        control={<Checkbox checked={checked} onChange={onChange} />}
+        control={<Checkbox checked={checked} onChange={onChange} onPointerDown={(e) => e.stopPropagation()} />}
         label={
           <Typography variant="body2" sx={{ m: 0 }}>
             Call due for {task?.assignedTo?.userName} on <strong>{formatDate(task?.dueDate)}</strong>
@@ -427,10 +433,10 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
       />
 
       <Box>
-        <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit}>
+        <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit} onPointerDown={(e) => e.stopPropagation()}>
           <Iconify icon={'eva:edit-fill'} />
         </IconButton>
-        <IconButton size="large" color="error" onClick={onDelete}>
+        <IconButton size="large" color="error" onClick={onDelete} onPointerDown={(e) => e.stopPropagation()}>
           <Iconify icon={'eva:trash-2-outline'} />
         </IconButton>
       </Box>

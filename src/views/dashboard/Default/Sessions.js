@@ -81,6 +81,7 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
               variant="contained"
               size="small"
               onClick={handleEditClick}
+              onPointerDown={(e) => e.stopPropagation()}
               sx={{
                 backgroundColor: '#1B4B66',
                 textTransform: 'none',
@@ -101,6 +102,7 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
               variant="outlined"
               size="small"
               onClick={handleAddAttendeesClick}
+              onPointerDown={(e) => e.stopPropagation()}
               sx={{
                 textTransform: 'none',
                 fontSize: 8,
@@ -121,7 +123,7 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
             </Button>
 
             <IconButton size="small">
-              <InfoIcon fontSize="small" sx={{ color: '#49494c' }} />
+              <InfoIcon fontSize="small" sx={{ color: '#49494c' }} onPointerDown={(e) => e.stopPropagation()} />
             </IconButton>
           </Stack>
         </Grid>
@@ -186,7 +188,7 @@ const Sessions = () => {
         <Typography variant="h5" fontWeight={500} fontSize={14}>
           Current Sessions
         </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap">
+        <Stack direction="row" spacing={1} flexWrap="wrap" onPointerDown={(e) => e.stopPropagation()}>
           <Select value="This Week" size="small">
             <MenuItem value="This Week">This Week</MenuItem>
             <MenuItem value="This Month">This Month</MenuItem>
@@ -196,6 +198,7 @@ const Sessions = () => {
             variant="outlined"
             placeholder="Search"
             size="small"
+            onPointerDown={(e) => e.stopPropagation()}
             sx={{
               maxWidth: 120,
               '& input::placeholder': {

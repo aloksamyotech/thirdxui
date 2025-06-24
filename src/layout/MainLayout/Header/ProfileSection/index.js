@@ -64,8 +64,10 @@ const ProfileSection = () => {
   const anchorRef = useRef(null);
   const handleLogout = async () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('dashboard_components_order');
     navigate('/login');
   };
+
   const [taskList, setTaskList] = useState([]);
   const initialTaskState = {
     details: '',

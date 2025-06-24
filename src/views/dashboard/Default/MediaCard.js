@@ -28,13 +28,13 @@ const Card = () => {
   );
 
   return (
-    <Box sx={{ bgcolor: '#fff', p: 1, borderRadius: '10px', height: 'auto' }}>
+    <Box sx={{ bgcolor: '#fff', p: 1, borderRadius: '10px',height: '430px' }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', p: '10px' }}>
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
           Recent Media
         </Typography>
         <Stack direction="row" spacing={1}>
-          <Select value="This Week" size="small">
+          <Select value="This Week" size="small" onPointerDown={(e) => e.stopPropagation()}>
             <MenuItem value="This Week">This Week</MenuItem>
             <MenuItem value="This Month">This Month</MenuItem>
             <MenuItem value="This Year">This Year</MenuItem>
@@ -53,6 +53,7 @@ const Card = () => {
             }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -105,7 +106,7 @@ const Card = () => {
                   </Typography>
                 </Stack>
               </Stack>
-              <InfoIcon sx={{ color: '#49494c' }} />
+              <InfoIcon sx={{ color: '#49494c' }} onPointerDown={(e) => e.stopPropagation()} />
             </Stack>
             <Divider />
           </React.Fragment>

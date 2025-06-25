@@ -31,7 +31,7 @@ export default function UserProfileDialog({ open, handleClose, user, userView })
           <Grid container alignItems="center" spacing={2}>
             <Grid item>
               <img
-                src={userView ? (userView.startsWith('https://') ? userView : `${imageUrl}${userView}`) : userProfile}
+                src={userView ? (userView.startsWith('https://') ? userView : `${userView}`) : userProfile}
                 alt={user?.name}
                 style={{ width: 64, height: 64, borderRadius: '50%' }}
               />

@@ -40,6 +40,7 @@ const AddTag = Loadable(lazy(() => import('views/AddTag')));
 const AddSession = Loadable(lazy(() => import('views/AddSession')));
 const ViewCase = Loadable(lazy(() => import('views/ViewCase')));
 const ViewSession = Loadable(lazy(() => import('views/ViewSession')));
+const ViewServices = Loadable(lazy(() => import('views/viewServices')));
 const Attendees = Loadable(lazy(() => import('views/Attendees')));
 const ViewDonor = Loadable(lazy(() => import('views/ViewDonor')));
 const ViewSubmission = Loadable(lazy(() => import('views/ViewSubmission')));
@@ -204,6 +205,10 @@ const MainRoutes = {
         {
           path: 'view-case',
           element: <ViewCase />
+        },
+        {
+          path: 'view-serviceDetails',
+          element: <ViewServices />
         },
         {
           path: 'view-session',

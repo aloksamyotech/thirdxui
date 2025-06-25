@@ -172,7 +172,7 @@ const AddCaseForm = () => {
       });
 
       formData.append('description', data.description || '');
-      formData.append('isActive', data.serviceStatus);
+      formData.append('status', data.serviceStatus);
 
       if (data.file) {
         formData.append('file', data.file);

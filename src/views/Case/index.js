@@ -177,7 +177,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
+          owner: user?.caseOwner?.personalInfo?.firstName || '',
           status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });
@@ -223,7 +223,8 @@ const Case = () => {
       const formattedUsers = allCases?.map((user, index) => {
         const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
         const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
-
+        const caseOwnerFirstName = user?.caseOwner?.personalInfo?.firstName || '';
+        const caseOwnerLastName = user?.caseOwner?.personalInfo?.lastName || '';
         return {
           id: user?._id,
           serialNumber: user?.uniqueId,
@@ -231,7 +232,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
+          owner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
           status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });

@@ -307,7 +307,7 @@ const CaseDetailsPage = () => {
     };
     fetchData();
   }, []);
-
+  
   return (
     <>
       <Box>
@@ -463,16 +463,19 @@ const CaseDetailsPage = () => {
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>RD-758</TableCell>
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                            {serviceuserDetails?.personalInfo?.firstName || ''}
+                            {serviceuserDetails?.personalInfo?.firstName || '-'}
                           </Typography>
                           <Typography variant="body2" sx={{ fontSize: '12px' }}>
                             {serviceuserDetails?.personalInfo?.lastName || ''}
                           </Typography>
                         </TableCell>
 
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none', whiteSpace: 'normal' }}>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                            {caseData?.serviceType || ''}
+                            {caseData?.caseOwnerDetails?.[0]?.personalInfo?.firstName || '-'}
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+                            {caseData?.caseOwnerDetails?.[0]?.personalInfo?.lastName || ''}
                           </Typography>
                         </TableCell>
 

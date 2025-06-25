@@ -9,7 +9,7 @@ import GoogleMap from '../../components/GoogleMap';
 const Map = () => {
 
   return (
-    <Box sx={{ bgcolor: '#fff', borderRadius: '10px', overflow: 'hidden', height: '300px' }}>
+    <Box sx={{ bgcolor: '#fff', borderRadius: '10px', overflow: 'hidden', height: '430px' }}>
       <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '20px' }}>
         <Typography variant="h5" sx={{ fontSize: '12px' }}>
           Where We Have Deliver Session ?

@@ -5,12 +5,14 @@ import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
 import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
+import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
 import { useNavigate } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import { maxWidth } from '@mui/system';
 
 const Case = () => {
   const navigate = useNavigate();
@@ -97,27 +99,98 @@ const Case = () => {
       width: 90,
       valueGetter: (params) => params.value || '-'
     },
+
     {
       field: 'status',
       headerName: 'Status',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          label={params.value || '-'}
-          variant="outlined"
-          icon={params.value === 'Open' ? <CheckIcon /> : params.value ? <LoopIcon /> : null}
-          sx={{
-            padding: '0px',
-            height: '24px',
-            minHeight: 'unset',
-            margin: '0px',
-            fontSize: '12px',
-            borderRadius: '12px',
-            borderColor: 'gray',
-            backgroundColor: 'transparent'
-          }}
-        />
-      )
+      width: 140,
+      renderCell: (params) => {
+        const status = params.value?.toLowerCase();
+        let icon = null;
+        let color = '';
+        let bgColor = '';
+
+        const iconSize = 16;
+
+        switch (status) {
+          case 'open':
+            icon = (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: iconSize,
+                  color: '#2e7d32'
+                }}
+              >
+                <CheckIcon fontSize="inherit" />
+              </Box>
+            );
+            color = '#2e7d32';
+            bgColor = '#e8f5e9';
+            break;
+          case 'close':
+            icon = (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: iconSize,
+                  color: '#c62828'
+                }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </Box>
+            );
+            color = '#c62828';
+            bgColor = '#ffebee';
+            break;
+          case 'pending':
+            icon = (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: iconSize,
+                  color: '#f9a825'
+                }}
+              >
+                <LoopIcon fontSize="inherit" />
+              </Box>
+            );
+            color = '#f9a825';
+            bgColor = '#fffde7';
+            break;
+          default:
+            icon = null;
+            color = 'gray';
+            bgColor = 'transparent';
+        }
+
+        return (
+          <Chip
+            label={status || '-'}
+            icon={icon}
+            variant="outlined"
+            sx={{
+              height: 24,
+              width: '100px',
+              fontSize: '12px',
+              paddingRight: '4px',
+              paddingLeft: '4px',
+              borderRadius: '12px',
+              borderColor: color,
+              backgroundColor: bgColor,
+              color: color,
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          />
+        );
+      }
     },
     {
       field: 'service',
@@ -177,8 +250,8 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
-          status: user?.isActive === true ? 'Open' : 'Closed'
+          owner: user?.caseOwner?.personalInfo?.firstName || '',
+          status: user?.status
         };
       });
 
@@ -223,7 +296,8 @@ const Case = () => {
       const formattedUsers = allCases?.map((user, index) => {
         const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
         const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
-
+        const caseOwnerFirstName = user?.caseOwner?.personalInfo?.firstName || '';
+        const caseOwnerLastName = user?.caseOwner?.personalInfo?.lastName || '';
         return {
           id: user?._id,
           serialNumber: user?.uniqueId,
@@ -231,8 +305,8 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
-          status: user?.isActive === true ? 'Open' : 'Closed'
+          owner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
+          status: user?.status
         };
       });
 

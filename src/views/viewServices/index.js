@@ -1,0 +1,244 @@
+import React from 'react';
+import { Box, Grid, Typography, Paper, Chip, Button, IconButton, Divider, Stack } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import TagIcon from '@mui/icons-material/LocalOffer';
+import { useLocation } from 'react-router-dom';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { useEffect, useState } from 'react';
+import { urls } from 'common/urls';
+import { getApi } from 'common/apiClient';
+import { imageUrl } from 'common/urls';
+import OptionsPopover from 'components/AddFilter';
+const ServiceDetails = () => {
+  const location = useLocation();
+  const { serviceid } = location.state || {};
+  const [serviceTypeName, setServiceTypeName] = useState('');
+  const [serviceData, setServiceData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [groupedTags, setGroupedTags] = useState([]);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const open = Boolean(anchorEl);
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+  useEffect(() => {
+    const fetchServiceDetails = async () => {
+      if (!serviceid) return;
+      try {
+        const res = await getApi(urls.service.getById.replace(':id', serviceid));
+        setServiceData(res?.data?.userData || {});
+      } catch (error) {
+        console.error('Failed to fetch service details', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServiceDetails();
+  }, [serviceid]);
+
+  useEffect(() => {
+    const fetchServiceTypeName = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const configList = response?.data?.allConfiguration || [];
+        const serviceTypeConfigs = configList.filter((item) => item.configurationType === 'Service Types');
+        const matched = serviceTypeConfigs.find((item) => item._id === serviceData?.serviceType || item._id?.$oid === serviceType);
+
+        if (matched) {
+          setServiceTypeName(matched.name);
+        } else {
+          setServiceTypeName('Unknown');
+        }
+      } catch (error) {
+        console.error('Error fetching configuration:', error);
+        setServiceTypeName('Unknown');
+      }
+    };
+    if (serviceData?.serviceType) {
+      fetchServiceTypeName();
+    }
+  }, [serviceData?.serviceType]);
+
+  useEffect(() => {
+    const fetchAndGroupTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+        const allTags = response?.data?.allTags || [];
+
+        const allIds = [
+          ...serviceData.benificiary,
+          ...serviceData.campaigns,
+          ...serviceData.eventAttanded,
+          ...serviceData.engagement,
+          ...serviceData.fundingInterest,
+          ...serviceData.fundraisingActivities
+        ].map((id) => (typeof id === 'object' ? id.$oid : id));
+
+        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id.$oid || tag._id));
+
+        const grouped = {};
+        relatedTags.forEach((tag) => {
+          const category = tag.tagCategoryName || 'Uncategorized';
+          if (!grouped[category]) grouped[category] = [];
+          grouped[category].push(tag.name);
+        });
+
+        const formatted = Object.entries(grouped).map(([category, tags]) => ({
+          category,
+          tags
+        }));
+
+        setGroupedTags(formatted);
+      } catch (err) {
+        console.error('Error fetching tags:', err);
+      }
+    };
+
+    if (serviceData?.benificiary) {
+      fetchAndGroupTags();
+    }
+  }, [serviceData]);
+
+  return (
+    <Box sx={{ p: 2 }}>
+      <Grid item xs={12} mb={2}>
+        <Stack direction="row" alignItems="center">
+          <Typography fontWeight="bold" display="flex" alignItems="center">
+            <IconButton onClick={() => navigate('/services')}>
+              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+            </IconButton>
+            Service Details
+          </Typography>
+        </Stack>
+      </Grid>
+
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
+            <Typography variant="subtitle1" fontWeight={600} mb={2}>
+              🗂️ Service Information
+            </Typography>
+
+            <Grid container spacing={1}>
+              <Grid item xs={6}>
+                <Typography>
+                  <strong>Service Name:</strong> {serviceData?.name}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography>
+                  <strong>Service Status:</strong> {serviceData?.isActive ? 'Active' : 'Inactive'}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography>
+                  <strong>Service Code:</strong> {serviceData?.code}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography>
+                  <strong>Start Date:</strong>
+                  {formatDate(serviceData?.createdAt)}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography>
+                  <strong>Service Type:</strong>
+                  {serviceTypeName}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography>
+                  <strong>Attachment:</strong> {serviceData?.file ? 1 : 0} File
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography>
+                  <strong>Description:</strong> {serviceData?.description}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} mt={1}>
+                <Typography>
+                  <strong>Image:</strong>
+                </Typography>
+                <Box mt={1}>
+                  <Box mt={1}>
+                    {serviceData?.file ? (
+                      <img
+                        src={
+                          serviceData.file.startsWith('https://')
+                            ? serviceData.file
+                            : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                        }
+                        alt="Service"
+                        style={{ width: 200, height: 'auto', borderRadius: 8 }}
+                      />
+                    ) : (
+                      <Typography color="textSecondary">No image available</Typography>
+                    )}
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle1" fontWeight={600} mb={2}>
+              <TagIcon fontSize="small" sx={{ mr: 1 }} />
+              Service Tags
+            </Typography>
+
+            {groupedTags.length === 0 ? (
+              <Typography variant="body2" color="textSecondary">
+                No tags found.
+              </Typography>
+            ) : (
+              groupedTags.map((group, idx) => (
+                <Box key={idx} mb={2}>
+                  <Typography variant="body2" fontWeight={500} mb={1}>
+                    {group.category}
+                  </Typography>
+                  <Box display="flex" flexWrap="wrap" gap={1}>
+                    {group.tags.map((tag, i) => (
+                      <Chip key={i} label={tag} sx={{ backgroundColor: '#009FC7', color: '#fff' }} onDelete={() => {}} />
+                    ))}
+                  </Box>
+                </Box>
+              ))
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Divider sx={{ my: 3 }} />
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+        <Button
+          variant="contained"
+          onClick={handleClick}
+          sx={{ mb: 1, borderRadius: '6px', width: '25%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
+        >
+          MANAGE
+        </Button>
+        <Button variant="outlined" color="error" onClick={handleClose}>
+          CLOSE
+        </Button>
+      </Box>
+      {/* <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} /> */}
+    </Box>
+  );
+};
+
+export default ServiceDetails;

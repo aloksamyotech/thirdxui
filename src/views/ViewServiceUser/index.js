@@ -94,7 +94,6 @@ const UserProfileCard = () => {
     { value: 'training', label: 'Training' },
     { value: 'workshop', label: 'Workshop' }
   ];
-
   const sessionNames = [
     { value: 'session1', label: 'Session 1' },
     { value: 'session2', label: 'Session 2' }
@@ -359,7 +358,13 @@ const UserProfileCard = () => {
                     {loading ? (
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={300} />
                     ) : (
-                      <CardContent sx={{ p: 0 }}>
+                      <CardContent
+                        sx={{
+                          p: 0,
+                          maxHeight: '270px',
+                          overflowY: 'auto'
+                        }}
+                      >
                         <Typography variant="h6" fontWeight={600} gutterBottom>
                           Risk Assessment
                         </Typography>
@@ -408,6 +413,145 @@ const UserProfileCard = () => {
                               </Box>
                             </Grid>
                           ))}
+                        </Grid>
+
+                        <Typography variant="subtitle1" sx={{ color: '#009fc7', mb: 1 }} className="text">
+                          Tags
+                        </Typography>
+
+                        <Grid container spacing={2}>
+                          {(() => {
+                            const tagItems = [];
+
+                            Object.entries(userData.otherInfo).forEach(([key, value]) => {
+                              if (key === 'description' || key === 'file' || key === 'restrictAccess') return;
+
+                              const isEmptyValue =
+                                value === null ||
+                                value === undefined ||
+                                (typeof value === 'string' && value.trim() === '') ||
+                                (Array.isArray(value) && value.length === 0) ||
+                                (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0);
+
+                              if (isEmptyValue) return;
+
+                              let valueItems = [];
+
+                              if (Array.isArray(value)) {
+                                value.forEach((item, index) => {
+                                  if (item.name) {
+                                    valueItems.push(
+                                      <Box
+                                        key={`${key}-name-${index}`}
+                                        sx={{
+                                          bgcolor: '#009FC7',
+                                          color: '#fff',
+                                          px: 1,
+                                          py: 0.5,
+                                          borderRadius: '20px',
+                                          fontSize: '12px',
+                                          fontWeight: 400,
+                                          mr: 1,
+                                          mb: 1,
+                                          display: 'inline-block'
+                                        }}
+                                      >
+                                        {item.name}
+                                      </Box>
+                                    );
+                                  }
+                                });
+                              } else if (typeof value === 'object' && value !== null) {
+                                Object.entries(value).forEach(([innerKey, innerValue], index) => {
+                                  valueItems.push(
+                                    <Box
+                                      key={`${key}-obj-${index}-${innerKey}`}
+                                      sx={{
+                                        bgcolor: '#009FC7',
+                                        color: '#fff',
+                                        px: 1,
+                                        py: 0.5,
+                                        borderRadius: '20px',
+                                        fontSize: '12px',
+                                        fontWeight: 400,
+                                        mr: 1,
+                                        mb: 1,
+                                        display: 'inline-block'
+                                      }}
+                                    >
+                                      {innerKey}: {String(innerValue)}
+                                    </Box>
+                                  );
+                                });
+                              } else {
+                                valueItems.push(
+                                  <Box
+                                    key={`${key}-value`}
+                                    sx={{
+                                      bgcolor: '#009FC7',
+                                      color: '#fff',
+                                      px: 1,
+                                      py: 0.5,
+                                      borderRadius: '20px',
+                                      fontSize: '12px',
+                                      fontWeight: 400,
+                                      mr: 1,
+                                      mb: 1,
+                                      display: 'inline-block'
+                                    }}
+                                  >
+                                    {String(value)}
+                                  </Box>
+                                );
+                              }
+
+                              tagItems.push(
+                                <Grid item xs={12} key={`${key}-group`}>
+                                  <Box
+                                    sx={{
+                                      backgroundColor: '#f0f0f0',
+                                      p: 2,
+                                      borderRadius: '12px',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: 1
+                                    }}
+                                  >
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                      <Box
+                                        sx={{
+                                          bgcolor: '#053146',
+                                          color: '#fff',
+                                          px: 1,
+                                          py: 0.5,
+                                          borderRadius: '20px',
+                                          fontSize: '12px',
+                                          fontWeight: 400,
+                                          display: 'inline-block',
+                                          width: 'auto',
+                                          maxWidth: 'fit-content'
+                                        }}
+                                      >
+                                        {key}
+                                      </Box>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{valueItems}</Box>
+                                  </Box>
+                                </Grid>
+                              );
+                            });
+
+                            return tagItems.length > 0 ? (
+                              tagItems
+                            ) : (
+                              <Grid item xs={12}>
+                                <Typography variant="body2" color="textSecondary">
+                                  No tags available.
+                                </Typography>
+                              </Grid>
+                            );
+                          })()}
                         </Grid>
                       </CardContent>
                     )}

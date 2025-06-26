@@ -44,6 +44,8 @@ const ViewServices = Loadable(lazy(() => import('views/viewServices')));
 const Attendees = Loadable(lazy(() => import('views/Attendees')));
 const ViewDonor = Loadable(lazy(() => import('views/ViewDonor')));
 const ViewSubmission = Loadable(lazy(() => import('views/ViewSubmission')));
+const AboutCase = Loadable(lazy(() => import('views/AboutCase')));
+const AboutCaseNote = Loadable(lazy(() => import('views/AboutCaseNote')));
 
 const MainRoutes = {
   path: '/',
@@ -225,6 +227,14 @@ const MainRoutes = {
         {
           path: 'submission/:id',
           element: <ViewSubmission />
+        },
+        {
+          path: 'about-case',
+          element: <AboutCase />
+        },
+        {
+          path: 'about-case-note',
+          element: <AboutCaseNote />
         }
       ]
     }

@@ -1,10 +1,29 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Avatar,
+  Tooltip,
+  Grid,
+  Stack,
+  IconButton,
+  Tabs,
+  Tab,
+  Divider,
+  Paper,
+  Chip
+} from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import CancelIcon from '@mui/icons-material/Cancel';
+
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
@@ -37,6 +56,7 @@ const UserProfileCard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [groupedTags, setGroupedTags] = useState([]);
   const id = location?.state?.id;
   const uniqueid = location?.state?.serialNumber;
 
@@ -59,6 +79,61 @@ const UserProfileCard = () => {
       fetchUserById();
     }
   }, [id]);
+
+  useEffect(() => {
+    const fetchAndGroupTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+        const allTags = response?.data?.allTags || [];
+        
+        
+        const combinedData = [
+          ...(userData?.otherInfo?.benificiary ?? []),
+          ...(userData?.otherInfo?.campaigns ?? []),
+          ...(userData?.otherInfo?.eventAttanded ?? []),
+          ...(userData?.otherInfo?.engagement ?? []),
+          ...(userData?.otherInfo?.fundingInterest ?? []),
+          ...(userData?.otherInfo?.fundraisingActivities ?? [])
+        ];
+
+        
+        const allIds = combinedData.map((item) => {
+          const id = typeof item === 'object' && item !== null ? item._id : item;
+          if (!id) {
+            console.warn('⚠️ Invalid ID in item:', item);
+          }
+          return id;
+        });
+
+        
+        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
+
+        
+        const grouped = {};
+        relatedTags.forEach((tag) => {
+          const category = tag.tagCategoryName || 'Uncategorized';
+          if (!grouped[category]) grouped[category] = [];
+          grouped[category].push(tag.name);
+        });
+
+      
+        const formatted = Object.entries(grouped).map(([category, tags]) => ({
+          category,
+          tags
+        }));
+
+        setGroupedTags(formatted);
+      } catch (err) {
+        console.error('❌ Error fetching tags:', err);
+      }
+    };
+
+    if (userData?.otherInfo) {
+      fetchAndGroupTags();
+    } else {
+      console.log('⛔ userData.otherInfo not found, skipping tag fetch.');
+    }
+  }, [userData]);
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
@@ -386,172 +461,91 @@ const UserProfileCard = () => {
                             'Learning disability'
                           ].map((label, index) => (
                             <Grid item key={index}>
-                              <Box
+                              <Chip
+                                label={label}
+                                onDelete={() => {}}
+                                deleteIcon={
+                                  <CancelIcon
+                                    sx={{
+                                      fontSize: 16,
+                                      color: '#666'
+                                    }}
+                                  />
+                                }
                                 sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
                                   bgcolor: '#009FC7',
                                   color: '#fff',
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: '20px',
                                   fontSize: '12px',
-                                  fontWeight: 400
+                                  fontWeight: 400,
+                                  borderRadius: '20px',
+                                  height: 28,
+                                  '& .MuiChip-deleteIcon': {
+                                    marginLeft: '4px'
+                                  }
                                 }}
-                              >
-                                {label}
-                                <Box
-                                  component="span"
-                                  sx={{
-                                    ml: 1,
-                                    fontWeight: 'bold',
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  ✕
-                                </Box>
-                              </Box>
+                              />
                             </Grid>
                           ))}
                         </Grid>
 
-                        <Typography variant="subtitle1" sx={{ color: '#009fc7', mb: 1 }} className="text">
-                          Tags
-                        </Typography>
+                        <Box display="flex" alignItems="center" mb={1} mt={2}>
+                          <Typography variant="subtitle1" sx={{ color: '#009fc7' }} className="text">
+                            Tags
+                          </Typography>
+                        </Box>
 
-                        <Grid container spacing={2}>
-                          {(() => {
-                            const tagItems = [];
+                        <Grid>
+                          {groupedTags.length === 0 ? (
+                            <Typography variant="body2" color="textSecondary">
+                              No tags found.
+                            </Typography>
+                          ) : (
+                            groupedTags.map((group, idx) => (
+                              <Box
+                                key={idx}
+                                mb={2}
+                                p={2}
+                                sx={{
+                                  backgroundColor: '#f5f5f5',
+                                  borderRadius: 1,
+                                  width: '100%'
+                                }}
+                              >
+                                <Box display="flex" alignItems="center" mb={1}>
+                                  <Typography variant="subtitle2" fontWeight={600}>
+                                    {group.category}
+                                  </Typography>
+                                </Box>
 
-                            Object.entries(userData.otherInfo).forEach(([key, value]) => {
-                              if (key === 'description' || key === 'file' || key === 'restrictAccess') return;
-
-                              const isEmptyValue =
-                                value === null ||
-                                value === undefined ||
-                                (typeof value === 'string' && value.trim() === '') ||
-                                (Array.isArray(value) && value.length === 0) ||
-                                (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0);
-
-                              if (isEmptyValue) return;
-
-                              let valueItems = [];
-
-                              if (Array.isArray(value)) {
-                                value.forEach((item, index) => {
-                                  if (item.name) {
-                                    valueItems.push(
-                                      <Box
-                                        key={`${key}-name-${index}`}
-                                        sx={{
-                                          bgcolor: '#009FC7',
-                                          color: '#fff',
-                                          px: 1,
-                                          py: 0.5,
-                                          borderRadius: '20px',
-                                          fontSize: '12px',
-                                          fontWeight: 400,
-                                          mr: 1,
-                                          mb: 1,
-                                          display: 'inline-block'
-                                        }}
-                                      >
-                                        {item.name}
-                                      </Box>
-                                    );
-                                  }
-                                });
-                              } else if (typeof value === 'object' && value !== null) {
-                                Object.entries(value).forEach(([innerKey, innerValue], index) => {
-                                  valueItems.push(
-                                    <Box
-                                      key={`${key}-obj-${index}-${innerKey}`}
+                                <Box display="flex" flexWrap="wrap" gap={1}>
+                                  {group.tags.map((tag, i) => (
+                                    <Chip
+                                      key={i}
+                                      label={tag}
+                                      onDelete={() => {}}
+                                      deleteIcon={
+                                        <CancelIcon
+                                          sx={{
+                                            fontSize: 16,
+                                            color: '#666'
+                                          }}
+                                        />
+                                      }
                                       sx={{
-                                        bgcolor: '#009FC7',
+                                        backgroundColor: '#009FC7',
                                         color: '#fff',
-                                        px: 1,
-                                        py: 0.5,
-                                        borderRadius: '20px',
-                                        fontSize: '12px',
+                                        height: 28,
                                         fontWeight: 400,
-                                        mr: 1,
-                                        mb: 1,
-                                        display: 'inline-block'
+                                        '& .MuiChip-deleteIcon': {
+                                          marginLeft: '4px'
+                                        }
                                       }}
-                                    >
-                                      {innerKey}: {String(innerValue)}
-                                    </Box>
-                                  );
-                                });
-                              } else {
-                                valueItems.push(
-                                  <Box
-                                    key={`${key}-value`}
-                                    sx={{
-                                      bgcolor: '#009FC7',
-                                      color: '#fff',
-                                      px: 1,
-                                      py: 0.5,
-                                      borderRadius: '20px',
-                                      fontSize: '12px',
-                                      fontWeight: 400,
-                                      mr: 1,
-                                      mb: 1,
-                                      display: 'inline-block'
-                                    }}
-                                  >
-                                    {String(value)}
-                                  </Box>
-                                );
-                              }
-
-                              tagItems.push(
-                                <Grid item xs={12} key={`${key}-group`}>
-                                  <Box
-                                    sx={{
-                                      backgroundColor: '#f0f0f0',
-                                      p: 2,
-                                      borderRadius: '12px',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: 1
-                                    }}
-                                  >
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                      <Box
-                                        sx={{
-                                          bgcolor: '#053146',
-                                          color: '#fff',
-                                          px: 1,
-                                          py: 0.5,
-                                          borderRadius: '20px',
-                                          fontSize: '12px',
-                                          fontWeight: 400,
-                                          display: 'inline-block',
-                                          width: 'auto',
-                                          maxWidth: 'fit-content'
-                                        }}
-                                      >
-                                        {key}
-                                      </Box>
-                                    </Box>
-
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{valueItems}</Box>
-                                  </Box>
-                                </Grid>
-                              );
-                            });
-
-                            return tagItems.length > 0 ? (
-                              tagItems
-                            ) : (
-                              <Grid item xs={12}>
-                                <Typography variant="body2" color="textSecondary">
-                                  No tags available.
-                                </Typography>
-                              </Grid>
-                            );
-                          })()}
+                                    />
+                                  ))}
+                                </Box>
+                              </Box>
+                            ))
+                          )}
                         </Grid>
                       </CardContent>
                     )}

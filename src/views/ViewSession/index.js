@@ -1,350 +1,327 @@
-import { useState, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Button,
-  Grid,
-  IconButton,
-  MenuItem,
-  Divider,
-  TextField,
-  Stack,
-  Tooltip,
-  Menu,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  FormControl,
-  InputLabel
-} from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import EditIcon from '@mui/icons-material/Edit';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React from 'react';
+import { Box, Grid, Typography, Paper, Chip, Button, IconButton, Divider, Stack } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import TagIcon from '@mui/icons-material/LocalOffer';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { useEffect, useState } from 'react';
+import { urls } from 'common/urls';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { getApi } from 'common/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { updateApi, updateApiPatch } from 'common/apiClient';
-import { urls } from 'common/urls';
-import toast from 'react-hot-toast';
-import { IconTrash } from '@tabler/icons';
-
-const columns = [
-  { field: 'country', headerName: 'Location', flex: 1 },
-  {
-    field: 'serviceUser',
-    headerName: 'Service Lead',
-    flex: 1,
-    valueGetter: (params) => {
-      const user = params.row.serviceuser;
-      return user ? `${user?.personalInfo?.firstName || ''} ${user?.personalInfo?.lastName || ''}`.trim() || '-' : '-';
-    }
-  },
-  {
-    field: 'serviceName',
-    headerName: 'Service Type',
-    flex: 1,
-    valueGetter: (params) => params.row.serviceId?.serviceType?.name || '-'
-  },
-  {
-    field: 'date',
-    headerName: 'Date',
-    flex: 1,
-    valueFormatter: (params) => {
-      if (!params.value) return '';
-      const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-      return new Date(params.value).toLocaleDateString(undefined, options);
-    }
-  },
-  { field: 'time', headerName: 'Time', flex: 1 }
-];
-
-const UserProfile = () => {
-  const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
-  const [archiveReason, setArchiveReason] = useState('');
-
+import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairServiceOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import { imageUrl } from 'common/urls';
+import OptionsPopover from 'components/AddFilter';
+const ServiceDetails = () => {
   const location = useLocation();
-  const session = location?.state?.session;
+  const navigate = useNavigate();
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
+  // const { serviceid } = location.state || {};
+  const [serviceTypeName, setServiceTypeName] = useState('');
+  const [sessionData, setSessionData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [groupedTags, setGroupedTags] = useState([]);
+  const session = location.state?.session;
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-    handleClose();
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
-
-  const handleArchiveClick = () => {
-    setArchiveDialogOpen(true);
-    handleClose();
-  };
-
-  const handleDeleteSession = async (sessionId) => {
-    try {
-      await updateApiPatch(urls.session.delete.replace(':id', sessionId));
-      toast.success('Session deleted successfully!');
-      navigate('/services');
-    } catch (error) {
-      toast.error('Failed to delete session.');
-    }
-  };
-
-  const handleArchiveSession = async (sessionId) => {
-    try {
-      await updateApi(urls.session.archieve.replace(':sessionId', sessionId), {
-        archiveReason: archiveReason
-      });
-      toast.success('Session archived successfully!');
-      navigate('/services');
-    } catch (error) {
-      toast.error('Failed to archive session.');
-    }
-  };
-
-  const handleEditSession = () => {
-    navigate('/add-session', { state: { session } });
-    handleClose();
-  };
-
   const open = Boolean(anchorEl);
-  const sessionRows = session ? [session] : [];
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
+
+  
+  useEffect(() => {
+    const fetchServiceDetails = async () => {
+      if (!session?._id) return;
+      try {
+        const res = await getApi(urls.session.getById.replace(':id', session?._id));
+  
+        setSessionData(res?.data?.userData || {});
+      } catch (error) {
+        console.error('Failed to fetch service details', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServiceDetails();
+  }, [session?._id]);
+  
+  useEffect(() => {
+    const fetchServiceTypeName = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const configList = response?.data?.allConfiguration || [];
+        const serviceTypeConfigs = configList.filter((item) => item.configurationType === 'Service Types');
+        const matched = serviceTypeConfigs.find((item) => item._id === sessionData?.serviceType || item._id?.$oid === serviceType);
+
+        if (matched) {
+          setServiceTypeName(matched.name);
+        } else {
+          setServiceTypeName('Unknown');
+        }
+      } catch (error) {
+        console.error('Error fetching configuration:', error);
+        setServiceTypeName('Unknown');
+      }
+    };
+    if (sessionData?.serviceType) {
+      fetchServiceTypeName();
+    }
+  }, [sessionData?.serviceType]);
+
+  useEffect(() => {
+    const fetchAndGroupTags = async () => {
+      try {
+  
+        const session = sessionData?.[0]; // Only using the first item
+        if (!session) {
+          console.warn('No session data found');
+          return;
+        }
+
+  
+        const allTagsResponse = await getApi(urls.tag.getAllTags);
+  
+        const allTags = allTagsResponse?.data?.allTags || [];
+  
+        const allIds = [
+          ...session.benificiary,
+          ...session.campaigns,
+          ...session.eventAttanded,
+          ...session.engagement,
+          ...session.fundingInterest,
+          ...session.fundraisingActivities
+        ].map((id) => {
+          const normalizedId = typeof id === 'object' ? id.$oid : id;
+          return normalizedId;
+        });
+
+  
+        const relatedTags = allTags.filter((tag) => {
+          const tagId = tag._id;
+          const isRelated = allIds.includes(tagId);
+          return isRelated;
+        });
+
+  
+        const grouped = {};
+        relatedTags.forEach((tag) => {
+          const category = tag.tagCategoryName || 'Uncategorized';
+          if (!grouped[category]) grouped[category] = [];
+          grouped[category].push(tag.name);
+        });
+
+  
+        const formatted = Object.entries(grouped).map(([category, tags]) => ({
+          category,
+          tags
+        }));
+
+  
+        setGroupedTags(formatted);
+      } catch (err) {
+        console.error('Error fetching tags:', err);
+      }
+    };
+
+    if (sessionData?.length > 0) {
+      fetchAndGroupTags();
+    } else {
+      console.warn('No sessionData available to trigger fetch');
+    }
+  }, [sessionData]);
 
   return (
-    <>
-      <Box>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <IconButton onClick={() => navigate('/view-service', { state: { serviceId: session?.serviceId?._id } })}>
-              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
-            </IconButton>
-            <Typography variant="h5" fontWeight="bold">
-              {session?.serviceId?.name || 'Session Details'}
-            </Typography>
-          </Stack>
-          <Button
-            variant="contained"
-            size="small"
-            sx={{ textTransform: 'none', backgroundColor: '#1B4B66' }}
-            onClick={() => navigate('/attendees', { state: { session } })}
-          >
-            View Attendees List
-          </Button>
+    <Box sx={{ p: 2 }}>
+      <Grid item xs={12} mb={2}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <IconButton onClick={() => navigate(-1)}>
+            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+          </IconButton>
+          <Typography fontWeight="bold">View Service Details</Typography>
         </Stack>
-      </Box>
+      </Grid>
 
-      <Box sx={{ height: 'auto', width: '100%', background: '#ffff' }}>
-        {session ? (
-          <DataGrid
-            rows={sessionRows}
-            columns={columns}
-            pageSize={1}
-            rowsPerPageOptions={[1]}
-            disableSelectionOnClick
-            hideFooter
+      <Grid container spacing={2} sx={{ height: 420 }}>
+        <Grid item xs={12} md={6} sx={{ height: '70%' }}>
+          <Paper
+            variant="outlined"
             sx={{
-              border: '1px solid #e0e0e0',
-              '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#f5f5f5',
-                fontWeight: 'bold'
-              }
+              p: 2,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
             }}
-            getRowId={(row) => row._id}
-          />
-        ) : (
-          <Typography>Loading session details...</Typography>
-        )}
-      </Box>
-      <Box display="flex" flexDirection="row" justifyContent="flex-end" mt={2}>
+          >
+            {/* Header */}
+            <Box display="flex" alignItems="center" mb={2}>
+              <HomeRepairServiceOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
+              <Typography variant="subtitle1">ABOUT SESSION</Typography>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            {/* Scrollable content */}
+            <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
+              <Stack spacing={1}>
+                {[
+                  { label: 'Location:', value: sessionData?.[0]?.country || '-' },
+                  {
+                    label: 'Session Lead:',
+                    value: [sessionData?.[0]?.serviceuser?.personalInfo?.firstName, sessionData?.[0]?.serviceuser?.personalInfo?.lastName]
+                      .filter(Boolean)
+                      .join(' ')
+                  },
+                  { label: 'Service Type:', value: sessionData?.[0]?.serviceId?.name || '-' },
+                  { label: 'Date:', value: formatDate(sessionData?.[0]?.timestamp) || '-' },
+                  { label: 'Time:', value: sessionData?.[0]?.serviceId?.name || '-' },
+                  { label: 'Attachment:', value: (sessionData?.[0]?.file ? 1 : 0) + ' File' }
+                ].map(({ label, value }, idx) => (
+                  <Box
+                    key={idx}
+                    sx={{
+                      display: 'flex',
+                      gap: 1,
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      sx={{
+                        width: 110,
+                        fontWeight: 'bold',
+                        flexShrink: 0
+                      }}
+                    >
+                      {label}
+                    </Typography>
+                    <Typography component="span" sx={{ flexGrow: 1 }}>
+                      {value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6} sx={{ height: '100%' }}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 2,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {/* Header */}
+            <Box display="flex" alignItems="center" mb={2}>
+              <LocalOfferOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
+              <Typography variant="subtitle1">Session Tags</Typography>
+            </Box>
+
+            {/* Scrollable content */}
+            <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
+              {groupedTags.length === 0 ? (
+                <Typography variant="body2" color="textSecondary">
+                  No tags found.
+                </Typography>
+              ) : (
+                groupedTags.map((group, idx) => (
+                  <Box
+                    key={idx}
+                    mb={2}
+                    p={2}
+                    sx={{
+                      backgroundColor: '#F7F7F7',
+                      borderRadius: 2,
+                      width: '100%'
+                    }}
+                  >
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <Typography variant="subtitle2">{group.category}</Typography>
+                    </Box>
+
+                    <Box display="flex" flexWrap="wrap" gap={1}>
+                      {group.tags.map((tag, i) => (
+                        <Chip
+                          key={i}
+                          label={tag}
+                          size="small"
+                          onDelete={() => {}}
+                          deleteIcon={
+                            <CancelIcon
+                              sx={{
+                                fontSize: 16,
+                                color: '#009FC7'
+                              }}
+                            />
+                          }
+                          sx={{
+                            backgroundColor: '#009FC7',
+                            color: '#FFFFFF',
+                            height: 24,
+                            fontSize: '0.75rem',
+                            padding: '0 4px',
+
+                            '& .MuiChip-deleteIcon': {
+                              marginLeft: '4px',
+                              color: '#009FC7'
+                            }
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                ))
+              )}
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
         <Button
           variant="contained"
           onClick={handleClick}
           sx={{
-            mb: 1,
             borderRadius: '6px',
-            fontSize: '10px',
-            backgroundColor: '#009fc7'
+            width: '100px',
+            height: '36px',
+            fontSize: '12px',
+            backgroundColor: '#009fc7',
+            '&:hover': {
+              backgroundColor: '#009fc7'
+            }
           }}
         >
-          MANAGE
+          Manage
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => navigate(-1)}
+          sx={{
+            borderRadius: '6px',
+            width: '100px',
+            height: '36px',
+            fontSize: '12px'
+          }}
+        >
+          CLOSE
         </Button>
       </Box>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-            mt: 1.5,
-            '& .MuiAvatar-root': {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1
-            }
-          }
-        }}
-      >
-        <MenuItem onClick={handleEditSession}>
-          <EditIcon sx={{ mr: 1, fontSize: 20 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleArchiveClick}>
-          <ArchiveIcon sx={{ mr: 1, fontSize: 20 }} />
-          Archive
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
-          <DeleteIcon sx={{ mr: 1, fontSize: 20, color: 'error.main' }} />
-          Delete
-        </MenuItem>
-      </Menu>
-
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        maxWidth={false}
-        PaperProps={{
-          sx: { width: 400, borderRadius: 2 }
-        }}
-      >
-        <Box sx={{ textAlign: 'center', pt: 3 }}>
-          <IconButton
-            disableRipple
-            sx={{
-              backgroundColor: '#FFE8E6',
-              color: '#FF5C5C',
-              pointerEvents: 'none',
-              '&:hover': { backgroundColor: '#FFE8E6' }
-            }}
-          >
-            <IconTrash fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
-
-        <DialogContent>
-          <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
-            You want to delete this session. <br />
-            This action cannot be undone.
-          </Typography>
-        </DialogContent>
-
-        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            variant="outlined"
-            sx={{
-              color: '#FF5C5C',
-              borderColor: '#FF5C5C',
-              textTransform: 'uppercase',
-              fontWeight: 480,
-              width: 120
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              handleDeleteSession(session?._id);
-              setDeleteDialogOpen(false);
-            }}
-            variant="contained"
-            sx={{
-              backgroundColor: '#053046',
-              color: '#efeceb',
-              textTransform: 'uppercase',
-              fontWeight: 380,
-              width: 120,
-              '&:hover': { backgroundColor: '#053046' }
-            }}
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={archiveDialogOpen}
-        onClose={() => setArchiveDialogOpen(false)}
-        aria-labelledby="archive-dialog-title"
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            p: 2,
-            width: 400
-          }
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 600, textAlign: 'left', pb: 1 }}>Archive Reason</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <FormControl size="small" sx={{ flexGrow: 1 }}>
-              <InputLabel>Reason</InputLabel>
-              <Select
-                value={archiveReason}
-                onChange={(e) => setArchiveReason(e.target.value)}
-                label="Reason"
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      maxHeight: 200,
-                      zIndex: 1300
-                    }
-                  }
-                }}
-                sx={{
-                  backgroundColor: '#f4f2ff',
-                  borderRadius: 1
-                }}
-              >
-                <MenuItem value="Deceased">Deceased</MenuItem>
-                <MenuItem value="Gone away">Gone away</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
-              </Select>
-            </FormControl>
-            <Button
-              variant="contained"
-              onClick={() => {
-                handleArchiveSession(session?._id);
-                setArchiveDialogOpen(false);
-              }}
-              sx={{
-                backgroundColor: '#6366f1',
-                textTransform: 'uppercase',
-                fontWeight: 500,
-                px: 3,
-                height: 40,
-                whiteSpace: 'nowrap',
-                minWidth: 100,
-                '&:hover': {
-                  backgroundColor: '#4f46e5'
-                }
-              }}
-            >
-              Archive
-            </Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
-    </>
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={session?._id} />
+    </Box>
   );
 };
 
-export default UserProfile;
+export default ServiceDetails;

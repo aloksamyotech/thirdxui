@@ -6,10 +6,12 @@ import { IconSeeding } from '@tabler/icons';
 import SearchIcon from '@mui/icons-material/Search';
 import { urls, imageUrl } from 'common/urls';
 import { getApi } from 'common/apiClient';
+import { useNavigate } from 'react-router-dom';
 const Card = () => {
   const [mediaList, setMediaList] = useState([]);
   const [search, setSearch] = useState('');
   const [imgError, setImgError] = useState(false);
+  const navigate = useNavigate();
 
   const getAllForms = async () => {
     const fromUrl = urls?.dashboard?.getMedia;
@@ -28,7 +30,7 @@ const Card = () => {
   );
 
   return (
-    <Box sx={{ bgcolor: '#fff', p: 1, borderRadius: '10px',height: '430px' }}>
+    <Box sx={{ bgcolor: '#fff', p: 1, borderRadius: '10px', height: '430px' }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', p: '10px' }}>
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
           Recent Media
@@ -114,7 +116,13 @@ const Card = () => {
       </Box>
 
       <Stack sx={{ mt: 1, alignItems: 'center' }}>
-        <Typography sx={{ fontSize: '12px', cursor: 'pointer' }}>View All Media</Typography>
+        <Typography
+          sx={{ fontSize: '12px', cursor: 'pointer' }}
+          onClick={() => navigate('/donor')}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          View All Media
+        </Typography>
       </Stack>
     </Box>
   );

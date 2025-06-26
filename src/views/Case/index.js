@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
-import { maxWidth } from '@mui/system';
+import StatusChip from 'views/AboutCase/StatusChip';
 
 const Case = () => {
   const navigate = useNavigate();
@@ -103,94 +103,10 @@ const Case = () => {
     {
       field: 'status',
       headerName: 'Status',
-      width: 140,
-      renderCell: (params) => {
-        const status = params.value?.toLowerCase();
-        let icon = null;
-        let color = '';
-        let bgColor = '';
-
-        const iconSize = 16;
-
-        switch (status) {
-          case 'open':
-            icon = (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: iconSize,
-                  color: '#2e7d32'
-                }}
-              >
-                <CheckIcon fontSize="inherit" />
-              </Box>
-            );
-            color = '#2e7d32';
-            bgColor = '#e8f5e9';
-            break;
-          case 'close':
-            icon = (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: iconSize,
-                  color: '#c62828'
-                }}
-              >
-                <CloseIcon fontSize="inherit" />
-              </Box>
-            );
-            color = '#c62828';
-            bgColor = '#ffebee';
-            break;
-          case 'pending':
-            icon = (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: iconSize,
-                  color: '#f9a825'
-                }}
-              >
-                <LoopIcon fontSize="inherit" />
-              </Box>
-            );
-            color = '#f9a825';
-            bgColor = '#fffde7';
-            break;
-          default:
-            icon = null;
-            color = 'gray';
-            bgColor = 'transparent';
-        }
-
-        return (
-          <Chip
-            label={status || '-'}
-            icon={icon}
-            variant="outlined"
-            sx={{
-              height: 24,
-              width: '100px',
-              fontSize: '12px',
-              paddingRight: '4px',
-              paddingLeft: '4px',
-              borderRadius: '12px',
-              borderColor: color,
-              backgroundColor: bgColor,
-              color: color,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          />
-        );
-      }
+      width: 120,
+      renderCell: (params) => (
+        <StatusChip status={params.value} />
+      )
     },
     {
       field: 'service',
@@ -458,9 +374,9 @@ const Case = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                     }
                     columns={columns}
                     rowCount={totalRows}

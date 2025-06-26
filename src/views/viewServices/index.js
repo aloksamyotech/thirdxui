@@ -6,17 +6,25 @@ import { useLocation } from 'react-router-dom';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useEffect, useState } from 'react';
 import { urls } from 'common/urls';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { getApi } from 'common/apiClient';
+import { useNavigate } from 'react-router-dom';
+
+import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairServiceOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import { imageUrl } from 'common/urls';
 import OptionsPopover from 'components/AddFilter';
 const ServiceDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const { serviceid } = location.state || {};
   const [serviceTypeName, setServiceTypeName] = useState('');
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [groupedTags, setGroupedTags] = useState([]);
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -43,7 +51,7 @@ const ServiceDetails = () => {
 
     fetchServiceDetails();
   }, [serviceid]);
-
+  
   useEffect(() => {
     const fetchServiceTypeName = async () => {
       try {
@@ -110,70 +118,79 @@ const ServiceDetails = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Grid item xs={12} mb={2}>
-        <Stack direction="row" alignItems="center">
-          <Typography fontWeight="bold" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/services')}>
-              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
-            </IconButton>
-            Service Details
-          </Typography>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <IconButton onClick={() => navigate(-1)}>
+            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+          </IconButton>
+          <Typography fontWeight="bold">View Service Details</Typography>
         </Stack>
       </Grid>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
-            <Typography variant="subtitle1" fontWeight={600} mb={2}>
-              🗂️ Service Information
-            </Typography>
+      <Grid container spacing={2} sx={{ height: 420 }}>
+        <Grid item xs={12} md={6} sx={{ height: '100%' }}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 2,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {/* Header */}
+            <Box display="flex" alignItems="center" mb={2}>
+              <HomeRepairServiceOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
+              <Typography variant="subtitle1">Service Information</Typography>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            {/* Scrollable content */}
+            <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Typography>
+                    <strong>Service Name:</strong> {serviceData?.name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>
+                    <strong>Service Status:</strong> {serviceData?.isActive ? 'Active' : 'Inactive'}
+                  </Typography>
+                </Grid>
 
-            <Grid container spacing={1}>
-              <Grid item xs={6}>
-                <Typography>
-                  <strong>Service Name:</strong> {serviceData?.name}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography>
-                  <strong>Service Status:</strong> {serviceData?.isActive ? 'Active' : 'Inactive'}
-                </Typography>
-              </Grid>
+                <Grid item xs={6}>
+                  <Typography>
+                    <strong>Service Code:</strong> {serviceData?.code}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>
+                    <strong>Start Date:</strong>
+                    {formatDate(serviceData?.createdAt)}
+                  </Typography>
+                </Grid>
 
-              <Grid item xs={6}>
-                <Typography>
-                  <strong>Service Code:</strong> {serviceData?.code}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography>
-                  <strong>Start Date:</strong>
-                  {formatDate(serviceData?.createdAt)}
-                </Typography>
-              </Grid>
+                <Grid item xs={6}>
+                  <Typography>
+                    <strong>Service Type:</strong>
+                    {serviceTypeName}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>
+                    <strong>Attachment:</strong> {serviceData?.file ? 1 : 0} File
+                  </Typography>
+                </Grid>
 
-              <Grid item xs={6}>
-                <Typography>
-                  <strong>Service Type:</strong>
-                  {serviceTypeName}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography>
-                  <strong>Attachment:</strong> {serviceData?.file ? 1 : 0} File
-                </Typography>
-              </Grid>
+                <Grid item xs={12}>
+                  <Typography>
+                    <strong>Description:</strong> {serviceData?.description}
+                  </Typography>
+                </Grid>
 
-              <Grid item xs={12}>
-                <Typography>
-                  <strong>Description:</strong> {serviceData?.description}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12} mt={1}>
-                <Typography>
-                  <strong>Image:</strong>
-                </Typography>
-                <Box mt={1}>
+                <Grid item xs={12} mt={1}>
+                  <Typography>
+                    <strong>Image:</strong>
+                  </Typography>
                   <Box mt={1}>
                     {serviceData?.file ? (
                       <img
@@ -189,54 +206,114 @@ const ServiceDetails = () => {
                       <Typography color="textSecondary">No image available</Typography>
                     )}
                   </Box>
-                </Box>
+                </Grid>
               </Grid>
-            </Grid>
+            </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle1" fontWeight={600} mb={2}>
-              <TagIcon fontSize="small" sx={{ mr: 1 }} />
-              Service Tags
-            </Typography>
 
-            {groupedTags.length === 0 ? (
-              <Typography variant="body2" color="textSecondary">
-                No tags found.
-              </Typography>
-            ) : (
-              groupedTags.map((group, idx) => (
-                <Box key={idx} mb={2}>
-                  <Typography variant="body2" fontWeight={500} mb={1}>
-                    {group.category}
-                  </Typography>
-                  <Box display="flex" flexWrap="wrap" gap={1}>
-                    {group.tags.map((tag, i) => (
-                      <Chip key={i} label={tag} sx={{ backgroundColor: '#009FC7', color: '#fff' }} onDelete={() => {}} />
-                    ))}
+        <Grid item xs={12} md={6} sx={{ height: '100%' }}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 2,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {/* Header */}
+            <Box display="flex" alignItems="center" mb={2}>
+              <LocalOfferOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
+              <Typography variant="subtitle1">Service Tags</Typography>
+            </Box>
+
+            {/* Scrollable content */}
+            <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
+              {groupedTags.length === 0 ? (
+                <Typography variant="body2" color="textSecondary">
+                  No tags found.
+                </Typography>
+              ) : (
+                groupedTags.map((group, idx) => (
+                  <Box
+                    key={idx}
+                    mb={2}
+                    p={2}
+                    sx={{
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: 1,
+                      width: '100%'
+                    }}
+                  >
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <Typography variant="subtitle2">{group.category}</Typography>
+                    </Box>
+
+                    <Box display="flex" flexWrap="wrap" gap={1}>
+                      {group.tags.map((tag, i) => (
+                        <Chip
+                          key={i}
+                          label={tag}
+                          onDelete={() => {}}
+                          deleteIcon={
+                            <CancelIcon
+                              sx={{
+                                fontSize: 16,
+                                color: '#666'
+                              }}
+                            />
+                          }
+                          sx={{
+                            backgroundColor: '#009FC7',
+                            color: '#fff',
+                            height: 28,
+
+                            '& .MuiChip-deleteIcon': {
+                              marginLeft: '4px'
+                            }
+                          }}
+                        />
+                      ))}
+                    </Box>
                   </Box>
-                </Box>
-              ))
-            )}
+                ))
+              )}
+            </Box>
           </Paper>
         </Grid>
       </Grid>
 
-      <Divider sx={{ my: 3 }} />
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
         <Button
           variant="contained"
           onClick={handleClick}
-          sx={{ mb: 1, borderRadius: '6px', width: '25%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
+          sx={{
+            borderRadius: '6px',
+            width: '100px',
+            height: '36px',
+            fontSize: '12px',
+            backgroundColor: '#009fc7'
+          }}
         >
-          MANAGE
+          Manage
         </Button>
-        <Button variant="outlined" color="error" onClick={handleClose}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => navigate(-1)}
+          sx={{
+            borderRadius: '6px',
+            width: '100px',
+            height: '36px',
+            fontSize: '12px'
+          }}
+        >
           CLOSE
         </Button>
       </Box>
-      {/* <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} /> */}
+
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} />
     </Box>
   );
 };

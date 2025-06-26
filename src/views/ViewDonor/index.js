@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider, Chip } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
@@ -11,6 +11,7 @@ import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import { useNavigate, useLocation } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CaseNoteDialog from 'components/AddCaseNote';
 import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
@@ -35,6 +36,7 @@ const UserProfileCard = () => {
   const [activityType, setActivityType] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [groupedTags, setGroupedTags] = useState([]);
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
@@ -61,6 +63,62 @@ const UserProfileCard = () => {
       fetchUserById();
     }
   }, [id]);
+
+  useEffect(() => {
+    const fetchAndGroupTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+        const allTags = response?.data?.allTags || [];
+    
+
+    
+        const combinedData = [
+          ...(userData?.otherInfo?.benificiary ?? []),
+          ...(userData?.otherInfo?.campaigns ?? []),
+          ...(userData?.otherInfo?.eventAttanded ?? []),
+          ...(userData?.otherInfo?.engagement ?? []),
+          ...(userData?.otherInfo?.fundingInterest ?? []),
+          ...(userData?.otherInfo?.fundraisingActivities ?? [])
+        ];
+
+    
+        const allIds = combinedData.map((item) => {
+          const id = typeof item === 'object' && item !== null ? item._id : item;
+          if (!id) {
+            console.warn('⚠️ Invalid ID in item:', item);
+          }
+          return id;
+        });
+
+    
+        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
+
+    
+        const grouped = {};
+        relatedTags.forEach((tag) => {
+          const category = tag.tagCategoryName || 'Uncategorized';
+          if (!grouped[category]) grouped[category] = [];
+          grouped[category].push(tag.name);
+        });
+
+    
+        const formatted = Object.entries(grouped).map(([category, tags]) => ({
+          category,
+          tags
+        }));
+
+        setGroupedTags(formatted);
+      } catch (err) {
+        console.error('❌ Error fetching tags:', err);
+      }
+    };
+
+    if (userData?.otherInfo) {
+      fetchAndGroupTags();
+    } else {
+      console.log('⛔ userData.otherInfo not found, skipping tag fetch.');
+    }
+  }, [userData]);
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
@@ -568,146 +626,68 @@ const UserProfileCard = () => {
                           overflowY: 'auto'
                         }}
                       >
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ color: '#009fc7', mb: 1 }}
-                          fontWeight={600}
-                          gutterBottom
-                          display="flex"
-                          alignItems="center"
-                          gap={1}
-                        >
-                          <LabelOutlinedIcon fontSize="medium" />
-                          Tags
+                        <Box display="flex" alignItems="center" mb={1} mt={2}>
+                          <Typography variant="subtitle1" sx={{ color: '#009fc7' }} className="text">
+                            Tags
+                          </Typography>
+                        </Box>
+
+                        <Typography variant="body2" color="textSecondary" mb={2} className="text">
+                          {otherInfo?.description ?? 'No description available.'}
                         </Typography>
-                        <Grid container spacing={2}>
-                          {(() => {
-                            const tagItems = [];
 
-                            Object.entries(userData.otherInfo).forEach(([key, value]) => {
-                              if (key === 'description' || key === 'file' || key === 'restrictAccess') return;
-                              const isEmptyValue =
-                                value === null ||
-                                value === undefined ||
-                                (typeof value === 'string' && value.trim() === '') ||
-                                (Array.isArray(value) && value.length === 0) ||
-                                (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0);
+                        <Grid>
+                          {groupedTags.length === 0 ? (
+                            <Typography variant="body2" color="textSecondary">
+                              No tags found.
+                            </Typography>
+                          ) : (
+                            groupedTags.map((group, idx) => (
+                              <Box
+                                key={idx}
+                                mb={2}
+                                p={2}
+                                sx={{
+                                  backgroundColor: '#f5f5f5',
+                                  borderRadius: 1,
+                                  width: '100%'
+                                }}
+                              >
+                                <Box display="flex" alignItems="center" mb={1}>
+                                  <Typography variant="subtitle2" fontWeight={600}>
+                                    {group.category}
+                                  </Typography>
+                                </Box>
 
-                              if (isEmptyValue) return;
-                              let valueItems = [];
-                              if (Array.isArray(value)) {
-                                value.forEach((item, index) => {
-                                  if (item.name) {
-                                    valueItems.push(
-                                      <Box
-                                        key={`${key}-name-${index}`}
-                                        sx={{
-                                          bgcolor: '#009FC7',
-                                          color: '#fff',
-                                          px: 1,
-                                          py: 0.5,
-                                          borderRadius: '20px',
-                                          fontSize: '12px',
-                                          fontWeight: 400,
-                                          mr: 1,
-                                          mb: 1,
-                                          display: 'inline-block'
-                                        }}
-                                      >
-                                        {item.name}
-                                      </Box>
-                                    );
-                                  }
-                                });
-                              } else if (typeof value === 'object' && value !== null) {
-                                Object.entries(value).forEach(([innerKey, innerValue], index) => {
-                                  valueItems.push(
-                                    <Box
-                                      key={`${key}-obj-${index}-${innerKey}`}
+                                <Box display="flex" flexWrap="wrap" gap={1}>
+                                  {group.tags.map((tag, i) => (
+                                    <Chip
+                                      key={i}
+                                      label={tag}
+                                      onDelete={() => {}}
+                                      deleteIcon={
+                                        <CancelIcon
+                                          sx={{
+                                            fontSize: 16,
+                                            color: '#666'
+                                          }}
+                                        />
+                                      }
                                       sx={{
-                                        bgcolor: '#009FC7',
+                                        backgroundColor: '#009FC7',
                                         color: '#fff',
-                                        px: 1,
-                                        py: 0.5,
-                                        borderRadius: '20px',
-                                        fontSize: '12px',
+                                        height: 28,
                                         fontWeight: 400,
-                                        mr: 1,
-                                        mb: 1,
-                                        display: 'inline-block'
+                                        '& .MuiChip-deleteIcon': {
+                                          marginLeft: '4px'
+                                        }
                                       }}
-                                    >
-                                      {innerKey}: {String(innerValue)}
-                                    </Box>
-                                  );
-                                });
-                              } else {
-                                valueItems.push(
-                                  <Box
-                                    key={`${key}-value`}
-                                    sx={{
-                                      bgcolor: '#009FC7',
-                                      color: '#fff',
-                                      px: 1,
-                                      py: 0.5,
-                                      borderRadius: '20px',
-                                      fontSize: '12px',
-                                      fontWeight: 400,
-                                      mr: 1,
-                                      mb: 1,
-                                      display: 'inline-block'
-                                    }}
-                                  >
-                                    {String(value)}
-                                  </Box>
-                                );
-                              }
-                              tagItems.push(
-                                <Grid item xs={12} key={`${key}-group`}>
-                                  <Box
-                                    sx={{
-                                      backgroundColor: '#f0f0f0',
-                                      p: 2,
-                                      borderRadius: '12px',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: 1
-                                    }}
-                                  >
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                      <Box
-                                        sx={{
-                                          bgcolor: '#053146',
-                                          color: '#fff',
-                                          px: 1,
-                                          py: 0.5,
-                                          borderRadius: '20px',
-                                          fontSize: '12px',
-                                          fontWeight: 400,
-                                          display: 'inline-block',
-                                          width: 'auto',
-                                          maxWidth: 'fit-content'
-                                        }}
-                                      >
-                                        {key}
-                                      </Box>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>{valueItems}</Box>
-                                  </Box>
-                                </Grid>
-                              );
-                            });
-
-                            return tagItems.length > 0 ? (
-                              tagItems
-                            ) : (
-                              <Grid item xs={12}>
-                                <Typography variant="body2" color="textSecondary">
-                                  No tags available.
-                                </Typography>
-                              </Grid>
-                            );
-                          })()}
+                                    />
+                                  ))}
+                                </Box>
+                              </Box>
+                            ))
+                          )}
                         </Grid>
                       </CardContent>
                     )}

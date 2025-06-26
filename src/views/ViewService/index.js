@@ -427,6 +427,13 @@ const ViewService = () => {
               ) : (
                 sessionData?.map((session, index) => (
                   <Box
+                    onClick={() =>
+                      navigate('/view-session', {
+                        state: {
+                          session
+                        }
+                      })
+                    }
                     key={session?._id || index}
                     sx={{
                       display: 'flex',
@@ -435,7 +442,8 @@ const ViewService = () => {
                       p: 1,
                       borderBottom: '1px solid #e0e0e0',
                       flexWrap: 'nowrap',
-                      gap: 1
+                      gap: 1,
+                      cursor: 'pointer'
                     }}
                   >
                     <Box sx={{ maxWidth: 90, ml: 1 }}>
@@ -507,13 +515,14 @@ const ViewService = () => {
                           px: 0.5,
                           maxHeight: '45px'
                         }}
-                        onClick={() =>
+                        onClick={(event) => {
+                          event.stopPropagation();
                           navigate('/add-session', {
                             state: {
                               session
                             }
-                          })
-                        }
+                          });
+                        }}
                       >
                         Edit Session
                       </Button>
@@ -529,25 +538,27 @@ const ViewService = () => {
                           maxHeight: '45px',
                           borderColor: '#1B4B66'
                         }}
-                        onClick={() =>
+                        onClick={(event) => {
+                          event.stopPropagation();
                           navigate('/attendees', {
                             state: {
                               session
                             }
-                          })
-                        }
+                          });
+                        }}
                       >
                         Add Attendee
                       </Button>
                       <IconButton
                         size="small"
-                        onClick={() =>
+                        onClick={(event) => {
+                          event.stopPropagation();
                           navigate('/view-session', {
                             state: {
                               session
                             }
-                          })
-                        }
+                          });
+                        }}
                       >
                         <InfoIcon sx={{ color: '#49494c' }} fontSize="small" />
                       </IconButton>

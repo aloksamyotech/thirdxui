@@ -137,6 +137,7 @@ const Sessions = () => {
   const [allSession, setAllSession] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -232,11 +233,17 @@ const Sessions = () => {
       <Typography
         sx={{
           textAlign: 'center',
+
           fontSize: 12,
+
           color: '#1B4B66',
+
           cursor: 'pointer',
+
           fontWeight: 500
         }}
+        onClick={() => navigate('/services')}
+        onPointerDown={(e) => e.stopPropagation()}
       >
         View all sessions
       </Typography>

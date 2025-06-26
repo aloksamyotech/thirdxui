@@ -458,7 +458,13 @@ const CaseDetailsPage = () => {
                         )}
                       </TableRow>
                     </TableHead>
-                    <TableBody sx={{ height: '73px' }}>
+                    <TableBody sx={{
+                      height: '73px', cursor: 'pointer', '&:hover': {
+                        backgroundColor: 'grey.200',
+                      },
+                    }}
+                      onClick={() => navigate('/about-case')}
+                    >
                       <TableRow key={row.caseId}>
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>RD-758</TableCell>
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
@@ -549,9 +555,9 @@ const CaseDetailsPage = () => {
                   loading2
                     ? []
                     : row.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                      ...row,
+                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                    }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -562,6 +568,9 @@ const CaseDetailsPage = () => {
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={70}
                 getRowId={(row) => row.id}
+                onRowClick={(params) => {
+                  navigate(`/about-case-note`);
+                }}
                 slots={{
                   toolbar: () => <CustomHeader />,
                   loadingOverlay: () => (
@@ -584,7 +593,10 @@ const CaseDetailsPage = () => {
                   '& .MuiDataGrid-columnHeaders': {
                     backgroundColor: '#f9fafb',
                     fontWeight: 'bold'
-                  }
+                  },
+                  '& .MuiDataGrid-row:hover': {
+                    cursor: 'pointer',
+                  },
                 }}
               />
             </Box>

@@ -278,13 +278,16 @@ const ViewService = () => {
         />
 
         <Grid item xs={12} md={9}>
-          <Card sx={{ borderRadius: 3, mb: 2 }}>
+          <Card
+            sx={{ borderRadius: 3, mb: 2, cursor: 'pointer' }}
+            onClick={() =>
+              navigate('/view-serviceDetails', {
+                state: { serviceid: serviceData?._id }
+              })
+            }
+          >
             {loading ? (
-              <Box
-                sx={{
-                  margin: '5px'
-                }}
-              >
+              <Box sx={{ margin: '5px' }}>
                 <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
               </Box>
             ) : (
@@ -363,9 +366,12 @@ const ViewService = () => {
                         variant="contained"
                         size="small"
                         sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 1, whiteSpace: 'nowrap' }}
-                        onClick={() => navigate('/add-session', { state: { serviceId: serviceData._id } })}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/add-session', { state: { serviceId: serviceData._id } });
+                        }}
                       >
-                        Add New Session {<AddIcon />}
+                        Add New Session <AddIcon />
                       </Button>
                     </Box>
 
@@ -421,6 +427,13 @@ const ViewService = () => {
               ) : (
                 sessionData?.map((session, index) => (
                   <Box
+                    onClick={() =>
+                      navigate('/view-session', {
+                        state: {
+                          session
+                        }
+                      })
+                    }
                     key={session?._id || index}
                     sx={{
                       display: 'flex',
@@ -429,7 +442,8 @@ const ViewService = () => {
                       p: 1,
                       borderBottom: '1px solid #e0e0e0',
                       flexWrap: 'nowrap',
-                      gap: 1
+                      gap: 1,
+                      cursor: 'pointer'
                     }}
                   >
                     <Box sx={{ maxWidth: 90, ml: 1 }}>
@@ -501,13 +515,14 @@ const ViewService = () => {
                           px: 0.5,
                           maxHeight: '45px'
                         }}
-                        onClick={() =>
+                        onClick={(event) => {
+                          event.stopPropagation();
                           navigate('/add-session', {
                             state: {
                               session
                             }
-                          })
-                        }
+                          });
+                        }}
                       >
                         Edit Session
                       </Button>
@@ -523,25 +538,27 @@ const ViewService = () => {
                           maxHeight: '45px',
                           borderColor: '#1B4B66'
                         }}
-                        onClick={() =>
+                        onClick={(event) => {
+                          event.stopPropagation();
                           navigate('/attendees', {
                             state: {
                               session
                             }
-                          })
-                        }
+                          });
+                        }}
                       >
                         Add Attendee
                       </Button>
                       <IconButton
                         size="small"
-                        onClick={() =>
+                        onClick={(event) => {
+                          event.stopPropagation();
                           navigate('/view-session', {
                             state: {
                               session
                             }
-                          })
-                        }
+                          });
+                        }}
                       >
                         <InfoIcon sx={{ color: '#49494c' }} fontSize="small" />
                       </IconButton>

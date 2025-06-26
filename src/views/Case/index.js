@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import TableStyle from '../../ui-component/TableStyle';
 import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
+import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterPanel from 'components/FilterPanel';
 import { useNavigate } from 'react-router-dom';
@@ -98,6 +99,7 @@ const Case = () => {
       width: 90,
       valueGetter: (params) => params.value || '-'
     },
+
     {
       field: 'status',
       headerName: 'Status',
@@ -164,8 +166,8 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
-          status: user?.isActive === true ? 'Open' : 'Closed'
+          owner: user?.caseOwner?.personalInfo?.firstName || '',
+          status: user?.status
         };
       });
 
@@ -210,7 +212,8 @@ const Case = () => {
       const formattedUsers = allCases?.map((user, index) => {
         const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
         const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
-
+        const caseOwnerFirstName = user?.caseOwner?.personalInfo?.firstName || '';
+        const caseOwnerLastName = user?.caseOwner?.personalInfo?.lastName || '';
         return {
           id: user?._id,
           serialNumber: user?.uniqueId,
@@ -218,8 +221,8 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
-          status: user?.isActive === true ? 'Open' : 'Closed'
+          owner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
+          status: user?.status
         };
       });
 

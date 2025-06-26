@@ -22,6 +22,7 @@ const AddCaseForm = () => {
   const fileInputRef = React.useRef(null);
   const [rows, setRows] = useState([]);
   const [services, setServices] = useState([]);
+  const [caseOwner, setCaseOwner] = useState([]);
   const [benificiary, setBenificiary] = useState([]);
   const [Campaigns, setCampaigns] = useState([]);
   const [engagement, setengagement] = useState([]);
@@ -30,6 +31,7 @@ const AddCaseForm = () => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchQueryService, setSearchQueryService] = useState('');
+  const [searchQueryCaseOwner, setSearchQueryCaseOwner] = useState('');
 
   const {
     control,
@@ -43,7 +45,7 @@ const AddCaseForm = () => {
     defaultValues: {
       serviceUserId: '',
       serviceId: '',
-      serviceType: '',
+      caseOwner: '',
       caseOpened: dayjs(),
       caseClosed: null,
       benificiary: [],
@@ -141,7 +143,7 @@ const AddCaseForm = () => {
 
       formData.append('serviceUserId', data.serviceUserId || '');
       formData.append('serviceId', data.serviceId || '');
-      formData.append('serviceType', data.serviceType || '');
+      formData.append('caseOwner', data.caseOwner || '');
       formData.append('caseOpened', data.caseOpened || '');
       formData.append('caseClosed', data.caseClosed || '');
 
@@ -170,7 +172,7 @@ const AddCaseForm = () => {
       });
 
       formData.append('description', data.description || '');
-      formData.append('isActive', data.serviceStatus);
+      formData.append('status', data.serviceStatus);
 
       if (data.file) {
         formData.append('file', data.file);
@@ -210,6 +212,25 @@ const AddCaseForm = () => {
     };
     fetchpeople();
   }, [searchQuery]);
+  useEffect(() => {
+    const fetchpeople = async () => {
+      const queryParams = new URLSearchParams();
+      if (searchQueryCaseOwner && searchQueryCaseOwner !== '') {
+        queryParams.append('search', searchQueryCaseOwner);
+      }
+      queryParams.append('role', 'service_user');
+
+      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+      const allUser = response?.data?.data || [];
+      const formattedUsers = allUser.map((user) => ({
+        id: user._id,
+        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
+        // name: user?.personalInfo?.firstName
+      }));
+      setCaseOwner(formattedUsers);
+    };
+    fetchpeople();
+  }, [searchQueryCaseOwner]);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -259,7 +280,7 @@ const AddCaseForm = () => {
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
                       const selectedUser = rows?.find((user) => user.id === field.value);
-
+                      
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                           <Autocomplete
@@ -318,27 +339,29 @@ const AddCaseForm = () => {
 
                 <Grid item xs={12} sm={4}>
                   <Controller
-                    name="serviceType"
+                    name="caseOwner"
                     control={control}
-                    rules={{ required: 'Service owner is required' }}
+                    rules={{ required: 'Case owner is required' }}
                     render={({ field }) => {
-                      const options = ['owner1', 'owner2', 'owner3'];
-
+                      const selectedCaseOwner = caseOwner?.find((owner) => owner.id === field.value);
                       return (
-                        <FormControl fullWidth size="small" error={!!errors.serviceType}>
+                        <FormControl fullWidth size="small" error={!!errors.caseOwner}>
                           <Autocomplete
-                            value={field.value || null}
-                            onChange={(_, value) => field.onChange(value || '')}
-                            options={options}
-                            getOptionLabel={(option) => option}
-                            isOptionEqualToValue={(option, value) => option === value}
+                            value={selectedCaseOwner}
+                            onChange={(_, value) => {
+                              field.onChange(value ? value.id : '');
+                            }}
+                            onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
+                            options={caseOwner || []}
+                            getOptionLabel={(option) => option.name || ''}
+                            isOptionEqualToValue={(option, value) => option._id === value._id}
                             renderInput={(params) => (
-                              <TextField {...params} label="Service Owner" variant="outlined" size="small" error={!!errors.serviceType} />
+                              <TextField {...params} label="Case Owner" variant="outlined" size="small" error={!!errors.caseOwner} />
                             )}
                           />
-                          {errors.serviceType && (
+                          {errors.caseOwner && (
                             <Typography color="error" variant="caption">
-                              {errors.serviceType.message}
+                              {errors.caseOwner.message}
                             </Typography>
                           )}
                         </FormControl>
@@ -346,7 +369,7 @@ const AddCaseForm = () => {
                     }}
                   />
                 </Grid>
-
+                
                 <Grid item xs={12} sm={4}>
                   <Controller
                     name="caseOpened"

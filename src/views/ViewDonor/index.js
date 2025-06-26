@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider, Chip } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
@@ -11,6 +11,7 @@ import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import { useNavigate, useLocation } from 'react-router-dom';
 import FilterPanel from 'components/FilterPanel';
+import CancelIcon from '@mui/icons-material/Cancel';
 import CaseNoteDialog from 'components/AddCaseNote';
 import AddItemDialog from 'components/AddItem';
 import UserBg from 'assets/images/form.png';
@@ -19,6 +20,7 @@ import OptionsPopover from 'components/AddFilter';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import OptionsPopoverDonor from 'components/PopoverDoner';
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { imageUrl } from 'common/urls';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import { SUBROLES } from 'common/constants';
@@ -34,6 +36,7 @@ const UserProfileCard = () => {
   const [activityType, setActivityType] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [groupedTags, setGroupedTags] = useState([]);
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
@@ -60,6 +63,62 @@ const UserProfileCard = () => {
       fetchUserById();
     }
   }, [id]);
+
+  useEffect(() => {
+    const fetchAndGroupTags = async () => {
+      try {
+        const response = await getApi(urls.tag.getAllTags);
+        const allTags = response?.data?.allTags || [];
+    
+
+    
+        const combinedData = [
+          ...(userData?.otherInfo?.benificiary ?? []),
+          ...(userData?.otherInfo?.campaigns ?? []),
+          ...(userData?.otherInfo?.eventAttanded ?? []),
+          ...(userData?.otherInfo?.engagement ?? []),
+          ...(userData?.otherInfo?.fundingInterest ?? []),
+          ...(userData?.otherInfo?.fundraisingActivities ?? [])
+        ];
+
+    
+        const allIds = combinedData.map((item) => {
+          const id = typeof item === 'object' && item !== null ? item._id : item;
+          if (!id) {
+            console.warn('⚠️ Invalid ID in item:', item);
+          }
+          return id;
+        });
+
+    
+        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
+
+    
+        const grouped = {};
+        relatedTags.forEach((tag) => {
+          const category = tag.tagCategoryName || 'Uncategorized';
+          if (!grouped[category]) grouped[category] = [];
+          grouped[category].push(tag.name);
+        });
+
+    
+        const formatted = Object.entries(grouped).map(([category, tags]) => ({
+          category,
+          tags
+        }));
+
+        setGroupedTags(formatted);
+      } catch (err) {
+        console.error('❌ Error fetching tags:', err);
+      }
+    };
+
+    if (userData?.otherInfo) {
+      fetchAndGroupTags();
+    } else {
+      console.log('⛔ userData.otherInfo not found, skipping tag fetch.');
+    }
+  }, [userData]);
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
@@ -550,6 +609,85 @@ const UserProfileCard = () => {
                               </Typography>
                             </Box>
                           </Grid>
+                        </Grid>
+                      </CardContent>
+                    )}
+                  </Card>
+                </Grid>
+                <Grid item xs={12} md={12}>
+                  <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '318px', p: 2 }}>
+                    {loading ? (
+                      <SectionSkeleton lines={1} variant="rectangular" width="100%" height={300} />
+                    ) : (
+                      <CardContent
+                        sx={{
+                          p: 0,
+                          maxHeight: '270px',
+                          overflowY: 'auto'
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" mb={1} mt={2}>
+                          <Typography variant="subtitle1" sx={{ color: '#009fc7' }} className="text">
+                            Tags
+                          </Typography>
+                        </Box>
+
+                        <Typography variant="body2" color="textSecondary" mb={2} className="text">
+                          {otherInfo?.description ?? 'No description available.'}
+                        </Typography>
+
+                        <Grid>
+                          {groupedTags.length === 0 ? (
+                            <Typography variant="body2" color="textSecondary">
+                              No tags found.
+                            </Typography>
+                          ) : (
+                            groupedTags.map((group, idx) => (
+                              <Box
+                                key={idx}
+                                mb={2}
+                                p={2}
+                                sx={{
+                                  backgroundColor: '#f5f5f5',
+                                  borderRadius: 1,
+                                  width: '100%'
+                                }}
+                              >
+                                <Box display="flex" alignItems="center" mb={1}>
+                                  <Typography variant="subtitle2" fontWeight={600}>
+                                    {group.category}
+                                  </Typography>
+                                </Box>
+
+                                <Box display="flex" flexWrap="wrap" gap={1}>
+                                  {group.tags.map((tag, i) => (
+                                    <Chip
+                                      key={i}
+                                      label={tag}
+                                      onDelete={() => {}}
+                                      deleteIcon={
+                                        <CancelIcon
+                                          sx={{
+                                            fontSize: 16,
+                                            color: '#666'
+                                          }}
+                                        />
+                                      }
+                                      sx={{
+                                        backgroundColor: '#009FC7',
+                                        color: '#fff',
+                                        height: 28,
+                                        fontWeight: 400,
+                                        '& .MuiChip-deleteIcon': {
+                                          marginLeft: '4px'
+                                        }
+                                      }}
+                                    />
+                                  ))}
+                                </Box>
+                              </Box>
+                            ))
+                          )}
                         </Grid>
                       </CardContent>
                     )}

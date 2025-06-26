@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import StatusChip from 'views/AboutCase/StatusChip';
 
 const Case = () => {
   const navigate = useNavigate();
@@ -102,21 +103,7 @@ const Case = () => {
       headerName: 'Status',
       width: 120,
       renderCell: (params) => (
-        <Chip
-          label={params.value || '-'}
-          variant="outlined"
-          icon={params.value === 'Open' ? <CheckIcon /> : params.value ? <LoopIcon /> : null}
-          sx={{
-            padding: '0px',
-            height: '24px',
-            minHeight: 'unset',
-            margin: '0px',
-            fontSize: '12px',
-            borderRadius: '12px',
-            borderColor: 'gray',
-            backgroundColor: 'transparent'
-          }}
-        />
+        <StatusChip status={params.value} />
       )
     },
     {
@@ -384,9 +371,9 @@ const Case = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                     }
                     columns={columns}
                     rowCount={totalRows}

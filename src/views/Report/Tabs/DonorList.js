@@ -134,7 +134,7 @@ const CaseList = ({ selectedName, status, caseId, dateOpenedFilter }) => {
           title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-',
           type:
             item?.donorId?.personalInfo?.firstName || item?.donorId?.personalInfo?.lastName
-              ? [item?.donorId?.personalInfo?.firstName || '-', item?.donorId?.personalInfo?.lastName || '-']
+              ? [`${item?.donorId?.personalInfo?.firstName || '-'}`, `${item?.donorId?.personalInfo?.lastName || '-'}`].join(' ')
               : [item?.donorId?.companyInformation?.companyName || '-'],
 
           code: item?.campaign?.name || item.campaign || '-',

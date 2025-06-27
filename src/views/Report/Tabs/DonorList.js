@@ -59,23 +59,48 @@ const CaseList = ({ selectedName, status, caseId, dateOpenedFilter }) => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight="600" sx={{ color: 'green', fontSize: '12px' }}>
-          {params.value || '-'}
-        </Typography>
-      )
+      renderCell: (params) => {
+        const formatAmount = (value) => {
+          const numericValue = parseFloat(value.replace(/[^\d.-]/g, ''));
+          if (isNaN(numericValue)) return `$0`;
+          let formattedValue = numericValue;
+          let suffix = '';
+          if (numericValue >= 1_000_000_000) {
+            formattedValue = (numericValue / 1_000_000_000).toFixed(1);
+            suffix = 'B';
+          } else if (numericValue >= 1_000_000) {
+            formattedValue = (numericValue / 1_000_000).toFixed(1);
+            suffix = 'M';
+          } else if (numericValue >= 1_000) {
+            formattedValue = (numericValue / 1_000).toFixed(1);
+            suffix = 'K';
+          }
+
+          return `$${formattedValue}${suffix}`;
+        };
+
+        return (
+          <Typography variant="body2" fontWeight="600" sx={{ color: 'green', fontSize: '12px' }}>
+            {formatAmount(params.value) || '-'}
+          </Typography>
+        );
+      }
     },
+
     {
       field: 'phone',
       headerName: 'Phone',
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ fontSize: '12px' }}>
-          {params.value || '-'}
-        </Typography>
-      )
+      renderCell: (params) => {
+        const phoneNumber = params.value ? params.value.replace(/^\+91/, '') : '-';
+        return (
+          <Typography variant="body2" sx={{ fontSize: '12px' }}>
+            {phoneNumber || '-'}
+          </Typography>
+        );
+      }
     }
   ];
   useEffect(() => {

@@ -73,7 +73,8 @@ export const urls = Object.freeze({
   },
   casenote: {
     create: `${baseUrl}/caseNote/add`,
-    fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+    fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`,
+    getById: `${baseUrl}/caseNote//getById/:id`
   },
   forms: {
     add: `${baseUrl}/forms`,
@@ -108,6 +109,6 @@ export const urls = Object.freeze({
     getAllAdmin: `${baseUrl}/admin/getAllAdmin`,
     forgotPassword: `${baseUrl}/admin/forgot-password`,
     otpvarify: `${baseUrl}/admin/verify-otp`,
-    resetPassword:`${baseUrl}/admin/reset-password`
+    resetPassword: `${baseUrl}/admin/reset-password`
   }
 });

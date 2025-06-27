@@ -36,8 +36,10 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
       width: 150,
       renderCell: (params) => (
         <Typography sx={{ fontSize: '12px' }}>
-          {params?.row?.firstName || '-'} {params?.row?.lastName || '-'}
-          {params?.value || '-'}
+          {params?.row?.firstName || ''}
+          {params?.row?.firstName && params?.row?.lastName ? ' ' : ''}
+          {params?.row?.lastName || ''}
+          {params?.value || ''}
         </Typography>
       )
     },

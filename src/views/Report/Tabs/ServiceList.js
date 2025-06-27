@@ -106,12 +106,14 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
       .then((res) => res.json())
       .then((data) => {
         const countries = data.map((country) => ({
-          value: country?.name?.common,
-          label: country?.name?.common,
-          flag: country?.flags?.png
+          value: country?.name?.common || country?.value,
+          label: country?.name?.common || country?.name,
+          flag: country?.flags?.png || country?.flags
         }));
+
         setCountriesWithFlags(countries);
-      });
+      })
+      .catch((error) => console.error('Error fetching countries:', error));
   }, []);
   const CustomHeader = () => {
     return (
@@ -165,6 +167,8 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
   };
 
   const fetchpeople = async () => {
+    if (!countriesWithFlags.length) return;
+
     try {
       setLoading(true);
       const queryParams = new URLSearchParams({
@@ -204,7 +208,9 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
         const dob = user.personalInfo?.dateOfBirth ? new Date(user.personalInfo?.dateOfBirth).toLocaleDateString() : '-';
         const age = dob !== '-' ? getAge(dob) : '-';
         const countryName = user?.contactInfo?.country || '-';
+
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
+
         const uniqueId = user?.uniqueId;
         return {
           id: user._id,
@@ -233,9 +239,10 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
   };
 
   useEffect(() => {
-    fetchpeople();
-  }, [paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
-
+    if (countriesWithFlags.length > 0) {
+      fetchpeople();
+    }
+  }, [countriesWithFlags, paginationModel, countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter]);
   return (
     <>
       <Grid container>

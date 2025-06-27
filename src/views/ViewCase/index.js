@@ -87,7 +87,6 @@ const CaseDetailsPage = () => {
       </Box>
     );
   };
-
   const dobRaw = serviceuserDetails?.personalInfo?.dateOfBirth;
   const dobFormatted = dobRaw ? dayjs(dobRaw).format('DD/MM/YYYY') : '';
   const age = dobRaw ? dayjs().diff(dayjs(dobRaw), 'year') : '';
@@ -265,6 +264,7 @@ const CaseDetailsPage = () => {
           subject: note.subject || '-',
           createdBy: note?.createdBy?.userName || '-',
           configurationName: configName,
+          time: note?.time,
           sNo: paginationModel.page * paginationModel.pageSize + index + 1
         };
       });
@@ -307,7 +307,14 @@ const CaseDetailsPage = () => {
     };
     fetchData();
   }, []);
-  
+
+  const handleClick = () => {
+    navigate('/about-case', {
+      state: {
+        caseData
+      }
+    });
+  };
   return (
     <>
       <Box>
@@ -458,15 +465,20 @@ const CaseDetailsPage = () => {
                         )}
                       </TableRow>
                     </TableHead>
-                    <TableBody sx={{
-                      height: '73px', cursor: 'pointer', '&:hover': {
-                        backgroundColor: 'grey.200',
-                      },
-                    }}
-                      onClick={() => navigate('/about-case')}
+                    <TableBody
+                      sx={{
+                        height: '73px',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: 'grey.200'
+                        }
+                      }}
+                      onClick={handleClick}
                     >
                       <TableRow key={row.caseId}>
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>RD-758</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {serviceuserDetails?.uniqueId || '-'}
+                        </TableCell>
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           <Typography variant="body2" sx={{ fontSize: '12px' }}>
                             {serviceuserDetails?.personalInfo?.firstName || '-'}
@@ -555,9 +567,9 @@ const CaseDetailsPage = () => {
                   loading2
                     ? []
                     : row.map((row, index) => ({
-                      ...row,
-                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                    }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -568,8 +580,10 @@ const CaseDetailsPage = () => {
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={70}
                 getRowId={(row) => row.id}
-                onRowClick={(params) => {
-                  navigate(`/about-case-note`);
+                onRowClick={(row) => {
+
+
+                  navigate('/about-case-note', { state: { caseData: row?.row } });
                 }}
                 slots={{
                   toolbar: () => <CustomHeader />,
@@ -595,8 +609,8 @@ const CaseDetailsPage = () => {
                     fontWeight: 'bold'
                   },
                   '& .MuiDataGrid-row:hover': {
-                    cursor: 'pointer',
-                  },
+                    cursor: 'pointer'
+                  }
                 }}
               />
             </Box>

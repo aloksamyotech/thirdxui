@@ -9,6 +9,8 @@ import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import AddCaseForm from 'views/AddTransaction';
+import { Dialog } from '@mui/material';
 
 const dateAddedFilters = [
   { value: 'today', label: 'Today' },
@@ -71,6 +73,11 @@ const Financial = () => {
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [donorOptions, setDonorOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const columns = [
     {
@@ -292,7 +299,7 @@ const Financial = () => {
         <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
           <Tooltip title="Add" arrow>
             <IconButton
-              onClick={() => navigate('/add-transaction')}
+              onClick={handleOpen}
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
@@ -314,6 +321,9 @@ const Financial = () => {
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+            <AddCaseForm onCancel={handleClose} />
+          </Dialog>
 
           <Box
             sx={{

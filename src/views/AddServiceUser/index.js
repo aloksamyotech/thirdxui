@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -25,6 +24,8 @@ import {
 import { CircularProgress } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import AddIcon from '@mui/icons-material/Add';
+
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -37,8 +38,23 @@ import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
 
+const contactMethodInitial = {
+  Telephone: 0,
+  Email: 0,
+  Letter: 0,
+  SMS: 0,
+  Whatsapp: 0
+};
+
+const stateStyles = [
+  { color: '#e9b867', icon: '?' },
+  { color: '#7cbd71', icon: '✓' },
+  { color: '#ce655d', icon: '✕' }
+];
+
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
+  const [contactMethodStates, setContactMethodStates] = useState(contactMethodInitial);
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [isLoading, setIsloading] = useState(false);
@@ -56,6 +72,14 @@ const AddCaseForm = ({ onCancel }) => {
   const location = useLocation();
   const editdata = location?.state?.editdata;
   const sessionId = location?.state?.sessionId;
+
+  const handleContactMethodClick = (label) => {
+    setContactMethodStates((prev) => {
+      const nextState = (prev[label] + 1) % 3;
+      setValue(label.toLowerCase(), nextState === 1);
+      return { ...prev, [label]: nextState };
+    });
+  };
 
   const {
     register,
@@ -291,9 +315,16 @@ const AddCaseForm = ({ onCancel }) => {
   );
 
   const handleToggle = () => setRestrictAccess(!restrictAccess);
+
+  useEffect(() => {
+    ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
+      register(field);
+      setValue(field, false);
+    });
+  }, [register, setValue]);
+
   const onSubmit = async (formData) => {
     const isValid = await trigger();
-
     if (!isValid) {
       toast.error('Please fill in all required fields.');
       return;
@@ -361,6 +392,22 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[country]', formData.emergencycountry || '');
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
+    fd.append('RiskAssessment[riskAssessment]', formData.RiskAssessment || '');
+    fd.append('RiskAssessment[keyIndicators]', formData.keyIndicators || '');
+    fd.append('Service[serviceName]', formData.serviceName || '');
+    fd.append('Service[startDate]', formData.startDate || '');
+    fd.append('Service[lastDate]', formData.lastDate || '');
+    fd.append('Service[referrerJob]', formData.referrerJob || '');
+    fd.append('Service[referrerPhone]', formData.referrerPhone || '');
+    fd.append('Service[referrerEmail]', formData.referrerEmail || '');
+    fd.append('Service[emergencyPhone]', formData.emergencyPhone || '');
+    fd.append('Service[emergencyEmail]', formData.emergencyEmail || '');
+    fd.append('Service[referralType]', formData.referralType || '');
+    fd.append('Service[referredDate]', formData.referredDate || '');
+    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
 
     if (formData.preferredContact) {
       fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
@@ -375,12 +422,6 @@ const AddCaseForm = ({ onCancel }) => {
     }
     const confirmDate = formData.confirmationDate;
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
-
-    fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
-
     fd.append('role', 'service_user');
     fd.append('isActive', true);
 
@@ -441,7 +482,6 @@ const AddCaseForm = ({ onCancel }) => {
       'country',
       'firstLanguage',
       'otherId',
-
       'Beneficiary',
       'Campaigns',
       'riskNotes',
@@ -531,9 +571,33 @@ const AddCaseForm = ({ onCancel }) => {
                 })}
               />
               <Tab
-                label="Contact Preferences"
+                label="Risk Assessment"
                 sx={(theme) => ({
                   backgroundColor: tabIndex === 2 ? '#e3f2fd' : 'transparent',
+                  transition: 'background-color 0.3s ease',
+                  marginRight: 2,
+                  fontSize: '14px',
+                  minWidth: 120,
+                  fontWeight: 'bold',
+                  textTransform: 'none'
+                })}
+              />
+              <Tab
+                label="Service"
+                sx={(theme) => ({
+                  backgroundColor: tabIndex === 3 ? '#e3f2fd' : 'transparent',
+                  transition: 'background-color 0.3s ease',
+                  marginRight: 2,
+                  fontSize: '14px',
+                  minWidth: 120,
+                  fontWeight: 'bold',
+                  textTransform: 'none'
+                })}
+              />
+              <Tab
+                label="Contact Preferences"
+                sx={(theme) => ({
+                  backgroundColor: tabIndex === 4 ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',
                   marginRight: 2,
                   fontSize: '14px',
@@ -1956,159 +2020,58 @@ const AddCaseForm = ({ onCancel }) => {
               )}
 
               {tabIndex === 2 && (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '12px',
+                      padding: 2,
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 2,
+                      mt: 2
+                    }}
+                  >
+                    <TextField
+                      name="RiskAssessment"
+                      fullWidth
+                      multiline
+                      minRows={5}
+                      label="Risk Assessment Notes"
+                      variant="outlined"
+                      {...register('riskAssessmentNotes')}
+                      sx={{
+                        flex: 1,
+                        backgroundColor: '#f9f9f9',
+                        borderRadius: '8px'
+                      }}
+                    />
+
                     <Controller
-                      name="preferredContact"
+                      name="keyIndicators"
                       control={control}
                       rules={{ required: 'This field is required' }}
                       render={({ field }) => (
                         <TextField
-                          fullWidth
-                          size="small"
-                          label="Preferred Method of Contact"
                           select
+                          fullWidth
+                          label="Key Indicators of Concern"
                           {...field}
-                          error={!!errors.preferredContact}
-                          helperText={errors.preferredContact?.message}
+                          sx={{
+                            flex: 1,
+                            backgroundColor: '#f9f9f9',
+                            borderRadius: '8px',
+                            minWidth: '300px'
+                          }}
                         >
-                          {contactmethod?.map((option) => (
-                            <MenuItem key={option._id} value={option._id}>
-                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                            </MenuItem>
-                          ))}
+                          <MenuItem value="Health">Health</MenuItem>
+                          <MenuItem value="Safety">Safety</MenuItem>
+                          <MenuItem value="Behavior">Behavior</MenuItem>
+                          <MenuItem value="Other">Other</MenuItem>
                         </TextField>
                       )}
                     />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Controller
-                      name="contactPurpose"
-                      control={control}
-                      rules={{ required: 'This field is required' }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Contact Purposes"
-                          select
-                          {...field}
-                          error={!!errors.contactPurpose}
-                          helperText={errors.contactPurpose?.message}
-                        >
-                          {contactpurpose?.map((option) => (
-                            <MenuItem key={option._id} value={option._id}>
-                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Controller
-                      name="confirmationDate"
-                      control={control}
-                      render={({ field }) => (
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            label="Date of Confirmation"
-                            value={field.value}
-                            onChange={(newValue) => field.onChange(newValue)}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                fullWidth
-                                size="small"
-                                error={!!errors.confirmationDate}
-                                helperText={errors.confirmationDate?.message}
-                              />
-                            )}
-                          />
-                        </LocalizationProvider>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Controller
-                      name="reason"
-                      control={control}
-                      rules={{ required: 'This field is required' }}
-                      render={({ field }) => (
-                        <TextField
-                          fullWidth
-                          label="Reason"
-                          size="small"
-                          select
-                          {...field}
-                          error={!!errors.reason}
-                          helperText={errors.reason?.message}
-                        >
-                          {reason?.map((option) => (
-                            <MenuItem key={option._id} value={option._id}>
-                              {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="telephone"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                          label="Telephone"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="emailConsent"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                          label="Email"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="sms"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                          label="SMS"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={2}>
-                    <Controller
-                      name="whatsapp"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                          label="Whatsapp"
-                          labelPlacement="start"
-                          sx={{ display: 'flex', gap: '10px' }}
-                        />
-                      )}
-                    />
-                  </Grid>
+                  </Box>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
                       <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
@@ -2121,6 +2084,309 @@ const AddCaseForm = ({ onCancel }) => {
                       </Button>
                     </Grid>
                   </Grid>{' '}
+                </Grid>
+              )}
+
+              {tabIndex === 3 && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <Box
+                      sx={{
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        p: 2
+                      }}
+                    >
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <Controller
+                            name="serviceName"
+                            control={control}
+                            rules={{ required: 'Service Name is required' }}
+                            render={({ field }) => (
+                              <TextField select label="Service Name" fullWidth size="small" {...field}>
+                                <MenuItem value="Counseling">Counseling</MenuItem>
+                                <MenuItem value="Training">Training</MenuItem>
+                                <MenuItem value="Support">Support</MenuItem>
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <Controller
+                            name="startDate"
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                type="date"
+                                fullWidth
+                                size="small"
+                                label="Start Date"
+                                InputLabelProps={{ shrink: true }}
+                                {...field}
+                              />
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <Controller
+                            name="lastDate"
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                type="date"
+                                fullWidth
+                                size="small"
+                                label="Last Date"
+                                InputLabelProps={{ shrink: true }}
+                                {...field}
+                              />
+                            )}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12} md={8}>
+                    <Box
+                      sx={{
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        p: 2
+                      }}
+                    >
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <TextField name="referrerName" fullWidth size="small" label="Referrer Name" {...register('referrerName')} />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <TextField name="referrerJob" fullWidth size="small" label="Referrer Job Title" {...register('referrerJob')} />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            name="referrerPhone"
+                            size="small"
+                            label="Referrer Phone No."
+                            {...register('referrerPhone')}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <TextField fullWidth name="referrerEmail" size="small" label="Referrer Email" {...register('referrerEmail')} />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            name="emergencyPhone"
+                            size="small"
+                            label="Emergency Phone No."
+                            {...register('emergencyPhone')}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <TextField fullWidth name="emergencyEmail" size="small" label="Emergency Email" {...register('emergencyEmail')} />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <Controller
+                            name="referralType"
+                            control={control}
+                            render={({ field }) => (
+                              <TextField select fullWidth size="small" label="Referral Type" {...field}>
+                                <MenuItem value="Direct">Direct</MenuItem>
+                                <MenuItem value="Agency">Agency</MenuItem>
+                                <MenuItem value="Other">Other</MenuItem>
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <Controller
+                            name="referredDate"
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                type="date"
+                                fullWidth
+                                size="small"
+                                label="Referred Date"
+                                InputLabelProps={{ shrink: true }}
+                                {...field}
+                              />
+                            )}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Button variant="outlined" size="small" startIcon={<AddIcon />} sx={{ mt: 1 }}>
+                      Add Another Service
+                    </Button>
+                  </Grid>
+                </Grid>
+              )}
+
+              {tabIndex === 4 && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Box
+                      sx={{
+                        border: '1px solid #ccc',
+                        borderRadius: 3,
+                        p: 2
+                      }}
+                    >
+                      <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+                        {Object.keys(contactMethodStates).map((label) => {
+                          const stateIndex = contactMethodStates[label];
+                          const { color, icon } = stateStyles[stateIndex];
+
+                          return (
+                            <Button
+                              key={label}
+                              variant="contained"
+                              onClick={() => handleContactMethodClick(label)}
+                              sx={{
+                                backgroundColor: color,
+                                '&:hover': {
+                                  backgroundColor: color
+                                },
+                                color: '#000',
+                                borderRadius: '8px',
+                                px: 2,
+                                fontWeight: 'bold',
+                                minWidth: 165,
+                                display: 'flex',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              {label}
+                              <span>{icon}</span>
+                            </Button>
+                          );
+                        })}
+                      </Box>
+
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
+                          <Controller
+                            name="confirmationDate"
+                            control={control}
+                            render={({ field }) => (
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                  label="Date of Confirmation"
+                                  value={field.value}
+                                  onChange={(newValue) => field.onChange(newValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      fullWidth
+                                      size="small"
+                                      error={!!errors.confirmationDate}
+                                      helperText={errors.confirmationDate?.message}
+                                    />
+                                  )}
+                                />
+                              </LocalizationProvider>
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={4}>
+                          <Controller
+                            name="reason"
+                            control={control}
+                            rules={{ required: 'This field is required' }}
+                            render={({ field }) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Reason"
+                                select
+                                {...field}
+                                error={!!errors.reason}
+                                helperText={errors.reason?.message}
+                              >
+                                {reason?.map((option) => (
+                                  <MenuItem key={option._id} value={option._id}>
+                                    {option.name}
+                                  </MenuItem>
+                                ))}
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={4}>
+                          <Controller
+                            name="contactPurpose"
+                            control={control}
+                            rules={{ required: 'This field is required' }}
+                            render={({ field }) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Purpose"
+                                select
+                                {...field}
+                                error={!!errors.contactPurpose}
+                                helperText={errors.contactPurpose?.message}
+                              >
+                                {contactpurpose?.map((option) => (
+                                  <MenuItem key={option._id} value={option._id}>
+                                    {option.name}
+                                  </MenuItem>
+                                ))}
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+
+                  <Grid container justifyContent="flex-end" spacing={2} sx={{ mt: 1, pr: 2 }}>
+                    <Grid item>
+                      <Button
+                        variant="outlined"
+                        onClick={() => navigate('/people')}
+                        sx={{
+                          borderColor: '#a6a9ff',
+                          color: '#a6a9ff',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        CANCEL
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                          background: '#053146',
+                          fontWeight: 'bold',
+                          color: '#fff',
+                          px: 3
+                        }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Saving...' : 'CONFIRM PREFERENCE'}
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Grid>
               )}
             </Box>

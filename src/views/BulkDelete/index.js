@@ -100,7 +100,7 @@ const BulkDelete = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h5">Bulk Delete</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Bulk Delete</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
           <Button

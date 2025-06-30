@@ -251,7 +251,7 @@ const PeopleManagement = () => {
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: '220px',
+                // width: '220px',
                 height: '35px',
                 display: 'flex',
                 justifyContent: 'center',
@@ -259,7 +259,9 @@ const PeopleManagement = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
-                padding:'22px',
+                padding: '22px',
+                // paddingInline: '55px',
+                // paddingBlock:'25px',
                 '&:hover': {
                   backgroundColor: '#009fc7'
                 }

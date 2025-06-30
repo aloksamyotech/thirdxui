@@ -473,7 +473,7 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">{editdata ? 'Edit User' : 'Add New User'}</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">{editdata ? 'Edit User' : 'Add New User'}</Typography>
 
           <Box
             sx={{

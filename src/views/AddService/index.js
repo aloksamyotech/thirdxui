@@ -225,7 +225,7 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Adding New Service</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Adding New Service</Typography>
         <Box
           sx={{
             display: 'flex',

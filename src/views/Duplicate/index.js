@@ -131,7 +131,7 @@ const Duplicate = () => {
     <>
       <Box>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="h5">Duplicates</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Duplicates</Typography>
           <Box
             sx={{
               display: 'flex',

@@ -171,7 +171,7 @@ const MailingListForm = () => {
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Create list of Service User</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Create list of Service User</Typography>
 
         <Box
           sx={{

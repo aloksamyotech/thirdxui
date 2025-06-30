@@ -565,11 +565,13 @@ const AddCaseForm = ({ onCancel }) => {
                                     {...field}
                                   >
                                     <MenuItem value="Mr">Mr.</MenuItem>
-                                    <MenuItem value="Ms">Ms.</MenuItem>
                                     <MenuItem value="Mrs">Mrs.</MenuItem>
-                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Miss">Miss</MenuItem>
                                     <MenuItem value="Dr">Dr.</MenuItem>
-                                    <MenuItem value="Lady">Lady</MenuItem>
+                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Rev">Rev.</MenuItem>
+                                    <MenuItem value="Lady">Lady.</MenuItem>
+                                    <MenuItem value="Sir">Sir.</MenuItem>
                                   </TextField>
                                 )}
                               />
@@ -1124,7 +1126,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        label="Country of origin"
+                                        label="Country"
                                         size="small"
                                         error={!!error}
                                         helperText={error ? error.message : ''}
@@ -1501,11 +1503,13 @@ const AddCaseForm = ({ onCancel }) => {
                                     {...field}
                                   >
                                     <MenuItem value="Mr">Mr.</MenuItem>
-                                    <MenuItem value="Ms">Ms.</MenuItem>
                                     <MenuItem value="Mrs">Mrs.</MenuItem>
-                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Miss">Miss</MenuItem>
                                     <MenuItem value="Dr">Dr.</MenuItem>
-                                    <MenuItem value="Dr">Lady</MenuItem>
+                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Rev">Rev.</MenuItem>
+                                    <MenuItem value="Lady">Lady.</MenuItem>
+                                    <MenuItem value="Sir">Sir.</MenuItem>
                                   </TextField>
                                 )}
                               />

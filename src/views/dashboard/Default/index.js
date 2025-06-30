@@ -110,42 +110,53 @@ const Dashboard = () => {
   };
 
   return (
-    <Grid container spacing={gridSpacing}>
-      <Grid item xs={12}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
+
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6} md={6} lg={3}>
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
             <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" loading={isLoading} />
           </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" loading={isLoading} />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
-            <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" loading={isLoading} />
+          <Grid item marginInline={5}>
+            <Shortcut2 icon={1} title="Add Person" path="/add-serviceuser" />
           </Grid>
         </Grid>
       </Grid>
 
-      <Grid item xs={12}>
-        <Grid container spacing={3} sx={{ px: '20px' }}>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
-            <Shortcut2 icon={1} title="Add Person" path="/add-serviceuser" />
+      <Grid item xs={12} sm={6} md={6} lg={3}>
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
+            <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" loading={isLoading} />
           </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
+          <Grid item marginInline={5}>
             <Shortcut2 icon={2} title="Add New Case" path="/add-case" />
           </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
+        </Grid>
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={6} lg={3}>
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
+            <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
+          </Grid>
+          <Grid item marginInline={5}>
             <Shortcut2 icon={3} title="Add Session Attendies" path="/services" />
           </Grid>
-          <Grid item xs={12} sm={6} md={6} lg={3}>
+        </Grid>
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={6} lg={3}>
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
+            <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" loading={isLoading} />
+          </Grid>
+          <Grid item marginInline={5}>
             <Shortcut2 icon={4} title="Add Donor" path="/add-donor" />
           </Grid>
         </Grid>
       </Grid>
 
-      <Grid item container xs={12} sx={{ justifyContent: 'center' }}>
+      <Grid item container xs={12} justifyContent="center" marginBlock={2}>
         <Divider sx={{ width: '70%', borderWidth: '1px' }} />
       </Grid>
 

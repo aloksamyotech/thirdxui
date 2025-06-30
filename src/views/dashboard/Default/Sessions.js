@@ -59,14 +59,16 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
     <Box sx={{ py: 1, px: 1 }}>
       <Grid container spacing={1} alignItems="center" wrap="wrap">
         <Grid item xs={12} sm={2}>
-          <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{date}</Typography>
-          <Typography sx={{ fontSize: 13 }}>{time}</Typography>
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
+            <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{date}</Typography>
+            <Typography sx={{ fontSize: 13 }}>{time}</Typography>
+          </Box>
         </Grid>
 
         <Grid item xs={12} sm={5}>
-          <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{title}</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 12, lineHeight: '23px', color: '#26262680' }}>{title}</Typography>
           <Typography
-            sx={{ fontSize: 12, color: 'text.secondary', whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word' }}
+            sx={{ fontSize: 12, color: '#26262680', whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word' }}
           >
             {description}
           </Typography>
@@ -148,12 +150,12 @@ const Sessions = () => {
       id: item._id || index,
       date: item?.date
         ? new Date(item.date)
-            .toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: '2-digit'
-            })
-            .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
+          .toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: '2-digit'
+          })
+          .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
         : '',
 
       title: item?.serviceId?.name || '',

@@ -27,6 +27,7 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { toast } from 'react-hot-toast';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import config from '../../config';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 const ViewService = () => {
   const navigate = useNavigate();
@@ -243,13 +244,38 @@ const ViewService = () => {
         <Typography>Loading...</Typography>
       ) : (
         <Grid item xs={12} mb={2}>
-          <Stack direction="row" alignItems="center">
-            <Typography fontWeight="bold" display="flex" alignItems="center">
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            flexWrap="wrap"
+          >
+            <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
               <IconButton onClick={() => navigate('/services')}>
                 <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
               </IconButton>
               Service Details
             </Typography>
+
+            <Button
+              variant="contained"
+              size="small"
+              sx={{
+                backgroundColor: '#009fc7',
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                '&:hover': { backgroundColor: '#009fc7' },
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/add-session', { state: { serviceId: serviceData._id } });
+              }}
+            >
+              Add New Session <AddIcon sx={{ ml: 1 }} />
+            </Button>
           </Stack>
         </Grid>
       )}
@@ -299,10 +325,10 @@ const ViewService = () => {
                       loading
                         ? Background
                         : serviceData?.file
-                        ? serviceData.file.startsWith('https://')
-                          ? serviceData.file
-                          : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                        : Background
+                          ? serviceData.file.startsWith('https://')
+                            ? serviceData.file
+                            : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                          : Background
                     }
                     alt="Service"
                     sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
@@ -362,17 +388,7 @@ const ViewService = () => {
                         </Stack>
                       </Box>
 
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{ backgroundColor: '#009fc7', textTransform: 'none', m: 1, whiteSpace: 'nowrap' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate('/add-session', { state: { serviceId: serviceData._id } });
-                        }}
-                      >
-                        Add New Session <AddIcon />
-                      </Button>
+                      <EditOutlinedIcon sx={{ marginRight: '20px' }} />
                     </Box>
 
                     <Typography variant="body2" color="textSecondary" mb={1}>
@@ -429,9 +445,7 @@ const ViewService = () => {
                   <Box
                     onClick={() =>
                       navigate('/view-session', {
-                        state: {
-                          session
-                        }
+                        state: { session }
                       })
                     }
                     key={session?._id || index}
@@ -439,39 +453,39 @@ const ViewService = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      p: 1,
+                      p: 2,
                       borderBottom: '1px solid #e0e0e0',
+                      cursor: 'pointer',
+                      gap: 2,
                       flexWrap: 'nowrap',
-                      gap: 1,
-                      cursor: 'pointer'
+                      backgroundColor: '#fff', // optional for visual clarity
                     }}
                   >
-                    <Box sx={{ maxWidth: 90, ml: 1 }}>
+                    <Box sx={{ minWidth: 80, textAlign: 'center' }}>
                       <Typography variant="subtitle2" fontWeight="bold">
                         {session?.date
                           ? new Date(session.date).toLocaleDateString('en-IN', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: '2-digit'
-                            })
+                            day: '2-digit',
+                            month: 'short',
+                            year: '2-digit',
+                          })
                           : '-'}
                       </Typography>
-                      <Typography variant="subtitle2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                      <Typography variant="subtitle2" color="text.secondary">
                         {session?.time || '-'}
                       </Typography>
                     </Box>
 
-                    <Box sx={{ flexGrow: 1, px: 2, maxWidth: 300 }}>
+                    <Box sx={{ flexGrow: 1, px: 2, minWidth: 0 }}>
                       <Tooltip title={session?.serviceId?.name || serviceData?.name || ''} placement="top" arrow>
                         <Typography
                           variant="subtitle2"
-                          fontSize="14px"
                           fontWeight="550"
+                          fontSize="14px"
                           sx={{
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
                             overflowWrap: 'break-word',
-                            maxWidth: '100%'
                           }}
                         >
                           {session?.serviceId?.name || serviceData?.name || '-'}
@@ -485,17 +499,13 @@ const ViewService = () => {
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          fontSize="10px"
+                          fontSize="11px"
                           sx={{
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            overflowWrap: 'break-word',
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            maxWidth: '282px'
                           }}
                         >
                           {session?.description || session?.serviceId?.description || serviceData?.description || '-'}
@@ -510,60 +520,54 @@ const ViewService = () => {
                         sx={{
                           backgroundColor: '#1B4B66',
                           textTransform: 'none',
-                          fontSize: '8px',
+                          fontSize: '10px',
                           py: 0.6,
-                          px: 0.5,
-                          maxHeight: '45px'
+                          px: 1.5,
+                          minWidth: 100,
+                          borderRadius: 1.5,
                         }}
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate('/add-session', {
-                            state: {
-                              session
-                            }
-                          });
+                          navigate('/add-session', { state: { session } });
                         }}
                       >
                         Edit Session
                       </Button>
+
                       <Button
                         variant="outlined"
                         size="small"
                         sx={{
                           textTransform: 'none',
                           color: '#1B4B66',
-                          fontSize: '8px',
-                          py: 0.45,
-                          px: 0.5,
-                          maxHeight: '45px',
-                          borderColor: '#1B4B66'
+                          fontSize: '10px',
+                          py: 0.6,
+                          px: 1.5,
+                          minWidth: 110,
+                          borderColor: '#1B4B66',
+                          borderRadius: 1.5,
+                          marginRight: '150px'
                         }}
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate('/attendees', {
-                            state: {
-                              session
-                            }
-                          });
+                          navigate('/attendees', { state: { session } });
                         }}
                       >
                         Add Attendee
                       </Button>
+
                       <IconButton
                         size="small"
                         onClick={(event) => {
                           event.stopPropagation();
-                          navigate('/view-session', {
-                            state: {
-                              session
-                            }
-                          });
+                          navigate('/view-session', { state: { session } });
                         }}
                       >
                         <InfoIcon sx={{ color: '#49494c' }} fontSize="small" />
                       </IconButton>
                     </Box>
                   </Box>
+
                 ))
               )}
             </Stack>

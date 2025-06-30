@@ -86,6 +86,7 @@ const UserProfileCard = () => {
         const response = await getApi(urls.tag.getAllTags);
         const allTags = response?.data?.allTags || [];
 
+
         const combinedData = [
           ...(userData?.otherInfo?.benificiary ?? []),
           ...(userData?.otherInfo?.campaigns ?? []),
@@ -95,6 +96,7 @@ const UserProfileCard = () => {
           ...(userData?.otherInfo?.fundraisingActivities ?? [])
         ];
 
+
         const allIds = combinedData.map((item) => {
           const id = typeof item === 'object' && item !== null ? item._id : item;
           if (!id) {
@@ -103,7 +105,9 @@ const UserProfileCard = () => {
           return id;
         });
 
+
         const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
+
 
         const grouped = {};
         relatedTags.forEach((tag) => {
@@ -111,6 +115,7 @@ const UserProfileCard = () => {
           if (!grouped[category]) grouped[category] = [];
           grouped[category].push(tag.name);
         });
+
 
         const formatted = Object.entries(grouped).map(([category, tags]) => ({
           category,
@@ -132,10 +137,10 @@ const UserProfileCard = () => {
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-      })
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    })
     : '';
   const personalInfo = userData?.personalInfo || {};
   const contactInfo = userData?.contactInfo || {};
@@ -206,7 +211,7 @@ const UserProfileCard = () => {
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
-          <Typography fontWeight="bold" display="flex" alignItems="center">
+          <Typography sx={{fontSize:'16px', fontWeight:'600'}}>
             <IconButton onClick={handleBackClick}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
@@ -278,7 +283,12 @@ const UserProfileCard = () => {
                     <Button
                       variant="contained"
                       onClick={handleClick}
-                      sx={{ mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
+                      sx={{
+                        mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7',
+                        '&:hover': {
+                          backgroundColor: '#009fc7'
+                        }
+                      }}
                     >
                       MANAGE
                     </Button>
@@ -331,40 +341,48 @@ const UserProfileCard = () => {
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={300} />
                     ) : (
                       <CardContent>
-                        <Typography variant="h5" fontWeight="600" gutterBottom mb={1}>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1,
+                          }}
+                          gutterBottom
+                        >
                           ABOUT
                         </Typography>
-                        <Grid container spacing={2}>
-                          <Grid item xs={6}>
+                        <Grid container spacing={5}>
+                          <Grid item xs={6} >
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>
-                                <Typography component="span" className="text">{`${personalInfo?.firstName ?? ''} ${
-                                  personalInfo?.lastName ?? ''
-                                }`}</Typography>
+                                <Typography component="span" className="text" marginLeft={1}>
+                                  {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
+                                </Typography>
                               </Typography>
                             </Box>{' '}
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
-                                <span>User ID:</span> <Typography component="span" className="text">{`${uniqueid ?? ''}`}</Typography>
+                                <span>User ID:</span> <Typography marginLeft={1} component="span" className="text">{`${uniqueid ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Ethnicity:</span>{' '}
-                                <Typography component="span" className="text">{`${personalInfo?.ethnicity ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${personalInfo?.ethnicity ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Language:</span>{' '}
-                                <Typography component="span" className="text">{`${contactInfo?.firstLanguage ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${contactInfo?.firstLanguage ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Contact:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${contactInfo?.phone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -372,7 +390,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Address:</span>{' '}
-                                <Typography component="span" className="text">{`${contactInfo?.addressLine1 ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${contactInfo?.addressLine1 ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -381,13 +399,13 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Gender:</span>{' '}
-                                <Typography component="span" className="text">{`${personalInfo?.gender ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${personalInfo?.gender ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>DOB:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
                                 </Typography>
                               </Typography>
@@ -396,7 +414,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Age:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {personalInfo?.dateOfBirth
                                     ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
                                     : ''}
@@ -406,13 +424,13 @@ const UserProfileCard = () => {
 
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
-                                <span>Alternative Id:</span> <Typography component="span" fontSize="12px">{`${uniqueid ?? ''}`}</Typography>
+                                <span>Alternative Id:</span> <Typography marginLeft={1} component="span" fontSize="12px">{`${uniqueid ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Telephone no:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${contactInfo?.homePhone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -436,7 +454,15 @@ const UserProfileCard = () => {
                           overflowY: 'auto'
                         }}
                       >
-                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1,
+                          }}
+                          gutterBottom
+                        >
                           Risk Assessment
                         </Typography>
 
@@ -444,45 +470,47 @@ const UserProfileCard = () => {
                           {otherInfo?.description ?? 'No description available.'}
                         </Typography>
 
-                        <Typography variant="subtitle1" sx={{ color: '#009fc7', mb: 1 }} className="text">
-                          Key Indicator Concern
-                        </Typography>
+                        <Box sx={{ bgcolor: '#F7F7F7', p: 1, marginRight: 2, borderRadius: 2 }}>
+                          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                            Key Indicator Concern
+                          </Typography>
 
-                        <Grid container spacing={1}>
-                          {[
-                            'Attendance and Engagement',
-                            'Poor school',
-                            'Learning disability',
-                            'Subtractive Mixture',
-                            'Learning disability'
-                          ].map((label, index) => (
-                            <Grid item key={index}>
-                              <Chip
-                                label={label}
-                                onDelete={() => {}}
-                                deleteIcon={
-                                  <CancelIcon
-                                    sx={{
-                                      fontSize: 16,
-                                      color: '#666'
-                                    }}
-                                  />
-                                }
-                                sx={{
-                                  bgcolor: '#009FC7',
-                                  color: '#fff',
-                                  fontSize: '12px',
-                                  fontWeight: 400,
-                                  borderRadius: '20px',
-                                  height: 28,
-                                  '& .MuiChip-deleteIcon': {
-                                    marginLeft: '4px'
+                          <Grid container spacing={1}>
+                            {[
+                              'Attendance and Engagement',
+                              'Poor school',
+                              'Learning disability',
+                              'Subtractive Mixture',
+                              'Learning disability',
+                            ].map((label, index) => (
+                              <Grid item key={index}>
+                                <Chip
+                                  label={label}
+                                  onDelete={() => { }}
+                                  deleteIcon={
+                                    <CancelIcon
+                                      sx={{
+                                        fontSize: 16,
+                                        color: '#666',
+                                      }}
+                                    />
                                   }
-                                }}
-                              />
-                            </Grid>
-                          ))}
-                        </Grid>
+                                  sx={{
+                                    bgcolor: '#009FC7',
+                                    color: '#fff',
+                                    fontSize: '12px',
+                                    fontWeight: 400,
+                                    borderRadius: '20px',
+                                    height: 28,
+                                    '& .MuiChip-deleteIcon': {
+                                      marginLeft: '4px',
+                                    },
+                                  }}
+                                />
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </Box>
 
                         <Box display="flex" alignItems="center" mb={1} mt={2}>
                           <Typography variant="subtitle1" sx={{ color: '#009fc7' }} className="text">
@@ -502,13 +530,13 @@ const UserProfileCard = () => {
                                 mb={2}
                                 p={2}
                                 sx={{
-                                  backgroundColor: '#f5f5f5',
-                                  borderRadius: 1,
+                                  backgroundColor: '#F7F7F7',
+                                  borderRadius: 2,
                                   width: '100%'
                                 }}
                               >
                                 <Box display="flex" alignItems="center" mb={1}>
-                                  <Typography variant="subtitle2" fontWeight={600}>
+                                  <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>
                                     {group.category}
                                   </Typography>
                                 </Box>
@@ -518,7 +546,7 @@ const UserProfileCard = () => {
                                     <Chip
                                       key={i}
                                       label={tag}
-                                      onDelete={() => {}}
+                                      onDelete={() => { }}
                                       deleteIcon={
                                         <CancelIcon
                                           sx={{
@@ -554,7 +582,15 @@ const UserProfileCard = () => {
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
                     ) : (
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight="600" gutterBottom mb={1}>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1,
+                          }}
+                          gutterBottom
+                        >
                           Next of Kin Details
                         </Typography>
                         <Grid container spacing={2}>
@@ -562,27 +598,26 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${
-                                  emergencyContact?.lastName ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${emergencyContact?.lastName ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Gender:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.gender ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.gender ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Relationship to Service User:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.relationshipToUser ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.relationshipToUser ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Address:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.addressLine1 ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.addressLine1 ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -591,7 +626,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Home no:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${emergencyContact?.homePhone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -599,7 +634,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Mobile no:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${emergencyContact?.phone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -607,7 +642,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Email:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.email ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.email ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -623,7 +658,14 @@ const UserProfileCard = () => {
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
                     ) : (
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight="600" color="#042E4C" gutterBottom mb={1}>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1,
+                          }} gutterBottom
+                        >
                           Contact Preferences
                         </Typography>
                         <Grid container spacing={2}>
@@ -631,7 +673,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Email:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -639,7 +681,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Telephone:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -647,7 +689,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 SMS:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -655,7 +697,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Letter:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -666,7 +708,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Reason:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.reason?.name || '-'}
                                 </Typography>
                               </Typography>
@@ -674,7 +716,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Contact purposes:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactPurposes?.name || '-'}
                                 </Typography>
                               </Typography>
@@ -682,7 +724,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Preferred Method of Contact:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.preferredMethod?.name || '-'}
                                 </Typography>
                               </Typography>
@@ -690,7 +732,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Date of confirmation:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.dateOfConfirmation
                                     ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
                                     : '-'}
@@ -719,7 +761,12 @@ const UserProfileCard = () => {
                         variant="contained"
                         size="small"
                         onClick={() => setAddItemOpen(true)}
-                        sx={{ backgroundColor: '#009fc7' }}
+                        sx={{
+                          backgroundColor: '#009fc7',
+                          '&:hover': {
+                            backgroundColor: '#009fc7'
+                          }
+                        }}
                         endIcon={<AddIcon />}
                       >
                         Add Item

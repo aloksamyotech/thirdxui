@@ -121,7 +121,7 @@ const ReferralTable = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-        <Typography variant="h5">New Referrals</Typography>
+        <Typography sx={{fontSize:'16px', fontWeight:'500'}}>New Referrals</Typography>
 
         <Box
           sx={{

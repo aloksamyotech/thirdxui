@@ -11,7 +11,8 @@ import {
   InputAdornment,
   Card,
   Typography,
-  Chip
+  Chip,
+  IconButton
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -26,6 +27,7 @@ import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { useLocation } from 'react-router-dom';
 import config from '../../config';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -296,7 +298,12 @@ const AddCaseForm = ({ onCancel }) => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">{session ? 'Edit Session' : 'Add New Session'}</Typography>
+        <Typography variant="h4">
+          <IconButton onClick={() => navigate(-1)}>
+            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+          </IconButton>
+          {session ? 'Edit Session' : 'Add New Session'}
+        </Typography>
 
         <Box
           sx={{

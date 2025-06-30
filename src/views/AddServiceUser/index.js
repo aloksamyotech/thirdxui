@@ -19,7 +19,8 @@ import {
   Autocomplete,
   FormHelperText,
   IconButton,
-  Chip
+  Chip,
+  FormControl
 } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 import { useLocation } from 'react-router-dom';
@@ -47,9 +48,9 @@ const contactMethodInitial = {
 };
 
 const stateStyles = [
-  { color: '#e9b867', icon: '?' },
-  { color: '#7cbd71', icon: '✓' },
-  { color: '#ce655d', icon: '✕' }
+  { color: '#E9B867', icon: '?' },
+  { color: '#7CBD71', icon: '✓' },
+  { color: '#CE655D', icon: '✕' }
 ];
 
 const AddCaseForm = ({ onCancel }) => {
@@ -68,6 +69,9 @@ const AddCaseForm = ({ onCancel }) => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [serviceData, setServiceData] = useState([]);
+  const [serviceNames, setServiceNames] = useState([]);
+  const [serviceNameSearchQuery, setServiceNameSearchQuery] = useState('');
 
   const location = useLocation();
   const editdata = location?.state?.editdata;
@@ -100,7 +104,8 @@ const AddCaseForm = ({ onCancel }) => {
         nickName: editdata?.personalInfo?.nickName || '',
         gender: editdata?.personalInfo?.gender || '',
         dateOfBirth: editdata?.personalInfo?.dateOfBirth || null,
-        ethnicity: editdata?.personalInfo?.ethnicity || ''
+        ethnicity: editdata?.personalInfo?.ethnicity || '',
+        profileImage: editdata?.personalInfo?.profileImage || ''
       },
       phone: editdata?.contactInfo?.homePhone || '',
       mobilePhone: editdata?.contactInfo?.phone || '',
@@ -272,6 +277,30 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchTags();
   }, []);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (serviceNameSearchQuery && serviceNameSearchQuery !== '') {
+          queryParams.append('search', serviceNameSearchQuery);
+        }
+        // Add any needed filters here if your API requires them
+
+        const response = await getApi(`${urls.service.fetchWithPagination}?${queryParams.toString()}`);
+        const services = response?.data?.data || [];
+        const formattedServices = services.map((service) => ({
+          id: service._id,
+          name: service.name || service.title || '' // adapt based on API response
+        }));
+        setServiceNames(formattedServices);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      }
+    };
+
+    fetchServices();
+  }, [serviceNameSearchQuery]);
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -309,6 +338,36 @@ const AddCaseForm = ({ onCancel }) => {
             ))
           }
           renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+        />
+      )}
+    />
+  );
+
+  const renderAutocomplete2 = (name, label, options, errorObject, errorMessage, control) => (
+    <Controller
+      name={name}
+      control={control}
+      rules={{ required: 'This field is required' }}
+      render={({ field }) => (
+        <Autocomplete
+          multiple
+          options={options}
+          getOptionLabel={(option) => option.label || option}
+          value={field.value || []}
+          onChange={(_, newValue) => field.onChange(newValue)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              error={!!errorObject}
+              helperText={errorMessage}
+              sx={{
+                backgroundColor: '#f9f9f9',
+                borderRadius: '8px',
+                minWidth: '300px'
+              }}
+            />
+          )}
         />
       )}
     />
@@ -392,8 +451,8 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[country]', formData.emergencycountry || '');
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
-    fd.append('RiskAssessment[riskAssessment]', formData.RiskAssessment || '');
-    fd.append('RiskAssessment[keyIndicators]', formData.keyIndicators || '');
+    fd.append('RiskAssessment[riskAssessmentNotes]', formData.riskAssessmentNotes || '');
+    fd.append('riskAssessment[keyIndicators]', JSON.stringify(formData?.keyIndicators.map((item) => item.value || item)));
     fd.append('Service[serviceName]', formData.serviceName || '');
     fd.append('Service[startDate]', formData.startDate || '');
     fd.append('Service[lastDate]', formData.lastDate || '');
@@ -408,6 +467,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][letter]', formData.letter ? 'true' : 'false');
 
     if (formData.preferredContact) {
       fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
@@ -427,6 +487,9 @@ const AddCaseForm = ({ onCancel }) => {
 
     if (formData.file) {
       fd.append('file', formData.file || '');
+    }
+    if (formData.profileImage) {
+      fd.append('profileImage', formData.profileImage || '');
     }
 
     try {
@@ -554,7 +617,6 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
-                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -566,7 +628,6 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
-                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -578,7 +639,6 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
-                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -590,7 +650,6 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
-                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -602,7 +661,6 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
-                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -635,11 +693,13 @@ const AddCaseForm = ({ onCancel }) => {
                                     {...field}
                                   >
                                     <MenuItem value="Mr">Mr.</MenuItem>
-                                    <MenuItem value="Ms">Ms.</MenuItem>
                                     <MenuItem value="Mrs">Mrs.</MenuItem>
-                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Miss">Miss</MenuItem>
                                     <MenuItem value="Dr">Dr.</MenuItem>
-                                    <MenuItem value="Lady">Lady</MenuItem>
+                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Rev">Rev.</MenuItem>
+                                    <MenuItem value="Lady">Lady.</MenuItem>
+                                    <MenuItem value="Sir">Sir.</MenuItem>
                                   </TextField>
                                 )}
                               />
@@ -755,7 +815,7 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="profileImg"
+                                name="profileImage"
                                 control={control}
                                 render={({ field }) => (
                                   <TextField
@@ -896,7 +956,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     }}
                                     ListboxProps={{
                                       style: {
-                                        maxHeight: 200,
+                                        maxHeight: 215,
                                         overflowY: 'auto'
                                       }
                                     }}
@@ -1194,7 +1254,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        label="Country of origin"
+                                        label="Country"
                                         size="small"
                                         error={!!error}
                                         helperText={error ? error.message : ''}
@@ -1569,11 +1629,13 @@ const AddCaseForm = ({ onCancel }) => {
                                     {...field}
                                   >
                                     <MenuItem value="Mr">Mr.</MenuItem>
-                                    <MenuItem value="Ms">Ms.</MenuItem>
                                     <MenuItem value="Mrs">Mrs.</MenuItem>
-                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Miss">Miss</MenuItem>
                                     <MenuItem value="Dr">Dr.</MenuItem>
-                                    <MenuItem value="Dr">Lady</MenuItem>
+                                    <MenuItem value="Prof">Prof.</MenuItem>
+                                    <MenuItem value="Rev">Rev.</MenuItem>
+                                    <MenuItem value="Lady">Lady.</MenuItem>
+                                    <MenuItem value="Sir">Sir.</MenuItem>
                                   </TextField>
                                 )}
                               />
@@ -1896,7 +1958,7 @@ const AddCaseForm = ({ onCancel }) => {
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        label="Country of origin"
+                                        label="Country"
                                         size="small"
                                         error={!!error}
                                         helperText={error ? error.message : ''}
@@ -2026,51 +2088,43 @@ const AddCaseForm = ({ onCancel }) => {
                       border: '1px solid #e0e0e0',
                       borderRadius: '12px',
                       padding: 2,
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: 2,
                       mt: 2
                     }}
                   >
-                    <TextField
-                      name="RiskAssessment"
-                      fullWidth
-                      multiline
-                      minRows={5}
-                      label="Risk Assessment Notes"
-                      variant="outlined"
-                      {...register('riskAssessmentNotes')}
-                      sx={{
-                        flex: 1,
-                        backgroundColor: '#f9f9f9',
-                        borderRadius: '8px'
-                      }}
-                    />
-
-                    <Controller
-                      name="keyIndicators"
-                      control={control}
-                      rules={{ required: 'This field is required' }}
-                      render={({ field }) => (
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
                         <TextField
-                          select
+                          name="riskAssessmentNotes"
+                          multiline
+                          minRows={5}
+                          label="Risk Assessment Notes"
+                          variant="outlined"
+                          {...register('riskAssessmentNotes')}
                           fullWidth
-                          label="Key Indicators of Concern"
-                          {...field}
                           sx={{
-                            flex: 1,
                             backgroundColor: '#f9f9f9',
-                            borderRadius: '8px',
-                            minWidth: '300px'
+                            borderRadius: '8px'
                           }}
-                        >
-                          <MenuItem value="Health">Health</MenuItem>
-                          <MenuItem value="Safety">Safety</MenuItem>
-                          <MenuItem value="Behavior">Behavior</MenuItem>
-                          <MenuItem value="Other">Other</MenuItem>
-                        </TextField>
-                      )}
-                    />
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {renderAutocomplete2(
+                          'keyIndicators',
+                          'Key Indicators of Concern',
+                          [
+                            { label: 'Poor school attendance and engagement', value: 'Poor school attendance and engagement' },
+                            { label: 'School Exclusion', value: 'School Exclusion' },
+                            { label: 'Not in education, traingng or work (Neet)', value: 'Not in education, traingng or work (Neet)' },
+                            { label: 'Substance Misuse', value: 'Substance Misuse' },
+                            { label: 'Social Services', value: 'Social Services' },
+                            { label: 'CAHMS', value: 'CAHMS' }
+                          ],
+                          errors.keyIndicators,
+                          errors.keyIndicators?.message,
+                          control
+                        )}
+                      </Grid>
+                    </Grid>
                   </Box>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
@@ -2079,8 +2133,8 @@ const AddCaseForm = ({ onCancel }) => {
                       </Button>
                     </Grid>
                     <Grid item>
-                      <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-                        {isLoading ? 'Saving...' : 'SAVE CHANGES'}
+                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
+                        SAVE CHANGES
                       </Button>
                     </Grid>
                   </Grid>{' '}
@@ -2088,153 +2142,237 @@ const AddCaseForm = ({ onCancel }) => {
               )}
 
               {tabIndex === 3 && (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
-                    <Box
-                      sx={{
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 2,
-                        p: 2
-                      }}
-                    >
+                <>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}>
+                      <Box
+                        sx={{
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 2,
+                          p: 2
+                        }}
+                      >
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
+                            <Controller
+                              name="serviceName"
+                              control={control}
+                              rules={{ required: 'Service Name is required' }}
+                              render={({ field }) => {
+                                const selectedService = serviceNames.find((service) => service.id === field.value);
+
+                                return (
+                                  <FormControl fullWidth size="small" error={!!errors.serviceName}>
+                                    <Autocomplete
+                                      value={selectedService || null}
+                                      onChange={(_, value) => field.onChange(value ? value.id : '')}
+                                      onInputChange={(_, newInputValue) => setServiceNameSearchQuery(newInputValue)}
+                                      options={serviceNames}
+                                      getOptionLabel={(option) => option.name || ''}
+                                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                                      renderInput={(params) => (
+                                        <TextField
+                                          {...params}
+                                          label="Service Name"
+                                          variant="outlined"
+                                          size="small"
+                                          error={!!errors.serviceName}
+                                        />
+                                      )}
+                                    />
+                                    {errors.serviceName && (
+                                      <Typography color="error" variant="caption">
+                                        {errors.serviceName.message}
+                                      </Typography>
+                                    )}
+                                  </FormControl>
+                                );
+                              }}
+                            />
+                          </Grid>
+
+                          <Grid item xs={6}>
+                            <Controller
+                              name="startDate"
+                              control={control}
+                              rules={{
+                                required: 'Start Date is required',
+                                validate: (value) => (dayjs(value).isBefore(dayjs(), 'day') ? 'Start Date cannot be in the past' : true)
+                              }}
+                              render={({ field, fieldState: { error } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <DatePicker
+                                    label="Start Date"
+                                    value={field.value || null}
+                                    onChange={(newValue) => field.onChange(newValue)}
+                                    disablePast
+                                    renderInput={(params) => (
+                                      <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
+                                    )}
+                                  />
+                                </LocalizationProvider>
+                              )}
+                            />
+                          </Grid>
+
+                          <Grid item xs={6}>
+                            <Controller
+                              name="lastDate"
+                              control={control}
+                              rules={{
+                                required: 'Last Date is required',
+                                validate: (value) => {
+                                  const startDate = watch('startDate');
+                                  if (!startDate) return true;
+                                  return dayjs(value).isBefore(dayjs(startDate), 'day') ? 'Last Date cannot be before Start Date' : true;
+                                }
+                              }}
+                              render={({ field, fieldState: { error } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <DatePicker
+                                    label="Last Date"
+                                    value={field.value || null}
+                                    onChange={(newValue) => field.onChange(newValue)}
+                                    minDate={watch('startDate') || undefined}
+                                    renderInput={(params) => (
+                                      <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
+                                    )}
+                                  />
+                                </LocalizationProvider>
+                              )}
+                            />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} md={8}>
+                      <Box
+                        sx={{
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 2,
+                          p: 2
+                        }}
+                      >
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <TextField name="referrerName" fullWidth size="small" label="Referrer Name" {...register('referrerName')} />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField name="referrerJob" fullWidth size="small" label="Referrer Job Title" {...register('referrerJob')} />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              name="referrerPhone"
+                              size="small"
+                              label="Referrer Phone No."
+                              {...register('referrerPhone')}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField fullWidth name="referrerEmail" size="small" label="Referrer Email" {...register('referrerEmail')} />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              name="emergencyPhone"
+                              size="small"
+                              label="Emergency Phone No."
+                              {...register('emergencyPhone')}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              name="emergencyEmail"
+                              size="small"
+                              label="Emergency Email"
+                              {...register('emergencyEmail')}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <Controller
+                              name="referralType"
+                              control={control}
+                              render={({ field }) => (
+                                <TextField select fullWidth size="small" label="Referral Type" {...field}>
+                                  <MenuItem value="Family Member">Family Member</MenuItem>
+                                  <MenuItem value="Community Member">Community Member</MenuItem>
+                                  <MenuItem value="Parent">Parent</MenuItem>
+                                  <MenuItem value="School">School</MenuItem>
+                                  <MenuItem value="Self Referral">Self Referral</MenuItem>
+                                  <MenuItem value="Other">Other</MenuItem>
+                                </TextField>
+                              )}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <Controller
+                              name="referredDate"
+                              control={control}
+                              render={({ field, fieldState: { error } }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <DatePicker
+                                    label="Referred Date"
+                                    value={field.value || null}
+                                    onChange={(newValue) => field.onChange(newValue)}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        fullWidth
+                                        size="small"
+                                        InputLabelProps={{ shrink: true }}
+                                        error={!!error}
+                                        helperText={error?.message}
+                                      />
+                                    )}
+                                  />
+                                </LocalizationProvider>
+                              )}
+                            />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                  <Grid container alignItems="center" justifyContent="space-between" sx={{ mt: 2, px: 2 }}>
+                    <Grid item>
+                      <Button variant="outlined" size="small" startIcon={<AddIcon />}>
+                        Add Another Service
+                      </Button>
+                    </Grid>
+
+                    <Grid item>
                       <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <Controller
-                            name="serviceName"
-                            control={control}
-                            rules={{ required: 'Service Name is required' }}
-                            render={({ field }) => (
-                              <TextField select label="Service Name" fullWidth size="small" {...field}>
-                                <MenuItem value="Counseling">Counseling</MenuItem>
-                                <MenuItem value="Training">Training</MenuItem>
-                                <MenuItem value="Support">Support</MenuItem>
-                              </TextField>
-                            )}
-                          />
+                        <Grid item>
+                          <Button
+                            variant="outlined"
+                            onClick={() => navigate('/people')}
+                            sx={{
+                              borderColor: '#FF4D49',
+                              color: '#FF4D49'
+                            }}
+                          >
+                            CANCEL
+                          </Button>
                         </Grid>
-
-                        <Grid item xs={6}>
-                          <Controller
-                            name="startDate"
-                            control={control}
-                            render={({ field }) => (
-                              <TextField
-                                type="date"
-                                fullWidth
-                                size="small"
-                                label="Start Date"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                              />
-                            )}
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Controller
-                            name="lastDate"
-                            control={control}
-                            render={({ field }) => (
-                              <TextField
-                                type="date"
-                                fullWidth
-                                size="small"
-                                label="Last Date"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                              />
-                            )}
-                          />
+                        <Grid item>
+                          <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
+                            SAVE CHANGES
+                          </Button>
                         </Grid>
                       </Grid>
-                    </Box>
+                    </Grid>
                   </Grid>
-
-                  <Grid item xs={12} md={8}>
-                    <Box
-                      sx={{
-                        border: '1px solid #e0e0e0',
-                        borderRadius: 2,
-                        p: 2
-                      }}
-                    >
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField name="referrerName" fullWidth size="small" label="Referrer Name" {...register('referrerName')} />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField name="referrerJob" fullWidth size="small" label="Referrer Job Title" {...register('referrerJob')} />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            name="referrerPhone"
-                            size="small"
-                            label="Referrer Phone No."
-                            {...register('referrerPhone')}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField fullWidth name="referrerEmail" size="small" label="Referrer Email" {...register('referrerEmail')} />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            name="emergencyPhone"
-                            size="small"
-                            label="Emergency Phone No."
-                            {...register('emergencyPhone')}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField fullWidth name="emergencyEmail" size="small" label="Emergency Email" {...register('emergencyEmail')} />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <Controller
-                            name="referralType"
-                            control={control}
-                            render={({ field }) => (
-                              <TextField select fullWidth size="small" label="Referral Type" {...field}>
-                                <MenuItem value="Direct">Direct</MenuItem>
-                                <MenuItem value="Agency">Agency</MenuItem>
-                                <MenuItem value="Other">Other</MenuItem>
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <Controller
-                            name="referredDate"
-                            control={control}
-                            render={({ field }) => (
-                              <TextField
-                                type="date"
-                                fullWidth
-                                size="small"
-                                label="Referred Date"
-                                InputLabelProps={{ shrink: true }}
-                                {...field}
-                              />
-                            )}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Button variant="outlined" size="small" startIcon={<AddIcon />} sx={{ mt: 1 }}>
-                      Add Another Service
-                    </Button>
-                  </Grid>
-                </Grid>
+                </>
               )}
 
               {tabIndex === 4 && (
@@ -2265,7 +2403,6 @@ const AddCaseForm = ({ onCancel }) => {
                                 color: '#000',
                                 borderRadius: '8px',
                                 px: 2,
-                                fontWeight: 'bold',
                                 minWidth: 165,
                                 display: 'flex',
                                 justifyContent: 'space-between'
@@ -2363,9 +2500,8 @@ const AddCaseForm = ({ onCancel }) => {
                         variant="outlined"
                         onClick={() => navigate('/people')}
                         sx={{
-                          borderColor: '#a6a9ff',
-                          color: '#a6a9ff',
-                          fontWeight: 'bold'
+                          borderColor: '#FF4D49',
+                          color: '#FF4D49'
                         }}
                       >
                         CANCEL
@@ -2377,7 +2513,6 @@ const AddCaseForm = ({ onCancel }) => {
                         variant="contained"
                         sx={{
                           background: '#053146',
-                          fontWeight: 'bold',
                           color: '#fff',
                           px: 3
                         }}

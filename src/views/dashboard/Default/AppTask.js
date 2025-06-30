@@ -426,7 +426,7 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
       <FormControlLabel
         control={<Checkbox checked={checked} onChange={onChange} onPointerDown={(e) => e.stopPropagation()} />}
         label={
-          <Typography variant="body2" sx={{ m: 0 }}>
+          <Typography variant="body2" sx={{ m: 0, color:'#26262680' }}>
             Call due for {task?.assignedTo?.userName} on <strong>{formatDate(task?.dueDate)}</strong>
           </Typography>
         }
@@ -434,7 +434,7 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
 
       <Box>
         <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit} onPointerDown={(e) => e.stopPropagation()}>
-          <Iconify icon={'eva:edit-fill'} />
+          <Iconify icon={'material-symbols:edit-outline'} />
         </IconButton>
         <IconButton size="large" color="error" onClick={onDelete} onPointerDown={(e) => e.stopPropagation()}>
           <Iconify icon={'eva:trash-2-outline'} />

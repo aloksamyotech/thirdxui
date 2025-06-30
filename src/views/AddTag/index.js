@@ -268,7 +268,7 @@ const TagForm = () => {
   return (
     <Grid>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" sx={{ fontWeight: '450', color: '#333' }}>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
           Add Tag Category
         </Typography>
         <Box

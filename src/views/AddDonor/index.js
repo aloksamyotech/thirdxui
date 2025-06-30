@@ -342,7 +342,7 @@ const AddDonorForm = () => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">{location.state?.isEdit ? 'Edit Donor' : 'Add Donor'}</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">{location.state?.isEdit ? 'Edit Donor' : 'Add Donor'}</Typography>
 
           <Box
             sx={{

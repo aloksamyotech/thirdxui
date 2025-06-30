@@ -211,7 +211,7 @@ const UserProfileCard = () => {
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
-          <Typography sx={{fontSize:'16px', fontWeight:'600'}}>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
             <IconButton onClick={handleBackClick}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>

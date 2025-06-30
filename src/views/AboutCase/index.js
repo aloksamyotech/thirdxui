@@ -179,7 +179,7 @@ const AboutCase = () => {
     <>
       <Grid item xs={12} mb={2}>
         <Stack direction="row" alignItems="center">
-          <Typography fontWeight="bold" display="flex" alignItems="center">
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
             <IconButton onClick={() => navigate(-1)}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>

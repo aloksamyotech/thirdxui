@@ -250,7 +250,7 @@ const Archives = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h5">Archives</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Archives</Typography>
         <Stack direction="row" spacing={2} alignItems="center">
           <Box
             sx={{

@@ -298,7 +298,7 @@ const AddCaseForm = ({ onCancel }) => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
           <IconButton onClick={() => navigate(-1)}>
             <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>

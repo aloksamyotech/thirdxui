@@ -136,7 +136,7 @@ const Lead = () => {
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
         <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-          <Typography variant="h5">Mailing List </Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Mailing List </Typography>
           <Box
           sx={{
               display: 'flex',

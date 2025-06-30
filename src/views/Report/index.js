@@ -165,7 +165,7 @@ const Report = () => {
               />
 
               <Tab
-                label="Surveys Report"
+                label="Key Indicators Report"
                 value="4"
                 sx={(theme) => ({
                   backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
@@ -175,8 +175,18 @@ const Report = () => {
                 })}
               />
               <Tab
-                label="Donor Report"
+                label="Attendance Report"
                 value="5"
+                sx={(theme) => ({
+                  backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
+                  transition: 'background-color 0.3s ease',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                })}
+              />
+              <Tab
+                label="Donor Report"
+                value="6"
                 sx={(theme) => ({
                   backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',

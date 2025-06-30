@@ -62,9 +62,7 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#555',
             fontSize: '14px',
-            fontWeight: 'bold',
             border: '1px solid #d4d4d4'
           }}
         >
@@ -72,6 +70,7 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
         </Box>
       )
     },
+
     {
       field: 'country',
       headerName: 'Country',

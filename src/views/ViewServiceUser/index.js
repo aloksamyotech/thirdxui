@@ -197,13 +197,14 @@ const UserProfileCard = () => {
     : '';
 
   const handleBackClick = () => {
-    if (location.state?.isArchive) {
-      navigate('/archives');
-    } else if (userData?.role === 'volunteer') {
-      navigate('/volunteer');
-    } else {
-      navigate('/people');
-    }
+    navigate(-1);
+    // if (location.state?.isArchive) {
+    //   navigate('/archives');
+    // } else if (userData?.role === 'volunteer') {
+    //   navigate('/volunteer');
+    // } else {
+    //   navigate('/people');
+    // }
   };
 
   return (

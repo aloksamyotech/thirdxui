@@ -11,6 +11,7 @@ import moment from 'moment';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import { useNavigate } from 'react-router';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import SubmissionDialog from './SubmissionDialog';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
@@ -63,6 +64,25 @@ const Lead = () => {
     pageSize: 10
   });
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleAccept = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDecline = () => {
+    setDialogOpen(false);
+  };
+
+
   const navigate = useNavigate();
   const handleNavigate = (id) => {
     navigate(`${id}`);
@@ -275,12 +295,13 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                   }
                   columns={columns}
                   loading={loading}
+                  onRowClick={handleOpenDialog}
                   slots={{
                     toolbar: () => <CustomHeader />,
                     loadingOverlay: () => (
@@ -301,19 +322,12 @@ const Lead = () => {
                   getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                   rowHeight={65}
                   // getRowHeight={() => 'auto'}
-                  // sx={{
-                  //   '& .MuiDataGrid-cell': {
-                  //     whiteSpace: 'normal',
-                  //     lineHeight: '1.4rem',
-                  //     py: 1
-                  //   },
-                  //   '& .MuiDataGrid-row': {
-                  //     borderBottom: '1px solid #ccc'
-                  //   },
-                  //   '& .MuiDataGrid-columnHeader': {
-                  //     backgroundColor: '#f5f5f5'
-                  //   }
-                  // }}
+                  sx={{
+                    '& .MuiDataGrid-row': {
+                      borderBottom: '1px solid #ccc',
+                      cursor: 'pointer'
+                    }
+                  }}
                   rowCount={totalRows}
                   pagination
                   paginationMode="server"
@@ -326,6 +340,7 @@ const Lead = () => {
           </Grid>
         </Card>
       </Grid>
+      <SubmissionDialog open={dialogOpen} onClose={handleCloseDialog} onAccept={handleAccept} onDecline={handleDecline} />
     </>
   );
 };

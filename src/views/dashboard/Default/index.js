@@ -138,8 +138,8 @@ const Dashboard = () => {
         <Grid container direction="column" spacing={2}>
           <Grid item>
             <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
-          </Grid>
-          <Grid item marginInline={5}>
+          </Grid> 
+          <Grid item marginInline={2}>
             <Shortcut2 icon={3} title="Add Session Attendies" path="/services" />
           </Grid>
         </Grid>

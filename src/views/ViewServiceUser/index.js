@@ -85,8 +85,7 @@ const UserProfileCard = () => {
       try {
         const response = await getApi(urls.tag.getAllTags);
         const allTags = response?.data?.allTags || [];
-        
-        
+
         const combinedData = [
           ...(userData?.otherInfo?.benificiary ?? []),
           ...(userData?.otherInfo?.campaigns ?? []),
@@ -96,7 +95,6 @@ const UserProfileCard = () => {
           ...(userData?.otherInfo?.fundraisingActivities ?? [])
         ];
 
-        
         const allIds = combinedData.map((item) => {
           const id = typeof item === 'object' && item !== null ? item._id : item;
           if (!id) {
@@ -105,10 +103,8 @@ const UserProfileCard = () => {
           return id;
         });
 
-        
         const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
 
-        
         const grouped = {};
         relatedTags.forEach((tag) => {
           const category = tag.tagCategoryName || 'Uncategorized';
@@ -116,7 +112,6 @@ const UserProfileCard = () => {
           grouped[category].push(tag.name);
         });
 
-      
         const formatted = Object.entries(grouped).map(([category, tags]) => ({
           category,
           tags
@@ -197,13 +192,14 @@ const UserProfileCard = () => {
     : '';
 
   const handleBackClick = () => {
-    if (location.state?.isArchive) {
-      navigate('/archives');
-    } else if (userData?.role === 'volunteer') {
-      navigate('/volunteer');
-    } else {
-      navigate('/people');
-    }
+    navigate(-1);
+    // if (location.state?.isArchive) {
+    //   navigate('/archives');
+    // } else if (userData?.role === 'volunteer') {
+    //   navigate('/volunteer');
+    // } else {
+    //   navigate('/people');
+    // }
   };
 
   return (

@@ -19,6 +19,7 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 import { decodedToken } from 'utils/adminData.js';
+import StatusChip from 'views/AboutCase/StatusChip.js';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ const CaseDetailsPage = () => {
 
   const location = useLocation();
   const { id } = location.state || {};
+
+  console.log(`serviceuserDetails`, serviceuserDetails?._id);
 
   const CustomHeader = () => {
     return (
@@ -315,6 +318,12 @@ const CaseDetailsPage = () => {
       }
     });
   };
+
+  const viewUser = () => {
+    navigate('/view-people', {
+      state: { id: serviceuserDetails?._id }
+    });
+  };
   return (
     <>
       <Box>
@@ -326,7 +335,7 @@ const CaseDetailsPage = () => {
                   <IconButton onClick={() => navigate('/case')}>
                     <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
                   </IconButton>
-                  {serviceDetails?.name}
+                  {serviceDetails?.name} Case
                 </Typography>
               </Stack>
 
@@ -365,7 +374,7 @@ const CaseDetailsPage = () => {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <Card sx={{ mb: 2, backgroundColor: '#042E4C', color: 'white' }}>
+            <Card sx={{ mb: 2, backgroundColor: '#052c3f33', color: 'black', border: '1px solid #0080A1' }}>
               {loading ? (
                 <Box
                   sx={{
@@ -381,22 +390,27 @@ const CaseDetailsPage = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      width: '100%',
-                      padding: '4px 0'
+                      width: '100%'
                     }}
                   >
-                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 500 }}>
+                    <Typography variant="h6" sx={{ color: 'black', fontWeight: 500 }}>
                       Service User Summary
                     </Typography>
 
                     <Chip
                       label="View"
                       size="small"
-                      onClick={() => setOpen(true)}
+                      onClick={viewUser}
                       sx={{
                         backgroundColor: 'white',
                         color: '#042E4C',
                         fontWeight: 300,
+                        fontSize: '0.65rem',
+                        height: 22,
+                        padding: '0 6px',
+                        '& .MuiChip-label': {
+                          padding: 0
+                        },
                         '&:hover': {
                           backgroundColor: 'white',
                           color: '#042E4C'
@@ -405,29 +419,29 @@ const CaseDetailsPage = () => {
                     />
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                      <strong>Name:</strong> {serviceuserDetails?.personalInfo?.firstName || ''}{' '}
+                    <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                      <span style={{ fontWeight: 600 }}>Name:</span> {serviceuserDetails?.personalInfo?.firstName || '-'}
                       {serviceuserDetails?.personalInfo?.lastName || ''}
                     </Typography>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>User ID :</strong> 01231
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>User ID:</span> {serviceuserDetails?.uniqueId || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>Gender:</strong> {serviceuserDetails?.personalInfo?.gender || ''}
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>Gender:</span> {serviceuserDetails?.personalInfo?.gender || '-'}
                       </Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>Contact:</strong> {serviceuserDetails?.contactInfo?.phone || ''}
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>Contact:</span> {serviceuserDetails?.contactInfo?.phone || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>DOB:</strong>{' '}
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>DOB:</span>
                         {serviceuserDetails?.personalInfo?.dateOfBirth
                           ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
-                          : ''}
+                          : '-'}
                       </Typography>
                     </Box>
                   </Box>
@@ -517,25 +531,7 @@ const CaseDetailsPage = () => {
                           })()}
                         </TableCell>
                         <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
-                          <Chip
-                            label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
-                            icon={
-                              row.serviceStatus === 'Active' ? (
-                                <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                              ) : (
-                                <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                              )
-                            }
-                            variant="outlined"
-                            sx={{
-                              borderColor: 'gray',
-                              color: 'gray',
-                              backgroundColor: 'transparent',
-                              fontSize: '10px',
-                              height: '20px',
-                              paddingRight: '4px'
-                            }}
-                          />
+                          <StatusChip status={caseData?.status.charAt(0).toUpperCase() + caseData?.status.slice(1).toLowerCase()} />
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -581,8 +577,6 @@ const CaseDetailsPage = () => {
                 rowHeight={70}
                 getRowId={(row) => row.id}
                 onRowClick={(row) => {
-
-
                   navigate('/about-case-note', { state: { caseData: row?.row } });
                 }}
                 slots={{

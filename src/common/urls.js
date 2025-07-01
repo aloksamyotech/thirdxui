@@ -86,7 +86,8 @@ export const urls = Object.freeze({
   },
   attendees: {
     create: `${baseUrl}/attendees/addAttendee`,
-    getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`
+    getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`,
+    fetchWithPagination: `${baseUrl}/attendees//getwithpagination`
   },
   dashboard: {
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,

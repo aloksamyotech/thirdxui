@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Tabs, Tab, Grid } from '@mui/material';
-import Chart from './Chart.js';
 import DonorList from './DonorList';
 
 const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
@@ -32,7 +31,7 @@ const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
       </Tabs>
 
       <Box>
-        {value === 0 && <Chart />}
+        {/* {value === 0 && <Chart />} */}
         {value === 1 && <DonorList selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />}
       </Box>
     </Grid>

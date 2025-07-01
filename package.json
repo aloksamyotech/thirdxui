@@ -44,6 +44,7 @@
     "react-datepicker": "^8.2.0",
     "react-device-detect": "^2.2.2",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8",
     "react-email-editor": "^1.7.9",
     "react-hook-form": "^7.49.2",
     "react-hot-toast": "^2.5.2",

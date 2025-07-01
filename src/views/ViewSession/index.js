@@ -186,7 +186,7 @@ const ServiceDetails = () => {
       </Grid>
 
       <Grid container spacing={2} sx={{ height: 560 }}>
-        <Grid item xs={12} md={6} sx={{ height: '40%' }}>
+        <Grid item xs={12} md={6} sx={{ height: '50%' }}>
           <Paper
             variant="outlined"
             sx={{

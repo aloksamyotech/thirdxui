@@ -452,7 +452,10 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
     fd.append('RiskAssessment[riskAssessmentNotes]', formData.riskAssessmentNotes || '');
-    fd.append('riskAssessment[keyIndicators]', JSON.stringify(formData?.keyIndicators.map((item) => item.value || item)));
+    (formData?.keyIndicators || []).forEach((item) => {
+      fd.append('riskAssessment[keyIndicators][]', item.value || item);
+    });
+
     fd.append('Service[serviceName]', formData.serviceName || '');
     fd.append('Service[startDate]', formData.startDate || '');
     fd.append('Service[lastDate]', formData.lastDate || '');
@@ -580,7 +583,9 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">{editdata ? 'Edit Service User' : 'Add New Service User'}</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+            {editdata ? 'Edit Service User' : 'Add New Service User'}
+          </Typography>
 
           <Box
             sx={{

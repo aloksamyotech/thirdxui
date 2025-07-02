@@ -1,9 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
-
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 const Chart = () => {
+  const riskFactors = [
+    'Special Educational Needs (SEN)',
+    'Offending history',
+    'CAHMS',
+    'Mental health issues',
+    'Criminal or Sexual Exploitation (CRE/ CSE)',
+    'Risk of offending',
+    'Experience of DV',
+    'School exclusion (temp or perm)',
+    'Substance Misuse',
+    'Social Services',
+    'Poor school Attendance and engagement'
+  ];
+  const [riskBarData, setRiskBarData] = useState(new Array(riskFactors.length).fill(0));
+
+  useEffect(() => {
+    getApi(urls.serviceuser.getAllServicesUser)
+      .then((response) => {
+        const attendees = response.data.allUser;
+        const riskCountArray = new Array(riskFactors.length).fill(0);
+
+        attendees.forEach((item) => {
+          const risks = item?.riskAssessment?.keyIndicators || [];
+
+          risks.forEach((risk) => {
+            const index = riskFactors.indexOf(risk);
+            if (index !== -1) {
+              riskCountArray[index]++;
+            }
+          });
+        });
+
+        setRiskBarData(riskCountArray);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch risk data:', err);
+      });
+  }, []);
+
   return (
     <Grid item xs={12}>
       <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 1 }}>Cases by Risk Factors</Typography>
@@ -20,7 +60,7 @@ const Chart = () => {
           series={[
             {
               id: 'risk-series',
-              data: [1, 1, 1, 1, 1, 4, 3, 1, 2, 4, 1],
+              data: riskBarData,
               color: '#0C3149'
             }
           ]}
@@ -28,38 +68,18 @@ const Chart = () => {
             {
               id: 'x-axis',
               scaleType: 'linear',
-              min: 0,
-              max: 5
+              min: 0
             }
           ]}
           yAxis={[
             {
               id: 'y-axis',
               scaleType: 'band',
-              data: [
-                'Special Educational Needs (SEN)',
-                'Offending history',
-                'CAHMS',
-                'Mental health issues',
-                'Criminal or Sexual Exploitation (CRE/ CSE)',
-                'Risk of offending',
-                'Experience of DV',
-                'School exclusion (temp or perm)',
-                'Substance Misuse',
-                'Social Services',
-                'Poor school Attendance and engagement'
-              ]
+              data: riskFactors
             }
           ]}
-          height={400}
+          height={riskFactors.length * 35}
           margin={{ top: 10, bottom: 30, left: 250, right: 20 }}
-          sx={{
-            '& .{MuiChartsAxis-tickContainer"]': {
-              backgroundColor: '#13314433',
-              borderRadius: '4px',
-              padding: '2px 6px'
-            }
-          }}
         />
       </Box>
     </Grid>

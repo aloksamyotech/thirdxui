@@ -13,10 +13,12 @@ import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-
+import { useLocation } from 'react-router-dom';
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const sessionData = location.state?.sessionData;
   const [isLoading, setIsloading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = React.useRef(null);
@@ -30,6 +32,8 @@ const AddCaseForm = () => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const [searchQueryService, setSearchQueryService] = useState('');
   const [searchQueryCaseOwner, setSearchQueryCaseOwner] = useState('');
 
@@ -94,6 +98,58 @@ const AddCaseForm = () => {
     };
     fetchTags();
   }, []);
+  useEffect(() => {
+    if (sessionData) {
+      console.log('sessionData', {
+        serviceUserId: sessionData?.serviceUserId || '',
+        serviceId: sessionData?.serviceId || '',
+        caseOwner: sessionData?.caseOwner || '',
+        caseOpened: dayjs(sessionData?.caseOpened) || dayjs(),
+        caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
+        Beneficiary: sessionData?.benificiary || [],
+        Campaigns: sessionData?.campaigns || [],
+        engagement: sessionData?.engagement || [],
+        eventsAttended: sessionData?.eventAttanded || [],
+        fundingInterests: sessionData?.fundingInterest || [],
+        fundraisingActivities: sessionData?.fundraisingActivities || [],
+        description: sessionData?.description || '',
+        serviceStatus: sessionData?.status || 'pending',
+        file: null // Do not pre-fill file inputs
+      });
+
+      reset({
+        serviceUserId: sessionData?.serviceUserId || '',
+        serviceId: sessionData?.serviceId || '',
+        caseOwner: sessionData?.caseOwner || '',
+        caseOpened: dayjs(sessionData?.caseOpened) || dayjs(),
+        caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
+        Beneficiary: sessionData?.benificiary || [],
+        Campaigns: sessionData?.campaigns || [],
+        engagement: sessionData?.engagement || [],
+        eventsAttended: sessionData?.eventAttanded || [],
+        fundingInterests: sessionData?.fundingInterest || [],
+        fundraisingActivities: sessionData?.fundraisingActivities || [],
+        description: sessionData?.description || '',
+        serviceStatus: sessionData?.status || 'pending',
+        file: null // Do not pre-fill file inputs
+      });
+    }
+  }, [sessionData, reset]);
+
+  useEffect(() => {
+  if (sessionData?.serviceUserId && rows.length > 0) {
+    setValue('serviceUserId', sessionData.serviceUserId);
+  }
+}, [sessionData?.serviceUserId, rows]);
+
+  useEffect(() => {
+    // After fetching caseOwner
+    if (sessionData?.caseOwner && caseOwner.length > 0) {
+      const matched = caseOwner.find((owner) => owner.id === sessionData.caseOwner);
+      if (matched) setValue('caseOwner', matched.id);
+    }
+  }, [caseOwner, sessionData?.caseOwner, setValue]);
+
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -249,7 +305,9 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Adding New Case</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          Adding New Case
+        </Typography>
 
         <Box
           sx={{
@@ -280,7 +338,7 @@ const AddCaseForm = () => {
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
                       const selectedUser = rows?.find((user) => user.id === field.value);
-                      
+
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                           <Autocomplete
@@ -369,7 +427,7 @@ const AddCaseForm = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={4}>
                   <Controller
                     name="caseOpened"

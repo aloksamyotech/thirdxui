@@ -41,6 +41,42 @@ import { urls } from 'common/urls';
 import { imageUrl } from 'common/urls';
 import './index.css';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+import TimelineActivity from 'components/TimelineActivity';
+
+const timelineData = [
+    {
+        date: '27 Nov 2024',
+        type: 'Survey completed',
+        color: 'error',
+        description: 'Mentee satisfaction form',
+        file: 'Invoices.pdf'
+    },
+    {
+        date: '27 Nov 2024',
+        type: 'Attended a session',
+        color: 'secondary',
+        description: 'Group work – Ether – Sammy Odoi - Soapbox',
+        avatars: ['/avatars/user1.png'],
+        sessionTitle: 'Create a new session',
+        members: '50 members in a sessions'
+    },
+    {
+        date: '27 Nov 2024',
+        type: 'Attended a session',
+        color: 'warning',
+        description: 'Group work – Ether – Sammy Odoi - Soapbox',
+        avatars: ['/avatars/user1.png', '/avatars/user2.png', '/avatars/user3.png'],
+        extraCount: 3,
+        sessionTitle: 'Create a new session',
+        members: '50 members in a sessions'
+    },
+    {
+        date: '27 Nov 2024',
+        type: 'Volunteering Activity',
+        color: 'primary',
+        description: 'Mentee satisfaction form'
+    }
+];
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -132,10 +168,10 @@ const UserProfileCard = () => {
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit'
-      })
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    })
     : '';
   const personalInfo = userData?.personalInfo || {};
   const contactInfo = userData?.contactInfo || {};
@@ -371,17 +407,15 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Ethnicity:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  personalInfo?.ethnicity ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${personalInfo?.ethnicity ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Language:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  contactInfo?.firstLanguage ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${contactInfo?.firstLanguage ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
@@ -395,9 +429,8 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Address:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  contactInfo?.addressLine1 ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${contactInfo?.addressLine1 ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -488,7 +521,7 @@ const UserProfileCard = () => {
                               <Grid item key={index}>
                                 <Chip
                                   label={label}
-                                  onDelete={() => {}}
+                                  onDelete={() => { }}
                                   deleteIcon={
                                     <CancelIcon
                                       sx={{
@@ -546,7 +579,7 @@ const UserProfileCard = () => {
                                     <Chip
                                       key={i}
                                       label={tag}
-                                      onDelete={() => {}}
+                                      onDelete={() => { }}
                                       deleteIcon={
                                         <CancelIcon
                                           sx={{
@@ -598,33 +631,29 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${
-                                  emergencyContact?.lastName ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${emergencyContact?.lastName ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Gender:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  emergencyContact?.gender ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.gender ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Relationship to Service User:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  emergencyContact?.relationshipToUser ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.relationshipToUser ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Address:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  emergencyContact?.addressLine1 ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.addressLine1 ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -649,9 +678,8 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Email:</span>{' '}
-                                <Typography marginLeft={1} component="span" className="text">{`${
-                                  emergencyContact?.email ?? ''
-                                }`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.email ?? ''
+                                  }`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -762,7 +790,7 @@ const UserProfileCard = () => {
               <Grid container spacing={2} p={2}>
                 <Grid item xs={12}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} gap={2}>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography fontWeight="600" fontSize="16px" >
                       Activity Timeline
                     </Typography>
 
@@ -799,64 +827,8 @@ const UserProfileCard = () => {
                 />
 
                 <Grid item xs={9}>
-                  <Card>
-                    <Timeline position="alternate">
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-03-01</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="error" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Survey Completed</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Mentee Satisfaction Form
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
 
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-02-20</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="secondary" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Attended a Session</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Leadership Training Workshop
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-02-20</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="warning" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Attended a Session</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Leadership Training Workshop
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-01-15</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="primary" />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Volunteering Activity</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Mentee Satisfaction Form
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </Timeline>
-                  </Card>
+                  <TimelineActivity timelineData={timelineData} />
                 </Grid>
 
                 <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />

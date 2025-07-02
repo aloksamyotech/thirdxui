@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Tabs, Tab, Grid } from '@mui/material';
-import Chart from './SessionChart.js';
-import SessionList from './SessionList';
+import Chart from './AttendeeChart.js';
+import DonorList from './AttendeeList.js';
 
-const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
+const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -33,15 +33,7 @@ const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpen
 
       <Box>
         {value === 0 && <Chart />}
-        {value === 1 && (
-          <SessionList
-            countryOfOriginFilter={countryOfOriginFilter}
-            selectedName={selectedName}
-            status={status}
-            caseId={caseId}
-            dateOpenedFilter1={dateOpenedFilter}
-          />
-        )}
+        {value === 1 && <DonorList selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />}
       </Box>
     </Grid>
   );

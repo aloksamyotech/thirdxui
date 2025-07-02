@@ -56,9 +56,8 @@ const AboutCase = () => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
-  
   const caseId = location.state?.caseData?.row?._id || location.state?.caseData?.row || location.state?.caseData?._id;
-  
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClose = () => {
@@ -74,7 +73,7 @@ const AboutCase = () => {
       if (!caseId) return;
       try {
         const res = await getApi(urls.case.getById.replace(':id', caseId));
-        
+
         setSessionData(res?.data?.caseData || {});
       } catch (error) {
         console.error('Failed to fetch service details', error);
@@ -85,7 +84,6 @@ const AboutCase = () => {
 
     fetchServiceDetails();
   }, [caseId]);
-
 
   useEffect(() => {
     const fetchServiceTypeName = async () => {
@@ -119,12 +117,8 @@ const AboutCase = () => {
           return;
         }
 
-
-
         const allTagsResponse = await getApi(urls.tag.getAllTags);
         const allTags = allTagsResponse?.data?.allTags || [];
-
-        
 
         const allIds = [
           ...session.benificiary,
@@ -135,18 +129,12 @@ const AboutCase = () => {
           ...session.fundraisingActivities
         ].map((id) => (typeof id === 'object' ? id.$oid : id));
 
-        
-
         const relatedTags = allTags.filter((tag) => {
           const tagId = typeof tag._id === 'object' ? tag._id.$oid : tag._id;
           const match = allIds.includes(tagId);
-          if (match) {
-            console.log(`✅ Match found for tag: ${tag.name} (${tagId})`);
-          }
           return match;
         });
 
-        
         const grouped = {};
         relatedTags.forEach((tag) => {
           const category = tag.tagCategoryName || 'Uncategorized';
@@ -158,7 +146,6 @@ const AboutCase = () => {
           category,
           tags
         }));
-
 
         setGroupedTags(formatted);
       } catch (err) {
@@ -173,8 +160,6 @@ const AboutCase = () => {
     }
   }, [sessionData]);
 
-  
-
   return (
     <>
       <Grid item xs={12} mb={2}>
@@ -188,7 +173,7 @@ const AboutCase = () => {
         </Stack>
       </Grid>
 
-      <Grid container sx={{ p: 1 }}>
+      <Grid container sx={{ p: 1 }} spacing={2}>
         <Grid item xs={12} md={6}>
           <AboutCaseCard sessionData={sessionData} caseId={caseId} />
         </Grid>

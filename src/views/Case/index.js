@@ -22,7 +22,7 @@ const Case = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
-  const [owner, setOwner] = useState('');
+  const [caseOwner, setOwner] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFiltered, setIsFiltered] = useState(false);
@@ -36,8 +36,9 @@ const Case = () => {
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   const statusFilter = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'open', label: 'Open' },
+    { value: 'close', label: 'Close' },
+    { value: 'pending', label: 'Pending' }
   ];
 
   const dateAddedFilters = [
@@ -94,7 +95,7 @@ const Case = () => {
       valueGetter: (params) => params.value || '-'
     },
     {
-      field: 'owner',
+      field: 'caseOwner',
       headerName: 'Owner',
       width: 90,
       valueGetter: (params) => params.value || '-'
@@ -104,9 +105,7 @@ const Case = () => {
       field: 'status',
       headerName: 'Status',
       width: 120,
-      renderCell: (params) => (
-        <StatusChip status={params.value} />
-      )
+      renderCell: (params) => <StatusChip status={params.value} />
     },
     {
       field: 'service',
@@ -129,9 +128,9 @@ const Case = () => {
       if (serviceType && serviceType !== '') {
         queryParams.append('serviceId', serviceType);
       }
-      if (status) queryParams.append('status', status === 'active');
-      if (owner && owner !== '') {
-        queryParams.append('serviceType', owner);
+      if (status) queryParams.append('status', status);
+      if (caseOwner && caseOwner !== '') {
+        queryParams.append('caseOwner', caseOwner);
       }
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
@@ -166,7 +165,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
-          owner: user?.caseOwner?.personalInfo?.firstName || '',
+          caseOwner: user?.caseOwner?.personalInfo?.firstName || '',
           status: user?.status
         };
       });
@@ -190,10 +189,10 @@ const Case = () => {
   };
 
   useEffect(() => {
-    if (serviceType || status || owner || dateOpenedFilter || searchQuery || isFiltered) {
+    if (serviceType || status || caseOwner || dateOpenedFilter || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [serviceType, status, owner, dateOpenedFilter, searchQuery]);
+  }, [serviceType, status, caseOwner, dateOpenedFilter, searchQuery]);
 
   const fetchInitialData = async () => {
     setLoading(true);
@@ -221,7 +220,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
+          caseOwner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
           status: user?.status
         };
       });
@@ -246,10 +245,20 @@ const Case = () => {
 
       setServiceTypeFilterOptions(uniqueServiceTypes);
 
-      const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
-        value,
-        label: value
-      }));
+      const uniqueOwners = [
+        ...new Map(
+          allCases
+            .filter((item) => item?.caseOwner?._id)
+            .map((item) => [
+              item.caseOwner._id,
+              {
+                value: item.caseOwner._id,
+                label: `${item.caseOwner.personalInfo.firstName ?? ''} ${item.caseOwner.personalInfo.lastName ?? ''}`.trim()
+              }
+            ])
+        ).values()
+      ];
+
       setOwnerFilters(uniqueOwners);
     } catch (error) {
       console.error('Failed to fetch services:', error);
@@ -358,7 +367,7 @@ const Case = () => {
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             owners={ownerFilters}
-            ownerFilter={owner}
+            ownerFilter={caseOwner}
             setOwnerFilter={(value) => setOwner(value)}
             selectedFilters={['serviceFilter', 'statusFilter', 'dateOpenedFilter', 'ownerFilter']}
             customDateLabel="Date Opened"
@@ -374,9 +383,9 @@ const Case = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}

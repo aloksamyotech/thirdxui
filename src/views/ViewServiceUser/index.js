@@ -517,13 +517,7 @@ const UserProfileCard = () => {
                           </Typography>
 
                           <Grid container spacing={1}>
-                            {[
-                              'Attendance and Engagement',
-                              'Poor school',
-                              'Learning disability',
-                              'Subtractive Mixture',
-                              'Learning disability'
-                            ].map((label, index) => (
+                            {userData?.riskAssessment?.keyIndicators?.map((label, index) => (
                               <Grid item key={index}>
                                 <Chip
                                   label={label}

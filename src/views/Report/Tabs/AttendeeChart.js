@@ -2,7 +2,8 @@ import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
-
+import female from '../../../assets/images/female.png';
+import male from '../../../assets/images/male.png';
 const Chart = () => {
   return (
     <Grid container spacing={3}>
@@ -92,37 +93,60 @@ const Chart = () => {
           sx={{
             backgroundColor: '#fff',
             boxShadow: '0px 4px 10px rgba(0,0,0,0.05)',
-            borderRadius: '12px'
+            borderRadius: '12px',
+            p: 2,
+            height: 340
           }}
         >
-          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Age Range</Typography>
+          <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 1 }}>Cases By Age Range</Typography>
 
-          <BarChart
-            layout="horizontal"
-            series={[
-              {
-                id: 'bar-series-1',
-                data: [3, 7, 10, 12, 6],
-                color: '#009FC7'
-              }
-            ]}
-            xAxis={[
-              {
-                id: 'x-axis',
-                scaleType: 'linear',
-                label: 'Units of measure'
-              }
-            ]}
-            yAxis={[
-              {
-                id: 'y-axis',
-                scaleType: 'band',
-                data: ['Adults', 'Infants', 'Seniors', 'Kids', 'Anyone']
-              }
-            ]}
-            height={300}
-            margin={{ top: 10, bottom: 30, left: 60, right: 20 }}
-          />
+          <Box sx={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', mb: 2 }}>
+            <Box sx={{ width: '60%', backgroundColor: '#ff2f92' }} />
+            <Box sx={{ width: '80%', backgroundColor: '#00c7ff' }} />
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Box
+                sx={{
+                  width: 150,
+                  height: 150,
+                  borderRadius: '50%',
+                  border: '2px solid #ddd',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  mb: 1
+                }}
+              >
+                <img src={female} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </Box>
+
+              <Typography sx={{ fontWeight: 600 }}>Female</Typography>
+              <Typography sx={{ color: '#ff2f92', fontWeight: 700 }}>29%</Typography>
+            </Box>
+
+            <Box sx={{ textAlign: 'center' }}>
+              <Box
+                sx={{
+                  width: 150,
+                  height: 150,
+                  borderRadius: '50%',
+                  border: '2px solid #ddd',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  mb: 1
+                }}
+              >
+                <img src={male} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </Box>
+              <Typography sx={{ fontWeight: 600 }}>Male</Typography>
+              <Typography sx={{ color: '#00c7ff', fontWeight: 700 }}>71%</Typography>
+            </Box>
+          </Box>
         </Box>
       </Grid>
 

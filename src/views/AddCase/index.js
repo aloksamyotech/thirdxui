@@ -135,20 +135,19 @@ const AddCaseForm = () => {
       });
     }
   }, [sessionData, reset]);
-
   useEffect(() => {
-  if (sessionData?.serviceUserId && rows.length > 0) {
-    setValue('serviceUserId', sessionData.serviceUserId);
-  }
-}, [sessionData?.serviceUserId, rows]);
-
-  useEffect(() => {
-    // After fetching caseOwner
-    if (sessionData?.caseOwner && caseOwner.length > 0) {
-      const matched = caseOwner.find((owner) => owner.id === sessionData.caseOwner);
-      if (matched) setValue('caseOwner', matched.id);
+    if (sessionData?.serviceUserId && rows.length > 0) {
+      const match = rows.find((user) => user.id === sessionData.serviceUserId);
+      if (match) setValue('serviceUserId', match.id);
     }
-  }, [caseOwner, sessionData?.caseOwner, setValue]);
+  }, [sessionData, rows, setValue]);
+
+  useEffect(() => {
+    if (sessionData?.caseOwner && caseOwner.length > 0) {
+      const match = caseOwner.find((owner) => owner.id === sessionData.caseOwner);
+      if (match) setValue('caseOwner', match.id);
+    }
+  }, [sessionData, caseOwner, setValue]);
 
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
@@ -337,15 +336,15 @@ const AddCaseForm = () => {
                     control={control}
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
-                      const selectedUser = rows?.find((user) => user.id === field.value);
+                      const selectedUser = rows.find((user) => user.id === field.value);
 
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                           <Autocomplete
-                            value={selectedUser}
-                            onChange={(_, value) => field.onChange(value ? value.id : '')}
-                            onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
-                            options={rows || []}
+                            value={selectedUser || null}
+                            onChange={(_, value) => field.onChange(value?.id || '')}
+                            // onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                            options={rows}
                             getOptionLabel={(option) => option.name || ''}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                             renderInput={(params) => (
@@ -401,18 +400,17 @@ const AddCaseForm = () => {
                     control={control}
                     rules={{ required: 'Case owner is required' }}
                     render={({ field }) => {
-                      const selectedCaseOwner = caseOwner?.find((owner) => owner.id === field.value);
+                      const selectedOwner = caseOwner.find((owner) => owner.id === field.value);
+
                       return (
                         <FormControl fullWidth size="small" error={!!errors.caseOwner}>
                           <Autocomplete
-                            value={selectedCaseOwner}
-                            onChange={(_, value) => {
-                              field.onChange(value ? value.id : '');
-                            }}
-                            onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
-                            options={caseOwner || []}
+                            value={selectedOwner || null}
+                            onChange={(_, value) => field.onChange(value?.id || '')}
+                            // onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
+                            options={caseOwner}
                             getOptionLabel={(option) => option.name || ''}
-                            isOptionEqualToValue={(option, value) => option._id === value._id}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
                             renderInput={(params) => (
                               <TextField {...params} label="Case Owner" variant="outlined" size="small" error={!!errors.caseOwner} />
                             )}

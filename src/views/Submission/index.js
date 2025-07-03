@@ -65,8 +65,10 @@ const Lead = () => {
   });
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (params) => {
+    setSelectedRowId(params.row.id);
     setDialogOpen(true);
   };
 
@@ -226,7 +228,9 @@ const Lead = () => {
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
             <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-              <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Submitted Form</Typography>
+              <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+                Submitted Form
+              </Typography>
               <Box
                 sx={{
                   display: 'flex',
@@ -295,9 +299,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
                   loading={loading}
@@ -340,7 +344,13 @@ const Lead = () => {
           </Grid>
         </Card>
       </Grid>
-      <SubmissionDialog open={dialogOpen} onClose={handleCloseDialog} onAccept={handleAccept} onDecline={handleDecline} />
+      <SubmissionDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        id={selectedRowId}
+      />
     </>
   );
 };

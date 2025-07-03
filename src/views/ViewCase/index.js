@@ -47,8 +47,6 @@ const CaseDetailsPage = () => {
   const location = useLocation();
   const { id } = location.state || {};
 
-  console.log(`serviceuserDetails`, serviceuserDetails?._id);
-
   const CustomHeader = () => {
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>

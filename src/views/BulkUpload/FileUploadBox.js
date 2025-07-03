@@ -14,8 +14,8 @@ const FileUploadBox = () => {
     accept: {
       'application/pdf': [],
       'application/msword': [],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [],
-    },
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': []
+    }
   });
 
   return (
@@ -29,8 +29,8 @@ const FileUploadBox = () => {
         p: 4,
         cursor: 'pointer',
         transition: 'border-color 0.2s',
-          '&:hover': { borderColor: '#aaa' },
-        marginTop:2
+        '&:hover': { borderColor: '#aaa' },
+        marginTop: 2
       }}
     >
       <input {...getInputProps()} />
@@ -47,9 +47,7 @@ const FileUploadBox = () => {
       </Box>
 
       <Typography variant="body1" mb={2}>
-        {isDragActive
-          ? 'Drop the file here...'
-          : 'Upload By Clicking Here Or Drag And Drop Your File'}
+        {isDragActive ? 'Drop the file here...' : 'Upload By Clicking Here Or Drag And Drop Your File'}
       </Typography>
 
       <Button
@@ -62,8 +60,8 @@ const FileUploadBox = () => {
           py: 1,
           fontWeight: 500,
           '&:hover': {
-            backgroundColor: '#053146',
-          },
+            backgroundColor: '#053146'
+          }
         }}
       >
         Upload a file

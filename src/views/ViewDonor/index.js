@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider, Chip } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Avatar,
+  Tooltip,
+  Grid,
+  Stack,
+  IconButton,
+  Tabs,
+  Tab,
+  Divider,
+  Chip
+} from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
@@ -38,8 +53,7 @@ const timelineData = [
     date: '28 Nov 2024',
     type: 'Email sent (Thank You)',
     color: 'secondary',
-    description: 'Acknowledgement email sent',
-
+    description: 'Acknowledgement email sent'
   },
   {
     date: '13 Jan 2025',
@@ -47,7 +61,6 @@ const timelineData = [
     color: 'warning',
     description: 'Special fundraising campaign',
     file: 'Invoices.pdf'
-
   },
   {
     date: '21 Feb 2025',
@@ -102,8 +115,6 @@ const UserProfileCard = () => {
         const response = await getApi(urls.tag.getAllTags);
         const allTags = response?.data?.allTags || [];
 
-
-
         const combinedData = [
           ...(userData?.otherInfo?.benificiary ?? []),
           ...(userData?.otherInfo?.campaigns ?? []),
@@ -113,7 +124,6 @@ const UserProfileCard = () => {
           ...(userData?.otherInfo?.fundraisingActivities ?? [])
         ];
 
-
         const allIds = combinedData.map((item) => {
           const id = typeof item === 'object' && item !== null ? item._id : item;
           if (!id) {
@@ -122,9 +132,7 @@ const UserProfileCard = () => {
           return id;
         });
 
-
         const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
-
 
         const grouped = {};
         relatedTags.forEach((tag) => {
@@ -132,7 +140,6 @@ const UserProfileCard = () => {
           if (!grouped[category]) grouped[category] = [];
           grouped[category].push(tag.name);
         });
-
 
         const formatted = Object.entries(grouped).map(([category, tags]) => ({
           category,
@@ -148,16 +155,16 @@ const UserProfileCard = () => {
     if (userData?.otherInfo) {
       fetchAndGroupTags();
     } else {
-      console.log('⛔ userData.otherInfo not found, skipping tag fetch.');
+      console.warn('⛔ userData.otherInfo not found, skipping tag fetch.');
     }
   }, [userData]);
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit'
-    })
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      })
     : '';
   const isActive = userData?.isActive;
   const uniqueId = userData?.uniqueId || '-';
@@ -329,10 +336,10 @@ const UserProfileCard = () => {
                         {sub_role === SUBROLES.INDIVIDUAL
                           ? 'Individual'
                           : sub_role === SUBROLES.COMPANY
-                            ? 'Company'
-                            : sub_role === SUBROLES.GROUP
-                              ? 'Group'
-                              : sub_role}
+                          ? 'Company'
+                          : sub_role === SUBROLES.GROUP
+                          ? 'Group'
+                          : sub_role}
                         | Added {formattedDate}
                       </Typography>
                     </Grid>
@@ -696,7 +703,7 @@ const UserProfileCard = () => {
                                     <Chip
                                       key={i}
                                       label={tag}
-                                      onDelete={() => { }}
+                                      onDelete={() => {}}
                                       deleteIcon={
                                         <CancelIcon
                                           sx={{
@@ -732,7 +739,7 @@ const UserProfileCard = () => {
               <Grid container spacing={2} p={2}>
                 <Grid item xs={12}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} gap={2}>
-                    <Typography fontWeight="600" fontSize="16px" >
+                    <Typography fontWeight="600" fontSize="16px">
                       Activity Timeline
                     </Typography>
 
@@ -769,7 +776,6 @@ const UserProfileCard = () => {
                 />
 
                 <Grid item xs={9}>
-
                   <TimelineActivity timelineData={timelineData} />
                 </Grid>
 

@@ -14,6 +14,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const fileInputRef = useRef(null);
   const [serviceType, setServiceType] = useState([]);
+  const [products, setProducts] = useState([]);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [donorData, setDonorData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,7 +75,8 @@ const AddCaseForm = ({ onCancel }) => {
         processingCost: data.processingCost || '',
         currency: data.currency || '',
         receiptNumber: data.receiptNumber || '',
-        transactionId: data.transactionId || ''
+        transactionId: data.transactionId || '',
+        productId: data.product || ''
       };
 
       const res = await postApi(urls.transaction.create, payload, {
@@ -94,6 +96,8 @@ const AddCaseForm = ({ onCancel }) => {
 
         const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
         setServiceType(servicetypeoption);
+        const productsOption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Product');
+        setProducts(productsOption);
       } catch (error) {
         console.error('Error fetching config:', error);
       }
@@ -387,21 +391,24 @@ const AddCaseForm = ({ onCancel }) => {
                     <Grid container spacing={2}>
                       <Grid item xs={12}>
                         <Controller
-                          name="preferredContact"
+                          name="product"
                           control={control}
                           rules={{ required: 'Product is required' }}
                           render={({ field }) => (
                             <TextField
+                              {...field}
                               select
                               fullWidth
-                              size="small"
                               label="Product"
-                              {...field}
-                              error={!!errors.preferredContact}
-                              helperText={errors.preferredContact?.message}
+                              size="small"
+                              error={!!errors.product}
+                              helperText={errors.product?.message}
                             >
-                              <MenuItem value="Dog Food">Dog Food</MenuItem>
-                              <MenuItem value="Cat Food">Cat Food</MenuItem>
+                              {products?.map((option) => (
+                                <MenuItem key={option._id} value={option._id}>
+                                  {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                </MenuItem>
+                              ))}
                             </TextField>
                           )}
                         />

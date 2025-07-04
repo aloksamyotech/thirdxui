@@ -72,6 +72,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [serviceData, setServiceData] = useState([]);
   const [serviceNames, setServiceNames] = useState([]);
   const [serviceNameSearchQuery, setServiceNameSearchQuery] = useState('');
+  const [keyIndicator, setKeyIndicator] = useState([]);
 
   const location = useLocation();
   const editdata = location?.state?.editdata;
@@ -80,7 +81,7 @@ const AddCaseForm = ({ onCancel }) => {
   const handleContactMethodClick = (label) => {
     setContactMethodStates((prev) => {
       const nextState = (prev[label] + 1) % 3;
-      setValue(label.toLowerCase(), nextState === 1);
+      setValue(`contactMethods.${label.toLowerCase()}`, nextState === 1);
       return { ...prev, [label]: nextState };
     });
   };
@@ -248,6 +249,8 @@ const AddCaseForm = ({ onCancel }) => {
         setContactpurpose(filtercontactpurpose);
         const filtercontactmethod = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Types');
         setContactmethod(filtercontactmethod);
+        const filterKeyIndicator = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Key Indicators');
+        setKeyIndicator(filterKeyIndicator);
       } catch (error) {
         console.error('Error fetching config:', error);
       }
@@ -352,7 +355,8 @@ const AddCaseForm = ({ onCancel }) => {
         <Autocomplete
           multiple
           options={options}
-          getOptionLabel={(option) => option.label || option}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
           value={field.value || []}
           onChange={(_, newValue) => field.onChange(newValue)}
           renderInput={(params) => (
@@ -372,6 +376,7 @@ const AddCaseForm = ({ onCancel }) => {
       )}
     />
   );
+
 
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
@@ -451,7 +456,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('emergencyContact[country]', formData.emergencycountry || '');
     fd.append('emergencyContact[town]', formData.emergencytown || '');
     fd.append('emergencyContact[postcode]', formData.emergencypinCode || '');
-    fd.append('RiskAssessment[riskAssessmentNotes]', formData.riskAssessmentNotes || '');
+    fd.append('riskAssessment[riskAssessmentNotes]', formData.riskAssessmentNotes || '');
     (formData?.keyIndicators || []).forEach((item) => {
       fd.append('riskAssessment[keyIndicators][]', item.value || item);
     });
@@ -1476,8 +1481,8 @@ const AddCaseForm = ({ onCancel }) => {
                                         ? typeof field.value === 'object' && field.value.name
                                           ? field.value.name
                                           : typeof field.value === 'string'
-                                          ? field.value.split('/').pop()
-                                          : ''
+                                            ? field.value.split('/').pop()
+                                            : ''
                                         : ''
                                     }
                                     placeholder="Attachments"
@@ -2116,14 +2121,10 @@ const AddCaseForm = ({ onCancel }) => {
                         {renderAutocomplete2(
                           'keyIndicators',
                           'Key Indicators of Concern',
-                          [
-                            { label: 'Poor school attendance and engagement', value: 'Poor school attendance and engagement' },
-                            { label: 'School Exclusion', value: 'School Exclusion' },
-                            { label: 'Not in education, traingng or work (Neet)', value: 'Not in education, traingng or work (Neet)' },
-                            { label: 'Substance Misuse', value: 'Substance Misuse' },
-                            { label: 'Social Services', value: 'Social Services' },
-                            { label: 'CAHMS', value: 'CAHMS' }
-                          ],
+                          keyIndicator?.map(item => ({
+                            label: item.name,
+                            value: item._id
+                          })) || [],
                           errors.keyIndicators,
                           errors.keyIndicators?.message,
                           control

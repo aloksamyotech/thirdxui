@@ -36,7 +36,8 @@ const defaultTabTypes = [
   'Location',
   'Reason',
   'Service Types',
-  'Form Types'
+  'Form Types',
+  'Product'
 ];
 
 const TabbedDataGrid = () => {

@@ -1,49 +1,12 @@
-import { Divider, Select, MenuItem, TextField, Button, InputAdornment, Typography, Grid, IconButton } from '@mui/material';
+import { Divider, Select, MenuItem, TextField, Button, InputAdornment, Typography, Grid, IconButton, Pagination } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
-import { useEffect } from 'react';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
-
-const sessionsData = [
-  {
-    date: "25 Oct '24",
-    time: '18:00',
-    title: 'Cover Letter Writing',
-    description: 'Online session conducted by',
-    presenter: 'Maria',
-    summary: 'imparted...'
-  },
-  {
-    date: "25 Oct '24",
-    time: '18:00',
-    title: 'Cover Letter Writing',
-    description: 'Online session conducted by',
-    presenter: 'Maria',
-    summary: 'imparted...'
-  },
-  {
-    date: "25 Oct '24",
-    time: '18:00',
-    title: 'Cover Letter Writing',
-    description: 'Online session conducted by',
-    presenter: 'Maria',
-    summary: 'imparted...'
-  },
-  {
-    date: "25 Oct '24",
-    time: '18:00',
-    title: 'Cover Letter Writing',
-    description: 'Online session conducted by',
-    presenter: 'Maria',
-    summary: 'imparted...'
-  }
-];
 
 const SessionItem = ({ id, date, time, title, description, summary, presenter }) => {
   const navigate = useNavigate();
@@ -83,7 +46,6 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
               variant="contained"
               size="small"
               onClick={handleEditClick}
-              onPointerDown={(e) => e.stopPropagation()}
               sx={{
                 backgroundColor: '#1B4B66',
                 textTransform: 'none',
@@ -97,6 +59,7 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
                   backgroundColor: '#163A52'
                 }
               }}
+              onPointerDown={(e) => e.stopPropagation()}
             >
               Edit Session
             </Button>
@@ -104,7 +67,6 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
               variant="outlined"
               size="small"
               onClick={handleAddAttendeesClick}
-              onPointerDown={(e) => e.stopPropagation()}
               sx={{
                 textTransform: 'none',
                 fontSize: 8,
@@ -120,6 +82,7 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
                   borderColor: '#1B4B66'
                 }
               }}
+              onPointerDown={(e) => e.stopPropagation()}
             >
               Add Attendees
             </Button>
@@ -139,38 +102,58 @@ const Sessions = () => {
   const [allSession, setAllSession] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [range, setRange] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
+
   const navigate = useNavigate();
 
   const fetchDashboardData = async () => {
     setLoading(true);
-    const session = await getApi(urls.session.fetch);
-    const currentSessions = session?.data?.allSession;
+    try {
+      const queryParams = {
+        name: search,
+        range: range?.toLowerCase().replace(/\s/g, '-'),
+        page,
+        limit
+      };
 
-    const formattedSessions = currentSessions?.map((item, index) => ({
-      id: item._id || index,
-      date: item?.date
-        ? new Date(item.date)
-          .toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: '2-digit'
-          })
-          .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
-        : '',
+      const queryString = new URLSearchParams(queryParams).toString();
 
-      title: item?.serviceId?.name || '',
-      serviceId: item?.serviceId || '',
-      time: item?.time || '',
-      description: item?.description || ''
-    }));
+      const response = await getApi(`${urls.session.fetchWithPagination}?${queryString}`);
+      const sessionList = response?.data?.data || [];
+      const meta = response?.data?.meta || {};
 
-    setAllSession(formattedSessions);
-    setLoading(false);
+      const formattedSessions = sessionList.map((item, index) => ({
+        id: item._id || index,
+        date: item?.date
+          ? new Date(item.date)
+              .toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: '2-digit'
+              })
+              .replace(/(\d{2})\/(\w{3})\/(\d{2})/, "$1 $2'$3")
+          : '',
+        title: item?.serviceId?.name || '',
+        serviceId: item?.serviceId || '',
+        time: item?.time || '',
+        description: item?.description || '',
+        presenter: item?.serviceuser?.name || '',
+      }));
+
+      setAllSession(formattedSessions);
+      setTotalPages(meta?.totalPages || 1);
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     fetchDashboardData();
-  }, []);
-  const filteredData = allSession.filter((item) => item?.serviceId?.name?.toLowerCase().includes(search.toLowerCase()));
+  }, [search, range, page]);
 
   return (
     <Box
@@ -191,8 +174,17 @@ const Sessions = () => {
         <Typography variant="h5" fontWeight={500} fontSize={14}>
           Current Sessions
         </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap" onPointerDown={(e) => e.stopPropagation()}>
-          <Select value="This Week" size="small">
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          <Select
+            value={range}
+            size="small"
+            onChange={(e) => {
+              setPage(1);
+              setRange(e.target.value);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <MenuItem value="">All</MenuItem>
             <MenuItem value="This Week">This Week</MenuItem>
             <MenuItem value="This Month">This Month</MenuItem>
             <MenuItem value="This Year">This Year</MenuItem>
@@ -201,7 +193,19 @@ const Sessions = () => {
             variant="outlined"
             placeholder="Search"
             size="small"
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
             onPointerDown={(e) => e.stopPropagation()}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
             sx={{
               maxWidth: 120,
               '& input::placeholder': {
@@ -210,42 +214,36 @@ const Sessions = () => {
                 opacity: 1
               }
             }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              )
-            }}
           />
         </Stack>
       </Stack>
 
       <Divider />
+
       <Box sx={{ maxHeight: 328, overflowY: 'auto', pr: 1, height: 328 }}>
         {loading ? (
           <SingleRowLoader />
         ) : (
-          filteredData.map((session, index) => <SessionItem key={index} {...session} id={session.serviceId} />)
+          allSession.map((session, index) => <SessionItem key={index} {...session} id={session.serviceId} />)
         )}
       </Box>
+
+      {totalPages > 1 && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination count={totalPages} page={page} onChange={(e, value) => setPage(value)} size="small" color="primary" />
+        </Box>
+      )}
 
       <Typography
         sx={{
           textAlign: 'center',
-
           fontSize: 12,
-
           color: '#1B4B66',
-
           cursor: 'pointer',
-
-          fontWeight: 500
+          fontWeight: 500,
+          mt: 2
         }}
         onClick={() => navigate('/services')}
-        onPointerDown={(e) => e.stopPropagation()}
       >
         View all sessions
       </Typography>

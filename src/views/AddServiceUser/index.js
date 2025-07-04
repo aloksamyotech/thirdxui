@@ -77,7 +77,6 @@ const AddCaseForm = ({ onCancel }) => {
   const location = useLocation();
   const editdata = location?.state?.editdata;
   const sessionId = location?.state?.sessionId;
-
   const handleContactMethodClick = (label) => {
     setContactMethodStates((prev) => {
       const nextState = (prev[label] + 1) % 3;

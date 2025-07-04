@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Tabs, Tab, Grid } from '@mui/material';
 import { Button, TextField, Typography } from '@mui/material';
 import Chart from './SurveyChart';
-import CaseList from './CaseList';
+import CaseList from './SurveyList';
 
 const Survey = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
   const [value, setValue] = useState(0);

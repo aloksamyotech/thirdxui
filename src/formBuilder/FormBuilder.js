@@ -1,41 +1,42 @@
-import { Box, Button, Divider, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Box, Button, Divider, Typography, CircularProgress } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData, setPreset }) => {
-  const updatedTemplateData = templateData.map(field => {
-    if (field.type !== "header") {
+  const [loading, setLoading] = useState(false);
+
+  const updatedTemplateData = templateData.map((field) => {
+    if (field.type !== 'header') {
       return {
         ...field,
-        disabledFieldButtons: ["remove", "edit"]
-      }
+        disabledFieldButtons: ['remove', 'edit']
+      };
     } else {
-      return field
+      return field;
     }
-  }
-  );
-  
+  });
+
   const loadScripts = () => {
+    setLoading(true);
     const scriptJQuery = document.createElement('script');
-    scriptJQuery.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js";
+    scriptJQuery.src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js';
     scriptJQuery.onload = () => {
       const scriptJQueryUI = document.createElement('script');
-      scriptJQueryUI.src = "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js";
+      scriptJQueryUI.src = 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js';
       scriptJQueryUI.onload = () => {
         const scriptFormBuilder = document.createElement('script');
-        scriptFormBuilder.src = "https://formbuilder.online/assets/js/form-builder.min.js";
+        scriptFormBuilder.src = 'https://formbuilder.online/assets/js/form-builder.min.js';
         scriptFormBuilder.onload = () => {
           const scriptFormRender = document.createElement('script');
-          scriptFormRender.src = "https://formbuilder.online/assets/js/form-render.min.js";
+          scriptFormRender.src = 'https://formbuilder.online/assets/js/form-render.min.js';
           scriptFormRender.onload = () => {
             if (!document.getElementById('fb-editor').classList.contains('fb-builder-initialized')) {
               const options = {
                 disableFields: ['textDefault', 'autocomplete', 'hidden', 'header', 'button'],
                 controlPosition: 'left',
                 disabledActionButtons: ['save', 'data', 'clear'],
-                disabledFieldButtons: { 'header': ['remove', 'copy'] },
+                disabledFieldButtons: { header: ['remove', 'copy'] },
                 disabledAttrs: [
                   'access',
                   // 'className',
@@ -52,18 +53,20 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
                   'step',
                   'toggle',
                   'subtype',
-                  'value',
+                  'value'
                 ],
                 defaultFields: updatedTemplateData,
                 formData: formData,
-                fields: [{
-                  label: 'textDefault',
-                  disabledFieldButtons: ['remove', 'copy', 'edit'],
-                  attrs: {
-                    type: 'textDefault'
-                  },
-                  icon: '🌟'
-                }],
+                fields: [
+                  {
+                    label: 'textDefault',
+                    disabledFieldButtons: ['remove', 'copy', 'edit'],
+                    attrs: {
+                      type: 'textDefault'
+                    },
+                    icon: '🌟'
+                  }
+                ],
                 templates: {
                   textDefault: function (fieldData) {
                     return {
@@ -74,7 +77,7 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
                     };
                   }
                 }
-              }
+              };
               window.$(document.getElementById('fb-editor')).formBuilder(options);
               document.getElementById('fb-editor').classList.add('fb-builder-initialized');
             }
@@ -86,28 +89,32 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
       document.body.appendChild(scriptJQueryUI);
     };
     document.body.appendChild(scriptJQuery);
+    setLoading(false);
   };
 
   useEffect(() => {
     loadScripts();
   }, []);
-  
+
   const getFormData = () => {
     const formData = window.$('#fb-editor').formBuilder('getData');
-    setFormData(formData)
-    setPreview(true)
-  }
+    setFormData(formData);
+    setPreview(true);
+  };
+
   const clearFormData = () => {
     const formInstance = window.$('#fb-editor').data('formBuilder');
     formInstance.actions.clearFields();
-  }
+  };
+
   const prevButton = () => {
-    setPreset(true)
-  }
+    setPreset(true);
+  };
+
   const onCloseFunction = () => {
-    onClose()
-    setPreset(true)
-  }
+    onClose();
+    setPreset(true);
+  };
 
   return (
     <div style={{ backgroundColor: '#f0ebf8', padding: '10px' }}>
@@ -115,25 +122,62 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
         <KeyboardDoubleArrowLeftIcon onClick={prevButton} sx={{ cursor: 'pointer' }} />
         <CancelIcon onClick={onCloseFunction} sx={{ cursor: 'pointer' }} />
       </Box>
-      <Typography variant='h6' sx={{ fontWeight: 700, fontSize: '30px', textAlign: 'center', mt: '-20px', mb: '20px' }}>Create Form</Typography>
-      <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '10px',
-        padding: '5px',
-      }}>
-        <div id="fb-editor" style={{
-        }}></div>
-        <Divider sx={{ mt: '10px' }} />
-        <div style={{
-          height: '100px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8
-        }}>
-          <Button variant='contained' style={{ border: '1px solid #673ab7', backgroundColor: '#fff', color: '#673ab7' }} onClick={clearFormData}>Clear</Button>
-          <Button variant='contained' style={{ backgroundColor: '#673ab7' }} onClick={getFormData}>Next</Button>
-        </div>
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 700,
+          fontSize: '30px',
+          textAlign: 'center',
+          mt: '-20px',
+          mb: '20px'
+        }}
+      >
+        Create Form
+      </Typography>
+
+      <div
+        style={{
+          backgroundColor: '#fff',
+          borderRadius: '10px',
+          padding: '5px',
+          minHeight: '300px'
+        }}
+      >
+        {loading ? (
+          <Box sx={{ textAlign: 'center', py: 10 }}>
+            <CircularProgress />
+            <Typography sx={{ mt: 2 }}>Loading form builder...</Typography>
+          </Box>
+        ) : (
+          <>
+            <div id="fb-editor"></div>
+            <Divider sx={{ mt: '10px' }} />
+            <div
+              style={{
+                height: '100px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+            >
+              <Button
+                variant="contained"
+                style={{
+                  border: '1px solid #673ab7',
+                  backgroundColor: '#fff',
+                  color: '#673ab7'
+                }}
+                onClick={clearFormData}
+              >
+                Clear
+              </Button>
+              <Button variant="contained" style={{ backgroundColor: '#673ab7' }} onClick={getFormData}>
+                Next
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

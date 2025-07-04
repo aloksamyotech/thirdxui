@@ -3,20 +3,19 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import React from 'react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
-import OptionsPopover from 'components/AddFilter';
 import { useLocation, useNavigate } from 'react-router';
 import { useState } from 'react';
 import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import { getApi } from 'common/apiClient';
 import moment from 'moment';
+import CasePopover from 'components/CasePopover';
 
 const AboutCaseNote = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const caseData = location.state?.caseData;
-  
 
   const [caseNoteData, setCaseNoteData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,12 +30,9 @@ const AboutCaseNote = () => {
   };
   const open = Boolean(anchorEl);
   useEffect(() => {
-
-
     const fetchCaseNotes = async () => {
       try {
         const res = await getApi(urls.casenote.getById.replace(':id', caseData?.id));
-
 
         setCaseNoteData(res?.data?.caseNoteData || {});
       } catch (error) {
@@ -183,13 +179,10 @@ const AboutCaseNote = () => {
           </Box>
         </Grid>
 
-        {/* Right Column if needed */}
-        <Grid item xs={12} md={6}>
-          {/* Optional second column content */}
-        </Grid>
+        <Grid item xs={12} md={6}></Grid>
       </Grid>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} />
+      <CasePopover open={open} anchorEl={anchorEl} onClose={handleClose} data={caseData} />
     </>
   );
 };

@@ -128,7 +128,7 @@ const AboutCase = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await getApi(urls.case.deleteById.replace(':id', caseId), 'DELETE');
+      await getApi(urls.case.delete.replace(':id', caseId), 'DELETE');
       toast.success('Case deleted successfully');
       navigate(-1);
     } catch (err) {
@@ -145,7 +145,7 @@ const AboutCase = () => {
         return;
       }
 
-      await getApi(urls.case.archiveById.replace(':id', caseId), 'PATCH', {
+      await getApi(urls.case.toggleArchive.replace(':id', caseId), 'PATCH', {
         reason: archiveReason
       });
 

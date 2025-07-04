@@ -1,22 +1,24 @@
 // components/OptionsPopoverForCase.jsx
 
-import {
-  Popover,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText
-} from '@mui/material';
+import { Popover, List, ListItem, ListItemIcon, ListItemText, Box } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { IconTrash, IconPencil } from '@tabler/icons';
 
 const options = [
   { label: 'Edit', icon: <EditIcon /> },
   { label: 'Archive', icon: <ArchiveIcon /> },
-  { label: 'Delete', icon: <DeleteIcon /> }
+  // { label: 'Merge', icon: <MergeTypeIcon /> },
+  {
+    label: 'Delete',
+    icon: (
+      <Box component="span" sx={{ color: '#F44336', display: 'flex' }}>
+        <IconTrash size={20} />
+      </Box>
+    )
+  }
 ];
-
 const OptionsPopoverForCase = ({ open, anchorEl, onClose, onOptionClick }) => (
   <Popover
     open={open}

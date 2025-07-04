@@ -40,7 +40,8 @@ export const urls = Object.freeze({
     delete: `${baseUrl}/cases/deleteCase/:id`,
     filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,
-    fetchWithPagination: `${baseUrl}/cases/allwithpagination`
+    fetchWithPagination: `${baseUrl}/cases/allwithpagination`,
+    toggleArchive: `${baseUrl}/cases/toggleArchive/:id`
   },
   mail: {
     create: `${baseUrl}/mail/addmail`,
@@ -74,7 +75,10 @@ export const urls = Object.freeze({
   casenote: {
     create: `${baseUrl}/caseNote/add`,
     fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`,
-    getById: `${baseUrl}/caseNote//getById/:id`
+    getById: `${baseUrl}/caseNote/getById/:id`,
+    update: `${baseUrl}/caseNote/edit/`,
+    toggleArchive: `${baseUrl}/caseNote/toggleArchive/`,
+    delete: `${baseUrl}/caseNote/delete/`
   },
   forms: {
     add: `${baseUrl}/forms`,
@@ -88,7 +92,7 @@ export const urls = Object.freeze({
     create: `${baseUrl}/attendees/addAttendee`,
     getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`,
     fetchWithPagination: `${baseUrl}/attendees/getwithpagination`,
-    fetch :`${baseUrl}/attendees/getwithpagination`,
+    fetch: `${baseUrl}/attendees/getwithpagination`
   },
   dashboard: {
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,

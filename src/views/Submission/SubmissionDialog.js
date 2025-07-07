@@ -99,7 +99,7 @@ const SubmissionDialog = ({ open, onClose, onAccept, onDecline, id }) => {
       <DialogActions sx={{ justifyContent: 'center', p: 2 }}>
         <Button
           variant="contained"
-          onClick={onClose}
+          onClick={onDecline}
           sx={{
             backgroundColor: '#E44E4E',
             px: 4,

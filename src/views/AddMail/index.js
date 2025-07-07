@@ -184,7 +184,7 @@ const MailingListForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/mail')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -362,7 +362,7 @@ const MailingListForm = () => {
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="error" onClick={() => navigate('/mail')}>
+              <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                 CANCEL
               </Button>
             </Grid>

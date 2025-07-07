@@ -45,7 +45,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   const [adminList, setAdminList] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
   const [search, setSearch] = useState('');
-  const [range, setRange] = useState('This Week');
+  const [range, setRange] = useState('This Year');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [editMode, setEditMode] = useState(false);
@@ -212,7 +212,6 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               }}
               onPointerDown={(e) => e.stopPropagation()}
             >
-              <MenuItem value="">All</MenuItem>
               <MenuItem value="This Week">This Week</MenuItem>
               <MenuItem value="This Month">This Month</MenuItem>
               <MenuItem value="This Year">This Year</MenuItem>
@@ -256,6 +255,16 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               const onSelected = (taskId) =>
                 field.value.includes(taskId) ? field.value.filter((id) => id !== taskId) : [...field.value, taskId];
 
+              if (myTasks.length === 0) {
+                return (
+                  <Stack alignItems="center" justifyContent="center" sx={{ py: 5 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No tasks found in this range
+                    </Typography>
+                  </Stack>
+                );
+              }
+
               return (
                 <>
                   {myTasks.map((task) => (
@@ -267,7 +276,6 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
                         onEdit={() => handleEditTask(task.id)}
                         onDelete={() => handleDelete(task.id)}
                       />
-
                       <Divider />
                     </div>
                   ))}

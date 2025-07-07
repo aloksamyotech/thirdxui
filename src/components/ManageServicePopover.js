@@ -69,7 +69,7 @@ const ManageServicePopover = ({ open, anchorEl, onClose, data }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await postApi(`${urls.service.delete}${data}`);
+      await postApi(`${urls.service.deleteService}${data}`);
       setConfirmDeleteOpen(false);
       onClose();
       toast.success('Service  Deleted successfully!');

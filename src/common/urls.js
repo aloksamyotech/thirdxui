@@ -29,10 +29,13 @@ export const urls = Object.freeze({
   },
   service: {
     create: `${baseUrl}/services/addServices`,
+    deleteService : `${baseUrl}/services/deleteService`,
     fetch: `${baseUrl}/services/all`,
     fetchWithPagination: `${baseUrl}/services/allwithpagination`,
     getById: `${baseUrl}/services/getServiceById/:id`,
-    filterType: `${baseUrl}/services/search`
+    filterType: `${baseUrl}/services/search`,
+    editServices: `${baseUrl}/services/editServices/`,
+    toggleArchive : `${baseUrl}/services/toggleArchive/`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,

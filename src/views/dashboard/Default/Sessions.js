@@ -102,7 +102,7 @@ const Sessions = () => {
   const [allSession, setAllSession] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [range, setRange] = useState('This Week');
+  const [range, setRange] = useState('This Year');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
@@ -170,7 +170,6 @@ const Sessions = () => {
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         spacing={2}
-        sx={{ mb: 2 }}
       >
         <Typography variant="h5" fontWeight={500} fontSize={14}>
           Current Sessions
@@ -185,7 +184,6 @@ const Sessions = () => {
             }}
             onPointerDown={(e) => e.stopPropagation()}
           >
-            <MenuItem value="">All</MenuItem>
             <MenuItem value="This Week">This Week</MenuItem>
             <MenuItem value="This Month">This Month</MenuItem>
             <MenuItem value="This Year">This Year</MenuItem>
@@ -219,13 +217,19 @@ const Sessions = () => {
         </Stack>
       </Stack>
 
-      <Divider />
+      <Divider sx={{ mt: 1 }} />
 
       <Box sx={{ maxHeight: 328, overflowY: 'auto', pr: 1, height: 328 }}>
         {loading ? (
           <SingleRowLoader />
-        ) : (
+        ) : allSession.length > 0 ? (
           allSession.map((session, index) => <SessionItem key={index} {...session} id={session.serviceId} />)
+        ) : (
+          <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+            <Typography variant="body2" color="text.secondary">
+              No data found in this range
+            </Typography>
+          </Box>
         )}
       </Box>
 
@@ -234,20 +238,22 @@ const Sessions = () => {
           <Pagination count={totalPages} page={page} onChange={(e, value) => setPage(value)} size="small" color="primary" />
         </Box>
       )}
-
-      <Typography
-        sx={{
-          textAlign: 'center',
-          fontSize: 12,
-          color: '#1B4B66',
-          cursor: 'pointer',
-          fontWeight: 500,
-          mt: 2
-        }}
-        onClick={() => navigate('/services')}
-      >
-        View all sessions
-      </Typography>
+      {allSession.length > 0 ? (
+        <Typography
+          sx={{
+            textAlign: 'center',
+            fontSize: 12,
+            color: '#1B4B66',
+            cursor: 'pointer',
+            fontWeight: 500,
+            mt: 2
+          }}
+          onClick={() => navigate('/services')}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          View all sessions
+        </Typography>
+      ) : null}
     </Box>
   );
 };

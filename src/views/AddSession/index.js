@@ -316,7 +316,7 @@ const AddCaseForm = ({ onCancel }) => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate(`/view-service`, { state: { row: serviceId } })}
+          onClick={() => navigate(-1, { state: { row: serviceId } })}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -639,7 +639,7 @@ const AddCaseForm = ({ onCancel }) => {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => navigate(`/view-service`, { state: { row: serviceId } })}
+              onClick={() => navigate(-1, { state: { row: serviceId } })}
               disabled={isLoading}
             >
               CANCEL

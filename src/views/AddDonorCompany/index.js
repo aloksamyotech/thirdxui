@@ -419,7 +419,7 @@ const AddCaseForm = ({ onCancel }) => {
               height: 32,
               cursor: 'pointer'
             }}
-            onClick={() => navigate('/donor')}
+            onClick={() => navigate(-1)}
           >
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
@@ -995,7 +995,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Grid item>
                                   <Button
                                     variant="outlined"
-                                    onClick={() => navigate('/people')}
+                                    onClick={() => navigate(-1)}
                                     sx={{
                                       borderColor: '#FF4D49',
                                       color: '#FF4D49'

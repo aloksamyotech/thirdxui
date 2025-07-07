@@ -1494,7 +1494,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
+                      <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                         CANCEL
                       </Button>
                     </Grid>
@@ -1972,7 +1972,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/people')}>
+                      <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                         CANCEL
                       </Button>
                     </Grid>
@@ -2108,7 +2108,7 @@ const AddCaseForm = ({ onCancel }) => {
                     <Grid item>
                       <Button
                         variant="outlined"
-                        onClick={() => navigate('/people')}
+                        onClick={() => navigate(-1)}
                         sx={{
                           borderColor: '#FF4D49',
                           color: '#FF4D49'

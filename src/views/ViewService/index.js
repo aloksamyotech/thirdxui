@@ -244,12 +244,7 @@ const ViewService = () => {
         <Typography>Loading...</Typography>
       ) : (
         <Grid item xs={12} mb={2}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            flexWrap="wrap"
-          >
+          <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap">
             <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
               <IconButton onClick={() => navigate('/services')}>
                 <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
@@ -325,10 +320,10 @@ const ViewService = () => {
                       loading
                         ? Background
                         : serviceData?.file
-                          ? serviceData.file.startsWith('https://')
-                            ? serviceData.file
-                            : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                          : Background
+                        ? serviceData.file.startsWith('https://')
+                          ? serviceData.file
+                          : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                        : Background
                     }
                     alt="Service"
                     sx={{ width: '100%', height: '180px', objectFit: 'cover' }}
@@ -398,8 +393,8 @@ const ViewService = () => {
                       Start Date - {formatDate(serviceData?.createdAt)}
                     </Typography>
                     <Typography variant="body2">
-                      <strong>Service Description - </strong>
-                      {serviceData?.description}
+                      <span style={{ fontWeight: 500 }}>Service Description - </span>
+                      <span style={{ color: 'rgba(0, 0, 0, 0.6)' }}>{serviceData?.description}</span>
                     </Typography>
                   </Stack>
                 </Grid>
@@ -458,17 +453,17 @@ const ViewService = () => {
                       cursor: 'pointer',
                       gap: 2,
                       flexWrap: 'nowrap',
-                      backgroundColor: '#fff', // optional for visual clarity
+                      backgroundColor: '#fff' // optional for visual clarity
                     }}
                   >
                     <Box sx={{ minWidth: 80, textAlign: 'center' }}>
                       <Typography variant="subtitle2" fontWeight="bold">
                         {session?.date
                           ? new Date(session.date).toLocaleDateString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: '2-digit',
-                          })
+                              day: '2-digit',
+                              month: 'short',
+                              year: '2-digit'
+                            })
                           : '-'}
                       </Typography>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -485,7 +480,7 @@ const ViewService = () => {
                           sx={{
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
-                            overflowWrap: 'break-word',
+                            overflowWrap: 'break-word'
                           }}
                         >
                           {session?.serviceId?.name || serviceData?.name || '-'}
@@ -505,7 +500,7 @@ const ViewService = () => {
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            textOverflow: 'ellipsis'
                           }}
                         >
                           {session?.description || session?.serviceId?.description || serviceData?.description || '-'}
@@ -524,7 +519,7 @@ const ViewService = () => {
                           py: 0.6,
                           px: 1.5,
                           minWidth: 100,
-                          borderRadius: 1.5,
+                          borderRadius: 1.5
                         }}
                         onClick={(event) => {
                           event.stopPropagation();
@@ -567,7 +562,6 @@ const ViewService = () => {
                       </IconButton>
                     </Box>
                   </Box>
-
                 ))
               )}
             </Stack>

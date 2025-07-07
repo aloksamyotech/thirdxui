@@ -162,7 +162,7 @@ const User = () => {
               lineHeight: '36px'
             }}
           >
-            User List
+            Existing User List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -452,9 +452,9 @@ const User = () => {
                         loading
                           ? []
                           : rows.map((row, index) => ({
-                            ...row,
-                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                          }))
+                              ...row,
+                              sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                            }))
                       }
                       columns={columns}
                       rowCount={totalRows}

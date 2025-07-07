@@ -282,7 +282,7 @@ const TagForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/tags')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -436,7 +436,7 @@ const TagForm = () => {
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="error" onClick={() => navigate('/tags')}>
+              <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                 CANCEL
               </Button>
             </Grid>

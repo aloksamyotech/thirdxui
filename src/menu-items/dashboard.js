@@ -103,15 +103,6 @@ const dashboard = {
       childrenUrls: ['/add-case', '/view-case']
     },
     {
-      id: '07',
-      title: 'Mailing List',
-      type: 'item',
-      url: '/mail',
-      icon: icons.IconMail,
-      breadcrumbs: false,
-      childrenUrls: ['/add-mail']
-    },
-    {
       id: '08',
       title: 'Donor Management',
       type: 'collapse',
@@ -134,16 +125,25 @@ const dashboard = {
           url: '/financial',
           breadcrumbs: false,
           childrenUrls: ['/add-transaction']
-        },
-        {
-          id: '11',
-          parentId: '08',
-          title: 'Mailing Lists',
-          type: 'item',
-          url: '/mailing-list',
-          breadcrumbs: false
         }
+        // {
+        //   id: '11',
+        //   parentId: '08',
+        //   title: 'Mailing Lists',
+        //   type: 'item',
+        //   url: '/mailing-list',
+        //   breadcrumbs: false
+        // }
       ]
+    },
+    {
+      id: '07',
+      title: 'Mailing List',
+      type: 'item',
+      url: '/mail',
+      icon: icons.IconMail,
+      breadcrumbs: false,
+      childrenUrls: ['/add-mail']
     },
 
     {

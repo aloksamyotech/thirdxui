@@ -19,19 +19,24 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { postApi, getApi } from 'common/apiClient';
+import { postApi, getApi, updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
+import { useLocation } from 'react-router-dom';
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const serviceToEdit = location.state?.serviceId;
   const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
   const [servicetype, setServiceType] = useState([]);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [serviceData, setServiceData] = useState([]);
   const [benificiary, setBenificiary] = useState([]);
   const [Campaigns, setCampaigns] = useState([]);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
   const [engagement, setengagement] = useState([]);
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
@@ -80,6 +85,20 @@ const AddCaseForm = () => {
     fetchData();
   }, [searchQuery]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!serviceToEdit) return;
+        const response = await getApi(urls.service.getById.replace(':id', serviceToEdit));
+        console.log('response', response?.data?.userData);
+        setServiceData(response?.data?.userData);
+      } catch (error) {
+        console.error('Error fetching service:', error);
+      }
+    };
+    fetchData();
+  }, [serviceToEdit]);
+
   const {
     control,
     handleSubmit,
@@ -102,6 +121,26 @@ const AddCaseForm = () => {
       restrictAccess: false
     }
   });
+
+  useEffect(() => {
+    if (serviceToEdit && serviceData) {
+      setValue('name', serviceData?.name || '');
+      setValue('code', serviceData?.code || '');
+      setValue('serviceType', serviceData?.serviceType || '');
+
+      setValue('benificiary', serviceData?.benificiary || []);
+      setValue('Campaigns', serviceData?.campaigns || []); // ✅ lowercase in response
+      setValue('engagement', serviceData?.engagement || []);
+      setValue('eventsAttended', serviceData?.eventAttanded || []); // ✅ match typo
+      setValue('fundingInterests', serviceData?.fundingInterest || []); // ✅ singular in response
+      setValue('fundraisingActivities', serviceData?.fundraisingActivities || []);
+
+      setValue('notes', serviceData?.description || '');
+      setValue('file', serviceData?.file || null);
+      setRestrictAccess(serviceData?.isActive || false);
+    }
+  }, [serviceData, serviceToEdit, setValue]);
+
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -174,6 +213,7 @@ const AddCaseForm = () => {
       formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
+
       (data.benificiary || []).forEach((id) => {
         formData.append('benificiary[]', id);
       });
@@ -197,26 +237,35 @@ const AddCaseForm = () => {
       (data.fundraisingActivities || []).forEach((id) => {
         formData.append('fundraisingActivities[]', id);
       });
+
       formData.append('description', data.notes || '');
       formData.append('isActive', restrictAccess || false);
+
       if (data.file) {
-        formData.append('file', data.file || '');
+        formData.append('file', data.file);
       }
 
-      const response = await postApi(urls.service.create, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      if (serviceToEdit) {
+        await updateApi(`${urls.service.editServices}${serviceToEdit}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service updated successfully');
+      } else {
+        await postApi(urls.service.create, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service added successfully');
+      }
 
-      toast.success('Service added successfully');
       navigate('/services');
-      setIsloading(false);
     } catch (error) {
+      console.error('Error submitting form:', error);
       toast.error('Error submitting service');
+    } finally {
       setIsloading(false);
     }
   };
+
   const selectList = serviceTypeOptions?.map((item, index) => ({
     id: item?._id,
     title: item?.name
@@ -225,7 +274,10 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">Adding New Service</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          {serviceToEdit ? 'Edit Service' : 'Adding New Service'}
+        </Typography>
+
         <Box
           sx={{
             display: 'flex',
@@ -237,7 +289,7 @@ const AddCaseForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/services')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -307,7 +359,7 @@ const AddCaseForm = () => {
                       return (
                         <Autocomplete
                           value={selectedUser}
-                          size='small'
+                          size="small"
                           disablePortal
                           options={selectList}
                           getOptionLabel={(options) => options?.title}
@@ -315,7 +367,8 @@ const AddCaseForm = () => {
                           onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
                           isOptionEqualToValue={(option, value) => option.id === value.id}
                           renderInput={(params) => <TextField {...params} label="Service Type" />}
-                        />)
+                        />
+                      );
                     }}
                   />
                 </Grid>
@@ -403,7 +456,7 @@ const AddCaseForm = () => {
                           variant="outlined"
                           size="small"
                           fullWidth
-                          value={field.value ? field.value.name : ''}
+                          value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
                           placeholder="Attachments"
                           InputProps={{
                             readOnly: true,
@@ -507,7 +560,7 @@ const AddCaseForm = () => {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="outlined" color="error" onClick={() => navigate('/services')}>
+                <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                   CANCEL
                 </Button>
               </Grid>

@@ -486,7 +486,7 @@ const AddCaseForm = ({ onCancel }) => {
               height: 32,
               cursor: 'pointer'
             }}
-            onClick={() => navigate('/users')}
+            onClick={() => navigate(-1)}
           >
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
@@ -2097,7 +2097,7 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/users')}>
+                      <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                         CANCEL
                       </Button>
                     </Grid>

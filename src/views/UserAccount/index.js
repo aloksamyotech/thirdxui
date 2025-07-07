@@ -144,7 +144,9 @@ const EmployeeDetails = () => {
   return (
     <>
       <Grid container spacing={2} p={2}>
-        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">User Account</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          User Account
+        </Typography>
         <Box sx={{ width: '100%', mt: '15px' }}>
           <Tabs
             value={tabValue}

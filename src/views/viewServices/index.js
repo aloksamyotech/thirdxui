@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairServiceOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import { imageUrl } from 'common/urls';
-import OptionsPopover from 'components/AddFilter';
+import ManageServicePopover from 'components/ManageServicePopover';
 const ServiceDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -370,7 +370,7 @@ const ServiceDetails = () => {
         </Button>
       </Box>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} />
+      <ManageServicePopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} />
     </Box>
   );
 };

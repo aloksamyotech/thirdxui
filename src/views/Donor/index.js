@@ -95,8 +95,8 @@ const Donor = () => {
                 {params.row.personalInfo?.firstName && params.row.personalInfo?.lastName
                   ? `${params.row.personalInfo.firstName} ${params.row.personalInfo.lastName}`
                   : params.row.companyInformation?.companyName
-                    ? params.row.companyInformation.companyName
-                    : ''}
+                  ? params.row.companyInformation.companyName
+                  : ''}
                 {params.row.serialNumber || 'No Serial Number'}
               </Typography>
               <Typography variant="body2" color="textSecondary">
@@ -362,8 +362,8 @@ const Donor = () => {
               setCampaignFilter={setCampaignFilter}
               includeArchives={includeArchives}
               setIncludeArchives={setIncludeArchives}
-              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'campaignFilter', 'includeArchives']}
-              customDateLabel="Start Date"
+              selectedFilters={['statusFilter', 'dateOpenedFilter', 'receiptIdFilter', 'campaignFilter']}
+              customDateLabel="By Date"
               onReset={handleReset}
             />
 
@@ -374,9 +374,9 @@ const Donor = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
                   rowCount={totalRows}

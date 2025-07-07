@@ -11,7 +11,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 const TotalGrowthBarChart = ({ isLoading }) => {
   const [chartSeries, setChartSeries] = useState([]);
-  const [range, setRange] = useState('this-week');
+  const [range, setRange] = useState('this-year');
   const [loading, setLoading] = useState(true);
 
   const theme = useTheme();
@@ -116,7 +116,15 @@ const TotalGrowthBarChart = ({ isLoading }) => {
             </Grid>
 
             <Grid item xs={12}>
-              <Chart options={chartOptions} series={chartSeries} type="bar" height={290} />
+              {chartSeries[0]?.data?.some((value) => value > 0) ? (
+                <Chart options={chartOptions} series={chartSeries} type="bar" height={290} />
+              ) : (
+                <Stack alignItems="center" justifyContent="center" height={290}>
+                  <Typography variant="body2" color="text.secondary">
+                    No data found in this range
+                  </Typography>
+                </Stack>
+              )}
             </Grid>
           </Grid>
         </MainCard>

@@ -202,7 +202,7 @@ const FilterPanel = ({
     },
     dateOpenedFilter: {
       data: dateOpenedFilters,
-      label: customDateLabel || 'Date Opened',
+      label: customDateLabel || 'Start Date',
       onChange: setDateOpenedFilter,
       value: dateOpenedFilter,
       type: 'date'
@@ -461,13 +461,26 @@ const FilterPanel = ({
                                   ? '#79dbfb'
                                   : selected?.toLowerCase() === 'inactive'
                                   ? '#ff6a67'
+                                  : selected?.toLowerCase() === 'open'
+                                  ? '#2e7d32'
+                                  : selected?.toLowerCase() === 'close'
+                                  ? '#c62828'
+                                  : selected?.toLowerCase() === 'pending'
+                                  ? '#f9a825'
                                   : 'white',
                               backgroundColor:
                                 selected?.toLowerCase() === 'active'
                                   ? '#e5f8fe'
                                   : selected?.toLowerCase() === 'inactive'
                                   ? '#ffeae9'
+                                  : selected?.toLowerCase() === 'open'
+                                  ? '#91FD91'
+                                  : selected?.toLowerCase() === 'close'
+                                  ? '#FDA191'
+                                  : selected?.toLowerCase() === 'pending'
+                                  ? '#FFF68D'
                                   : '#e0e0e0',
+
                               fontWeight: 500,
                               px: 1
                             }}
@@ -487,13 +500,26 @@ const FilterPanel = ({
                                 ? '#79dbfb'
                                 : option.value?.toLowerCase() === 'inactive'
                                 ? '#ff6a67'
+                                : option.value?.toLowerCase() === 'open'
+                                ? '#2e7d32'
+                                : option.value?.toLowerCase() === 'close'
+                                ? '#c62828'
+                                : option.value?.toLowerCase() === 'pending'
+                                ? '#f9a825'
                                 : 'white',
                             backgroundColor:
                               option.value?.toLowerCase() === 'active'
                                 ? '#e5f8fe'
                                 : option.value?.toLowerCase() === 'inactive'
                                 ? '#ffeae9'
+                                : option.value?.toLowerCase() === 'open'
+                                ? '#91FD91'
+                                : option.value?.toLowerCase() === 'close'
+                                ? '#FDA191'
+                                : option.value?.toLowerCase() === 'pending'
+                                ? '#FFF68D'
                                 : '#e0e0e0',
+
                             fontWeight: 500
                           }}
                         />

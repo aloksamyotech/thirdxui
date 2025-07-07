@@ -390,9 +390,9 @@ const Financial = () => {
             campaigns={campaignTypeOptions}
             campaignFilter={campaignName}
             setCampaignFilter={(value) => setCampaignName(value)}
-            selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
+            selectedFilters={['dateOpenedFilter', 'campaignFilter']}
             onReset={handleReset}
-            customDateLabel="Start Date"
+            customDateLabel="By Date"
           />
 
           <Grid item xs={9}>
@@ -404,9 +404,9 @@ const Financial = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}

@@ -319,7 +319,7 @@ const AddCaseForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/case')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -740,7 +740,7 @@ const AddCaseForm = () => {
               color="error"
               onClick={() => {
                 reset();
-                navigate('/case');
+                navigate(-1);
               }}
             >
               CANCEL

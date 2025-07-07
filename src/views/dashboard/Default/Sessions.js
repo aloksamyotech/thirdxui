@@ -102,7 +102,7 @@ const Sessions = () => {
   const [allSession, setAllSession] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [range, setRange] = useState('');
+  const [range, setRange] = useState('This Week');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
@@ -140,7 +140,7 @@ const Sessions = () => {
         serviceId: item?.serviceId || '',
         time: item?.time || '',
         description: item?.description || '',
-        presenter: item?.serviceuser?.name || '',
+        presenter: item?.serviceuser?.name || ''
       }));
 
       setAllSession(formattedSessions);
@@ -158,6 +158,7 @@ const Sessions = () => {
   return (
     <Box
       sx={{
+        height: '430px',
         bgcolor: '#fff',
         p: 2,
         borderRadius: 2,

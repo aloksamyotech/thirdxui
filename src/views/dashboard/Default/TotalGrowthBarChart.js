@@ -39,7 +39,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
       {
         title: {
           text: 'Case Count',
-          style: { color: '#0D9CC0', fontWeight: 400 }
+          style: { fontWeight: 400 }
         },
         labels: {
           style: { colors: text.primary }
@@ -95,12 +95,18 @@ const TotalGrowthBarChart = ({ isLoading }) => {
           <Grid container spacing={gridSpacing}>
             <Grid item xs={12}>
               <Grid container alignItems="center" justifyContent="space-between">
-                <Typography variant="h5" sx={{ fontWeight: 400, fontSize: 14 }}>
+                <Typography variant="h5" fontWeight={500} fontSize={14}>
                   Open Cases By Status
                 </Typography>
 
                 <Stack direction="row" spacing={2}>
-                  <Select value={range} size="small" onChange={(e) => setRange(e.target.value)} sx={{ minWidth: 120 }}>
+                  <Select
+                    value={range}
+                    size="small"
+                    onChange={(e) => setRange(e.target.value)}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    sx={{ minWidth: 120 }}
+                  >
                     <MenuItem value="this-week">This Week</MenuItem>
                     <MenuItem value="this-month">This Month</MenuItem>
                     <MenuItem value="this-year">This Year</MenuItem>

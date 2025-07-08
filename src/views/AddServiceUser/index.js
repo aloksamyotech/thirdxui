@@ -2349,11 +2349,11 @@ const AddCaseForm = ({ onCancel }) => {
                     </Grid>
                   </Grid>
                   <Grid container alignItems="center" justifyContent="space-between" sx={{ mt: 2, px: 2 }}>
-                    <Grid item>
+                    {/* <Grid item>
                       <Button variant="outlined" size="small" startIcon={<AddIcon />}>
                         Add Another Service
                       </Button>
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item>
                       <Grid container spacing={2}>

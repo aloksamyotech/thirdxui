@@ -90,7 +90,6 @@ const AddCaseForm = () => {
       try {
         if (!serviceToEdit) return;
         const response = await getApi(urls.service.getById.replace(':id', serviceToEdit));
-        console.log('response', response?.data?.userData);
         setServiceData(response?.data?.userData);
       } catch (error) {
         console.error('Error fetching service:', error);
@@ -254,13 +253,14 @@ const AddCaseForm = () => {
         await postApi(urls.service.create, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
+
         toast.success('Service added successfully');
       }
 
       navigate('/services');
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.error('Error submitting service');
+      toast.error('Service code already exists');
     } finally {
       setIsloading(false);
     }

@@ -111,7 +111,6 @@ const AddDonorForm = () => {
       contactemail: editdata?.contactPreferences?.email || '',
       contactNo: editdata?.contactPreferences?.phone || '',
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      donortag: editdata?.contactPreferences?.contactMethods?.donor ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
       donerTag: editdata?.contactPreferences?.contactMethods?.donerTag ?? true,
@@ -306,7 +305,6 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donor]', data.donortag ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][donor]', data.donerTag ? 'true' : 'false');

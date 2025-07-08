@@ -13,6 +13,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import StatusChip from 'views/AboutCase/StatusChip';
+import CustomHeader from 'components/CustomHeader';
 
 const Case = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const Case = () => {
   const [serviceTypeFilter, setServiceTypeFilterOptions] = useState([]);
   const [ownerFilters, setOwnerFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
   const [caseOwner, setOwner] = useState('');
@@ -48,38 +51,38 @@ const Case = () => {
     { value: 'year', label: 'Last 1 Year' }
   ];
 
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px',
-              fontWeight: '400'
-            }}
-          >
-            Case List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
+  // const CustomHeader = () => {
+  //   return (
+  //     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+  //       <GridToolbarContainer
+  //         sx={{
+  //           display: 'flex',
+  //           justifyContent: 'space-between',
+  //           alignItems: 'center',
+  //           borderBottom: '1px solid #ddd',
+  //           width: '100%',
+  //           height: '100%',
+  //           padding: '0 12px'
+  //         }}
+  //       >
+  //         <Typography
+  //           variant="h6"
+  //           sx={{
+  //             color: '#333',
+  //             fontSize: '14px',
+  //             lineHeight: '36px',
+  //             fontWeight: '400'
+  //           }}
+  //         >
+  //           Case List
+  //         </Typography>
+  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+  //           <GridToolbarExport />
+  //         </Box>
+  //       </GridToolbarContainer>
+  //     </Box>
+  //   );
+  // };
 
   const columns = [
     {
@@ -394,10 +397,23 @@ const Case = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
+                    onRowSelectionModelChange={(newSelection) => {
+                      setSelectedIds(newSelection);
+                    }}
                     rowHeight={65}
                     getRowId={(row) => row.id}
                     slots={{
-                      toolbar: () => <CustomHeader />,
+                      toolbar: () => (
+                        <CustomHeader
+                          entityType="cases"
+                          title="Case List"
+                          selectedIds={selectedIds}
+                          enableBulkActions={true}
+                          exportEnabled={true}
+                          extraActions={null}
+                          refetchData={fetchInitialData}
+                        />
+                      ),
                       loadingOverlay: () => (
                         <Box
                           sx={{

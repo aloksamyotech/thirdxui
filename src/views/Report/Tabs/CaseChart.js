@@ -9,40 +9,56 @@ const Chart = () => {
   const [ageRangePieData, setAgeRangePieData] = useState([]);
   const [ageBarData, setAgeBarData] = useState([0, 0, 0, 0, 0]);
   const [genderData, setGenderData] = useState([0, 0, 0, 0]);
- 
+
   useEffect(() => {
     getApi(urls.case.fetch)
       .then((response) => {
         const cases = response.data;
-        // ===== 1. Ethnicity Count =====
         const ethnicityCount = {
-          Other: 0,
+          'Black / Black British - Caribbean / African': 0,
+          'Asian / Asian British': 0,
+          'White British': 0,
+          'Mixed Other': 0,
+          'Mixed White And Black Caribbean / African': 0,
           Arab: 0,
-          Asian: 0,
-          Mixed: 0,
-          White: 0,
-          Black: 0
+          Other: 0
         };
 
         cases.forEach((item) => {
           const ethnicity = item?.userServiceDetails?.personalInfo?.ethnicity || 'Other';
-          if (ethnicity.includes('Arab')) ethnicityCount['Arab']++;
-          else if (ethnicity.includes('Asian')) ethnicityCount['Asian']++;
-          else if (ethnicity.includes('Mixed')) ethnicityCount['Mixed']++;
-          else if (ethnicity.includes('White')) ethnicityCount['White']++;
-          else if (ethnicity.includes('Black')) ethnicityCount['Black']++;
-          else ethnicityCount['Other']++;
+
+          if (ethnicity.includes('Black')) {
+            ethnicityCount['Black / Black British - Caribbean / African']++;
+          } else if (ethnicity.includes('Asian')) {
+            ethnicityCount['Asian / Asian British']++;
+          } else if (ethnicity.includes('White – British') || ethnicity.includes('White British')) {
+            ethnicityCount['White British']++;
+          } else if (ethnicity.includes('Mixed – White and Black Caribbean') || ethnicity.includes('Mixed – White and Black African')) {
+            ethnicityCount['Mixed White And Black Caribbean / African']++;
+          } else if (ethnicity.includes('Mixed')) {
+            ethnicityCount['Mixed Other']++;
+          } else if (ethnicity.includes('Arab')) {
+            ethnicityCount['Arab']++;
+          } else {
+            ethnicityCount['Other']++;
+          }
         });
 
+        // const finalEthnicityData = staticEthnicityConfig.map((item) => ({
+        //   id: item.id,
+        //   value: ethnicityCount[item.label],
+        //   label: `${item.label} ${ethnicityCount[item.label]}%`,
+        //   color: item.color
+        // }));
         const finalEthnicityData = staticEthnicityConfig.map((item) => ({
           id: item.id,
           value: ethnicityCount[item.label],
           label: `${item.label} ${ethnicityCount[item.label]}%`,
-          color: item.color
+          color: item.color,
+          labelColor: item.labelColor
         }));
         setEthnicityData(finalEthnicityData);
 
-        // ===== 2. Age Range Pie Chart Data =====
         const ageRangeCount = {
           '15 - 24': 0,
           '25 - 39': 0,
@@ -127,14 +143,14 @@ const Chart = () => {
         console.error('API Error:', error);
       });
   }, []);
-
   const staticEthnicityConfig = [
-    { id: 0, label: 'Other', color: '#0C3149' },
-    { id: 1, label: 'Arab', color: '#2A5B77' },
-    { id: 2, label: 'Asian', color: '#64CAFF' },
-    { id: 3, label: 'Mixed', color: '#61CFF4' },
-    { id: 4, label: 'White', color: '#86D6FF' },
-    { id: 5, label: 'Black', color: '#092E43' }
+    { id: 1, label: 'Black / Black British - Caribbean / African', color: '#133144', labelColor: '#fff' },
+    { id: 2, label: 'Asian / Asian British', color: '#86E5FC', labelColor: '#000' },
+    { id: 3, label: 'White British', color: '#3E8EB6', labelColor: '#fff' },
+    { id: 4, label: 'Mixed Other', color: '#B3F0FD', labelColor: '#000' },
+    { id: 5, label: 'Mixed White And Black Caribbean / African', color: '#61CFF4', labelColor: '#000' },
+    { id: 6, label: 'Arab', color: '#2A5B77', labelColor: '#fff' },
+    { id: 7, label: 'Other', color: '#327193', labelColor: '#fff' }
   ];
   const ageRangeConfig = [
     { id: 0, label: '15 - 24', color: '#0C3149' },
@@ -168,18 +184,22 @@ const Chart = () => {
               series={[
                 {
                   arcLabel: (item) => item.label,
-                  arcLabelMinAngle: 10,
+                  arcLabelMinAngle: 15,
                   paddingAngle: 1,
-                  data: ethnicityData
+                  data: ethnicityData,
+                  arcLabelStyle: (item) => ({
+                    fill: item.labelColor,
+                    fontSize: 14
+                  })
                 }
               ]}
-              width={320}
-              height={300}
+              width={360}
+              height={340}
               slotProps={{ legend: { hidden: true } }}
               sx={{
                 [`& .MuiPieArcLabel-root`]: {
                   fill: '#fff',
-                  fontSize: '14px'
+                  fontSize: '10px'
                 }
               }}
             />
@@ -207,8 +227,8 @@ const Chart = () => {
                   paddingAngle: 1
                 }
               ]}
-              width={320}
-              height={300}
+              width={360}
+              height={340}
               slotProps={{ legend: { hidden: true } }}
               sx={{
                 [`& .MuiPieArcLabel-root`]: {
@@ -270,10 +290,24 @@ const Chart = () => {
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>
             Cases By Gender{' '}
-            <Box component="span" sx={{ fontWeight: 400, fontSize: 14 }}>
-              34 Total
+            <Box
+              component="span"
+              sx={{
+                fontWeight: 400,
+                fontSize: 14,
+                ml: 2,
+                px: 1,
+                backgroundColor: 'black',
+                borderRadius: 1,
+                color: 'white',
+                marginLeft: '60px'
+              }}
+            >
+              34
             </Box>
+            Total
           </Typography>
+
           <BarChart
             layout="horizontal"
             series={[
@@ -297,7 +331,7 @@ const Chart = () => {
               }
             ]}
             height={300}
-            margin={{ top: 10, bottom: 30, left: 100, right: 20 }}
+            margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
           />
         </Box>
       </Grid>

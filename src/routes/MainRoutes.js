@@ -46,7 +46,7 @@ const ViewDonor = Loadable(lazy(() => import('views/ViewDonor')));
 const ViewSubmission = Loadable(lazy(() => import('views/ViewSubmission')));
 const AboutCase = Loadable(lazy(() => import('views/AboutCase')));
 const AboutCaseNote = Loadable(lazy(() => import('views/AboutCaseNote')));
-
+const List = Loadable(lazy(() => import('views/List')));
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -175,6 +175,10 @@ const MainRoutes = {
         {
           path: 'archives',
           element: <Archives />
+        },
+        {
+          path: 'list',
+          element: <List />
         },
         {
           path: 'configuration',

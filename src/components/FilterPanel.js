@@ -101,7 +101,12 @@ const FilterPanel = ({
   includeArchives,
   setIncludeArchives,
   selectedFilters = [],
-  customDateLabel
+  customDateLabel,
+  listTypeFilter,
+  listType,
+  setListType,
+  includeServiceuser,
+  setIncludeServiceuser,
 }) => {
   useEffect(() => {
     if (!dateAddedFilter || !setDateAddedFilter) return;
@@ -139,6 +144,8 @@ const FilterPanel = ({
     if (setTimeFilter) setTimeFilter('');
     if (setSessionLeadFilter) setSessionLeadFilter('');
     if (setIncludeArchives) setIncludeArchives(false);
+    if (setListType) setListType('');
+    if (setIncludeServiceuser) setIncludeServiceuser(false);
   };
 
   if (!showFilter) return null;
@@ -352,7 +359,20 @@ const FilterPanel = ({
       onChange: setIncludeArchives,
       value: includeArchives,
       type: 'checkbox'
-    }
+    },
+    listTypeFilter: {
+      data: listType,
+      label: 'By List Type',
+      onChange: setListType,
+      value: listType,
+      type: 'select'
+    },
+    includeServiceuser: {
+      label: 'Include Service User',
+      onChange: setIncludeServiceuser,
+      value: includeServiceuser,
+      type: 'checkbox'
+    },
   };
 
   return (

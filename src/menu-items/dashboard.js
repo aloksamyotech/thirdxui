@@ -204,46 +204,54 @@ const dashboard = {
         {
           id: '19',
           parentId: '17',
-          title: 'Duplicate',
+          title: 'Duplicates',
           type: 'item',
           url: '/duplicate',
           breadcrumbs: false
         },
+        // {
+        //   id: '20',
+        //   parentId: '17',
+        //   title: 'Bulk Delete',
+        //   type: 'item',
+        //   url: '/bulkdelete',
+        //   breadcrumbs: false
+        // },
+        // {
+        //   id: '21',
+        //   parentId: '17',
+        //   title: 'Archives',
+        //   type: 'item',
+        //   url: '/archives',
+        //   breadcrumbs: false
+        // },
         {
-          id: '20',
+          id: '22',
           parentId: '17',
-          title: 'Bulk Delete',
+          title: 'List',
           type: 'item',
-          url: '/bulkdelete',
-          breadcrumbs: false
-        },
-        {
-          id: '21',
-          parentId: '17',
-          title: 'Archives',
-          type: 'item',
-          url: '/archives',
+          url: '/list',
           breadcrumbs: false
         }
       ]
     },
     {
-      id: '22',
+      id: '23',
       title: 'Configuration',
       type: 'collapse',
       icon: icons.IconSettings,
       children: [
         {
-          id: '23',
-          parentId: '22',
+          id: '24',
+          parentId: '23',
           title: 'Configuration',
           type: 'item',
           url: '/configuration',
           breadcrumbs: false
         },
         {
-          id: '24',
-          parentId: '22',
+          id: '25',
+          parentId: '23',
           title: 'Tags',
           type: 'item',
           url: '/tags',
@@ -251,8 +259,8 @@ const dashboard = {
           childrenUrls: ['/add-tag']
         },
         {
-          id: '25',
-          parentId: '22',
+          id: '26',
+          parentId: '23',
           title: 'Users',
           type: 'item',
           url: '/users',
@@ -260,8 +268,8 @@ const dashboard = {
           childrenUrls: ['/add-user']
         },
         {
-          id: '26',
-          parentId: '22',
+          id: '27',
+          parentId: '23',
           title: 'Account',
           type: 'item',
           url: '/account',

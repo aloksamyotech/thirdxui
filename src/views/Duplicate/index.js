@@ -63,7 +63,7 @@ const Duplicate = () => {
     },
     {
       field: 'no',
-      headerName: 'Contact No.',
+      headerName: 'Phone',
       flex: 1,
       renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
     },

@@ -17,35 +17,43 @@ const Chart = () => {
     getApi(urls.attendees.fetch)
       .then((response) => {
         const attendee = response.data.data;
-        // ===== Ethnicity Chart =====
         const ethnicityCount = {
-          Other: 0,
+          'Black / Black British - Caribbean / African': 0,
+          'Asian / Asian British': 0,
+          'White British': 0,
+          'Mixed Other': 0,
+          'Mixed White And Black Caribbean / African': 0,
           Arab: 0,
-          Asian: 0,
-          Mixed: 0,
-          White: 0,
-          Black: 0
+          Other: 0
         };
 
         attendee.forEach((item) => {
           const ethnicity = item?.attendee?.personalInfo?.ethnicity || 'Other';
-          if (ethnicity.includes('Arab')) ethnicityCount.Arab++;
-          else if (ethnicity.includes('Asian')) ethnicityCount.Asian++;
-          else if (ethnicity.includes('Mixed')) ethnicityCount.Mixed++;
-          else if (ethnicity.includes('White')) ethnicityCount.White++;
-          else if (ethnicity.includes('Black')) ethnicityCount.Black++;
-          else ethnicityCount.Other++;
+          if (ethnicity.includes('Black')) {
+            ethnicityCount['Black / Black British - Caribbean / African']++;
+          } else if (ethnicity.includes('Asian')) {
+            ethnicityCount['Asian / Asian British']++;
+          } else if (ethnicity.includes('White – British') || ethnicity.includes('White British')) {
+            ethnicityCount['White British']++;
+          } else if (ethnicity.includes('Mixed – White and Black Caribbean') || ethnicity.includes('Mixed – White and Black African')) {
+            ethnicityCount['Mixed White And Black Caribbean / African']++;
+          } else if (ethnicity.includes('Mixed')) {
+            ethnicityCount['Mixed Other']++;
+          } else if (ethnicity.includes('Arab')) {
+            ethnicityCount['Arab']++;
+          } else {
+            ethnicityCount['Other']++;
+          }
         });
 
-        const ethnicityChartData = [
-          { id: 0, value: ethnicityCount.Other, label: `Other ${ethnicityCount.Other}%`, color: '#0C3149' },
-          { id: 1, value: ethnicityCount.Arab, label: `Arab ${ethnicityCount.Arab}%`, color: '#2A5B77' },
-          { id: 2, value: ethnicityCount.Asian, label: `Asian ${ethnicityCount.Asian}%`, color: '#64CAFF' },
-          { id: 3, value: ethnicityCount.Mixed, label: `Mixed ${ethnicityCount.Mixed}%`, color: '#61CFF4' },
-          { id: 4, value: ethnicityCount.White, label: `White ${ethnicityCount.White}%`, color: '#86D6FF' },
-          { id: 5, value: ethnicityCount.Black, label: `Black ${ethnicityCount.Black}%`, color: '#092E43' }
-        ];
-        setEthnicityData(ethnicityChartData);
+        const finalEthnicityData = staticEthnicityConfig.map((item) => ({
+          id: item.id,
+          value: ethnicityCount[item.label],
+          label: `${item.label} ${ethnicityCount[item.label]}%`,
+          color: item.color,
+          labelColor: item.labelColor
+        }));
+        setEthnicityData(finalEthnicityData);
 
         // ===== Age Range Pie Chart =====
         const ageRangeCount = {
@@ -83,23 +91,24 @@ const Chart = () => {
         const genderCount = {
           Male: 0,
           Female: 0,
-          Binary: 0,
+          NonBinary: 0,
           'Not prefer to say': 0
         };
 
         attendee.forEach((item) => {
-          const gender = item?.userServiceDetails?.personalInfo?.gender?.toLowerCase()?.trim();
+          const gender = item?.attendee?.personalInfo?.gender?.toLowerCase()?.trim();
           if (gender === 'male') genderCount.Male++;
           else if (gender === 'female') genderCount.Female++;
-          else if (gender === 'binary') genderCount.Binary++;
+          else if (gender === 'non-binary') genderCount.NonBinary++;
           else if (gender === 'not prefer to say') genderCount['Not prefer to say']++;
         });
 
-        const genderData = [genderCount.Male, genderCount.Female, genderCount.Binary, genderCount['Not prefer to say']];
+        const genderData = [genderCount.Male, genderCount.Female, genderCount.NonBinary, genderCount['Not prefer to say']];
         setGenderBarData(genderData);
-        const totalGender = Object.values(genderCount).reduce((a, b) => a + b, 0);
-        const maleP = totalGender ? Math.round((genderCount.Male / totalGender) * 100) : 0;
-        const femaleP = totalGender ? Math.round((genderCount.Female / totalGender) * 100) : 0;
+
+        const validTotal = genderCount.Male + genderCount.Female;
+        const maleP = validTotal ? Math.round((genderCount.Male / validTotal) * 100) : 0;
+        const femaleP = validTotal ? Math.round((genderCount.Female / validTotal) * 100) : 0;
 
         setMalePercent(maleP);
         setFemalePercent(femaleP);
@@ -110,6 +119,15 @@ const Chart = () => {
         console.error('Error fetching cases:', error);
       });
   }, []);
+  const staticEthnicityConfig = [
+    { id: 1, label: 'Black / Black British - Caribbean / African', color: '#133144', labelColor: '#fff' },
+    { id: 2, label: 'Asian / Asian British', color: '#86E5FC', labelColor: '#000' },
+    { id: 3, label: 'White British', color: '#3E8EB6', labelColor: '#fff' },
+    { id: 4, label: 'Mixed Other', color: '#B3F0FD', labelColor: '#000' },
+    { id: 5, label: 'Mixed White And Black Caribbean / African', color: '#61CFF4', labelColor: '#000' },
+    { id: 6, label: 'Arab', color: '#2A5B77', labelColor: '#fff' },
+    { id: 7, label: 'Other', color: '#327193', labelColor: '#fff' }
+  ];
   return (
     <Grid container spacing={3}>
       <Grid item xs={6}>
@@ -127,18 +145,22 @@ const Chart = () => {
               series={[
                 {
                   arcLabel: (item) => item.label,
-                  arcLabelMinAngle: 10,
+                  arcLabelMinAngle: 15,
                   paddingAngle: 1,
-                  data: ethnicityData
+                  data: ethnicityData,
+                  arcLabelStyle: (item) => ({
+                    fill: item.labelColor,
+                    fontSize: 14
+                  })
                 }
               ]}
-              width={320}
-              height={300}
+              width={360}
+              height={340}
               slotProps={{ legend: { hidden: true } }}
               sx={{
                 [`& .MuiPieArcLabel-root`]: {
                   fill: '#fff',
-                  fontSize: '14px'
+                  fontSize: '10px'
                 }
               }}
             />
@@ -166,8 +188,8 @@ const Chart = () => {
                   paddingAngle: 1
                 }
               ]}
-              width={320}
-              height={300}
+              width={360}
+              height={340}
               slotProps={{ legend: { hidden: true } }}
               sx={{
                 [`& .MuiPieArcLabel-root`]: {
@@ -276,11 +298,11 @@ const Chart = () => {
               {
                 id: 'y-axis',
                 scaleType: 'band',
-                data: ['Male', 'Female', 'Binary', 'Not prefer to say'] // <-- static labels
+                data: ['Male', 'Female', 'Non-Binary', 'Not prefer to say']
               }
             ]}
             height={300}
-            margin={{ top: 10, bottom: 30, left: 100, right: 20 }}
+            margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
           />
         </Box>
       </Grid>

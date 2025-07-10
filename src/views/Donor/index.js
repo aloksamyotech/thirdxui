@@ -12,6 +12,7 @@ import DonorTypeDialog from './donorType.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
+import CustomHeader from 'components/CustomHeader.js';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
@@ -31,6 +32,8 @@ const Donor = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [name, setNameFilter] = useState('');
   const [campaign, setCampaignFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,40 +48,6 @@ const Donor = () => {
     page: 0,
     pageSize: 10
   });
-
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Donor List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
 
   const columns = [
     {
@@ -362,7 +331,7 @@ const Donor = () => {
               setCampaignFilter={setCampaignFilter}
               includeArchives={includeArchives}
               setIncludeArchives={setIncludeArchives}
-              selectedFilters={['statusFilter', 'dateOpenedFilter', 'receiptIdFilter', 'campaignFilter']}
+              selectedFilters={['statusFilter', 'dateOpenedFilter', 'campaignFilter']}
               customDateLabel="By Date"
               onReset={handleReset}
             />
@@ -379,17 +348,31 @@ const Donor = () => {
                         }))
                   }
                   columns={columns}
+                  checkboxSelection
                   rowCount={totalRows}
                   loading={loading}
                   pageSizeOptions={[5, 10, 25, 50]}
                   paginationMode="server"
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
+                  onRowSelectionModelChange={(newSelection) => {
+                    setSelectedIds(newSelection);
+                  }}
                   rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
                   slots={{
-                    toolbar: () => <CustomHeader />,
+                    toolbar: () => (
+                      <CustomHeader
+                        entityType="donor"
+                        title="Donor List"
+                        selectedIds={selectedIds}
+                        enableBulkActions={true}
+                        exportEnabled={true}
+                        extraActions={null}
+                        refetchData={fetchDonor}
+                      />
+                    ),
                     loadingOverlay: () => (
                       <Box
                         sx={{

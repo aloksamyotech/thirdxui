@@ -27,7 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { urls } from 'common/urls';
 import { updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
-import { IconTrash, IconPencil } from '@tabler/icons';
+import { IconTrash} from '@tabler/icons';
 
 const OptionsPopover = ({ anchorEl, open, onClose, data }) => {
   const UserId = data?._id;

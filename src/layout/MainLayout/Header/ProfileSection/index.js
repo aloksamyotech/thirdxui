@@ -339,11 +339,11 @@ const ProfileSection = () => {
                       </List>
                     </Box>
 
-                    <Box sx={{ textAlign: 'center', p: 2 }}>
+                    {/* <Box sx={{ textAlign: 'center', p: 2 }}>
                       <Button variant="text" fullWidth sx={{ borderRadius: '8px' }}>
                         View all
                       </Button>
-                    </Box>
+                    </Box> */}
                   </PerfectScrollbar>
                 </MainCard>
               </ClickAwayListener>

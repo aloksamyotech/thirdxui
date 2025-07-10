@@ -29,18 +29,18 @@ export const urls = Object.freeze({
   },
   service: {
     create: `${baseUrl}/services/addServices`,
-    deleteService : `${baseUrl}/services/deleteService`,
+    deleteService: `${baseUrl}/services/deleteService/`,
     fetch: `${baseUrl}/services/all`,
     fetchWithPagination: `${baseUrl}/services/allwithpagination`,
     getById: `${baseUrl}/services/getServiceById/:id`,
     filterType: `${baseUrl}/services/search`,
     editServices: `${baseUrl}/services/editServices/`,
-    toggleArchive : `${baseUrl}/services/toggleArchive/`
+    toggleArchive: `${baseUrl}/services/toggleArchive/`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,
     fetch: `${baseUrl}/cases/getAllCases`,
-    delete: `${baseUrl}/cases/deleteCase/:id`,
+    delete: `${baseUrl}/cases/deleteCase/`,
     filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,
     fetchWithPagination: `${baseUrl}/cases/allwithpagination`,
@@ -122,5 +122,9 @@ export const urls = Object.freeze({
     forgotPassword: `${baseUrl}/admin/forgot-password`,
     otpvarify: `${baseUrl}/admin/verify-otp`,
     resetPassword: `${baseUrl}/admin/reset-password`
+  },
+  bulkFuntions: {
+    delete: `${baseUrl}/bulk/delete`,
+    archive: `${baseUrl}/bulk/archive`
   }
 });

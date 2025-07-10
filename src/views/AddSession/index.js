@@ -35,6 +35,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [serviceid, setServiceid] = useState();
   const [benificiary, setBenificiary] = useState([]);
+  const [sessionLocation, setsessionLocation] = useState([]);
   const [Campaigns, setCampaigns] = useState([]);
   const [engagement, setengagement] = useState([]);
   const [eventsAttended, seteventsAttended] = useState([]);
@@ -121,6 +122,20 @@ const AddCaseForm = ({ onCancel }) => {
   }, []);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.configuration.fetch);
+        const filterreason = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Location');
+        setsessionLocation(filterreason);
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+
+  useEffect(() => {
     const fetchserviceUser = async () => {
       try {
         const queryParams = new URLSearchParams();
@@ -180,16 +195,7 @@ const AddCaseForm = ({ onCancel }) => {
               />
             ))
           }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={label}
-              size="small"
-              error={!!error}
-              helperText={helperText}
-              fullWidth
-            />
-          )}
+          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
         />
       )}
     />
@@ -352,55 +358,23 @@ const AddCaseForm = ({ onCancel }) => {
                   <Controller
                     name="countryOfOrigin"
                     control={control}
-                    rules={{ required: 'Country is required' }}
+                    rules={{ required: 'Location is required' }}
                     render={({ field, fieldState: { error } }) => (
-                      <Autocomplete
-                        options={countryList}
-                        getOptionLabel={(option) => option.name}
-                        isOptionEqualToValue={(option, value) => option.code === value.code}
-                        onChange={(_, value) => field.onChange(value?.name || '')}
-                        value={countryList.find((c) => c.name === field.value) || null}
-                        renderOption={(props, option) => (
-                          <Box component="li" {...props} key={option.code} sx={{ display: 'flex', alignItems: 'center' }}>
-                            <img src={option.flag} alt={option.code} style={{ width: 20, height: 14, marginRight: 8 }} />
-                            {option.name}
-                          </Box>
-                        )}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Select Location"
-                            size="small"
-                            error={!!error}
-                            helperText={error ? error.message : ''}
-                          />
-                        )}
-                        PopperProps={{
-                          modifiers: [
-                            {
-                              name: 'preventOverflow',
-                              options: {
-                                altBoundary: true,
-                                rootBoundary: 'viewport',
-                                tether: false
-                              }
-                            },
-                            {
-                              name: 'flip',
-                              options: {
-                                fallbackPlacements: ['bottom-start']
-                              }
-                            }
-                          ],
-                          placement: 'bottom-start'
-                        }}
-                        ListboxProps={{
-                          style: {
-                            maxHeight: 200,
-                            overflowY: 'auto'
-                          }
-                        }}
-                      />
+                      <TextField
+                        select
+                        label="Select Location"
+                        fullWidth
+                        size="small"
+                        {...field}
+                        error={!!error}
+                        helperText={error ? error.message : ''}
+                      >
+                        {sessionLocation?.map((loc) => (
+                          <MenuItem key={loc._id} value={loc._id}>
+                            {loc.name}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     )}
                   />
                 </Grid>
@@ -636,12 +610,7 @@ const AddCaseForm = ({ onCancel }) => {
             </Button>
           </Grid>
           <Grid item>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => navigate(-1, { state: { row: serviceId } })}
-              disabled={isLoading}
-            >
+            <Button variant="outlined" color="error" onClick={() => navigate(-1, { state: { row: serviceId } })} disabled={isLoading}>
               CANCEL
             </Button>
           </Grid>

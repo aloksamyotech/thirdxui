@@ -12,44 +12,12 @@ import { useEffect } from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNavigate } from 'react-router';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
+import CustomHeader from 'components/CustomHeader.js';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
   { value: 'campaign2', label: 'Campaign 2' }
 ];
-
-const CustomHeader = () => {
-  return (
-    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-      <GridToolbarContainer
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid #ddd',
-          width: '100%',
-          height: '100%',
-          padding: '0 12px'
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: '400',
-            color: '#333',
-            fontSize: '14px',
-            lineHeight: '36px'
-          }}
-        >
-          Form List
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <GridToolbarExport />
-        </Box>
-      </GridToolbarContainer>
-    </Box>
-  );
-};
 
 const Lead = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -58,6 +26,8 @@ const Lead = () => {
   const [formType, setFormType] = useState('');
   const [formTypes, setFormTypes] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
@@ -130,6 +100,23 @@ const Lead = () => {
 
   const columns = [
     {
+      field: 'title',
+      headerName: 'Form Display Title',
+      flex: 0.8,
+      renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
+    },
+    {
+      field: 'campaign',
+      headerName: 'Form Description',
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+          {/* {params.value} */}-
+        </Typography>
+      )
+    },
+
+    {
       field: 'description',
       headerName: 'Form Type',
       flex: 0.8,
@@ -139,22 +126,7 @@ const Lead = () => {
         </Typography>
       )
     },
-    {
-      field: 'campaign',
-      headerName: 'Form Campaign',
-      flex: 1,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */}-
-        </Typography>
-      )
-    },
-    {
-      field: 'title',
-      headerName: 'Form Display Title',
-      flex: 0.8,
-      renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
-    },
+
     {
       field: 'edit',
       headerName: 'Action',
@@ -273,14 +245,26 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
+                  checkboxSelection
                   loading={loading}
                   slots={{
-                    toolbar: () => <CustomHeader />,
+                    toolbar: () => (
+                      <CustomHeader
+                        entityType="form"
+                        title="Form List"
+                        selectedIds={selectedIds}
+                        enableBulkActions={true}
+                        exportEnabled={true}
+                        extraActions={null}
+                        refetchData={getAllForms}
+                      />
+                    ),
+
                     loadingOverlay: () => (
                       <Box
                         sx={{
@@ -317,6 +301,9 @@ const Lead = () => {
                   paginationMode="server"
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
+                  onRowSelectionModelChange={(newSelection) => {
+                    setSelectedIds(newSelection);
+                  }}
                   pageSizeOptions={[5, 10, 25, 50]}
                 />
               </Card>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase, Menu, MenuItem, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -8,8 +8,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
+import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import { IconTrash } from '@tabler/icons';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import CustomHeader from 'components/CustomHeader';
 
 const districts = [
   { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
@@ -41,6 +45,8 @@ const Volunteer = () => {
   const [districtFilter, setDistrictFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [isFiltered, setIsFiltered] = useState(false);
   const [dateOpenedFilter, setDateOpenedFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,39 +73,108 @@ const Volunteer = () => {
     }));
   }, []);
 
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Volunteer List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
+  // const CustomHeader = () => {
+  //   const [anchorEl, setAnchorEl] = useState(null);
+  //   const open = Boolean(anchorEl);
+
+  //   const handleClick = (event) => {
+  //     setAnchorEl(event.currentTarget);
+  //   };
+
+  //   const handleClose = () => {
+  //     setAnchorEl(null);
+  //   };
+
+  //   const handleBulkDelete = () => {
+  //     handleClose();
+  //   };
+
+  //   const handleBulkArchive = () => {
+  //     handleClose();
+  //   };
+
+  //   return (
+  //     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+  //       <GridToolbarContainer
+  //         sx={{
+  //           display: 'flex',
+  //           justifyContent: 'space-between',
+  //           alignItems: 'center',
+  //           backgroundColor: '#f5f5f5',
+  //           borderBottom: '1px solid #ddd',
+  //           width: '100%',
+  //           height: '100%',
+  //           padding: '0 12px'
+  //         }}
+  //       >
+  //         <Typography
+  //           variant="h6"
+  //           sx={{
+  //             fontWeight: '400',
+  //             color: '#101010',
+  //             fontSize: '14px',
+  //             lineHeight: '36px'
+  //           }}
+  //         >
+  //           Service Users
+  //         </Typography>
+
+  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+  //           <div>
+  //             <Button
+  //               variant="outlined"
+  //               size="small"
+  //               onClick={handleClick}
+  //               sx={{
+  //                 backgroundColor: '#FAFAFA',
+  //                 borderRadius: '10px',
+  //                 textTransform: 'none',
+  //                 display: 'flex',
+  //                 alignItems: 'center',
+  //                 gap: 3
+  //               }}
+  //             >
+  //               Bulk Select
+  //               <LibraryAddCheckOutlinedIcon fontSize="small" />
+  //             </Button>
+  //             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+  //               <MenuItem onClick={handleBulkDelete}>
+  //                 Bulk Delete
+  //                 <IconTrash
+  //                   size={18}
+  //                   sx={{
+  //                     backgroundColor: '#FAFAFA',
+  //                     borderRadius: '10px',
+  //                     textTransform: 'none',
+  //                     display: 'flex',
+  //                     alignItems: 'center',
+  //                     gap: 3
+  //                   }}
+  //                 />
+  //               </MenuItem>
+  //               <MenuItem onClick={handleBulkArchive}>
+  //                 Bulk Archive
+  //                 <ArchiveIcon
+  //                   fontSize="small"
+  //                   sx={{
+  //                     backgroundColor: '#FAFAFA',
+  //                     borderRadius: '10px',
+  //                     textTransform: 'none',
+  //                     display: 'flex',
+  //                     alignItems: 'center',
+  //                     gap: 3
+  //                   }}
+  //                 />
+  //               </MenuItem>
+  //             </Menu>
+  //           </div>
+
+  //           <GridToolbarExport />
+  //         </Box>
+  //       </GridToolbarContainer>
+  //     </Box>
+  //   );
+  // };
 
   const columns = [
     {
@@ -257,7 +332,7 @@ const Volunteer = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
-                padding:'22px',
+                padding: '22px',
                 '&:hover': {
                   backgroundColor: '#009fc7'
                 }
@@ -342,6 +417,7 @@ const Volunteer = () => {
           <Grid item xs={9}>
             <Card style={{ height: '100vh' }}>
               <DataGrid
+                checkboxSelection
                 rows={
                   loading
                     ? []
@@ -357,12 +433,25 @@ const Volunteer = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
+                onRowSelectionModelChange={(newSelection) => {
+                  setSelectedIds(newSelection);
+                }}
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
                 slots={{
-                  toolbar: () => <CustomHeader />,
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType="volunteer"
+                      title="Volunteer List"
+                      selectedIds={selectedIds}
+                      enableBulkActions={true}
+                      exportEnabled={true}
+                      extraActions={null}
+                      refetchData={fetchpeople}
+                    />
+                  ),
                   loadingOverlay: () => (
                     <Box
                       sx={{

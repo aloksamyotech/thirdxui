@@ -11,49 +11,52 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import CustomHeader from 'components/CustomHeader';
 
 const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
 ];
 
-const CustomHeader = () => {
-  return (
-    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-      <GridToolbarContainer
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid #ddd',
-          width: '100%',
-          height: '100%',
-          padding: '0 12px'
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: '400',
-            color: '#333',
-            fontSize: '14px',
-            lineHeight: '36px'
-          }}
-        >
-          Service List
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <GridToolbarExport />
-        </Box>
-      </GridToolbarContainer>
-    </Box>
-  );
-};
+// const CustomHeader = () => {
+//   return (
+//     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+//       <GridToolbarContainer
+//         sx={{
+//           display: 'flex',
+//           justifyContent: 'space-between',
+//           alignItems: 'center',
+//           borderBottom: '1px solid #ddd',
+//           width: '100%',
+//           height: '100%',
+//           padding: '0 12px'
+//         }}
+//       >
+//         <Typography
+//           variant="h6"
+//           sx={{
+//             fontWeight: '400',
+//             color: '#333',
+//             fontSize: '14px',
+//             lineHeight: '36px'
+//           }}
+//         >
+//           Service List
+//         </Typography>
+//         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+//           <GridToolbarExport />
+//         </Box>
+//       </GridToolbarContainer>
+//     </Box>
+//   );
+// };
 
 const ServiceManagement = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
   const [serviceType, setServiceType] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [status, setStatus] = useState('');
   const [rows, setRows] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
@@ -332,13 +335,14 @@ const ServiceManagement = () => {
               <Box width="100%">
                 <Card style={{ height: '100vh' }}>
                   <DataGrid
+                    checkboxSelection
                     rows={
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -347,11 +351,24 @@ const ServiceManagement = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
+                    onRowSelectionModelChange={(newSelection) => {
+                      setSelectedIds(newSelection);
+                    }}
                     pageSizeOptions={[5, 10, 25, 50]}
                     rowHeight={70}
                     getRowId={(row) => row._id}
                     slots={{
-                      toolbar: () => <CustomHeader />,
+                      toolbar: () => (
+                        <CustomHeader
+                          entityType="services"
+                          title="Service List"
+                          selectedIds={selectedIds}
+                          enableBulkActions={true}
+                          exportEnabled={true}
+                          extraActions={null}
+                          refetchData={fetchServices}
+                        />
+                      ),
                       loadingOverlay: () => (
                         <Box
                           sx={{

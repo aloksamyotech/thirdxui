@@ -147,7 +147,20 @@ const AddCaseForm = ({ onCancel }) => {
       telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+      riskAssessmentNotes: editdata?.riskAssessment?.riskAssessmentNotes || '',
+      keyIndicators: editdata?.riskAssessment?.keyIndicators || [],
+      serviceName: editdata?.Service?.serviceName || '',
+      startDate: editdata?.Service?.startDate ? dayjs(editdata?.Service?.startDate) : null,
+      lastDate: editdata?.Service?.lastDate ? dayjs(editdata?.Service?.lastDate) : null,
+      referrerName: editdata?.Service?.referrerName || '',
+      referrerJob: editdata?.Service?.referrerJob || '',
+      referrerPhone: editdata?.Service?.referrerPhone || '',
+      referrerEmail: editdata?.Service?.referrerEmail || '',
+      emergencyPhone: editdata?.Service?.emergencyPhone || '',
+      emergencyEmail: editdata?.Service?.emergencyEmail || '',
+      referralType: editdata?.Service?.referralType || '',
+      referredDate: editdata?.Service?.referredDate ? dayjs(editdata?.Service?.referredDate) : null
     }
   });
 
@@ -287,13 +300,12 @@ const AddCaseForm = ({ onCancel }) => {
         if (serviceNameSearchQuery && serviceNameSearchQuery !== '') {
           queryParams.append('search', serviceNameSearchQuery);
         }
-        // Add any needed filters here if your API requires them
 
         const response = await getApi(`${urls.service.fetchWithPagination}?${queryParams.toString()}`);
         const services = response?.data?.data || [];
         const formattedServices = services.map((service) => ({
           id: service._id,
-          name: service.name || service.title || '' // adapt based on API response
+          name: service.name || service.title || ''
         }));
         setServiceNames(formattedServices);
       } catch (error) {
@@ -379,11 +391,32 @@ const AddCaseForm = ({ onCancel }) => {
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   useEffect(() => {
+    if (editdata?.contactPreferences?.contactMethods) {
+      const methods = editdata.contactPreferences.contactMethods;
+
+      const updatedStates = {
+        Telephone: methods.telephone ? 1 : 0,
+        Email: methods.email ? 1 : 0,
+        SMS: methods.sms ? 1 : 0,
+        Whatsapp: methods.whatsapp ? 1 : 0,
+        Letter: methods.letter ? 1 : 0
+      };
+
+      setContactMethodStates(updatedStates); // 👈 update button UI states
+
+      // Also update react-hook-form fields
+      setValue('telephone', methods.telephone);
+      setValue('emailConsent', methods.email);
+      setValue('sms', methods.sms);
+      setValue('whatsapp', methods.whatsapp);
+      setValue('letter', methods.letter);
+    }
+  }, [editdata, setValue]);
+  useEffect(() => {
     ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
-      register(field);
-      setValue(field, false);
+      register(field); // <-- must register so setValue can track changes
     });
-  }, [register, setValue]);
+  }, [register]);
 
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -401,7 +434,9 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
-
+    if (formData.personalInfo?.profileImage) {
+      fd.append('profileImage', formData.personalInfo.profileImage);
+    }
     fd.append('contactInfo[homePhone]', formData.phone || '');
     fd.append('contactInfo[phone]', formData.mobilePhone || '');
     fd.append('contactInfo[email]', formData.email || '');
@@ -462,6 +497,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('Service[serviceName]', formData.serviceName || '');
     fd.append('Service[startDate]', formData.startDate || '');
     fd.append('Service[lastDate]', formData.lastDate || '');
+    fd.append('Service[referrerName]', formData.referrerName || '');
     fd.append('Service[referrerJob]', formData.referrerJob || '');
     fd.append('Service[referrerPhone]', formData.referrerPhone || '');
     fd.append('Service[referrerEmail]', formData.referrerEmail || '');
@@ -493,9 +529,6 @@ const AddCaseForm = ({ onCancel }) => {
 
     if (formData.file) {
       fd.append('file', formData.file || '');
-    }
-    if (formData.profileImage) {
-      fd.append('profileImage', formData.profileImage || '');
     }
 
     try {
@@ -825,14 +858,22 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="profileImage"
+                                name="personalInfo.profileImage"
                                 control={control}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
                                     variant="outlined"
                                     size="small"
-                                    value={field.value ? (typeof field.value === 'object' && field.value.name ? field.value.name : '') : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object'
+                                          ? field.value.name || ''
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop() // extract file name from string
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Profile image"
                                     inputProps={{
                                       readOnly: true,
@@ -2103,32 +2144,66 @@ const AddCaseForm = ({ onCancel }) => {
                   >
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
-                        <TextField
+                        <Controller
                           name="riskAssessmentNotes"
-                          multiline
-                          minRows={5}
-                          label="Risk Assessment Notes"
-                          variant="outlined"
-                          {...register('riskAssessmentNotes')}
-                          fullWidth
-                          sx={{
-                            backgroundColor: '#f9f9f9',
-                            borderRadius: '8px'
-                          }}
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              multiline
+                              minRows={5}
+                              label="Risk Assessment Notes"
+                              variant="outlined"
+                              fullWidth
+                              sx={{
+                                backgroundColor: '#f9f9f9',
+                                borderRadius: '8px'
+                              }}
+                            />
+                          )}
                         />
                       </Grid>
+
                       <Grid item xs={12} sm={6}>
-                        {renderAutocomplete2(
-                          'keyIndicators',
-                          'Key Indicators of Concern',
-                          keyIndicator?.map((item) => ({
-                            label: item.name,
-                            value: item._id
-                          })) || [],
-                          errors.keyIndicators,
-                          errors.keyIndicators?.message,
-                          control
-                        )}
+                        <Controller
+                          name="keyIndicators"
+                          control={control}
+                          render={({ field }) => {
+                            const options = keyIndicator.map((item) => ({
+                              label: item.name,
+                              value: item._id
+                            }));
+
+                            // Normalize value: if it's array of IDs → convert to objects from options
+                            const selected = Array.isArray(field.value)
+                              ? field.value
+                                  .map((val) => {
+                                    if (typeof val === 'string' || typeof val === 'number') {
+                                      return options.find((opt) => opt.value === val);
+                                    }
+                                    return {
+                                      label: val?.name,
+                                      value: val?._id
+                                    };
+                                  })
+                                  .filter(Boolean)
+                              : [];
+
+                            return (
+                              <Autocomplete
+                                multiple
+                                options={options}
+                                value={selected}
+                                onChange={(e, newValue) => {
+                                  field.onChange(newValue.map((item) => item.value));
+                                }}
+                                getOptionLabel={(option) => option.label || ''}
+                                renderInput={(params) => <TextField {...params} label="Key Indicators of Concern" variant="outlined" />}
+                              />
+                            );
+                          }}
+                        />
                       </Grid>
                     </Grid>
                   </Box>

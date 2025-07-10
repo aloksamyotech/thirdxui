@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import SubmissionDialog from './SubmissionDialog';
 import toast from 'react-hot-toast';
+import { IconTrash } from '@tabler/icons';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
@@ -93,7 +94,6 @@ const Lead = () => {
     setDialogOpen(false);
   };
 
-
   const navigate = useNavigate();
   const handleNavigate = (id) => {
     navigate(`${id}`);
@@ -161,26 +161,6 @@ const Lead = () => {
       )
     },
     {
-      field: 'submissionDate',
-      headerName: 'Date Submitted',
-      flex: 0.8,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
-          {params.value || '-'}
-        </Typography>
-      )
-    },
-    {
-      field: 'campaign',
-      headerName: 'Form Campaign',
-      flex: 1,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */} Beach cleaning - Corporate volunteer project 2019
-        </Typography>
-      )
-    },
-    {
       field: 'title',
       headerName: 'Form Display Title',
       flex: 0.8,
@@ -190,6 +170,27 @@ const Lead = () => {
         </Typography>
       )
     },
+    {
+      field: 'submissionDate',
+      headerName: 'Date Submitted',
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
+          {params.value || '-'}
+        </Typography>
+      )
+    },
+    // {
+    //   field: 'campaign',
+    //   headerName: 'Form Campaign',
+    //   flex: 1,
+    //   renderCell: (params) => (
+    //     <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+    //       {/* {params.value} */} Beach cleaning - Corporate volunteer project 2019
+    //     </Typography>
+    //   )
+    // },
+
     // {
     //   field: 'status',
     //   headerName: 'Status',
@@ -216,20 +217,25 @@ const Lead = () => {
     //     </Button>
     //   )
     // },
-    // {
-    //   field: 'edit',
-    //   headerName: 'Edit',
-    //   flex: 0.3,
-    //   align: 'center',
-    //   headerAlign: 'center',
-    //   sortable: false,
-    //   renderCell: (params) => (
-    //     <Box sx={{ display: 'flex', gap: 1 }}>
-    //       <ReadMoreIcon sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.id)} />
-    //       <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" onClick={() => handleEdit(params.row)} />
-    //     </Box>
-    //   )
-    // }
+    {
+      field: 'edit',
+      headerName: 'Edit',
+      flex: 0.3,
+      align: 'center',
+      headerAlign: 'center',
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+
+          <IconTrash
+            onClick={() => handleTrustAction(params.row)}
+            size={18}
+            style={{ color: 'red', cursor: 'pointer', verticalAlign: 'middle' }}
+          />
+        </Box>
+      )
+    }
   ];
 
   const handleSearchChange = (event) => {
@@ -313,9 +319,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
                   loading={loading}

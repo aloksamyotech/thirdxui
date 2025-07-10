@@ -3,6 +3,8 @@ import { Stack, Grid, Card, Box, Typography, TextField, IconButton, InputBase } 
 import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
 import TableStyle from '../../ui-component/TableStyle';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import FilterPanel from 'components/FilterPanel';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import ViewReferral from './view';
@@ -121,7 +123,11 @@ const ReferralTable = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-        <Typography sx={{fontSize:'16px', fontWeight:'500'}}>New Referrals</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+                    <IconButton onClick={() => navigate(-1)} size="small">
+                      <ArrowBackIcon />
+                    </IconButton>
+                  New Referrals</Typography>
 
         <Box
           sx={{

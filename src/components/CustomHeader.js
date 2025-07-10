@@ -17,7 +17,8 @@ const CustomHeader = ({
   exportEnabled = true,
   enableBulkActions = false,
   extraActions = null,
-  refetchData
+  refetchData,
+  isCompletlyDelete = false
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -34,7 +35,8 @@ const CustomHeader = ({
     try {
       const requestBody = {
         entityType,
-        ids: selectedIds
+        ids: selectedIds,
+        isCompletlyDelete
       };
 
       const response = await updateApi(urls.bulkFuntions.delete, requestBody);

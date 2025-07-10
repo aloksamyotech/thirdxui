@@ -44,7 +44,8 @@ export const urls = Object.freeze({
     filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,
     fetchWithPagination: `${baseUrl}/cases/allwithpagination`,
-    toggleArchive: `${baseUrl}/cases/toggleArchive/:id`
+    toggleArchive: `${baseUrl}/cases/toggleArchive/:id`,
+    bulkUpload: `${baseUrl}/cases/bulkUpload`
   },
   mail: {
     create: `${baseUrl}/mail/addmail`,

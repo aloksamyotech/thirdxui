@@ -22,6 +22,8 @@ import {
 } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from '@mui/material/Link';
@@ -46,14 +48,13 @@ const stateStyles = [
   { color: '#CE655D', icon: '✕' }
 ];
 
-
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-  
-    const [contactMethodStates, setContactMethodStates] = useState(contactMethodInitial);
+
+  const [contactMethodStates, setContactMethodStates] = useState(contactMethodInitial);
   const [isLoading, setIsloading] = useState(false);
   const fileInputRef = React.useRef(null);
   const [campaigns, setCampaigns] = useState([]);
@@ -394,7 +395,10 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+            <IconButton onClick={() => navigate(-1)} size="small">
+              <ArrowBackIcon />
+            </IconButton>
             {location.state?.isEdit
               ? subRole === 'donar_company'
                 ? 'Edit Donor Company'
@@ -561,6 +565,11 @@ const AddCaseForm = ({ onCancel }) => {
                                     fullWidth
                                     label="Social Media Links"
                                     size="small"
+                                    InputProps={{
+                                      sx: {
+                                        height: 57
+                                      }
+                                    }}
                                     error={!!errors.socialmedia}
                                     helperText={errors.socialmedia?.message}
                                     {...field}
@@ -848,12 +857,6 @@ const AddCaseForm = ({ onCancel }) => {
                                   {...field}
                                 />
                               )}
-                            />{' '}
-                            <FormControlLabel
-                              control={<AntSwitch checked={restrictAccess} onChange={() => setRestrictAccess(!restrictAccess)} />}
-                              label="Restrict Access?"
-                              labelPlacement="start"
-                              sx={{ gap: 1 , mt:1}}
                             />
                           </Paper>
                         </Grid>
@@ -861,166 +864,182 @@ const AddCaseForm = ({ onCancel }) => {
                     </Box>
                   </Grid>
 
-                  <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+                  <Grid container spacing={2} alignItems="center" sx={{ mt: 1, pr: 2, pl: 2 }} justifyContent="space-between">
                     <Grid item>
-                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(1)}>
-                        Next
-                      </Button>
+                      <FormControlLabel
+                        control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                        label="Restrict Access?"
+                        labelPlacement="start"
+                        sx={{ gap: 1 }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Grid container spacing={2}>
+                        <Grid item>
+                          <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
+                            SAVE CHANGES
+                          </Button>
+                        </Grid>
+                        <Grid item>
+                          <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
+                            CANCEL
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </>
               )}
 
-            
-                          {tabIndex === 1 && (
-                            <Grid container spacing={2}>
-                              <Grid item xs={12}>
-                                <Box
-                                  sx={{
-                                    border: '1px solid #ccc',
-                                    borderRadius: 3,
-                                    p: 2
-                                  }}
-                                >
-                                  <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
-                                    {Object.keys(contactMethodStates).map((label) => {
-                                      const stateIndex = contactMethodStates[label];
-                                      const { color, icon } = stateStyles[stateIndex];
-            
-                                      return (
-                                        <Button
-                                          key={label}
-                                          variant="contained"
-                                          onClick={() => handleContactMethodClick(label)}
-                                          sx={{
-                                            backgroundColor: color,
-                                            '&:hover': {
-                                              backgroundColor: color
-                                            },
-                                            color: '#000',
-                                            borderRadius: '8px',
-                                            px: 2,
-                                            minWidth: 165,
-                                            display: 'flex',
-                                            justifyContent: 'space-between'
-                                          }}
-                                        >
-                                          {label}
-                                          <span>{icon}</span>
-                                        </Button>
-                                      );
-                                    })}
-                                  </Box>
-            
-                                  <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={4}>
-                                      <Controller
-                                        name="confirmationDate"
-                                        control={control}
-                                        render={({ field }) => (
-                                          <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                            <DatePicker
-                                              label="Date of Confirmation"
-                                              value={field.value}
-                                              onChange={(newValue) => field.onChange(newValue)}
-                                              renderInput={(params) => (
-                                                <TextField
-                                                  {...params}
-                                                  fullWidth
-                                                  size="small"
-                                                  error={!!errors.confirmationDate}
-                                                  helperText={errors.confirmationDate?.message}
-                                                />
-                                              )}
-                                            />
-                                          </LocalizationProvider>
-                                        )}
-                                      />
-                                    </Grid>
-            
-                                    <Grid item xs={12} sm={4}>
-                                      <Controller
-                                        name="reason"
-                                        control={control}
-                                        rules={{ required: 'This field is required' }}
-                                        render={({ field }) => (
-                                          <TextField
-                                            fullWidth
-                                            size="small"
-                                            label="Reason"
-                                            select
-                                            {...field}
-                                            error={!!errors.reason}
-                                            helperText={errors.reason?.message}
-                                          >
-                                            {reason?.map((option) => (
-                                              <MenuItem key={option._id} value={option._id}>
-                                                {option.name}
-                                              </MenuItem>
-                                            ))}
-                                          </TextField>
-                                        )}
-                                      />
-                                    </Grid>
-            
-                                    <Grid item xs={12} sm={4}>
-                                      <Controller
-                                        name="contactPurpose"
-                                        control={control}
-                                        rules={{ required: 'This field is required' }}
-                                        render={({ field }) => (
-                                          <TextField
-                                            fullWidth
-                                            size="small"
-                                            label="Purpose"
-                                            select
-                                            {...field}
-                                            error={!!errors.contactPurpose}
-                                            helperText={errors.contactPurpose?.message}
-                                          >
-                                            {contactpurpose?.map((option) => (
-                                              <MenuItem key={option._id} value={option._id}>
-                                                {option.name}
-                                              </MenuItem>
-                                            ))}
-                                          </TextField>
-                                        )}
-                                      />
-                                    </Grid>
-                                  </Grid>
-                                </Box>
-                              </Grid>
-            
-                              <Grid container justifyContent="flex-end" spacing={2} sx={{ mt: 1, pr: 2 }}>
-                                <Grid item>
-                                  <Button
-                                    variant="outlined"
-                                    onClick={() => navigate(-1)}
-                                    sx={{
-                                      borderColor: '#FF4D49',
-                                      color: '#FF4D49'
-                                    }}
-                                  >
-                                    CANCEL
-                                  </Button>
-                                </Grid>
-                                <Grid item>
-                                  <Button
-                                    type="submit"
-                                    variant="contained"
-                                    sx={{
-                                      background: '#053146',
-                                      color: '#fff',
-                                      px: 3
-                                    }}
-                                    disabled={isLoading}
-                                  >
-                                    {isLoading ? 'Saving...' : 'SAVE CHANGES'}
-                                  </Button>
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                          )}
+              {tabIndex === 1 && (
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Box
+                      sx={{
+                        border: '1px solid #ccc',
+                        borderRadius: 3,
+                        p: 2
+                      }}
+                    >
+                      <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+                        {Object.keys(contactMethodStates).map((label) => {
+                          const stateIndex = contactMethodStates[label];
+                          const { color, icon } = stateStyles[stateIndex];
+
+                          return (
+                            <Button
+                              key={label}
+                              variant="contained"
+                              onClick={() => handleContactMethodClick(label)}
+                              sx={{
+                                backgroundColor: color,
+                                '&:hover': {
+                                  backgroundColor: color
+                                },
+                                color: '#000',
+                                borderRadius: '8px',
+                                px: 2,
+                                minWidth: 165,
+                                display: 'flex',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              {label}
+                              <span>{icon}</span>
+                            </Button>
+                          );
+                        })}
+                      </Box>
+
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={4}>
+                          <Controller
+                            name="confirmationDate"
+                            control={control}
+                            render={({ field }) => (
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                  label="Date of Confirmation"
+                                  value={field.value}
+                                  onChange={(newValue) => field.onChange(newValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      fullWidth
+                                      size="small"
+                                      error={!!errors.confirmationDate}
+                                      helperText={errors.confirmationDate?.message}
+                                    />
+                                  )}
+                                />
+                              </LocalizationProvider>
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={4}>
+                          <Controller
+                            name="reason"
+                            control={control}
+                            rules={{ required: 'This field is required' }}
+                            render={({ field }) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Reason"
+                                select
+                                {...field}
+                                error={!!errors.reason}
+                                helperText={errors.reason?.message}
+                              >
+                                {reason?.map((option) => (
+                                  <MenuItem key={option._id} value={option._id}>
+                                    {option.name}
+                                  </MenuItem>
+                                ))}
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sm={4}>
+                          <Controller
+                            name="contactPurpose"
+                            control={control}
+                            rules={{ required: 'This field is required' }}
+                            render={({ field }) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Purpose"
+                                select
+                                {...field}
+                                error={!!errors.contactPurpose}
+                                helperText={errors.contactPurpose?.message}
+                              >
+                                {contactpurpose?.map((option) => (
+                                  <MenuItem key={option._id} value={option._id}>
+                                    {option.name}
+                                  </MenuItem>
+                                ))}
+                              </TextField>
+                            )}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+
+                  <Grid container justifyContent="flex-end" spacing={2} sx={{ mt: 1, pr: 2 }}>
+                    <Grid item>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                          background: '#053146',
+                          color: '#fff',
+                          px: 3
+                        }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Saving...' : 'SAVE CHANGES'}
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        variant="outlined"
+                        onClick={() => navigate(-1)}
+                        sx={{
+                          borderColor: '#FF4D49',
+                          color: '#FF4D49'
+                        }}
+                      >
+                        CANCEL
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              )}
             </Box>
           </form>
         </Card>

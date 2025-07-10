@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getApi } from 'common/apiClient';
+import { getApi, postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import AboutCaseCard from './AboutCaseCard';
@@ -128,7 +128,7 @@ const AboutCase = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await getApi(urls.case.delete.replace(':id', caseId), 'DELETE');
+      await postApi(`${urls.case.delete}${caseId}`);
       toast.success('Case deleted successfully');
       navigate(-1);
     } catch (err) {
@@ -145,7 +145,7 @@ const AboutCase = () => {
         return;
       }
 
-      await getApi(urls.case.toggleArchive.replace(':id', caseId), 'PATCH', {
+      await postApi(urls.case.toggleArchive.replace(':id', caseId), 'PATCH', {
         reason: archiveReason
       });
 

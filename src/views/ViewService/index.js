@@ -196,7 +196,7 @@ const ViewService = () => {
       queryParams.append('time', timeFilter);
       queryParams.append('serviceId', serviceId);
       if (locationFilter) {
-        queryParams.append('location', locationFilter);
+        queryParams.append('country', locationFilter);
       }
 
       const url = `${urls.session.fetchWithPagination}?${queryParams.toString()}`;

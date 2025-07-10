@@ -372,7 +372,7 @@ const List = () => {
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
         <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
-          List
+          Bulk Delete
         </Typography>
         <Stack direction="row" spacing={2} alignItems="center">
           <Box
@@ -441,7 +441,7 @@ const List = () => {
           setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
           includeServiceuser={includeServiceuser}
           setIncludeServiceuser={setIncludeServiceuser}
-          selectedFilters={['listTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeServiceuser']}
+          selectedFilters={['listTypeFilter', 'dateOpenedFilter']}
           customDateLabel="By Date"
           onReset={handleReset}
         />

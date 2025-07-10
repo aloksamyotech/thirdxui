@@ -204,27 +204,27 @@ const dashboard = {
         {
           id: '19',
           parentId: '17',
-          title: 'Duplicate',
+          title: 'Duplicates',
           type: 'item',
           url: '/duplicate',
           breadcrumbs: false
         },
-        {
-          id: '20',
-          parentId: '17',
-          title: 'Bulk Delete',
-          type: 'item',
-          url: '/bulkdelete',
-          breadcrumbs: false
-        },
-        {
-          id: '21',
-          parentId: '17',
-          title: 'Archives',
-          type: 'item',
-          url: '/archives',
-          breadcrumbs: false
-        },
+        // {
+        //   id: '20',
+        //   parentId: '17',
+        //   title: 'Bulk Delete',
+        //   type: 'item',
+        //   url: '/bulkdelete',
+        //   breadcrumbs: false
+        // },
+        // {
+        //   id: '21',
+        //   parentId: '17',
+        //   title: 'Archives',
+        //   type: 'item',
+        //   url: '/archives',
+        //   breadcrumbs: false
+        // },
         {
           id: '22',
           parentId: '17',

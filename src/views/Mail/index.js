@@ -11,11 +11,14 @@ import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import CustomHeader from 'components/CustomHeader';
 
 const Mail = () => {
   const navigate = useNavigate();
   const [listName, setListName] = useState('');
   const [listFilters, setListFilters] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [tag, setTag] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
@@ -35,39 +38,39 @@ const Mail = () => {
     { value: 'follow-up', label: 'Follow-up' }
   ];
 
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Mailing List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
+  // const CustomHeader = () => {
+  //   return (
+  //     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+  //       <GridToolbarContainer
+  //         sx={{
+  //           display: 'flex',
+  //           justifyContent: 'space-between',
+  //           alignItems: 'center',
+  //           backgroundColor: '#f5f5f5',
+  //           borderBottom: '1px solid #ddd',
+  //           width: '100%',
+  //           height: '100%',
+  //           padding: '0 12px'
+  //         }}
+  //       >
+  //         <Typography
+  //           variant="h6"
+  //           sx={{
+  //             fontWeight: '400',
+  //             color: '#333',
+  //             fontSize: '14px',
+  //             lineHeight: '36px'
+  //           }}
+  //         >
+  //           Mailing List
+  //         </Typography>
+  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+  //           <GridToolbarExport />
+  //         </Box>
+  //       </GridToolbarContainer>
+  //     </Box>
+  //   );
+  // };
 
   const columns = [
     {
@@ -329,11 +332,24 @@ const Mail = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
+                onRowSelectionModelChange={(newSelection) => {
+                  setSelectedIds(newSelection);
+                }}
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 slots={{
-                  toolbar: () => <CustomHeader />,
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType="mailingList"
+                      title="Mailing List"
+                      selectedIds={selectedIds}
+                      enableBulkActions={true}
+                      exportEnabled={true}
+                      extraActions={null}
+                      refetchData={fetchMails}
+                    />
+                  ),
                   loadingOverlay: () => (
                     <Box
                       sx={{

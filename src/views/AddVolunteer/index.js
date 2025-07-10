@@ -22,6 +22,8 @@ import {
   FormHelperText,
   Chip
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import { CircularProgress } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -499,7 +501,11 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+            <IconButton onClick={() => navigate(-1)} size="small">
+              <ArrowBackIcon />
+            </IconButton>
+
             {editdata ? 'Edit Volunteer' : 'Add Volunteer'}
           </Typography>
 

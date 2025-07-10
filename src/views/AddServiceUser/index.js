@@ -26,7 +26,7 @@ import { CircularProgress } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import AddIcon from '@mui/icons-material/Add';
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -376,7 +376,6 @@ const AddCaseForm = ({ onCancel }) => {
     />
   );
 
-
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   useEffect(() => {
@@ -587,10 +586,12 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
-            {editdata ? 'Edit Service User' : 'Add New Service User'}
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+            <IconButton onClick={() => navigate(-1)} size="small">
+              <ArrowBackIcon />
+            </IconButton>
+            {editdata ? 'Edit Service' : 'Add New Service'}
           </Typography>
-
           <Box
             sx={{
               display: 'flex',
@@ -1480,8 +1481,8 @@ const AddCaseForm = ({ onCancel }) => {
                                         ? typeof field.value === 'object' && field.value.name
                                           ? field.value.name
                                           : typeof field.value === 'string'
-                                            ? field.value.split('/').pop()
-                                            : ''
+                                          ? field.value.split('/').pop()
+                                          : ''
                                         : ''
                                     }
                                     placeholder="Attachments"
@@ -2120,7 +2121,7 @@ const AddCaseForm = ({ onCancel }) => {
                         {renderAutocomplete2(
                           'keyIndicators',
                           'Key Indicators of Concern',
-                          keyIndicator?.map(item => ({
+                          keyIndicator?.map((item) => ({
                             label: item.name,
                             value: item._id
                           })) || [],
@@ -2349,11 +2350,11 @@ const AddCaseForm = ({ onCancel }) => {
                     </Grid>
                   </Grid>
                   <Grid container alignItems="center" justifyContent="space-between" sx={{ mt: 2, px: 2 }}>
-                    {/* <Grid item>
-                      <Button variant="outlined" size="small" startIcon={<AddIcon />}>
+                    <Grid item>
+                      {/* <Button variant="outlined" size="small" startIcon={<AddIcon />}>
                         Add Another Service
-                      </Button>
-                    </Grid> */}
+                      </Button> */}
+                    </Grid>
 
                     <Grid item>
                       <Grid container spacing={2}>

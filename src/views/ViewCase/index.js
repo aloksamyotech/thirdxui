@@ -12,6 +12,7 @@ import CaseNoteDialog from 'components/AddCaseNote';
 import UserProfileDialog from './userProfile.js';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient.js';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { urls } from 'common/urls';
 import dayjs from 'dayjs';
 import { imageUrl } from 'common/urls';

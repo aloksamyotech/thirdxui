@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography, FormControlLabel, Autocomplete } from '@mui/material';
+import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography, FormControlLabel, Autocomplete, IconButton } from '@mui/material';
 import { MenuItem, Select, Chip, FormControl, InputLabel } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -304,8 +306,11 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
-          Adding New Case
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+                    <IconButton onClick={() => navigate(-1)} size="small">
+                      <ArrowBackIcon />
+                    </IconButton>
+                    Adding New Case
         </Typography>
 
         <Box

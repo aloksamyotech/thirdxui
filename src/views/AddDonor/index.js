@@ -17,7 +17,8 @@ import {
   Typography,
   Button,
   FormControlLabel,
-  Chip
+  Chip,
+  IconButton
 } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
@@ -26,6 +27,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from '@mui/material/Link';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AntSwitch from 'components/AntSwitch.js';
 import dayjs from 'dayjs';
@@ -35,7 +37,7 @@ import config from '../../config';
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
-  Letter: 0,
+  letter: 0,
   SMS: 0,
   Whatsapp: 0
 };
@@ -113,7 +115,8 @@ const AddDonorForm = () => {
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      donerTag: editdata?.contactPreferences?.contactMethods?.donerTag ?? true,
+      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? true,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       role: 'donor'
@@ -357,12 +360,34 @@ const AddDonorForm = () => {
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
+  const booleanToState = (value) => {
+    if (value === true) return 1;
+    if (value === false) return 2;
+    return 0;
+  };
+
+  useEffect(() => {
+    if (editdata) {
+      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+
+      setContactMethodStates({
+        donerTag: booleanToState(contactMethods?.donor),
+        Email: booleanToState(contactMethods?.email),
+        SMS: booleanToState(contactMethods?.sms),
+        Whatsapp: booleanToState(contactMethods?.whatsapp),
+        letter: booleanToState(contactMethods?.letter)
+      });
+    }
+  }, [editdata, reset]);
 
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+            <IconButton onClick={() => navigate(-1)} size="small">
+              <ArrowBackIcon />
+            </IconButton>
             {location.state?.isEdit ? 'Edit Donor' : 'Add Donor'}
           </Typography>
 
@@ -1139,24 +1164,34 @@ const AddDonorForm = () => {
                                 />
                               )}
                             />
-
-                            <FormControlLabel
-                              control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
-                              label="Restrict Access?"
-                              labelPlacement="start"
-                              sx={{ gap: 1 }}
-                            />
                           </Paper>
                         </Grid>
                       </Grid>
                     </Box>
                   </Grid>
 
-                  <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+                  <Grid container spacing={2} alignItems="center" sx={{ mt: 1, pr: 2, pl: 2 }} justifyContent="space-between">
                     <Grid item>
-                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(1)}>
-                        Next
-                      </Button>
+                      <FormControlLabel
+                        control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                        label="Restrict Access?"
+                        labelPlacement="start"
+                        sx={{ gap: 1 }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Grid container spacing={2}>
+                        <Grid item>
+                          <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
+                            SAVE CHANGES
+                          </Button>
+                        </Grid>
+                        <Grid item>
+                          <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
+                            CANCEL
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </>
@@ -1284,18 +1319,6 @@ const AddDonorForm = () => {
                   <Grid container justifyContent="flex-end" spacing={2} sx={{ mt: 1, pr: 2 }}>
                     <Grid item>
                       <Button
-                        variant="outlined"
-                        onClick={() => navigate(-1)}
-                        sx={{
-                          borderColor: '#FF4D49',
-                          color: '#FF4D49'
-                        }}
-                      >
-                        CANCEL
-                      </Button>
-                    </Grid>
-                    <Grid item>
-                      <Button
                         type="submit"
                         variant="contained"
                         sx={{
@@ -1306,6 +1329,18 @@ const AddDonorForm = () => {
                         disabled={isLoading}
                       >
                         {isLoading ? 'Saving...' : 'SAVE CHANGES'}
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        variant="outlined"
+                        onClick={() => navigate(-1)}
+                        sx={{
+                          borderColor: '#FF4D49',
+                          color: '#FF4D49'
+                        }}
+                      >
+                        CANCEL
                       </Button>
                     </Grid>
                   </Grid>

@@ -11,6 +11,7 @@ import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import AddCaseForm from 'views/AddTransaction';
 import { Dialog } from '@mui/material';
+import CustomHeader from 'components/CustomHeader';
 
 const dateAddedFilters = [
   { value: 'today', label: 'Today' },
@@ -19,44 +20,13 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const CustomHeader = () => {
-  return (
-    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-      <GridToolbarContainer
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid #ddd',
-          width: '100%',
-          height: '100%',
-          padding: '0 12px'
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: '400',
-            color: '#333',
-            fontSize: '13px',
-            lineHeight: '36px'
-          }}
-        >
-          Donation Transactions
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <GridToolbarExport />
-        </Box>
-      </GridToolbarContainer>
-    </Box>
-  );
-};
-
 const Financial = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
   const [nameFilters, setNameFilters] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [campaign, setCampaignFilter] = useState('');
   const [user, setUser] = useState([]);
   const [assignedTo, setAssignedTo] = useState('');
@@ -199,7 +169,6 @@ const Financial = () => {
     }
   }, [assignedTo, dateOpenedFilter, searchQuery, campaignName]);
 
-  useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -251,6 +220,8 @@ const Financial = () => {
         setLoading(false);
       }
     };
+  useEffect(() => {
+  
 
     fetchData();
   }, [paginationModel]);
@@ -417,9 +388,22 @@ const Financial = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
+                    onRowSelectionModelChange={(newSelection) => {
+                      setSelectedIds(newSelection);
+                    }}
                     pageSizeOptions={[5, 10, 25, 50]}
                     slots={{
-                      toolbar: () => <CustomHeader />,
+                      toolbar: () => (
+                        <CustomHeader
+                          entityType="donationTransaction"
+                          title="Donation Transactions"
+                          selectedIds={selectedIds}
+                          enableBulkActions={true}
+                          exportEnabled={true}
+                          extraActions={null}
+                          refetchData={fetchData}
+                        />
+                      ),
                       loadingOverlay: () => (
                         <Box
                           sx={{

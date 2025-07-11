@@ -76,7 +76,6 @@ const AddCaseForm = ({ onCancel }) => {
 
   const location = useLocation();
   const editdata = location?.state?.editdata;
-  console.log(editdata);
   const sessionId = location?.state?.sessionId;
   const handleContactMethodClick = (label) => {
     setContactMethodStates((prev) => {
@@ -149,21 +148,7 @@ const AddCaseForm = ({ onCancel }) => {
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      // serviceSections: [
-      //   {
-      //     serviceName: '',
-      //     startDate: null,
-      //     lastDate: null,
-      //     referrerName: '',
-      //     referrerJob: '',
-      //     referrerPhone: '',
-      //     referrerEmail: '',
-      //     emergencyPhone: '',
-      //     emergencyEmail: '',
-      //     referralType: '',
-      //     referredDate: null
-      //   }
-      // ]
+
       serviceSections: editdata?.Service?.length
         ? editdata.Service.map((item) => ({
             serviceName: item.serviceName || '',
@@ -449,12 +434,11 @@ const AddCaseForm = ({ onCancel }) => {
   }, [editdata, setValue]);
   useEffect(() => {
     ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
-      register(field); // <-- must register so setValue can track changes
+      register(field);
     });
   }, [register]);
 
   const onSubmit = async (formData) => {
-    console.log(formData);
     const isValid = await trigger();
     if (!isValid) {
       toast.error('Please fill in all required fields.');
@@ -529,17 +513,6 @@ const AddCaseForm = ({ onCancel }) => {
     (formData?.keyIndicators || []).forEach((item) => {
       fd.append('riskAssessment[keyIndicators][]', item.value || item);
     });
-
-    // fd.append('Service[serviceName]', formData.serviceName || '');
-    // fd.append('Service[startDate]', formData.startDate || '');
-    // fd.append('Service[lastDate]', formData.lastDate || '');
-    // fd.append('Service[referrerJob]', formData.referrerJob || '');
-    // fd.append('Service[referrerPhone]', formData.referrerPhone || '');
-    // fd.append('Service[referrerEmail]', formData.referrerEmail || '');
-    // fd.append('Service[emergencyPhone]', formData.emergencyPhone || '');
-    // fd.append('Service[emergencyEmail]', formData.emergencyEmail || '');
-    // fd.append('Service[referralType]', formData.referralType || '');
-    // fd.append('Service[referredDate]', formData.referredDate || '');
     formData.serviceSections.forEach((section, index) => {
       fd.append(`Service[${index}][serviceName]`, section.serviceName || '');
       fd.append(`Service[${index}][startDate]`, section.startDate || '');

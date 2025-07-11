@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Grid, Divider } from '@mui/material';
+import { Grid, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem, TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -17,6 +17,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { toast } from 'react-toastify';
 import { gridSpacing } from 'store/constant';
+import { useNavigate } from 'react-router-dom';
 
 const STORAGE_KEY = 'dashboard_components_order';
 
@@ -72,6 +73,17 @@ const Dashboard = () => {
     const saved = loadFromLocalStorage();
     return saved || defaultComponents;
   });
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [servicesName, setServicesName] = useState([]);
+  const [searchQueryService, setSearchQueryService] = useState('');
+  const [selectedServiceId, setSelectedServiceId] = useState('');
+  const navigate = useNavigate();
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -108,72 +120,134 @@ const Dashboard = () => {
       saveToLocalStorage(newItems);
     }
   };
-
+  useEffect(() => {
+    const fetchServices = async () => {
+      const queryParams = new URLSearchParams();
+      if (searchQueryService && searchQueryService !== '') {
+        queryParams.append('search', searchQueryService);
+      }
+      const response = await getApi(`${urls.service.fetchWithPagination}?${queryParams.toString()}`);
+      setServicesName(response?.data?.data);
+    };
+    fetchServices();
+  }, [searchQueryService]);
   return (
-
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6} md={6} lg={3}>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" loading={isLoading} />
-          </Grid>
-          <Grid item marginInline={5}>
-            <Shortcut2 icon={1} title="Add Person" path="/add-serviceuser" />
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={6} lg={3}>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" loading={isLoading} />
-          </Grid>
-          <Grid item marginInline={5}>
-            <Shortcut2 icon={2} title="Add New Case" path="/add-case" />
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={6} lg={3}>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
-          </Grid> 
-          <Grid item marginInline={2}>
-            <Shortcut2 icon={3} title="Add Session Attendies" path="/services" />
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={6} lg={3}>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" loading={isLoading} />
-          </Grid>
-          <Grid item marginInline={5}>
-            <Shortcut2 icon={4} title="Add Donor" path="/add-donor" />
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Grid item container xs={12} justifyContent="center" marginBlock={2}>
-        <Divider sx={{ width: '70%', borderWidth: '1px' }} />
-      </Grid>
-
-      <Grid item xs={12}>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={components.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-            <Grid container spacing={2}>
-              {components.map((comp) => (
-                <Grid item xs={12} sm={12} md={12} lg={6} key={comp.id}>
-                  <SortableItem id={comp.id}>{comp.component}</SortableItem>
-                </Grid>
-              ))}
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={6} lg={3}>
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
+              <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" loading={isLoading} />
             </Grid>
-          </SortableContext>
-        </DndContext>
+            <Grid item marginInline={5}>
+              <Shortcut2 icon={1} title="Add Person" path="/add-serviceuser" />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={6} lg={3}>
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
+              <DashboardCard title="Open Cases" num1={`${totalOpenedCases}`} num2="62" loading={isLoading} />
+            </Grid>
+            <Grid item marginInline={5}>
+              <Shortcut2 icon={2} title="Add New Case" path="/add-case" />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={6} lg={3}>
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
+              <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
+            </Grid>
+            <Grid item marginInline={2}>
+              <Shortcut2 icon={3} title="Add Session Attendies" onClick={handleClickOpen} />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={6} lg={3}>
+          <Grid container direction="column" spacing={2}>
+            <Grid item>
+              <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" loading={isLoading} />
+            </Grid>
+            <Grid item marginInline={5}>
+              <Shortcut2 icon={4} title="Add Donor" path="/add-donor" />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid item container xs={12} justifyContent="center" marginBlock={2}>
+          <Divider sx={{ width: '70%', borderWidth: '1px' }} />
+        </Grid>
+
+        <Grid item xs={12}>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={components.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+              <Grid container spacing={2}>
+                {components.map((comp) => (
+                  <Grid item xs={12} sm={12} md={12} lg={6} key={comp.id}>
+                    <SortableItem id={comp.id}>{comp.component}</SortableItem>
+                  </Grid>
+                ))}
+              </Grid>
+            </SortableContext>
+          </DndContext>
+        </Grid>
       </Grid>
-    </Grid>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>Choose Service</DialogTitle>
+        <DialogContent>
+          <TextField
+            select
+            label="Select Service Type"
+            fullWidth
+            value={selectedServiceId}
+            onChange={(e) => {
+              setSelectedServiceId(e.target.value);
+              setError('');
+            }}
+            sx={{ mt: 2 }}
+            error={!!error}
+            helperText={error}
+          >
+            {servicesName.map((service) => (
+              <MenuItem key={service._id} value={service._id}>
+                {service.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="error">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              const selectedService = servicesName.find((service) => service._id === selectedServiceId);
+
+              if (!selectedService) {
+                setError('Please select a service.');
+                return;
+              }
+              setError('');
+              navigate('/view-service', {
+                state: {
+                  serviceId: selectedService._id,
+                  serviceName: selectedService.name
+                }
+              });
+
+              handleClose();
+            }}
+            variant="contained"
+          >
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

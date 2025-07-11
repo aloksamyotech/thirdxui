@@ -34,6 +34,7 @@ import dayjs from 'dayjs';
 import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
+import { stateStyles } from 'common/constants';
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
@@ -41,12 +42,6 @@ const contactMethodInitial = {
   SMS: 0,
   Whatsapp: 0
 };
-
-const stateStyles = [
-  { color: '#E9B867', icon: '?' },
-  { color: '#7CBD71', icon: '✓' },
-  { color: '#CE655D', icon: '✕' }
-];
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -71,6 +66,12 @@ const AddCaseForm = ({ onCancel }) => {
 
   const subRole = location?.state?.subRole;
   const editdata = location?.state || {};
+  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+    acc[curr._id] = 0;
+    return acc;
+  }, {});
+
+  const [purposeStates, setPurposeStates] = useState(initialPurposeStates || {});
 
   const {
     register,
@@ -296,10 +297,11 @@ const AddCaseForm = ({ onCancel }) => {
       fd.append('contactPreferences[preferredMethod]', data.preferredContact);
     }
 
-    if (data.contactPurpose) {
-      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    if (data.contactPurpose && Array.isArray(data.contactPurpose)) {
+      data.contactPurpose.forEach((id) => {
+        fd.append('contactPreferences[contactPurposes][]', id);
+      });
     }
-
     if (data.reason) {
       fd.append('contactPreferences[reason]', data.reason);
     }
@@ -360,36 +362,61 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
   const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
-  // const handleTabChange = async (newValue) => {
-  //   if (newValue > tabIndex) {
-  //     const firstTabFields = [
-  //       'companyname',
-  //       'contactname',
-  //       'socialmedia',
-  //       'otherId',
-  //       'Recruitmentcampaign',
-  //       'Beneficiary',
-  //       'Campaigns',
-  //       'engagement',
-  //       'eventsAttended',
-  //       'fundingInterests',
-  //       'fundraisingActivities',
-  //       'riskNotes'
-  //     ];
-  //     const isValid = await trigger(firstTabFields);
-
-  //     if (isValid) {
-  //       setTabIndex(newValue);
-  //     } else {
-  //       toast.error('Please fill all required fields before proceeding');
-  //     }
-  //   } else {
-  //     setTabIndex(newValue);
-  //   }
-  // };
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
+  const handlePurposeClick = (id) => {
+    setPurposeStates((prev) => {
+      const nextState = ((prev?.[id] || 0) + 1) % 3;
+      const updated = { ...prev, [id]: nextState };
+
+      const selected = Object.keys(updated).filter((key) => updated[key] === 1);
+
+      setValue('contactPurpose', selected);
+      setValue('contactPurposeStates', updated);
+      return updated;
+    });
+  };
+
+  const booleanToState = (value) => {
+    if (value === true) return 1;
+    if (value === false) return 2;
+    return 0;
+  };
+
+  useEffect(() => {
+    if (editdata) {
+      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+
+      setContactMethodStates({
+        donerTag: booleanToState(contactMethods?.donor),
+        Email: booleanToState(contactMethods?.email),
+        SMS: booleanToState(contactMethods?.sms),
+        Whatsapp: booleanToState(contactMethods?.whatsapp),
+        letter: booleanToState(contactMethods?.letter)
+      });
+    }
+  }, [editdata, reset]);
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
 
   return (
     <Grid>
@@ -931,8 +958,55 @@ const AddCaseForm = ({ onCancel }) => {
                         })}
                       </Box>
 
+                      <Grid item xs={12} mb={2}>
+                        <Box>
+                          <Typography variant="subtitle2" mb={1}>
+                            Purpose
+                          </Typography>
+                          <Box display="flex" gap={2} flexWrap="wrap">
+                            {contactpurpose?.map((option) => {
+                              const stateIndex = purposeStates[option._id] || 0;
+                              const { color, icon } = stateStyles[stateIndex];
+
+                              return (
+                                <Button
+                                  key={option._id}
+                                  variant="contained"
+                                  onClick={() => handlePurposeClick(option._id)}
+                                  sx={{
+                                    backgroundColor: color,
+                                    '&:hover': {
+                                      backgroundColor: color
+                                    },
+                                    color: '#000',
+                                    borderRadius: '8px',
+                                    px: 2,
+                                    minWidth: 165,
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  {option.name}
+                                  <span>{icon}</span>
+                                </Button>
+                              );
+                            })}
+                          </Box>
+                          {errors.contactPurpose && (
+                            <Typography variant="caption" color="error">
+                              {errors.contactPurpose.message}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" mb={1}>
+                            Details associated with confirmation
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="confirmationDate"
                             control={control}
@@ -957,7 +1031,7 @@ const AddCaseForm = ({ onCancel }) => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="reason"
                             control={control}
@@ -973,31 +1047,6 @@ const AddCaseForm = ({ onCancel }) => {
                                 helperText={errors.reason?.message}
                               >
                                 {reason?.map((option) => (
-                                  <MenuItem key={option._id} value={option._id}>
-                                    {option.name}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={4}>
-                          <Controller
-                            name="contactPurpose"
-                            control={control}
-                            rules={{ required: 'This field is required' }}
-                            render={({ field }) => (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Purpose"
-                                select
-                                {...field}
-                                error={!!errors.contactPurpose}
-                                helperText={errors.contactPurpose?.message}
-                              >
-                                {contactpurpose?.map((option) => (
                                   <MenuItem key={option._id} value={option._id}>
                                     {option.name}
                                   </MenuItem>

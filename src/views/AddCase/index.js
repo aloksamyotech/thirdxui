@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography, FormControlLabel, Autocomplete, IconButton } from '@mui/material';
+import {
+  Grid,
+  TextField,
+  Box,
+  Paper,
+  Button,
+  InputAdornment,
+  Card,
+  Typography,
+  FormControlLabel,
+  Autocomplete,
+  IconButton
+} from '@mui/material';
 import { MenuItem, Select, Chip, FormControl, InputLabel } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -307,10 +319,10 @@ const AddCaseForm = () => {
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
-                    <IconButton onClick={() => navigate(-1)} size="small">
-                      <ArrowBackIcon />
-                    </IconButton>
-                    Adding New Case
+          <IconButton onClick={() => navigate(-1)} size="small">
+            <ArrowBackIcon />
+          </IconButton>
+          Adding New Case
         </Typography>
 
         <Box
@@ -492,7 +504,72 @@ const AddCaseForm = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <Controller
+                  <Box mb={2} display="flex" justifyContent="space-between">
+                    <Controller
+                      name="file"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          value={field.value ? field.value.name : ''}
+                          placeholder="Attachments"
+                          InputProps={{
+                            readOnly: true,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AttachFileIcon fontSize="small" />
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                  <Link component="span">Upload a file</Link>
+                                  <input
+                                    type="file"
+                                    hidden
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      const allowedTypes = [
+                                        'application/pdf',
+                                        'application/msword',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                      ];
+                                      const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                      if (file) {
+                                        if (!allowedTypes.includes(file.type)) {
+                                          toast.error('Only PDF, DOC, and DOCX files are allowed.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        if (file.size > maxSizeInBytes) {
+                                          toast.error('File size must be less than or equal to 25MB.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        field.onChange(file);
+                                      } else {
+                                        field.onChange(null);
+                                      }
+                                    }}
+                                  />
+                                </Button>
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  {/* <Controller
                     name="serviceStatus"
                     control={control}
                     defaultValue="pending"
@@ -557,7 +634,7 @@ const AddCaseForm = () => {
                         </Select>
                       </FormControl>
                     )}
-                  />
+                  /> */}
                 </Grid>
               </Grid>
             </Grid>
@@ -634,71 +711,6 @@ const AddCaseForm = () => {
 
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                  <Box mb={2} display="flex" justifyContent="space-between">
-                    <Controller
-                      name="file"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          value={field.value ? field.value.name : ''}
-                          placeholder="Attachments"
-                          InputProps={{
-                            readOnly: true,
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <AttachFileIcon fontSize="small" />
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                  <Link component="span">Upload a file</Link>
-                                  <input
-                                    type="file"
-                                    hidden
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      const allowedTypes = [
-                                        'application/pdf',
-                                        'application/msword',
-                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                                      ];
-                                      const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                      if (file) {
-                                        if (!allowedTypes.includes(file.type)) {
-                                          toast.error('Only PDF, DOC, and DOCX files are allowed.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        if (file.size > maxSizeInBytes) {
-                                          toast.error('File size must be less than or equal to 25MB.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        field.onChange(file);
-                                      } else {
-                                        field.onChange(null);
-                                      }
-                                    }}
-                                  />
-                                </Button>
-                              </InputAdornment>
-                            )
-                          }}
-                        />
-                      )}
-                    />
-                  </Box>
-
                   <Controller
                     name="description"
                     control={control}
@@ -708,7 +720,7 @@ const AddCaseForm = () => {
                         {...field}
                         label="Notes"
                         multiline
-                        minRows={12}
+                        minRows={15}
                         fullWidth
                         variant="outlined"
                         error={!!errors.description}

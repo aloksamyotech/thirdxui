@@ -72,15 +72,15 @@ const dashboard = {
           breadcrumbs: false,
           role: 'volunteer',
           childrenUrls: ['/add-volunteer', '/view-people']
-        },
-        {
-          id: '04',
-          parentId: '01',
-          title: 'New Referral',
-          type: 'item',
-          url: '/referral',
-          breadcrumbs: false
         }
+        // {
+        //   id: '04',
+        //   parentId: '01',
+        //   title: 'New Referral',
+        //   type: 'item',
+        //   url: '/referral',
+        //   breadcrumbs: false
+        // }
       ]
     },
 

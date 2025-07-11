@@ -498,57 +498,67 @@ const UserProfileCard = () => {
                           overflowY: 'auto'
                         }}
                       >
-                        <Typography
-                          sx={{
-                            fontWeight: 500,
-                            fontSize: '14px',
-                            color: '#053146',
-                            mb: 1
-                          }}
-                          gutterBottom
-                        >
-                          Risk Assessment
-                        </Typography>
+                        {userData?.role === 'volunteer' || (
+                          <>
+                            <Typography
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: '14px',
+                                color: '#053146',
+                                mb: 1
+                              }}
+                              gutterBottom
+                            >
+                              Risk Assessment
+                            </Typography>
 
-                        <Typography variant="body2" color="textSecondary" mb={2} className="text">
-                          {otherInfo?.description ?? 'No description available.'}
-                        </Typography>
+                            <Typography variant="body2" color="textSecondary" mb={2} className="text">
+                              {otherInfo?.description ?? 'No description available.'}
+                            </Typography>
 
-                        <Box sx={{ bgcolor: '#F7F7F7', p: 1, marginRight: 2, borderRadius: 2 }}>
-                          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                            Key Indicator Concern
-                          </Typography>
+                            {userData?.riskAssessment?.keyIndicators.length === 0 ? (
+                              <Typography variant="body2" color="textSecondary">
+                                No Keys found.
+                              </Typography>
+                            ) : (
+                              <Box sx={{ bgcolor: '#F7F7F7', p: 1, marginRight: 2, borderRadius: 2 }}>
+                                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                  Key Indicator Concern
+                                </Typography>
 
-                          <Grid container spacing={1}>
-                            {userData?.riskAssessment?.keyIndicators?.map((label, index) => (
-                              <Grid item key={index}>
-                                <Chip
-                                  label={label}
-                                  onDelete={() => {}}
-                                  deleteIcon={
-                                    <CancelIcon
-                                      sx={{
-                                        fontSize: 16,
-                                        color: '#666'
-                                      }}
-                                    />
-                                  }
-                                  sx={{
-                                    bgcolor: '#009FC7',
-                                    color: '#fff',
-                                    fontSize: '12px',
-                                    fontWeight: 400,
-                                    borderRadius: '20px',
-                                    height: 28,
-                                    '& .MuiChip-deleteIcon': {
-                                      marginLeft: '4px'
-                                    }
-                                  }}
-                                />
-                              </Grid>
-                            ))}
-                          </Grid>
-                        </Box>
+                                <Grid container spacing={1}>
+                                  {userData?.riskAssessment?.keyIndicators?.map((label, index) => (
+                                    <Grid item key={index}>
+                                      <Chip
+                                        label={label?.name}
+                                        onDelete={() => {}}
+                                        deleteIcon={
+                                          <CancelIcon
+                                            sx={{
+                                              fontSize: 16,
+                                              color: '#666'
+                                            }}
+                                          />
+                                        }
+                                        sx={{
+                                          bgcolor: '#009FC7',
+                                          color: '#fff',
+                                          fontSize: '12px',
+                                          fontWeight: 400,
+                                          borderRadius: '20px',
+                                          height: 28,
+                                          '& .MuiChip-deleteIcon': {
+                                            marginLeft: '4px'
+                                          }
+                                        }}
+                                      />
+                                    </Grid>
+                                  ))}
+                                </Grid>
+                              </Box>
+                            )}
+                          </>
+                        )}
 
                         <Box display="flex" alignItems="center" mb={1} mt={2}>
                           <Typography variant="subtitle1" sx={{ color: '#009fc7' }} className="text">

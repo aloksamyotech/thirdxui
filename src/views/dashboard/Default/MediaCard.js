@@ -36,12 +36,12 @@ const Card = () => {
           Recent Media
         </Typography>
         <Stack direction="row" spacing={1}>
-          <Select value="This Year" size="small" onPointerDown={(e) => e.stopPropagation()}>
+          {/* <Select value="This Year" size="small" onPointerDown={(e) => e.stopPropagation()}>
             <MenuItem value="This Week">This Week</MenuItem>
             <MenuItem value="This Month">This Month</MenuItem>
             <MenuItem value="This Year">This Year</MenuItem>
-          </Select>
-          <TextField
+          </Select> */}
+          {/* <TextField
             variant="outlined"
             placeholder="Search"
             size="small"
@@ -63,7 +63,7 @@ const Card = () => {
                 </InputAdornment>
               )
             }}
-          />
+          /> */}
         </Stack>
       </Stack>
 

@@ -238,7 +238,7 @@ const Sessions = () => {
           <Pagination count={totalPages} page={page} onChange={(e, value) => setPage(value)} size="small" color="primary" />
         </Box>
       )}
-      {allSession.length > 0 ? (
+      {/* {allSession.length > 0 ? (
         <Typography
           sx={{
             textAlign: 'center',
@@ -253,7 +253,7 @@ const Sessions = () => {
         >
           View all sessions
         </Typography>
-      ) : null}
+      ) : null} */}
     </Box>
   );
 };

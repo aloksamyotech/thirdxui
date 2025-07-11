@@ -250,7 +250,6 @@ const Lead = () => {
                         }))
                   }
                   columns={columns}
-                  checkboxSelection
                   loading={loading}
                   slots={{
                     toolbar: () => (
@@ -258,7 +257,7 @@ const Lead = () => {
                         entityType="form"
                         title="Form List"
                         selectedIds={selectedIds}
-                        enableBulkActions={true}
+                        enableBulkActions={false}
                         exportEnabled={true}
                         extraActions={null}
                         refetchData={getAllForms}

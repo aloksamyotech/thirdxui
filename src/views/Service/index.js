@@ -18,39 +18,6 @@ const statusFilter = [
   { value: 'inactive', label: 'Inactive' }
 ];
 
-// const CustomHeader = () => {
-//   return (
-//     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-//       <GridToolbarContainer
-//         sx={{
-//           display: 'flex',
-//           justifyContent: 'space-between',
-//           alignItems: 'center',
-//           borderBottom: '1px solid #ddd',
-//           width: '100%',
-//           height: '100%',
-//           padding: '0 12px'
-//         }}
-//       >
-//         <Typography
-//           variant="h6"
-//           sx={{
-//             fontWeight: '400',
-//             color: '#333',
-//             fontSize: '14px',
-//             lineHeight: '36px'
-//           }}
-//         >
-//           Service List
-//         </Typography>
-//         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-//           <GridToolbarExport />
-//         </Box>
-//       </GridToolbarContainer>
-//     </Box>
-//   );
-// };
-
 const ServiceManagement = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
@@ -335,7 +302,6 @@ const ServiceManagement = () => {
               <Box width="100%">
                 <Card style={{ height: '100vh' }}>
                   <DataGrid
-                    checkboxSelection
                     rows={
                       loading
                         ? []
@@ -363,7 +329,7 @@ const ServiceManagement = () => {
                           entityType="services"
                           title="Service List"
                           selectedIds={selectedIds}
-                          enableBulkActions={true}
+                          enableBulkActions={false}
                           exportEnabled={true}
                           extraActions={null}
                           refetchData={fetchServices}

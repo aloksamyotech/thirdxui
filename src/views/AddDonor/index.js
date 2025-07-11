@@ -34,6 +34,7 @@ import dayjs from 'dayjs';
 import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
+import { stateStyles } from 'common/constants';
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
@@ -41,12 +42,6 @@ const contactMethodInitial = {
   SMS: 0,
   Whatsapp: 0
 };
-
-const stateStyles = [
-  { color: '#E9B867', icon: '?' },
-  { color: '#7CBD71', icon: '✓' },
-  { color: '#CE655D', icon: '✕' }
-];
 
 const AddDonorForm = () => {
   const navigate = useNavigate();
@@ -67,6 +62,12 @@ const AddDonorForm = () => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+    acc[curr._id] = 0;
+    return acc;
+  }, {});
+
+  const [purposeStates, setPurposeStates] = useState(initialPurposeStates || {});
 
   const location = useLocation();
   const editdata = location?.state;
@@ -296,8 +297,10 @@ const AddDonorForm = () => {
       fd.append('contactPreferences[preferredMethod]', data.preferredContact);
     }
 
-    if (data.contactPurpose) {
-      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    if (data.contactPurpose && Array.isArray(data.contactPurpose)) {
+      data.contactPurpose.forEach((id) => {
+        fd.append('contactPreferences[contactPurposes][]', id);
+      });
     }
 
     if (data.reason) {
@@ -379,6 +382,45 @@ const AddDonorForm = () => {
       });
     }
   }, [editdata, reset]);
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
+  const handlePurposeClick = (id) => {
+    setPurposeStates((prev) => {
+      const nextState = ((prev?.[id] || 0) + 1) % 3;
+      const updated = { ...prev, [id]: nextState };
+
+      const selected = Object.keys(updated).filter((key) => updated[key] === 1);
+
+      setValue('contactPurpose', selected);
+      setValue('contactPurposeStates', updated);
+      return updated;
+    });
+  };
+
+  useEffect(() => {
+    if (editdata?.contactPreferences?.contactPurposes && contactpurpose.length > 0) {
+      const selected = Array.isArray(editdata.contactPreferences.contactPurposes)
+        ? editdata.contactPreferences.contactPurposes.map((p) => p._id || p)
+        : [editdata.contactPreferences.contactPurposes._id || editdata.contactPreferences.contactPurposes];
+
+      const restoredStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = selected.includes(item._id) ? 1 : 0;
+        return acc;
+      }, {});
+
+      setPurposeStates(restoredStates);
+      setValue('contactPurposeStates', restoredStates);
+      setValue('contactPurpose', selected);
+    }
+  }, [editdata, contactpurpose]);
 
   return (
     <Grid>
@@ -1207,6 +1249,10 @@ const AddDonorForm = () => {
                         p: 2
                       }}
                     >
+                      <Typography variant="subtitle2" mb={1}>
+                        Channels
+                      </Typography>
+
                       <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
                         {Object.keys(contactMethodStates).map((label) => {
                           const stateIndex = contactMethodStates[label];
@@ -1237,8 +1283,56 @@ const AddDonorForm = () => {
                         })}
                       </Box>
 
+                      <Grid item xs={12} mb={2}>
+                        <Box>
+                          <Typography variant="subtitle2" mb={1}>
+                            Purpose
+                          </Typography>
+                          <Box display="flex" gap={2} flexWrap="wrap">
+                            {contactpurpose?.map((option) => {
+                              const stateIndex = purposeStates[option._id] || 0;
+                              const { color, icon } = stateStyles[stateIndex];
+
+                              return (
+                                <Button
+                                  key={option._id}
+                                  variant="contained"
+                                  onClick={() => handlePurposeClick(option._id)}
+                                  sx={{
+                                    backgroundColor: color,
+                                    '&:hover': {
+                                      backgroundColor: color
+                                    },
+                                    color: '#000',
+                                    borderRadius: '8px',
+                                    px: 2,
+                                    minWidth: 165,
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  {option.name}
+                                  <span>{icon}</span>
+                                </Button>
+                              );
+                            })}
+                          </Box>
+                          {errors.contactPurpose && (
+                            <Typography variant="caption" color="error">
+                              {errors.contactPurpose.message}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
+
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" mb={1}>
+                            Details associated with confirmation
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="confirmationDate"
                             control={control}
@@ -1263,7 +1357,7 @@ const AddDonorForm = () => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="reason"
                             control={control}
@@ -1287,23 +1381,53 @@ const AddDonorForm = () => {
                             )}
                           />
                         </Grid>
+                      </Grid>
 
-                        <Grid item xs={12} sm={4}>
+                      {/* <Grid container spacing={2}>
+                        <Typography variant="subtitle2" mb={1}>
+                          Details associated with confirmation
+                        </Typography>
+
+                        <Grid item xs={12} sm={6}>
                           <Controller
-                            name="contactPurpose"
+                            name="confirmationDate"
+                            control={control}
+                            render={({ field }) => (
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                  label="Date of Confirmation"
+                                  value={field.value}
+                                  onChange={(newValue) => field.onChange(newValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      fullWidth
+                                      size="small"
+                                      error={!!errors.confirmationDate}
+                                      helperText={errors.confirmationDate?.message}
+                                    />
+                                  )}
+                                />
+                              </LocalizationProvider>
+                            )}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Controller
+                            name="reason"
                             control={control}
                             rules={{ required: 'This field is required' }}
                             render={({ field }) => (
                               <TextField
                                 fullWidth
                                 size="small"
-                                label="Purpose"
+                                label="Reason"
                                 select
                                 {...field}
-                                error={!!errors.contactPurpose}
-                                helperText={errors.contactPurpose?.message}
+                                error={!!errors.reason}
+                                helperText={errors.reason?.message}
                               >
-                                {contactpurpose?.map((option) => (
+                                {reason?.map((option) => (
                                   <MenuItem key={option._id} value={option._id}>
                                     {option.name}
                                   </MenuItem>
@@ -1312,7 +1436,7 @@ const AddDonorForm = () => {
                             )}
                           />
                         </Grid>
-                      </Grid>
+                      </Grid> */}
                     </Box>
                   </Grid>
 

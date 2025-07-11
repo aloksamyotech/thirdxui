@@ -74,109 +74,6 @@ const PeopleManagement = () => {
     }));
   }, []);
 
-  // const CustomHeader = () => {
-  //   const [anchorEl, setAnchorEl] = useState(null);
-  //   const open = Boolean(anchorEl);
-
-  //   const handleClick = (event) => {
-  //     setAnchorEl(event.currentTarget);
-  //   };
-
-  //   const handleClose = () => {
-  //     setAnchorEl(null);
-  //   };
-
-  //   const handleBulkDelete = () => {
-  //     handleClose();
-  //   };
-
-  //   const handleBulkArchive = () => {
-  //     handleClose();
-  //   };
-
-  //   return (
-  //     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-  //       <GridToolbarContainer
-  //         sx={{
-  //           display: 'flex',
-  //           justifyContent: 'space-between',
-  //           alignItems: 'center',
-  //           backgroundColor: '#f5f5f5',
-  //           borderBottom: '1px solid #ddd',
-  //           width: '100%',
-  //           height: '100%',
-  //           padding: '0 12px'
-  //         }}
-  //       >
-  //         <Typography
-  //           variant="h6"
-  //           sx={{
-  //             fontWeight: '400',
-  //             color: '#101010',
-  //             fontSize: '14px',
-  //             lineHeight: '36px'
-  //           }}
-  //         >
-  //           Service Users
-  //         </Typography>
-
-  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-  //           <div>
-  //             <Button
-  //               variant="outlined"
-  //               size="small"
-  //               onClick={handleClick}
-  //               sx={{
-  //                 backgroundColor: '#FAFAFA',
-  //                 borderRadius: '10px',
-  //                 textTransform: 'none',
-  //                 display: 'flex',
-  //                 alignItems: 'center',
-  //                 gap: 3
-  //               }}
-  //             >
-  //               Bulk Select
-  //               <LibraryAddCheckOutlinedIcon fontSize="small" />
-  //             </Button>
-  //             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-  //               <MenuItem onClick={handleBulkDelete}>
-  //                 Bulk Delete
-  //                 <IconTrash
-  //                   size={18}
-  //                   sx={{
-  //                     backgroundColor: '#FAFAFA',
-  //                     borderRadius: '10px',
-  //                     textTransform: 'none',
-  //                     display: 'flex',
-  //                     alignItems: 'center',
-  //                     gap: 3
-  //                   }}
-  //                 />
-  //               </MenuItem>
-  //               <MenuItem onClick={handleBulkArchive}>
-  //                 Bulk Archive
-  //                 <ArchiveIcon
-  //                   fontSize="small"
-  //                   sx={{
-  //                     backgroundColor: '#FAFAFA',
-  //                     borderRadius: '10px',
-  //                     textTransform: 'none',
-  //                     display: 'flex',
-  //                     alignItems: 'center',
-  //                     gap: 3
-  //                   }}
-  //                 />
-  //               </MenuItem>
-  //             </Menu>
-  //           </div>
-
-  //           <GridToolbarExport />
-  //         </Box>
-  //       </GridToolbarContainer>
-  //     </Box>
-  //   );
-  // };
-
   const columns = [
     {
       field: 'details',
@@ -419,7 +316,6 @@ const PeopleManagement = () => {
           <Grid item xs={9}>
             <Card style={{ height: '100vh' }}>
               <DataGrid
-                checkboxSelection
                 rows={
                   loading
                     ? []
@@ -448,7 +344,7 @@ const PeopleManagement = () => {
                       entityType="service_user"
                       title="Service Users"
                       selectedIds={selectedIds}
-                      enableBulkActions={true}
+                      enableBulkActions={false}
                       exportEnabled={true}
                       extraActions={null}
                       refetchData={fetchpeople}

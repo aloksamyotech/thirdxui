@@ -162,7 +162,7 @@ const Dashboard = () => {
               <DashboardCard title="Sessions Delivered" num1={`${totalSession}`} num2="62" loading={isLoading} />
             </Grid>
             <Grid item marginInline={2}>
-              <Shortcut2 icon={3} title="Add Session Attendies" onClick={handleClickOpen} />
+              <Shortcut2 icon={3} title="Add Session" onClick={handleClickOpen} />
             </Grid>
           </Grid>
         </Grid>
@@ -196,19 +196,33 @@ const Dashboard = () => {
           </DndContext>
         </Grid>
       </Grid>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Choose Service</DialogTitle>
-        <DialogContent>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth={false}
+        PaperProps={{
+          sx: {
+            width: 500,
+            minHeight: 50,
+            borderRadius: 2,
+            p: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontSize: '1.1rem', fontWeight: 600, pb: 1 }}>Choose Service</DialogTitle>
+
+        <DialogContent sx={{ pt: 0 }}>
           <TextField
             select
             label="Select Service Type"
             fullWidth
+            size="small"
             value={selectedServiceId}
             onChange={(e) => {
               setSelectedServiceId(e.target.value);
               setError('');
             }}
-            sx={{ mt: 2 }}
+            sx={{ mt: 1 }}
             error={!!error}
             helperText={error}
           >
@@ -219,8 +233,9 @@ const Dashboard = () => {
             ))}
           </TextField>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="error">
+
+        <DialogActions sx={{ mt: 1 }}>
+          <Button onClick={handleClose} color="error" variant="outlined" size="small">
             Cancel
           </Button>
           <Button
@@ -231,6 +246,7 @@ const Dashboard = () => {
                 setError('Please select a service.');
                 return;
               }
+
               setError('');
               navigate('/view-service', {
                 state: {
@@ -242,6 +258,8 @@ const Dashboard = () => {
               handleClose();
             }}
             variant="contained"
+            size="small"
+            sx={{ backgroundColor: '#053146' }}
           >
             Continue
           </Button>

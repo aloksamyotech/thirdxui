@@ -467,7 +467,6 @@ const List = () => {
                 loading={loading}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                checkboxSelection
                 onRowSelectionModelChange={(newSelection) => {
                   setSelectedIds(newSelection);
                 }}
@@ -477,7 +476,7 @@ const List = () => {
                       entityType={entityTypeMap[listType] || 'service_user'}
                       title={`${listType} List`}
                       selectedIds={selectedIds}
-                      enableBulkActions={true}
+                      enableBulkActions={false}
                       exportEnabled={true}
                       extraActions={null}
                       refetchData={fetchListData}

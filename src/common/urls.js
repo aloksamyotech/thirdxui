@@ -59,6 +59,13 @@ export const urls = Object.freeze({
     filterType: `${baseUrl}/transaction/filter`,
     fetchWithPagination: `${baseUrl}/transaction/allwithpagination`
   },
+  tagCategory: {
+    create: `${baseUrl}/tagCategory`,
+    fetchWithPagination: `${baseUrl}/tagCategory/allwithpagination`,
+    updateStatus: `${baseUrl}/tagCategory/updateStatus`,
+    getById: `${baseUrl}/tagCategory`,
+    editTagCategory: `${baseUrl}/tagCategory/edit`
+  },
   tag: {
     create: `${baseUrl}/tag/`,
     getAllTags: `${baseUrl}/tag/getalltag`,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import {
   Grid,
   MenuItem,
@@ -38,20 +38,7 @@ import dayjs from 'dayjs';
 import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
-
-const contactMethodInitial = {
-  Telephone: 0,
-  Email: 0,
-  Letter: 0,
-  SMS: 0,
-  Whatsapp: 0
-};
-
-const stateStyles = [
-  { color: '#E9B867', icon: '?' },
-  { color: '#7CBD71', icon: '✓' },
-  { color: '#CE655D', icon: '✕' }
-];
+import { contactMethodInitial, districts, ethnicityOptions, stateStyles } from 'common/constants';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -73,6 +60,13 @@ const AddCaseForm = ({ onCancel }) => {
   const [serviceNames, setServiceNames] = useState([]);
   const [serviceNameSearchQuery, setServiceNameSearchQuery] = useState('');
   const [keyIndicator, setKeyIndicator] = useState([]);
+
+  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+    acc[curr._id] = 0;
+    return acc;
+  }, {});
+
+  const [purposeStates, setPurposeStates] = useState(initialPurposeStates || {});
 
   const location = useLocation();
   const editdata = location?.state?.editdata;
@@ -147,10 +141,43 @@ const AddCaseForm = ({ onCancel }) => {
       telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+
+      serviceSections: editdata?.Service?.length
+        ? editdata.Service.map((item) => ({
+            serviceName: item.serviceName || '',
+            startDate: item.startDate || null,
+            lastDate: item.lastDate || null,
+            referrerName: item.referrerName || '',
+            referrerJob: item.referrerJob || '',
+            referrerPhone: item.referrerPhone || '',
+            referrerEmail: item.referrerEmail || '',
+            emergencyPhone: item.emergencyPhone || '',
+            emergencyEmail: item.emergencyEmail || '',
+            referralType: item.referralType || '',
+            referredDate: item.referredDate || null
+          }))
+        : [
+            {
+              serviceName: '',
+              startDate: null,
+              lastDate: null,
+              referrerName: '',
+              referrerJob: '',
+              referrerPhone: '',
+              referrerEmail: '',
+              emergencyPhone: '',
+              emergencyEmail: '',
+              referralType: '',
+              referredDate: null
+            }
+          ]
     }
   });
-
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'serviceSections'
+  });
   useEffect(() => {
     if (editdata) {
       if (editdata.contactPreferences) {
@@ -180,32 +207,6 @@ const AddCaseForm = ({ onCancel }) => {
     }
   }, [editdata, setValue]);
 
-  const restrictAccessValue = watch('restrictAccess');
-  const telephoneValue = watch('telephone');
-  const emailConsentValue = watch('emailConsent');
-  const smsValue = watch('sms');
-  const whatsappValue = watch('whatsapp');
-
-  const ethnicityOptions = [
-    'Arabic or North African',
-    'Asian or Asian British – Indian',
-    'Asian – Pakistani',
-    'Asian – Bangladeshi',
-    'Asian – Any other Asian background',
-    'Black – Caribbean',
-    'Black – African',
-    'Black – Any other Black background',
-    'Mixed – White and Black Caribbean',
-    'Mixed – White and Black African',
-    'Mixed – White and Asian',
-    'Mixed – Other',
-    'Chinese',
-    'White – British',
-    'White – Irish',
-    'White – Other',
-    'Unknown'
-  ];
-
   useEffect(() => {
     fetch(config.filter_Country)
       .then((res) => res.json())
@@ -218,17 +219,6 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
-
-  const districts = [
-    { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
-    { label: 'Adur District', value: 'adur_district' },
-    { label: 'Amber Valley Borough', value: 'amber_valley_borough' },
-    { label: 'Arun District', value: 'arun_district' },
-    { label: 'Ashford Borough', value: 'ashford_borough' },
-    { label: 'Babergh District', value: 'babergh_district' },
-    { label: 'Ashfield District', value: 'ashfield_district' },
-    { label: 'Basildon Borough', value: 'basildon_borough' }
-  ];
 
   const fileInputRef = useRef(null);
 
@@ -287,13 +277,12 @@ const AddCaseForm = ({ onCancel }) => {
         if (serviceNameSearchQuery && serviceNameSearchQuery !== '') {
           queryParams.append('search', serviceNameSearchQuery);
         }
-        // Add any needed filters here if your API requires them
 
         const response = await getApi(`${urls.service.fetchWithPagination}?${queryParams.toString()}`);
         const services = response?.data?.data || [];
         const formattedServices = services.map((service) => ({
           id: service._id,
-          name: service.name || service.title || '' // adapt based on API response
+          name: service.name || service.title || ''
         }));
         setServiceNames(formattedServices);
       } catch (error) {
@@ -379,11 +368,32 @@ const AddCaseForm = ({ onCancel }) => {
   const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   useEffect(() => {
+    if (editdata?.contactPreferences?.contactMethods) {
+      const methods = editdata.contactPreferences.contactMethods;
+
+      const updatedStates = {
+        Telephone: methods.telephone ? 1 : 0,
+        Email: methods.email ? 1 : 0,
+        SMS: methods.sms ? 1 : 0,
+        Whatsapp: methods.whatsapp ? 1 : 0,
+        Letter: methods.letter ? 1 : 0
+      };
+
+      setContactMethodStates(updatedStates); // 👈 update button UI states
+
+      // Also update react-hook-form fields
+      setValue('telephone', methods.telephone);
+      setValue('emailConsent', methods.email);
+      setValue('sms', methods.sms);
+      setValue('whatsapp', methods.whatsapp);
+      setValue('letter', methods.letter);
+    }
+  }, [editdata, setValue]);
+  useEffect(() => {
     ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
       register(field);
-      setValue(field, false);
     });
-  }, [register, setValue]);
+  }, [register]);
 
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -401,7 +411,9 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
-
+    if (formData.personalInfo?.profileImage) {
+      fd.append('profileImage', formData.personalInfo.profileImage);
+    }
     fd.append('contactInfo[homePhone]', formData.phone || '');
     fd.append('contactInfo[phone]', formData.mobilePhone || '');
     fd.append('contactInfo[email]', formData.email || '');
@@ -458,17 +470,20 @@ const AddCaseForm = ({ onCancel }) => {
     (formData?.keyIndicators || []).forEach((item) => {
       fd.append('riskAssessment[keyIndicators][]', item.value || item);
     });
+    formData.serviceSections.forEach((section, index) => {
+      fd.append(`Service[${index}][serviceName]`, section.serviceName || '');
+      fd.append(`Service[${index}][startDate]`, section.startDate || '');
+      fd.append(`Service[${index}][lastDate]`, section.lastDate || '');
+      fd.append(`Service[${index}][referrerName]`, section.referrerName || '');
+      fd.append(`Service[${index}][referrerJob]`, section.referrerJob || '');
+      fd.append(`Service[${index}][referrerPhone]`, section.referrerPhone || '');
+      fd.append(`Service[${index}][referrerEmail]`, section.referrerEmail || '');
+      fd.append(`Service[${index}][emergencyPhone]`, section.emergencyPhone || '');
+      fd.append(`Service[${index}][emergencyEmail]`, section.emergencyEmail || '');
+      fd.append(`Service[${index}][referralType]`, section.referralType || '');
+      fd.append(`Service[${index}][referredDate]`, section.referredDate || '');
+    });
 
-    fd.append('Service[serviceName]', formData.serviceName || '');
-    fd.append('Service[startDate]', formData.startDate || '');
-    fd.append('Service[lastDate]', formData.lastDate || '');
-    fd.append('Service[referrerJob]', formData.referrerJob || '');
-    fd.append('Service[referrerPhone]', formData.referrerPhone || '');
-    fd.append('Service[referrerEmail]', formData.referrerEmail || '');
-    fd.append('Service[emergencyPhone]', formData.emergencyPhone || '');
-    fd.append('Service[emergencyEmail]', formData.emergencyEmail || '');
-    fd.append('Service[referralType]', formData.referralType || '');
-    fd.append('Service[referredDate]', formData.referredDate || '');
     fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
@@ -478,9 +493,10 @@ const AddCaseForm = ({ onCancel }) => {
     if (formData.preferredContact) {
       fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
     }
-
-    if (formData.contactPurpose) {
-      fd.append('contactPreferences[contactPurposes]', formData.contactPurpose);
+    if (formData.contactPurpose && Array.isArray(formData.contactPurpose)) {
+      formData.contactPurpose.forEach((id) => {
+        fd.append('contactPreferences[contactPurposes][]', id);
+      });
     }
 
     if (formData.reason) {
@@ -493,9 +509,6 @@ const AddCaseForm = ({ onCancel }) => {
 
     if (formData.file) {
       fd.append('file', formData.file || '');
-    }
-    if (formData.profileImage) {
-      fd.append('profileImage', formData.profileImage || '');
     }
 
     try {
@@ -582,6 +595,58 @@ const AddCaseForm = ({ onCancel }) => {
     setTabIndex(newIndex);
   };
 
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
+  const handlePurposeClick = (id) => {
+    setPurposeStates((prev) => {
+      const nextState = ((prev?.[id] || 0) + 1) % 3;
+      const updated = { ...prev, [id]: nextState };
+
+      const selected = Object.keys(updated).filter((key) => updated[key] === 1);
+
+      setValue('contactPurpose', selected);
+      setValue('contactPurposeStates', updated);
+      return updated;
+    });
+  };
+
+  const booleanToState = (value) => {
+    if (value === true) return 1;
+    if (value === false) return 2;
+    return 0;
+  };
+
+  useEffect(() => {
+    if (editdata) {
+      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+
+      setContactMethodStates({
+        donerTag: booleanToState(contactMethods?.donor),
+        Email: booleanToState(contactMethods?.email),
+        SMS: booleanToState(contactMethods?.sms),
+        Whatsapp: booleanToState(contactMethods?.whatsapp),
+        letter: booleanToState(contactMethods?.letter)
+      });
+    }
+  }, [editdata, reset]);
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
+
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -590,7 +655,7 @@ const AddCaseForm = ({ onCancel }) => {
             <IconButton onClick={() => navigate(-1)} size="small">
               <ArrowBackIcon />
             </IconButton>
-            {editdata ? 'Edit Service' : 'Add New Service'}
+            {editdata ? 'Edit Service' : 'Add New Service User'}
           </Typography>
           <Box
             sx={{
@@ -825,14 +890,22 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="profileImage"
+                                name="personalInfo.profileImage"
                                 control={control}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
                                     variant="outlined"
                                     size="small"
-                                    value={field.value ? (typeof field.value === 'object' && field.value.name ? field.value.name : '') : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object'
+                                          ? field.value.name || ''
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop() // extract file name from string
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Profile image"
                                     inputProps={{
                                       readOnly: true,
@@ -2103,32 +2176,66 @@ const AddCaseForm = ({ onCancel }) => {
                   >
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
-                        <TextField
+                        <Controller
                           name="riskAssessmentNotes"
-                          multiline
-                          minRows={5}
-                          label="Risk Assessment Notes"
-                          variant="outlined"
-                          {...register('riskAssessmentNotes')}
-                          fullWidth
-                          sx={{
-                            backgroundColor: '#f9f9f9',
-                            borderRadius: '8px'
-                          }}
+                          control={control}
+                          defaultValue=""
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              multiline
+                              minRows={5}
+                              label="Risk Assessment Notes"
+                              variant="outlined"
+                              fullWidth
+                              sx={{
+                                backgroundColor: '#f9f9f9',
+                                borderRadius: '8px'
+                              }}
+                            />
+                          )}
                         />
                       </Grid>
+
                       <Grid item xs={12} sm={6}>
-                        {renderAutocomplete2(
-                          'keyIndicators',
-                          'Key Indicators of Concern',
-                          keyIndicator?.map((item) => ({
-                            label: item.name,
-                            value: item._id
-                          })) || [],
-                          errors.keyIndicators,
-                          errors.keyIndicators?.message,
-                          control
-                        )}
+                        <Controller
+                          name="keyIndicators"
+                          control={control}
+                          render={({ field }) => {
+                            const options = keyIndicator.map((item) => ({
+                              label: item.name,
+                              value: item._id
+                            }));
+
+                            // Normalize value: if it's array of IDs → convert to objects from options
+                            const selected = Array.isArray(field.value)
+                              ? field.value
+                                  .map((val) => {
+                                    if (typeof val === 'string' || typeof val === 'number') {
+                                      return options.find((opt) => opt.value === val);
+                                    }
+                                    return {
+                                      label: val?.name,
+                                      value: val?._id
+                                    };
+                                  })
+                                  .filter(Boolean)
+                              : [];
+
+                            return (
+                              <Autocomplete
+                                multiple
+                                options={options}
+                                value={selected}
+                                onChange={(e, newValue) => {
+                                  field.onChange(newValue.map((item) => item.value));
+                                }}
+                                getOptionLabel={(option) => option.label || ''}
+                                renderInput={(params) => <TextField {...params} label="Key Indicators of Concern" variant="outlined" />}
+                              />
+                            );
+                          }}
+                        />
                       </Grid>
                     </Grid>
                   </Box>
@@ -2149,211 +2256,224 @@ const AddCaseForm = ({ onCancel }) => {
 
               {tabIndex === 3 && (
                 <>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={4}>
-                      <Box
-                        sx={{
-                          border: '1px solid #e0e0e0',
-                          borderRadius: 2,
-                          p: 2
-                        }}
-                      >
-                        <Grid container spacing={2}>
-                          <Grid item xs={12}>
-                            <Controller
-                              name="serviceName"
-                              control={control}
-                              rules={{ required: 'Service Name is required' }}
-                              render={({ field }) => {
-                                const selectedService = serviceNames.find((service) => service.id === field.value);
-
-                                return (
-                                  <FormControl fullWidth size="small" error={!!errors.serviceName}>
-                                    <Autocomplete
-                                      value={selectedService || null}
-                                      onChange={(_, value) => field.onChange(value ? value.id : '')}
-                                      onInputChange={(_, newInputValue) => setServiceNameSearchQuery(newInputValue)}
-                                      options={serviceNames}
-                                      getOptionLabel={(option) => option.name || ''}
-                                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                                      renderInput={(params) => (
-                                        <TextField
-                                          {...params}
-                                          label="Service Name"
-                                          variant="outlined"
-                                          size="small"
-                                          error={!!errors.serviceName}
-                                        />
-                                      )}
-                                    />
-                                    {errors.serviceName && (
-                                      <Typography color="error" variant="caption">
-                                        {errors.serviceName.message}
-                                      </Typography>
-                                    )}
-                                  </FormControl>
-                                );
-                              }}
-                            />
-                          </Grid>
-
-                          <Grid item xs={6}>
-                            <Controller
-                              name="startDate"
-                              control={control}
-                              rules={{
-                                required: 'Start Date is required',
-                                validate: (value) => (dayjs(value).isBefore(dayjs(), 'day') ? 'Start Date cannot be in the past' : true)
-                              }}
-                              render={({ field, fieldState: { error } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker
-                                    label="Start Date"
-                                    value={field.value || null}
-                                    onChange={(newValue) => field.onChange(newValue)}
-                                    disablePast
-                                    renderInput={(params) => (
-                                      <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
-                                    )}
-                                  />
-                                </LocalizationProvider>
-                              )}
-                            />
-                          </Grid>
-
-                          <Grid item xs={6}>
-                            <Controller
-                              name="lastDate"
-                              control={control}
-                              rules={{
-                                required: 'Last Date is required',
-                                validate: (value) => {
-                                  const startDate = watch('startDate');
-                                  if (!startDate) return true;
-                                  return dayjs(value).isBefore(dayjs(startDate), 'day') ? 'Last Date cannot be before Start Date' : true;
-                                }
-                              }}
-                              render={({ field, fieldState: { error } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker
-                                    label="Last Date"
-                                    value={field.value || null}
-                                    onChange={(newValue) => field.onChange(newValue)}
-                                    minDate={watch('startDate') || undefined}
-                                    renderInput={(params) => (
-                                      <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
-                                    )}
-                                  />
-                                </LocalizationProvider>
-                              )}
-                            />
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={12} md={8}>
-                      <Box
-                        sx={{
-                          border: '1px solid #e0e0e0',
-                          borderRadius: 2,
-                          p: 2
-                        }}
-                      >
-                        <Grid container spacing={2}>
-                          <Grid item xs={12} sm={6}>
-                            <TextField name="referrerName" fullWidth size="small" label="Referrer Name" {...register('referrerName')} />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <TextField name="referrerJob" fullWidth size="small" label="Referrer Job Title" {...register('referrerJob')} />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              fullWidth
-                              name="referrerPhone"
-                              size="small"
-                              label="Referrer Phone No."
-                              {...register('referrerPhone')}
-                            />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <TextField fullWidth name="referrerEmail" size="small" label="Referrer Email" {...register('referrerEmail')} />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              fullWidth
-                              name="emergencyPhone"
-                              size="small"
-                              label="Emergency Phone No."
-                              {...register('emergencyPhone')}
-                            />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              fullWidth
-                              name="emergencyEmail"
-                              size="small"
-                              label="Emergency Email"
-                              {...register('emergencyEmail')}
-                            />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <Controller
-                              name="referralType"
-                              control={control}
-                              render={({ field }) => (
-                                <TextField select fullWidth size="small" label="Referral Type" {...field}>
-                                  <MenuItem value="Family Member">Family Member</MenuItem>
-                                  <MenuItem value="Community Member">Community Member</MenuItem>
-                                  <MenuItem value="Parent">Parent</MenuItem>
-                                  <MenuItem value="School">School</MenuItem>
-                                  <MenuItem value="Self Referral">Self Referral</MenuItem>
-                                  <MenuItem value="Other">Other</MenuItem>
-                                </TextField>
-                              )}
-                            />
-                          </Grid>
-
-                          <Grid item xs={12} sm={6}>
-                            <Controller
-                              name="referredDate"
-                              control={control}
-                              render={({ field, fieldState: { error } }) => (
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                  <DatePicker
-                                    label="Referred Date"
-                                    value={field.value || null}
-                                    onChange={(newValue) => field.onChange(newValue)}
+                  {fields.map((item, index) => (
+                    <Grid container spacing={2} key={item.id}>
+                      <Grid item xs={12} md={4}>
+                        <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                              <Controller
+                                name={`serviceSections[${index}].serviceName`}
+                                control={control}
+                                rules={{ required: 'Service Name is required' }}
+                                render={({ field }) => (
+                                  <Autocomplete
+                                    fullWidth
+                                    size="small"
+                                    options={serviceNames}
+                                    getOptionLabel={(option) => option.name || ''}
+                                    isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                                    value={serviceNames.find((service) => service.id === field.value) || null}
+                                    onChange={(_, selected) => field.onChange(selected?.id || '')}
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        fullWidth
+                                        label="Service Name"
+                                        variant="outlined"
                                         size="small"
-                                        InputLabelProps={{ shrink: true }}
-                                        error={!!error}
-                                        helperText={error?.message}
+                                        error={!!errors?.serviceSections?.[index]?.serviceName}
+                                        helperText={errors?.serviceSections?.[index]?.serviceName?.message}
                                       />
                                     )}
                                   />
-                                </LocalizationProvider>
-                              )}
-                            />
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={6}>
+                              <Controller
+                                name={`serviceSections[${index}].startDate`}
+                                control={control}
+                                rules={{
+                                  required: 'Start Date is required',
+                                  validate: (value) => (dayjs(value).isBefore(dayjs(), 'day') ? 'Start Date cannot be in the past' : true)
+                                }}
+                                render={({ field, fieldState: { error } }) => (
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                      label="Start Date"
+                                      value={field.value || null}
+                                      onChange={(newValue) => field.onChange(newValue)}
+                                      disablePast
+                                      renderInput={(params) => (
+                                        <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
+                                      )}
+                                    />
+                                  </LocalizationProvider>
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={6}>
+                              <Controller
+                                name={`serviceSections[${index}].lastDate`}
+                                control={control}
+                                rules={{
+                                  required: 'Last Date is required',
+                                  validate: (value) => {
+                                    const startDate = watch(`serviceSections[${index}].startDate`);
+                                    if (!startDate) return true;
+                                    return dayjs(value).isBefore(dayjs(startDate), 'day') ? 'Last Date cannot be before Start Date' : true;
+                                  }
+                                }}
+                                render={({ field, fieldState: { error } }) => (
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                      label="Last Date"
+                                      value={field.value || null}
+                                      onChange={(newValue) => field.onChange(newValue)}
+                                      minDate={watch(`serviceSections[${index}].startDate`) || undefined}
+                                      renderInput={(params) => (
+                                        <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
+                                      )}
+                                    />
+                                  </LocalizationProvider>
+                                )}
+                              />
+                            </Grid>
                           </Grid>
-                        </Grid>
-                      </Box>
+                        </Box>
+                      </Grid>
+
+                      <Grid item xs={12} md={8}>
+                        <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Referrer Name"
+                                {...register(`serviceSections[${index}].referrerName`)}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Referrer Job Title"
+                                {...register(`serviceSections[${index}].referrerJob`)}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Referrer Phone No."
+                                {...register(`serviceSections[${index}].referrerPhone`)}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Referrer Email"
+                                {...register(`serviceSections[${index}].referrerEmail`)}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Emergency Phone No."
+                                {...register(`serviceSections[${index}].emergencyPhone`)}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Emergency Email"
+                                {...register(`serviceSections[${index}].emergencyEmail`)}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name={`serviceSections[${index}].referralType`}
+                                control={control}
+                                render={({ field }) => (
+                                  <TextField select fullWidth size="small" label="Referral Type" {...field}>
+                                    <MenuItem value="Family Member">Family Member</MenuItem>
+                                    <MenuItem value="Community Member">Community Member</MenuItem>
+                                    <MenuItem value="Parent">Parent</MenuItem>
+                                    <MenuItem value="School">School</MenuItem>
+                                    <MenuItem value="Self Referral">Self Referral</MenuItem>
+                                    <MenuItem value="Other">Other</MenuItem>
+                                  </TextField>
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name={`serviceSections[${index}].referredDate`}
+                                control={control}
+                                render={({ field, fieldState: { error } }) => (
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                      label="Referred Date"
+                                      value={field.value || null}
+                                      onChange={(newValue) => field.onChange(newValue)}
+                                      renderInput={(params) => (
+                                        <TextField
+                                          {...params}
+                                          fullWidth
+                                          size="small"
+                                          InputLabelProps={{ shrink: true }}
+                                          error={!!error}
+                                          helperText={error?.message}
+                                        />
+                                      )}
+                                    />
+                                  </LocalizationProvider>
+                                )}
+                              />
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </Grid>
                     </Grid>
-                  </Grid>
+                  ))}
+
                   <Grid container alignItems="center" justifyContent="space-between" sx={{ mt: 2, px: 2 }}>
                     <Grid item>
-                      {/* <Button variant="outlined" size="small" startIcon={<AddIcon />}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={() =>
+                          append({
+                            serviceName: '',
+                            startDate: null,
+                            lastDate: null,
+                            referrerName: '',
+                            referrerJob: '',
+                            referrerPhone: '',
+                            referrerEmail: '',
+                            emergencyPhone: '',
+                            emergencyEmail: '',
+                            referralType: '',
+                            referredDate: null
+                          })
+                        }
+                      >
                         Add Another Service
-                      </Button> */}
+                      </Button>
                     </Grid>
 
                     <Grid item>
@@ -2391,6 +2511,10 @@ const AddCaseForm = ({ onCancel }) => {
                         p: 2
                       }}
                     >
+                      <Typography variant="subtitle2" mb={1}>
+                        Channels
+                      </Typography>
+
                       <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
                         {Object.keys(contactMethodStates).map((label) => {
                           const stateIndex = contactMethodStates[label];
@@ -2420,9 +2544,55 @@ const AddCaseForm = ({ onCancel }) => {
                           );
                         })}
                       </Box>
+                      <Grid item xs={12} mb={2}>
+                        <Box>
+                          <Typography variant="subtitle2" mb={1}>
+                            Purpose
+                          </Typography>
+                          <Box display="flex" gap={2} flexWrap="wrap">
+                            {contactpurpose?.map((option) => {
+                              const stateIndex = purposeStates[option._id] || 0;
+                              const { color, icon } = stateStyles[stateIndex];
 
+                              return (
+                                <Button
+                                  key={option._id}
+                                  variant="contained"
+                                  onClick={() => handlePurposeClick(option._id)}
+                                  sx={{
+                                    backgroundColor: color,
+                                    '&:hover': {
+                                      backgroundColor: color
+                                    },
+                                    color: '#000',
+                                    borderRadius: '8px',
+                                    px: 2,
+                                    minWidth: 165,
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  {option.name}
+                                  <span>{icon}</span>
+                                </Button>
+                              );
+                            })}
+                          </Box>
+                          {errors.contactPurpose && (
+                            <Typography variant="caption" color="error">
+                              {errors.contactPurpose.message}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" mb={1}>
+                            Details associated with confirmation
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="confirmationDate"
                             control={control}
@@ -2447,7 +2617,7 @@ const AddCaseForm = ({ onCancel }) => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="reason"
                             control={control}
@@ -2463,31 +2633,6 @@ const AddCaseForm = ({ onCancel }) => {
                                 helperText={errors.reason?.message}
                               >
                                 {reason?.map((option) => (
-                                  <MenuItem key={option._id} value={option._id}>
-                                    {option.name}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={4}>
-                          <Controller
-                            name="contactPurpose"
-                            control={control}
-                            rules={{ required: 'This field is required' }}
-                            render={({ field }) => (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Purpose"
-                                select
-                                {...field}
-                                error={!!errors.contactPurpose}
-                                helperText={errors.contactPurpose?.message}
-                              >
-                                {contactpurpose?.map((option) => (
                                   <MenuItem key={option._id} value={option._id}>
                                     {option.name}
                                   </MenuItem>

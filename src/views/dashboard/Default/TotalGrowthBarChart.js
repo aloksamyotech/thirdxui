@@ -96,7 +96,7 @@ const TotalGrowthBarChart = ({ isLoading }) => {
             <Grid item xs={12}>
               <Grid container alignItems="center" justifyContent="space-between">
                 <Typography variant="h5" fontWeight={500} fontSize={14}>
-                  Open Cases By Status
+                  Open Cases By
                 </Typography>
 
                 <Stack direction="row" spacing={2}>

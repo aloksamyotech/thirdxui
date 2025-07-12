@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Grid, TextField, Card, CardContent, CardHeader, Tabs, Tab, Box, Typography, MenuItem, Button, Autocomplete } from '@mui/material';
+import { Grid, TextField, Card, Tabs, Tab, Box, Typography, MenuItem, Button, Autocomplete } from '@mui/material';
 import { FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
@@ -16,6 +16,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [serviceType, setServiceType] = useState([]);
   const [products, setProducts] = useState([]);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [currency, setCurrency] = useState([]);
   const [donorData, setDonorData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -65,6 +66,19 @@ const AddCaseForm = ({ onCancel }) => {
     fetchDonors();
   }, [searchQuery]);
 
+  const fetchData = async () => {
+    try {
+      const response = await getApi(urls.configuration.fetch);
+
+      const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
+      setServiceType(servicetypeoption);
+      const productsOption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Product');
+      setProducts(productsOption);
+    } catch (error) {
+      console.error('Error fetching config:', error);
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       const payload = {
@@ -76,32 +90,20 @@ const AddCaseForm = ({ onCancel }) => {
         currency: data.currency || '',
         receiptNumber: data.receiptNumber || '',
         transactionId: data.transactionId || '',
-        productId: data.product || ''
+        productId: data.product || null
       };
 
       const res = await postApi(urls.transaction.create, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
       toast.success('Transaction added successfully!');
-      onCancel();
+      fetchData();
     } catch (error) {
       toast.error('Submission failed!');
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getApi(urls.configuration.fetch);
-
-        const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
-        setServiceType(servicetypeoption);
-        const productsOption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Product');
-        setProducts(productsOption);
-      } catch (error) {
-        console.error('Error fetching config:', error);
-      }
-    };
     fetchData();
   }, []);
 
@@ -116,7 +118,13 @@ const AddCaseForm = ({ onCancel }) => {
             value: item._id,
             label: item.name
           }));
-
+        const currencyName = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Currency')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+        setCurrency(currencyName);
         setCampaignTypeOptions(options);
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -269,8 +277,11 @@ const AddCaseForm = ({ onCancel }) => {
                                   error={!!errors.currency}
                                   helperText={errors.currency?.message}
                                 >
-                                  <MenuItem value="USD">USD</MenuItem>
-                                  <MenuItem value="INR">INR</MenuItem>
+                                  {currency.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </MenuItem>
+                                  ))}
                                 </TextField>
                               )}
                             />

@@ -70,6 +70,13 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const location = useLocation();
+  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+    acc[curr._id] = 0;
+    return acc;
+  }, {});
+
+  const [purposeStates, setPurposeStates] = useState(initialPurposeStates || {});
+
   const editdata = location?.state;
 
   const handleContactMethodClick = (label) => {
@@ -389,10 +396,11 @@ const AddCaseForm = ({ onCancel }) => {
       fd.append('contactPreferences[preferredMethod]', formData.preferredContact);
     }
 
-    if (formData.contactPurpose) {
-      fd.append('contactPreferences[contactPurposes]', formData.contactPurpose);
+    if (formData.contactPurpose && Array.isArray(formData.contactPurpose)) {
+      formData.contactPurpose.forEach((id) => {
+        fd.append('contactPreferences[contactPurposes][]', id);
+      });
     }
-
     if (formData.reason) {
       fd.append('contactPreferences[reason]', formData.reason);
     }
@@ -496,6 +504,57 @@ const AddCaseForm = ({ onCancel }) => {
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
+  const handlePurposeClick = (id) => {
+    setPurposeStates((prev) => {
+      const nextState = ((prev?.[id] || 0) + 1) % 3;
+      const updated = { ...prev, [id]: nextState };
+
+      const selected = Object.keys(updated).filter((key) => updated[key] === 1);
+
+      setValue('contactPurpose', selected);
+      setValue('contactPurposeStates', updated);
+      return updated;
+    });
+  };
+
+  const booleanToState = (value) => {
+    if (value === true) return 1;
+    if (value === false) return 2;
+    return 0;
+  };
+
+  useEffect(() => {
+    if (editdata) {
+      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+
+      setContactMethodStates({
+        donerTag: booleanToState(contactMethods?.donor),
+        Email: booleanToState(contactMethods?.email),
+        SMS: booleanToState(contactMethods?.sms),
+        Whatsapp: booleanToState(contactMethods?.whatsapp),
+        letter: booleanToState(contactMethods?.letter)
+      });
+    }
+  }, [editdata, reset]);
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
 
   return (
     <Grid>
@@ -1512,7 +1571,6 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                 </>
               )}
-
               {tabIndex === 1 && (
                 <>
                   <Grid container spacing={2}>
@@ -1990,7 +2048,6 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                 </>
               )}
-
               {tabIndex === 2 && (
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
@@ -2001,6 +2058,9 @@ const AddCaseForm = ({ onCancel }) => {
                         p: 2
                       }}
                     >
+                      <Typography variant="subtitle2" mb={1}>
+                        Purpose
+                      </Typography>
                       <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
                         {Object.keys(contactMethodStates).map((label) => {
                           const stateIndex = contactMethodStates[label];
@@ -2031,8 +2091,55 @@ const AddCaseForm = ({ onCancel }) => {
                         })}
                       </Box>
 
+                      <Grid item xs={12} mb={2}>
+                        <Box>
+                          <Typography variant="subtitle2" mb={1}>
+                            Purpose
+                          </Typography>
+                          <Box display="flex" gap={2} flexWrap="wrap">
+                            {contactpurpose?.map((option) => {
+                              const stateIndex = purposeStates[option._id] || 0;
+                              const { color, icon } = stateStyles[stateIndex];
+
+                              return (
+                                <Button
+                                  key={option._id}
+                                  variant="contained"
+                                  onClick={() => handlePurposeClick(option._id)}
+                                  sx={{
+                                    backgroundColor: color,
+                                    '&:hover': {
+                                      backgroundColor: color
+                                    },
+                                    color: '#000',
+                                    borderRadius: '8px',
+                                    px: 2,
+                                    minWidth: 165,
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  {option.name}
+                                  <span>{icon}</span>
+                                </Button>
+                              );
+                            })}
+                          </Box>
+                          {errors.contactPurpose && (
+                            <Typography variant="caption" color="error">
+                              {errors.contactPurpose.message}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" mb={1}>
+                            Details associated with confirmation
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="confirmationDate"
                             control={control}
@@ -2057,7 +2164,7 @@ const AddCaseForm = ({ onCancel }) => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={6}>
                           <Controller
                             name="reason"
                             control={control}
@@ -2081,36 +2188,25 @@ const AddCaseForm = ({ onCancel }) => {
                             )}
                           />
                         </Grid>
-
-                        <Grid item xs={12} sm={4}>
-                          <Controller
-                            name="contactPurpose"
-                            control={control}
-                            rules={{ required: 'This field is required' }}
-                            render={({ field }) => (
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Purpose"
-                                select
-                                {...field}
-                                error={!!errors.contactPurpose}
-                                helperText={errors.contactPurpose?.message}
-                              >
-                                {contactpurpose?.map((option) => (
-                                  <MenuItem key={option._id} value={option._id}>
-                                    {option.name}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
                       </Grid>
                     </Box>
                   </Grid>
 
                   <Grid container justifyContent="flex-end" spacing={2} sx={{ mt: 1, pr: 2 }}>
+                    <Grid item>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                          background: '#053146',
+                          color: '#fff',
+                          px: 3
+                        }}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Saving...' : 'SAVE CHANGES'}
+                      </Button>
+                    </Grid>
                     <Grid item>
                       <Button
                         variant="outlined"
@@ -2123,23 +2219,9 @@ const AddCaseForm = ({ onCancel }) => {
                         CANCEL
                       </Button>
                     </Grid>
-                    <Grid item>
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        sx={{
-                          background: '#053146',
-                          color: '#fff',
-                          px: 3
-                        }}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? 'Saving...' : 'Save Changes'}
-                      </Button>
-                    </Grid>
                   </Grid>
                 </Grid>
-              )}
+              )}{' '}
             </Box>
           </form>
         </Card>

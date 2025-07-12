@@ -1,11 +1,13 @@
 import React from 'react';
-import { Card, Grid, IconButton, Tooltip, Typography, InputBase } from '@mui/material';
+import { Card, Grid, IconButton, Tooltip, Typography, InputBase, Button, Menu, MenuItem } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
 import { useState, useEffect } from 'react';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import PersonIcon from '@mui/icons-material/Person';
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import { IconTrash } from '@tabler/icons';
+import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import dayjs from 'dayjs';
@@ -55,6 +57,17 @@ const List = () => {
     { value: 'Donation', label: 'Donation' },
     { value: 'Form', label: 'Form' }
   ];
+  const entityTypeMap = {
+    'Service user': 'service_user',
+    Volunteer: 'volunteer',
+    Service: 'services',
+    Case: 'cases',
+    Donor: 'donor',
+    'Mailing List': 'mailing_list',
+    Donation: 'donation',
+    Form: 'form'
+  };
+
   const handleConfirmUnarchive = async () => {
     try {
       await updateApi(`${urls.serviceuser.unarchive}/${selectedUser.id}`, { archive: false });
@@ -454,20 +467,20 @@ const List = () => {
                 loading={loading}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                checkboxSelection
                 onRowSelectionModelChange={(newSelection) => {
                   setSelectedIds(newSelection);
                 }}
                 slots={{
                   toolbar: () => (
                     <CustomHeader
-                      entityType="service_user"
+                      entityType={entityTypeMap[listType] || 'service_user'}
                       title={`${listType} List`}
                       selectedIds={selectedIds}
-                      enableBulkActions={true}
+                      enableBulkActions={false}
                       exportEnabled={true}
                       extraActions={null}
                       refetchData={fetchListData}
+                      isCompletlyDelete={true}
                     />
                   ),
                   loadingOverlay: () => (

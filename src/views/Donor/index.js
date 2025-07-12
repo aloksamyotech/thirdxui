@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, InputBase, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
@@ -13,18 +13,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 import CustomHeader from 'components/CustomHeader.js';
-
-const statusFilter = [
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' }
-];
-
-const dateAddedFilters = [
-  { value: 'today', label: 'Today' },
-  { value: 'week', label: 'Last 7 Days' },
-  { value: 'month', label: 'Last 30 Days' },
-  { value: 'year', label: 'Last 1 Year' }
-];
+import { dateAddedFilters, statusFilter } from 'common/constants.js';
 
 const Donor = () => {
   const navigate = useNavigate();
@@ -331,7 +320,7 @@ const Donor = () => {
               setCampaignFilter={setCampaignFilter}
               includeArchives={includeArchives}
               setIncludeArchives={setIncludeArchives}
-              selectedFilters={['statusFilter', 'dateOpenedFilter', 'campaignFilter']}
+              selectedFilters={['statusFilter', 'dateOpenedFilter']}
               customDateLabel="By Date"
               onReset={handleReset}
             />
@@ -348,7 +337,6 @@ const Donor = () => {
                         }))
                   }
                   columns={columns}
-                  checkboxSelection
                   rowCount={totalRows}
                   loading={loading}
                   pageSizeOptions={[5, 10, 25, 50]}
@@ -367,7 +355,7 @@ const Donor = () => {
                         entityType="donor"
                         title="Donor List"
                         selectedIds={selectedIds}
-                        enableBulkActions={true}
+                        enableBulkActions={false}
                         exportEnabled={true}
                         extraActions={null}
                         refetchData={fetchDonor}

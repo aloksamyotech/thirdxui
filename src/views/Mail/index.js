@@ -38,40 +38,6 @@ const Mail = () => {
     { value: 'follow-up', label: 'Follow-up' }
   ];
 
-  // const CustomHeader = () => {
-  //   return (
-  //     <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-  //       <GridToolbarContainer
-  //         sx={{
-  //           display: 'flex',
-  //           justifyContent: 'space-between',
-  //           alignItems: 'center',
-  //           backgroundColor: '#f5f5f5',
-  //           borderBottom: '1px solid #ddd',
-  //           width: '100%',
-  //           height: '100%',
-  //           padding: '0 12px'
-  //         }}
-  //       >
-  //         <Typography
-  //           variant="h6"
-  //           sx={{
-  //             fontWeight: '400',
-  //             color: '#333',
-  //             fontSize: '14px',
-  //             lineHeight: '36px'
-  //           }}
-  //         >
-  //           Mailing List
-  //         </Typography>
-  //         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-  //           <GridToolbarExport />
-  //         </Box>
-  //       </GridToolbarContainer>
-  //     </Box>
-  //   );
-  // };
-
   const columns = [
     {
       field: 'person',
@@ -344,7 +310,7 @@ const Mail = () => {
                       entityType="mailingList"
                       title="Mailing List"
                       selectedIds={selectedIds}
-                      enableBulkActions={true}
+                      enableBulkActions={false}
                       exportEnabled={true}
                       extraActions={null}
                       refetchData={fetchMails}

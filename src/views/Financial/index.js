@@ -85,7 +85,30 @@ const Financial = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => <Typography sx={{ color: 'green' }}>{params.value || '-'}</Typography>
+      renderCell: (params) => {
+        const rawValue = params.value;
+
+        const formatAmount = (amount) => {
+          if (!amount) return '-';
+
+          // Remove currency symbol if any
+          const numericValue = parseFloat(String(amount).replace(/[^0-9.]/g, ''));
+
+          if (isNaN(numericValue)) return '-';
+
+          if (numericValue >= 1_000_000_000) {
+            return `$${(numericValue / 1_000_000_000).toFixed(1)}B`;
+          } else if (numericValue >= 1_000_000) {
+            return `$${(numericValue / 1_000_000).toFixed(1)}M`;
+          } else if (numericValue >= 1_000) {
+            return `$${(numericValue / 1_000).toFixed(1)}K`;
+          }
+
+          return `$${numericValue}`;
+        };
+
+        return <Typography sx={{ color: 'green' }}>{formatAmount(rawValue)}</Typography>;
+      }
     },
     {
       field: 'more',
@@ -169,60 +192,55 @@ const Financial = () => {
     }
   }, [assignedTo, dateOpenedFilter, searchQuery, campaignName]);
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await getApi(
-          `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
-        );
-        const allTransaction = response?.data?.data || [];
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await getApi(
+        `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
+      );
+      const allTransaction = response?.data?.data || [];
 
-        const pagination = response?.data?.meta || { total: 0 };
+      const pagination = response?.data?.meta || { total: 0 };
 
-        const formattedTransactions = allTransaction?.map((item, index) => ({
-          id: item._id || index,
-          title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-          type:
-            [
-              item?.donorId?.personalInfo?.firstName,
-              item?.donorId?.personalInfo?.lastName,
-              item?.donorId?.companyInformation?.companyName
-            ] || '',
+      const formattedTransactions = allTransaction?.map((item, index) => ({
+        id: item._id || index,
+        title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+        type:
+          [item?.donorId?.personalInfo?.firstName, item?.donorId?.personalInfo?.lastName, item?.donorId?.companyInformation?.companyName] ||
+          '',
 
-          code: item.campaign?.name || item.campaign || '',
-          status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
-          more: item.transactionId || ''
-        }));
+        code: item.campaign?.name || item.campaign || '',
+        status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
+        more: item.transactionId || ''
+      }));
 
-        setRows(formattedTransactions);
+      setRows(formattedTransactions);
 
-        setTotalRows(pagination?.total);
-        const nameOptions = allTransaction
-          .filter((item) => item?.donorId)
-          .map((item) => {
-            const donor = item.donorId;
-            const hasPersonalInfo = donor?.personalInfo?.firstName || donor?.personalInfo?.lastName;
-            const label = hasPersonalInfo
-              ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
-              : donor.companyInformation?.companyName || '';
+      setTotalRows(pagination?.total);
+      const nameOptions = allTransaction
+        .filter((item) => item?.donorId)
+        .map((item) => {
+          const donor = item.donorId;
+          const hasPersonalInfo = donor?.personalInfo?.firstName || donor?.personalInfo?.lastName;
+          const label = hasPersonalInfo
+            ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
+            : donor.companyInformation?.companyName || '';
 
-            return {
-              value: donor._id || '',
-              label
-            };
-          })
-          .filter((option) => option.value && option.label);
+          return {
+            value: donor._id || '',
+            label
+          };
+        })
+        .filter((option) => option.value && option.label);
 
-        setNameFilters(nameOptions);
-      } catch (err) {
-        console.error('Failed to fetch data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setNameFilters(nameOptions);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-  
-
     fetchData();
   }, [paginationModel]);
 
@@ -361,7 +379,7 @@ const Financial = () => {
             campaigns={campaignTypeOptions}
             campaignFilter={campaignName}
             setCampaignFilter={(value) => setCampaignName(value)}
-            selectedFilters={['dateOpenedFilter', 'campaignFilter']}
+            selectedFilters={['dateOpenedFilter']}
             onReset={handleReset}
             customDateLabel="By Date"
           />
@@ -398,7 +416,7 @@ const Financial = () => {
                           entityType="donationTransaction"
                           title="Donation Transactions"
                           selectedIds={selectedIds}
-                          enableBulkActions={true}
+                          enableBulkActions={false}
                           exportEnabled={true}
                           extraActions={null}
                           refetchData={fetchData}

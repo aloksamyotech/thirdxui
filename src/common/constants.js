@@ -5,8 +5,10 @@ export const SUBROLES = {
 };
 
 export const ROLES = {
-  SERVICE_USER : 'service_user',
-  USER: 'user', 
-  DONOR:'donor',
+  SERVICE_USER: 'service_user',
+  USER: 'user',
+  DONOR: 'donor',
   VOLUNTEER: 'volunteer',
 }
+
+export const TagCategoryAppliedToOptions = ['Service Users', 'Staff', 'Volunteers', 'Donors'];

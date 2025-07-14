@@ -11,6 +11,30 @@ export const ROLES = {
   VOLUNTEER: 'volunteer'
 };
 
+export const entityTypeMap = {
+    'Service user': 'service_user',
+    Volunteer: 'volunteer',
+    Service: 'services',
+    Case: 'cases',
+    Donor: 'donor',
+    'Mailing List': 'mailing_list',
+    Donation: 'donation',
+    Form: 'form'
+  };
+export const sessionNames = [
+    { value: 'sessionA', label: 'Session A' },
+    { value: 'sessionB', label: 'Session B' }
+  ];
+export const listTypeFilter = [
+    { value: 'Service user', label: 'Service user' },
+    { value: 'Volunteer', label: 'Volunteer ' },
+    { value: 'Service', label: 'Service ' },
+    { value: 'Case', label: 'Case' },
+    { value: 'Donor', label: 'Donor' },
+    { value: 'Mailing List', label: 'Mailing List' },
+    { value: 'Donation', label: 'Donation' },
+    { value: 'Form', label: 'Form' }
+  ];
 export const ethnicityOptions = [
   'Arabic or North African',
   'Asian or Asian British – Indian',

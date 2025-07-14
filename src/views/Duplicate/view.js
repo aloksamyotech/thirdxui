@@ -4,15 +4,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import { Visibility } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-
 import { IconTrash } from '@tabler/icons';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import CustomHeader from 'components/CustomHeader';
 
 const Duplicate = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
-  const navigate = useNavigate();
-
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
@@ -64,57 +62,25 @@ const Duplicate = () => {
       field: 'select',
       headerName: 'View',
       flex: 1,
-      renderCell: () => (
-        <IconButton
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate('/view-duplicates');
-          }}
-        >
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <IconButton>
           <Visibility />
         </IconButton>
       )
     }
   ];
 
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '450',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Duplicate List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
-
   return (
     <>
       <Box>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
           <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+            <IconButton onClick={() => navigate('/services')}>
+              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+            </IconButton>
             Duplicates
           </Typography>
           <Box
@@ -131,13 +97,6 @@ const Duplicate = () => {
           >
             <InputBase
               placeholder="Search..."
-              // value={searchQuery}
-              // onChange={handleSearchChange}
-              // onKeyPress={(e) => {
-              //   if (e.key === 'Enter') {
-              //     handleFilter();
-              //   }
-              // }}
               sx={{
                 '& .MuiInputBase-input::placeholder': {
                   fontSize: '12 px',
@@ -181,7 +140,16 @@ const Duplicate = () => {
                 hideFooterPagination
                 hideFooter
                 components={{
-                  Toolbar: () => <CustomHeader />
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType="duplicates"
+                      title="Duplicates"
+                      selectedIds={selectedIds}
+                      enableBulkActions={false}
+                      exportEnabled={true}
+                      extraActions={null}
+                    />
+                  )
                 }}
                 sx={{
                   '& .MuiDataGrid-row': {

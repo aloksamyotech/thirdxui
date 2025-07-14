@@ -1,122 +1,123 @@
-import { Card, Grid, Typography } from '@mui/material';
-import { Box, Stack } from '@mui/system';
+import { Grid, Typography } from '@mui/material';
 import React from 'react';
-import lp from '../../assets/images/imgLp.png';
-import StarIcon from '@mui/icons-material/Star';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import BulkUploadInfoBox from './InfoBox';
+import BulkUploadActions from './BulkUploadActions';
+import FileUploadBox from './FileUploadBox';
+import UploadedHistory from './UploadedHistory';
+import Papa from 'papaparse';
+import ExcelJS from 'exceljs';
+import { useState } from 'react';
+import { urls } from 'common/urls';
+import { postApi } from 'common/apiClient';
+import toast from 'react-hot-toast';
 
-const BulkUpload = () => {
+const BulkUploadFile = () => {
+  const [uploadType, setUploadType] = useState('');
+
+  const handleFileUpload = async (file) => {
+    const fileType = file.name.split('.').pop();
+
+    if (fileType === 'csv') {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: ({ data }) => {
+          switch (uploadType) {
+            case 'services':
+              return validateAndUploadServices(data);
+            case 'cases':
+              return validateAndUploadCases(data);
+            default:
+              throw new Error('Unsupported upload target');
+          }
+        },
+        error: (err) => {
+          alert('CSV parsing failed');
+          console.error(err);
+        }
+      });
+    } else if (fileType === 'xlsx') {
+      const buffer = await file.arrayBuffer();
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(buffer);
+
+      const worksheet = workbook.worksheets[0];
+      const headers = worksheet.getRow(1).values.slice(1);
+      const data = [];
+
+      worksheet.eachRow((row, index) => {
+        if (index === 1) return;
+        const rowData = {};
+        headers.forEach((header, i) => {
+          rowData[header] = row.values[i + 1];
+        });
+        data.push(rowData);
+      });
+
+      switch (uploadType) {
+        // case 'services':
+        //     return validateAndUploadServices(data);
+        case 'cases':
+          return validateAndUploadCases(data);
+        default:
+          throw new Error('Unsupported upload target');
+      }
+    } else {
+      alert('Unsupported file format. Please upload .csv or .xlsx');
+    }
+  };
+
+  const validateAndUploadCases = async (rows) => {
+    const requiredFields = ['service_user', 'service', 'case_owner', 'case_open_date', 'case_closed_date'];
+    const errors = [];
+
+    rows.forEach((row, i) => {
+      requiredFields.forEach((field) => {
+        if (!row[field]) {
+          errors.push(`Row ${i + 2}: Missing ${field}`);
+        }
+      });
+    });
+
+    if (errors.length) {
+      console.error(errors);
+      alert('Validation failed. See console.');
+      return;
+    }
+
+    try {
+      const res = await postApi(urls.case.bulkUpload, rows);
+      if (res.success == true) {
+        toast.success('Successfully uploaded Case data');
+      }
+    } catch (error) {
+      console.log('error in cases bulkUpload===========>', error);
+      toast.error('Error uploading case data, make sure data is correct');
+    }
+  };
   return (
     <>
-      <Box
-        sx={{
-          bgcolor: '#fff',
-          minHeight: '50vh',
-          borderRadius: '10px',
-          padding: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          flexWrap: 'wrap'
-        }}
-      >
-        {[1, 2, 3].map((item) => (
-          <Box
-            key={item}
-            sx={{
-              width: 240,
-              height: 160,
-              border: '1px dotted #adadad',
-              borderRadius: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column',
-              gap: 1
-            }}
-          >
-            <PictureAsPdfIcon sx={{ fontSize: 20 }} />
-            <Typography textAlign="center">
-              Drag or <span style={{ textDecoration: 'underline', color: '#0c8ce9', cursor: 'pointer' }}>Upload a file</span>
-            </Typography>
-          </Box>
-        ))}
-      </Box>
-
-      <Typography sx={{ marginY: '20px' }}>or Update Template</Typography>
-      <Grid container spacing={2}>
-        <Grid item>
-          <Card sx={{ p: '20px', width: '400px', boxShadow: '1px 1px 2px #b3b3b3' }}>
-            <Stack direction="row">
-              <Stack>
-                <Box sx={{ height: '100px', width: '100px' }}>
-                  <img src={lp} alt="" height="100%" width="100%" style={{ objectFit: 'contain' }} />
-                </Box>
-              </Stack>
-              <Stack sx={{ ml: '10px' }}>
-                <Typography fontSize="17px">Data Preparation Template</Typography>
-                <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: '10px' }}>
-                  <Stack direction="row">
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#d8d8dd' }} />
-                  </Stack>
-                  <Stack>
-                    <Typography textAlign="end" sx={{ mt: '5px' }}>
-                      4 Star | 98 Reviews
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Typography sx={{ fontSize: '10px', mt: '10px' }}>
-                  Download this template to use when preparing your data for upload
-                </Typography>
-                <Typography color="secondary" sx={{ mt: '15px', cursor: 'pointer' }}>
-                  Download
-                </Typography>
-              </Stack>
-            </Stack>
-          </Card>
+      <Grid container spacing={1} p={2}>
+        <Grid item xs={12}>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+            Bulk Upload
+          </Typography>
         </Grid>
-        <Grid item>
-          <Card sx={{ p: '20px', width: '400px', boxShadow: '1px 1px 2px #b3b3b3' }}>
-            <Stack direction="row">
-              <Stack>
-                <Box sx={{ height: '100px', width: '100px' }}>
-                  <img src={lp} alt="" height="100%" width="100%" style={{ objectFit: 'contain' }} />
-                </Box>
-              </Stack>
-              <Stack sx={{ ml: '10px' }}>
-                <Typography fontSize="17px">Data Preparation Template</Typography>
-                <Stack direction="row" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: '10px' }}>
-                  <Stack direction="row">
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#fdb528' }} />
-                    <StarIcon fontSize="small" sx={{ color: '#d8d8dd' }} />
-                  </Stack>
-                  <Stack>
-                    <Typography textAlign="end" sx={{ mt: '5px' }}>
-                      4 Star | 98 Reviews
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Typography sx={{ fontSize: '10px', mt: '10px' }}>
-                  Download this template to use when preparing your data for upload
-                </Typography>
-                <Typography color="secondary" sx={{ mt: '15px', cursor: 'pointer' }}>
-                  Download
-                </Typography>
-              </Stack>
-            </Stack>
-          </Card>
+        <Grid item xs={12}>
+          <BulkUploadInfoBox />
         </Grid>
+        <Grid item xs={12}>
+          <BulkUploadActions uploadType={uploadType} setUploadType={setUploadType} />
+        </Grid>
+        <Grid item xs={12}>
+          <FileUploadBox onFileUpload={handleFileUpload} />
+        </Grid>
+        {/* <Grid item xs={12}>
+                    <UploadedHistory />
+                </Grid> */}
       </Grid>
     </>
   );
 };
 
-export default BulkUpload;
+export default BulkUploadFile;

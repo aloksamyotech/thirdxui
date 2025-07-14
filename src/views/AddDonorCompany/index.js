@@ -22,6 +22,8 @@ import {
 } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from '@mui/material/Link';
@@ -32,12 +34,22 @@ import dayjs from 'dayjs';
 import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
+import { stateStyles } from 'common/constants';
+const contactMethodInitial = {
+  donerTag: 0,
+  Email: 0,
+  Letter: 0,
+  SMS: 0,
+  Whatsapp: 0
+};
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [countryList, setCountryList] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const [contactMethodStates, setContactMethodStates] = useState(contactMethodInitial);
   const [isLoading, setIsloading] = useState(false);
   const fileInputRef = React.useRef(null);
   const [campaigns, setCampaigns] = useState([]);
@@ -54,6 +66,12 @@ const AddCaseForm = ({ onCancel }) => {
 
   const subRole = location?.state?.subRole;
   const editdata = location?.state || {};
+  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+    acc[curr._id] = 0;
+    return acc;
+  }, {});
+
+  const [purposeStates, setPurposeStates] = useState(initialPurposeStates || {});
 
   const {
     register,
@@ -92,7 +110,8 @@ const AddCaseForm = ({ onCancel }) => {
       referrerEmail: editdata?.referrer?.email || '',
       referrerPhone: editdata?.referrer?.phone || '',
       referralType: editdata?.referrer?.referralType || '',
-      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
+      donerTag: editdata?.contactPreferences?.contactMethods?.donerTag ?? true,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
       donortag: editdata?.contactPreferences?.contactMethods?.donortag ?? true,
@@ -172,6 +191,14 @@ const AddCaseForm = ({ onCancel }) => {
     };
     fetchTags();
   }, []);
+
+  const handleContactMethodClick = (label) => {
+    setContactMethodStates((prev) => {
+      const nextState = (prev[label] + 1) % 3;
+      setValue(label.toLowerCase(), nextState === 1);
+      return { ...prev, [label]: nextState };
+    });
+  };
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -270,10 +297,11 @@ const AddCaseForm = ({ onCancel }) => {
       fd.append('contactPreferences[preferredMethod]', data.preferredContact);
     }
 
-    if (data.contactPurpose) {
-      fd.append('contactPreferences[contactPurposes]', data.contactPurpose);
+    if (data.contactPurpose && Array.isArray(data.contactPurpose)) {
+      data.contactPurpose.forEach((id) => {
+        fd.append('contactPreferences[contactPurposes][]', id);
+      });
     }
-
     if (data.reason) {
       fd.append('contactPreferences[reason]', data.reason);
     }
@@ -282,7 +310,8 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[contactMethods][donortag]', data.donortag ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][telephone]', data.telephone ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donerTag]', data.donerTag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
 
     fd.append('companyInformation[companyName]', data.companyname || '');
@@ -333,42 +362,70 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
   const ukPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
-  // const handleTabChange = async (newValue) => {
-  //   if (newValue > tabIndex) {
-  //     const firstTabFields = [
-  //       'companyname',
-  //       'contactname',
-  //       'socialmedia',
-  //       'otherId',
-  //       'Recruitmentcampaign',
-  //       'Beneficiary',
-  //       'Campaigns',
-  //       'engagement',
-  //       'eventsAttended',
-  //       'fundingInterests',
-  //       'fundraisingActivities',
-  //       'riskNotes'
-  //     ];
-  //     const isValid = await trigger(firstTabFields);
-
-  //     if (isValid) {
-  //       setTabIndex(newValue);
-  //     } else {
-  //       toast.error('Please fill all required fields before proceeding');
-  //     }
-  //   } else {
-  //     setTabIndex(newValue);
-  //   }
-  // };
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
   };
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
+  const handlePurposeClick = (id) => {
+    setPurposeStates((prev) => {
+      const nextState = ((prev?.[id] || 0) + 1) % 3;
+      const updated = { ...prev, [id]: nextState };
+
+      const selected = Object.keys(updated).filter((key) => updated[key] === 1);
+
+      setValue('contactPurpose', selected);
+      setValue('contactPurposeStates', updated);
+      return updated;
+    });
+  };
+
+  const booleanToState = (value) => {
+    if (value === true) return 1;
+    if (value === false) return 2;
+    return 0;
+  };
+
+  useEffect(() => {
+    if (editdata) {
+      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+
+      setContactMethodStates({
+        donerTag: booleanToState(contactMethods?.donor),
+        Email: booleanToState(contactMethods?.email),
+        SMS: booleanToState(contactMethods?.sms),
+        Whatsapp: booleanToState(contactMethods?.whatsapp),
+        letter: booleanToState(contactMethods?.letter)
+      });
+    }
+  }, [editdata, reset]);
+
+  useEffect(() => {
+    if (contactpurpose?.length) {
+      const initStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = 0;
+        return acc;
+      }, {});
+      setPurposeStates(initStates);
+    }
+  }, [contactpurpose]);
 
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+            <IconButton onClick={() => navigate(-1)} size="small">
+              <ArrowBackIcon />
+            </IconButton>
             {location.state?.isEdit
               ? subRole === 'donar_company'
                 ? 'Edit Donor Company'
@@ -393,7 +450,7 @@ const AddCaseForm = ({ onCancel }) => {
               height: 32,
               cursor: 'pointer'
             }}
-            onClick={() => navigate('/donor')}
+            onClick={() => navigate(-1)}
           >
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
@@ -535,6 +592,11 @@ const AddCaseForm = ({ onCancel }) => {
                                     fullWidth
                                     label="Social Media Links"
                                     size="small"
+                                    InputProps={{
+                                      sx: {
+                                        height: 57
+                                      }
+                                    }}
                                     error={!!errors.socialmedia}
                                     helperText={errors.socialmedia?.message}
                                     {...field}
@@ -822,12 +884,6 @@ const AddCaseForm = ({ onCancel }) => {
                                   {...field}
                                 />
                               )}
-                            />{' '}
-                            <FormControlLabel
-                              control={<AntSwitch checked={restrictAccess} onChange={() => setRestrictAccess(!restrictAccess)} />}
-                              label="Restrict Access?"
-                              labelPlacement="start"
-                              sx={{ gap: 1 , mt:1}}
                             />
                           </Paper>
                         </Grid>
@@ -835,287 +891,203 @@ const AddCaseForm = ({ onCancel }) => {
                     </Box>
                   </Grid>
 
-                  <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+                  <Grid container spacing={2} alignItems="center" sx={{ mt: 1, pr: 2, pl: 2 }} justifyContent="space-between">
                     <Grid item>
-                      <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(1)}>
-                        Next
-                      </Button>
+                      <FormControlLabel
+                        control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                        label="Restrict Access?"
+                        labelPlacement="start"
+                        sx={{ gap: 1 }}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Grid container spacing={2}>
+                        <Grid item>
+                          <Button variant="contained" sx={{ background: '#053146' }} onClick={() => handleTabChange(tabIndex + 1)}>
+                            SAVE CHANGES
+                          </Button>
+                        </Grid>
+                        <Grid item>
+                          <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
+                            CANCEL
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </>
               )}
 
               {tabIndex === 1 && (
-                <>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={4}>
-                      <Controller
-                        name="preferredContact"
-                        control={control}
-                        // rules={{
-                        //   required: 'Preferred method of contact is required'
-                        // }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Preferred Method of Contact"
-                            select
-                            {...field}
-                            error={!!errors.preferredContact}
-                            helperText={errors.preferredContact?.message}
-                          >
-                            {contactmethod?.map((option) => (
-                              <MenuItem key={option._id} value={option._id}>
-                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        )}
-                      />
-                    </Grid>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Box
+                      sx={{
+                        border: '1px solid #ccc',
+                        borderRadius: 3,
+                        p: 2
+                      }}
+                    >
+                      <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+                        {Object.keys(contactMethodStates).map((label) => {
+                          const stateIndex = contactMethodStates[label];
+                          const { color, icon } = stateStyles[stateIndex];
 
-                    <Grid item xs={12} sm={4}>
-                      <Controller
-                        name="contactPurpose"
-                        control={control}
-                        // rules={{
-                        //   required: 'Contact purpose is required'
-                        // }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Contact Purposes"
-                            select
-                            {...field}
-                            error={!!errors.contactPurpose}
-                            helperText={errors.contactPurpose?.message}
-                          >
-                            {contactpurpose?.map((option) => (
-                              <MenuItem key={option._id} value={option._id}>
-                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        )}
-                      />
-                    </Grid>
+                          return (
+                            <Button
+                              key={label}
+                              variant="contained"
+                              onClick={() => handleContactMethodClick(label)}
+                              sx={{
+                                backgroundColor: color,
+                                '&:hover': {
+                                  backgroundColor: color
+                                },
+                                color: '#000',
+                                borderRadius: '8px',
+                                px: 2,
+                                minWidth: 165,
+                                display: 'flex',
+                                justifyContent: 'space-between'
+                              }}
+                            >
+                              {label}
+                              <span>{icon}</span>
+                            </Button>
+                          );
+                        })}
+                      </Box>
 
-                    <Grid item xs={12} sm={4}>
-                      <Controller
-                        name="confirmationDate"
-                        control={control}
-                        // rules={{
-                        //   required: 'Date is required'
-                        // }}
-                        render={({ field }) => (
-                          <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                              label="Date of Confirmation"
-                              value={field.value}
-                              onChange={(newValue) => field.onChange(newValue)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  fullWidth
-                                  size="small"
-                                  error={!!errors.confirmationDate}
-                                  helperText={errors.confirmationDate?.message}
+                      <Grid item xs={12} mb={2}>
+                        <Box>
+                          <Typography variant="subtitle2" mb={1}>
+                            Purpose
+                          </Typography>
+                          <Box display="flex" gap={2} flexWrap="wrap">
+                            {contactpurpose?.map((option) => {
+                              const stateIndex = purposeStates[option._id] || 0;
+                              const { color, icon } = stateStyles[stateIndex];
+
+                              return (
+                                <Button
+                                  key={option._id}
+                                  variant="contained"
+                                  onClick={() => handlePurposeClick(option._id)}
+                                  sx={{
+                                    backgroundColor: color,
+                                    '&:hover': {
+                                      backgroundColor: color
+                                    },
+                                    color: '#000',
+                                    borderRadius: '8px',
+                                    px: 2,
+                                    minWidth: 165,
+                                    display: 'flex',
+                                    justifyContent: 'space-between'
+                                  }}
+                                >
+                                  {option.name}
+                                  <span>{icon}</span>
+                                </Button>
+                              );
+                            })}
+                          </Box>
+                          {errors.contactPurpose && (
+                            <Typography variant="caption" color="error">
+                              {errors.contactPurpose.message}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <Typography variant="subtitle2" mb={1}>
+                            Details associated with confirmation
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                          <Controller
+                            name="confirmationDate"
+                            control={control}
+                            render={({ field }) => (
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                  label="Date of Confirmation"
+                                  value={field.value}
+                                  onChange={(newValue) => field.onChange(newValue)}
+                                  renderInput={(params) => (
+                                    <TextField
+                                      {...params}
+                                      fullWidth
+                                      size="small"
+                                      error={!!errors.confirmationDate}
+                                      helperText={errors.confirmationDate?.message}
+                                    />
+                                  )}
                                 />
-                              )}
-                            />
-                          </LocalizationProvider>
-                        )}
-                      />
-                    </Grid>
+                              </LocalizationProvider>
+                            )}
+                          />
+                        </Grid>
 
-                    <Grid item xs={12} sm={4}>
-                      <Controller
-                        name="reason"
-                        control={control}
-                        // rules={{
-                        //   required: 'Reason is required'
-                        // }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            label="Reason"
-                            size="small"
-                            select
-                            {...field}
-                            error={!!errors.reason}
-                            helperText={errors.reason?.message}
-                          >
-                            {reason?.map((option) => (
-                              <MenuItem key={option._id} value={option._id}>
-                                {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        )}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={4}>
-                      <Controller
-                        name="mobilePhone"
-                        control={control}
-                        rules={{
-                          // required: 'Phone number is required',
-                          pattern: {
-                            value: onlyNumbers,
-                            message: 'Phone number must contain only numbers'
-                          },
-                          minLength: {
-                            value: 10,
-                            message: 'Phone number must be at least 10 digits'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            label="Mobile Phone No."
-                            size="small"
-                            error={!!errors.mobilePhone}
-                            helperText={errors.mobilePhone?.message}
-                            type="tel"
-                            inputProps={{
-                              pattern: onlyNumbers.source,
-                              onKeyPress: (e) => {
-                                if (!onlyNumbers.test(e.key)) {
-                                  e.preventDefault();
-                                }
-                              }
-                            }}
-                            {...field}
+                        <Grid item xs={12} sm={6}>
+                          <Controller
+                            name="reason"
+                            control={control}
+                            rules={{ required: 'This field is required' }}
+                            render={({ field }) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                label="Reason"
+                                select
+                                {...field}
+                                error={!!errors.reason}
+                                helperText={errors.reason?.message}
+                              >
+                                {reason?.map((option) => (
+                                  <MenuItem key={option._id} value={option._id}>
+                                    {option.name}
+                                  </MenuItem>
+                                ))}
+                              </TextField>
+                            )}
                           />
-                        )}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={4}>
-                      <Controller
-                        name="email"
-                        control={control}
-                        rules={{
-                          // required: 'Email is required',
-                          pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: 'Invalid email address'
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            fullWidth
-                            label="Email"
-                            size="small"
-                            error={!!errors.email}
-                            helperText={errors.email?.message}
-                            {...field}
-                          />
-                        )}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={2}>
-                      <Controller
-                        name="donortag"
-                        control={control}
-                        defaultValue={false}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                            label="Donor Tag"
-                            labelPlacement="start"
-                            sx={{ display: 'flex', gap: '10px' }}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={2}>
-                      <Controller
-                        name="emailConsent"
-                        control={control}
-                        defaultValue={false}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                            label="Email"
-                            labelPlacement="start"
-                            sx={{ display: 'flex', gap: '10px' }}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={2}>
-                      <Controller
-                        name="sms"
-                        control={control}
-                        defaultValue={false}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                            label="SMS"
-                            labelPlacement="start"
-                            sx={{ display: 'flex', gap: '10px' }}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={2}>
-                      <Controller
-                        name="telephone"
-                        control={control}
-                        defaultValue={false}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                            label="Telephone"
-                            labelPlacement="start"
-                            sx={{ display: 'flex', gap: '10px' }}
-                          />
-                        )}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={2}>
-                      <Controller
-                        name="whatsapp"
-                        control={control}
-                        defaultValue={false}
-                        render={({ field }) => (
-                          <FormControlLabel
-                            control={<AntSwitch checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
-                            label="Whatsapp"
-                            labelPlacement="start"
-                            sx={{ display: 'flex', gap: '10px' }}
-                          />
-                        )}
-                      />
-                    </Grid>
+                        </Grid>
+                      </Grid>
+                    </Box>
                   </Grid>
 
-                  <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+                  <Grid container justifyContent="flex-end" spacing={2} sx={{ mt: 1, pr: 2 }}>
                     <Grid item>
                       <Button
+                        type="submit"
                         variant="contained"
-                        sx={{ background: '#053146' }}
+                        sx={{
+                          background: '#053146',
+                          color: '#fff',
+                          px: 3
+                        }}
                         disabled={isLoading}
-                        onClick={handleSubmit((data) => {
-                          onSubmit(data);
-                        })}
                       >
                         {isLoading ? 'Saving...' : 'SAVE CHANGES'}
                       </Button>
                     </Grid>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/donor')}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => navigate(-1)}
+                        sx={{
+                          borderColor: '#FF4D49',
+                          color: '#FF4D49'
+                        }}
+                      >
                         CANCEL
                       </Button>
                     </Grid>
                   </Grid>
-                </>
+                </Grid>
               )}
             </Box>
           </form>

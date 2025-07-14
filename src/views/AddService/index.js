@@ -12,26 +12,34 @@ import {
   Card,
   Typography,
   Autocomplete,
-  Chip
+  Chip,
+  IconButton
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { postApi, getApi } from 'common/apiClient';
+import { postApi, getApi, updateApi } from 'common/apiClient';
 import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
+import { useLocation } from 'react-router-dom';
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const serviceToEdit = location.state?.serviceId;
   const [restrictAccess, setRestrictAccess] = useState(true);
   const [isLoading, setIsloading] = useState(false);
   const [servicetype, setServiceType] = useState([]);
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [serviceData, setServiceData] = useState([]);
   const [benificiary, setBenificiary] = useState([]);
   const [Campaigns, setCampaigns] = useState([]);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
   const [engagement, setengagement] = useState([]);
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
@@ -80,6 +88,19 @@ const AddCaseForm = () => {
     fetchData();
   }, [searchQuery]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!serviceToEdit) return;
+        const response = await getApi(urls.service.getById.replace(':id', serviceToEdit));
+        setServiceData(response?.data?.userData);
+      } catch (error) {
+        console.error('Error fetching service:', error);
+      }
+    };
+    fetchData();
+  }, [serviceToEdit]);
+
   const {
     control,
     handleSubmit,
@@ -98,10 +119,32 @@ const AddCaseForm = () => {
       fundingInterests: [],
       fundraisingActivities: [],
       notes: '',
+      attachment: null,
       file: null,
       restrictAccess: false
     }
   });
+
+  useEffect(() => {
+    if (serviceToEdit && serviceData) {
+      setValue('name', serviceData?.name || '');
+      setValue('code', serviceData?.code || '');
+      setValue('serviceType', serviceData?.serviceType || '');
+
+      setValue('benificiary', serviceData?.benificiary || []);
+      setValue('Campaigns', serviceData?.campaigns || []);
+      setValue('engagement', serviceData?.engagement || []);
+      setValue('eventsAttended', serviceData?.eventAttanded || []);
+      setValue('fundingInterests', serviceData?.fundingInterest || []);
+      setValue('fundraisingActivities', serviceData?.fundraisingActivities || []);
+
+      setValue('notes', serviceData?.description || '');
+      setValue('attachment', serviceData?.attachment || null);
+      setValue('file', serviceData?.file || null);
+      setRestrictAccess(serviceData?.isActive || false);
+    }
+  }, [serviceData, serviceToEdit, setValue]);
+
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -174,6 +217,7 @@ const AddCaseForm = () => {
       formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
+
       (data.benificiary || []).forEach((id) => {
         formData.append('benificiary[]', id);
       });
@@ -197,26 +241,39 @@ const AddCaseForm = () => {
       (data.fundraisingActivities || []).forEach((id) => {
         formData.append('fundraisingActivities[]', id);
       });
+
       formData.append('description', data.notes || '');
       formData.append('isActive', restrictAccess || false);
+
+      if (data.attachment) {
+        formData.append('attachment', data.attachment);
+      }
       if (data.file) {
-        formData.append('file', data.file || '');
+        formData.append('file', data.file);
       }
 
-      const response = await postApi(urls.service.create, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      if (serviceToEdit) {
+        await updateApi(`${urls.service.editServices}${serviceToEdit}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        toast.success('Service updated successfully');
+      } else {
+        await postApi(urls.service.create, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
 
-      toast.success('Service added successfully');
+        toast.success('Service added successfully');
+      }
+
       navigate('/services');
-      setIsloading(false);
     } catch (error) {
-      toast.error('Error submitting service');
+      console.error('Error submitting form:', error);
+      toast.error('Service code already exists');
+    } finally {
       setIsloading(false);
     }
   };
+
   const selectList = serviceTypeOptions?.map((item, index) => ({
     id: item?._id,
     title: item?.name
@@ -225,7 +282,13 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6', p: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Adding New Service</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+          <IconButton onClick={() => navigate(-1)} size="small">
+            <ArrowBackIcon />
+          </IconButton>
+          {serviceToEdit ? 'Edit Service' : 'Adding New Service'}
+        </Typography>
+
         <Box
           sx={{
             display: 'flex',
@@ -237,7 +300,7 @@ const AddCaseForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/services')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -307,7 +370,7 @@ const AddCaseForm = () => {
                       return (
                         <Autocomplete
                           value={selectedUser}
-                          size='small'
+                          size="small"
                           disablePortal
                           options={selectList}
                           getOptionLabel={(options) => options?.title}
@@ -315,7 +378,8 @@ const AddCaseForm = () => {
                           onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
                           isOptionEqualToValue={(option, value) => option.id === value.id}
                           renderInput={(params) => <TextField {...params} label="Service Type" />}
-                        />)
+                        />
+                      );
                     }}
                   />
                 </Grid>
@@ -394,108 +458,172 @@ const AddCaseForm = () => {
 
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                  <Controller
-                    name="file"
-                    control={control}
-                    render={({ field }) => (
-                      <Box mb={2} display="flex" justifyContent="space-between">
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          value={field.value ? field.value.name : ''}
-                          placeholder="Attachments"
-                          InputProps={{
-                            readOnly: true,
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <AttachFileIcon fontSize="small" />
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                  <Link component="span">Upload a file</Link>
-                                  <input
-                                    type="file"
-                                    hidden
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                      const maxSizeInBytes = 25 * 1024 * 1024;
+                  <Grid container spacing={2}>
+                    {/* Attachments Field */}
+                    <Grid item xs={12} md={6}>
+                      <Controller
+                        name="attachment"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
+                            placeholder="Attachments"
+                            InputProps={{
+                              readOnly: true,
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <AttachFileIcon fontSize="small" />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                    <Link component="span">Upload</Link>
+                                    <input
+                                      type="file"
+                                      hidden
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                        const maxSizeInBytes = 25 * 1024 * 1024;
 
-                                      if (file) {
-                                        if (!allowedTypes.includes(file.type)) {
-                                          toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
-                                          e.target.value = null;
+                                        if (file) {
+                                          if (!allowedTypes.includes(file.type)) {
+                                            toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
+                                            e.target.value = null;
+                                            field.onChange(null);
+                                            return;
+                                          }
+
+                                          if (file.size > maxSizeInBytes) {
+                                            toast.error('File size must be less than or equal to 25MB.');
+                                            e.target.value = null;
+                                            field.onChange(null);
+                                            return;
+                                          }
+
+                                          field.onChange(file);
+                                        } else {
                                           field.onChange(null);
-                                          return;
                                         }
-
-                                        if (file.size > maxSizeInBytes) {
-                                          toast.error('File size must be less than or equal to 25MB.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        field.onChange(file);
-                                      } else {
-                                        field.onChange(null);
-                                      }
-                                    }}
-                                  />
-                                </Button>
-                              </InputAdornment>
-                            )
-                          }}
-                        />
-                      </Box>
-                    )}
-                  />
-
-                  <Controller
-                    name="notes"
-                    control={control}
-                    rules={{
-                      validate: (value) => {
-                        if (!value) return true;
-
-                        if (value.length < 12) {
-                          return 'Notes must be at least 10 characters long';
-                        }
-                        const wordCount = value.trim().split(/\s+/).length;
-                        if (wordCount > 500) {
-                          return 'Notes cannot exceed 500 words';
-                        }
-
-                        if (!/^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value)) {
-                          return 'Notes can only contain letters, numbers, and common punctuation';
-                        }
-                        return true;
-                      }
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Notes"
-                        multiline
-                        minRows={11}
-                        fullWidth
-                        variant="outlined"
-                        error={!!errors.notes}
-                        helperText={errors.notes?.message}
+                                      }}
+                                    />
+                                  </Button>
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        )}
                       />
-                    )}
-                  />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Controller
+                        name="file"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
+                            placeholder="Upload Image"
+                            InputProps={{
+                              readOnly: true,
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <InsertPhotoOutlinedIcon fontSize="small" />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                    <Link component="span">Upload</Link>
+                                    <input
+                                      type="file"
+                                      hidden
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                        const maxSizeInBytes = 25 * 1024 * 1024;
 
-                  <FormControlLabel
-                    control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
-                    label="Restrict Access?"
-                    labelPlacement="start"
-                    sx={{ gap: 1, mt: 1 }}
-                  />
+                                        if (file) {
+                                          if (!allowedTypes.includes(file.type)) {
+                                            toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
+                                            e.target.value = null;
+                                            field.onChange(null);
+                                            return;
+                                          }
+
+                                          if (file.size > maxSizeInBytes) {
+                                            toast.error('File size must be less than or equal to 25MB.');
+                                            e.target.value = null;
+                                            field.onChange(null);
+                                            return;
+                                          }
+
+                                          field.onChange(file);
+                                        } else {
+                                          field.onChange(null);
+                                        }
+                                      }}
+                                    />
+                                  </Button>
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    {/* Notes */}
+                    <Grid item xs={12}>
+                      <Controller
+                        name="notes"
+                        control={control}
+                        rules={{
+                          validate: (value) => {
+                            if (!value) return true;
+
+                            if (value.length < 12) return 'Notes must be at least 10 characters long';
+                            const wordCount = value.trim().split(/\s+/).length;
+                            if (wordCount > 500) return 'Notes cannot exceed 500 words';
+                            if (!/^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value))
+                              return 'Notes can only contain letters, numbers, and common punctuation';
+
+                            return true;
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Notes"
+                            multiline
+                            minRows={11}
+                            fullWidth
+                            variant="outlined"
+                            error={!!errors.notes}
+                            helperText={errors.notes?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+
+                    {/* Restrict Access Switch */}
+                    {/* <Grid item xs={12}>
+                      <FormControlLabel
+                        control={<AntSwitch checked={restrictAccess} onChange={handleToggle} />}
+                        label="Restrict Access?"
+                        labelPlacement="start"
+                        sx={{ gap: 1 }}
+                      />
+                    </Grid> */}
+                  </Grid>
                 </Paper>
               </Grid>
             </Grid>
@@ -507,7 +635,7 @@ const AddCaseForm = () => {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="outlined" color="error" onClick={() => navigate('/services')}>
+                <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                   CANCEL
                 </Button>
               </Grid>

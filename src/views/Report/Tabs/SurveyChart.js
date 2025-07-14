@@ -1,0 +1,86 @@
+import React, { useState, useEffect } from 'react';
+import { Box, Grid, Typography } from '@mui/material';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
+const Chart = () => {
+  const [riskLabels, setRiskLabels] = useState([]);
+  const [riskBarData, setRiskBarData] = useState([]);
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const [userRes, configRes] = await Promise.all([getApi(urls.serviceuser.getAllServicesUser), getApi(urls.configuration.fetch)]);
+
+        const attendees = userRes?.data?.allUser || [];
+
+        const keyIndicatorConfig = configRes?.data?.allConfiguration?.filter((item) => item.configurationType === 'Key Indicators') || [];
+
+        const idToNameMap = {};
+        keyIndicatorConfig.forEach((item) => {
+          idToNameMap[item._id] = item.name;
+        });
+
+        const idCountMap = {};
+        keyIndicatorConfig.forEach((item) => {
+          idCountMap[item._id] = 0;
+        });
+
+        attendees.forEach((user) => {
+          const selectedIndicators = user?.riskAssessment?.keyIndicators || [];
+          selectedIndicators.forEach((id) => {
+            if (Object.prototype.hasOwnProperty.call(idCountMap, id)) {
+              idCountMap[id]++;
+            }
+          });
+        });
+
+        const labels = [];
+        const counts = [];
+        keyIndicatorConfig.forEach((item) => {
+          labels.push(item.name);
+          counts.push(idCountMap[item._id] || 0);
+        });
+
+        setRiskLabels(labels);
+        setRiskBarData(counts);
+      } catch (err) {
+        console.error('Error fetching risk factor chart data:', err);
+      }
+    };
+
+    fetchChartData();
+  }, []);
+
+  return (
+    <Grid item xs={12}>
+      <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 1 }}>Cases by Risk Factors</Typography>
+      <Box
+        sx={{
+          backgroundColor: '#fff',
+          boxShadow: '0px 4px 10px rgba(0,0,0,0.05)',
+          borderRadius: '12px',
+          padding: '16px'
+        }}
+      >
+        <BarChart
+          layout="horizontal"
+          series={[
+            {
+              id: 'risk-series',
+              data: riskBarData,
+              color: '#0C3149',
+              barCategoryGapRatio: 0.5
+            }
+          ]}
+          xAxis={[{ id: 'x-axis', scaleType: 'linear', min: 0 }]}
+          yAxis={[{ id: 'y-axis', scaleType: 'band', data: riskLabels }]}
+          height={riskLabels.length * 50}
+          margin={{ top: 10, bottom: 40, left: 150, right: 20 }}
+        />
+      </Box>
+    </Grid>
+  );
+};
+
+export default Chart;

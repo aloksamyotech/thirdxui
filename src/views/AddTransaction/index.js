@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Grid, TextField, Card, CardContent, CardHeader, Tabs, Tab, Box, Typography, MenuItem, Button, Autocomplete } from '@mui/material';
+import { Grid, TextField, Card, Tabs, Tab, Box, Typography, MenuItem, Button, Autocomplete } from '@mui/material';
 import { FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
@@ -14,7 +14,9 @@ const AddCaseForm = ({ onCancel }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const fileInputRef = useRef(null);
   const [serviceType, setServiceType] = useState([]);
+  const [products, setProducts] = useState([]);
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
+  const [currency, setCurrency] = useState([]);
   const [donorData, setDonorData] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -64,6 +66,19 @@ const AddCaseForm = ({ onCancel }) => {
     fetchDonors();
   }, [searchQuery]);
 
+  const fetchData = async () => {
+    try {
+      const response = await getApi(urls.configuration.fetch);
+
+      const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
+      setServiceType(servicetypeoption);
+      const productsOption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Product');
+      setProducts(productsOption);
+    } catch (error) {
+      console.error('Error fetching config:', error);
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       const payload = {
@@ -74,30 +89,21 @@ const AddCaseForm = ({ onCancel }) => {
         processingCost: data.processingCost || '',
         currency: data.currency || '',
         receiptNumber: data.receiptNumber || '',
-        transactionId: data.transactionId || ''
+        transactionId: data.transactionId || '',
+        productId: data.product || null
       };
 
       const res = await postApi(urls.transaction.create, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
       toast.success('Transaction added successfully!');
-      navigate('/financial');
+      fetchData();
     } catch (error) {
       toast.error('Submission failed!');
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getApi(urls.configuration.fetch);
-
-        const servicetypeoption = response?.data?.allConfiguration?.filter((item) => item.configurationType === 'Payment Method');
-        setServiceType(servicetypeoption);
-      } catch (error) {
-        console.error('Error fetching config:', error);
-      }
-    };
     fetchData();
   }, []);
 
@@ -112,7 +118,13 @@ const AddCaseForm = ({ onCancel }) => {
             value: item._id,
             label: item.name
           }));
-
+        const currencyName = response?.data?.allConfiguration
+          ?.filter((item) => item.configurationType === 'Currency')
+          ?.map((item) => ({
+            value: item._id,
+            label: item.name
+          }));
+        setCurrency(currencyName);
         setCampaignTypeOptions(options);
       } catch (error) {
         console.error('Error fetching config:', error);
@@ -123,299 +135,333 @@ const AddCaseForm = ({ onCancel }) => {
 
   return (
     <Grid>
-      <Card sx={{ backgroundColor: '#eef2f6' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">Add Transaction</Typography>
-          <Box
+      <Card>
+        <Card
+          sx={{
+            padding: 3,
+            borderRadius: 3,
+            boxShadow: 'none',
+            backgroundColor: '#ffffff'
+          }}
+        >
+          <Tabs
+            value={tabIndex}
+            onChange={(e, newValue) => setTabIndex(newValue)}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'grey',
-              borderRadius: '50%',
-              width: 32,
-              height: 32,
-              cursor: 'pointer'
+              minHeight: 'auto',
+              borderBottom: '1px solid #e0e0e0',
+              mb: 2,
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: 14,
+                color: '#7b7b7b',
+                minHeight: 32,
+                px: 2
+              },
+              '& .Mui-selected': {
+                color: '#4a90e2'
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: '#4a90e2',
+                height: 3,
+                borderRadius: 2
+              }
             }}
-            onClick={() => navigate('/financial')}
           >
-            <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
-          </Box>
-        </Box>
-
-        <Card sx={{ padding: 2, marginTop: 2 }}>
-          <Tabs value={tabIndex} onChange={(e, newValue) => setTabIndex(newValue)} sx={{ borderBottom: '1px solid #4792d3' }}>
             <Tab label="Payment" />
-            {/* <Tab label="Allocation" /> */}
+            <Tab label="Allocation" />
           </Tabs>
 
           <Box component="form" mt={2} onSubmit={handleSubmit(onSubmit)}>
-            {tabIndex === 0 && (
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <Card sx={{ boxShadow: 1, borderRadius: 2, p: 0 }}>
-                    <CardContent>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <FormControl fullWidth size="small" error={!!errors.assignedTo}>
+            <Grid container spacing={2}>
+              {tabIndex === 0 && (
+                <Box sx={{ p: 2 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          borderRadius: 3,
+                          p: 2,
+                          border: '1px solid #e0e0e0'
+                        }}
+                      >
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth size="small" error={!!errors.assignedTo}>
+                              <Controller
+                                name="assignedTo"
+                                control={control}
+                                rules={{ required: 'Assigned To is required' }}
+                                render={({ field }) => (
+                                  <Autocomplete
+                                    {...field}
+                                    size="small"
+                                    options={donorData}
+                                    getOptionLabel={(option) => option.label || ''}
+                                    onChange={(event, value) => {
+                                      setValue('assignedTo', value ? value.value : '');
+                                    }}
+                                    onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        label="Assigned to"
+                                        error={!!errors.assignedTo}
+                                        helperText={errors.assignedTo?.message}
+                                      />
+                                    )}
+                                  />
+                                )}
+                              />
+                            </FormControl>
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
                             <Controller
-                              name="assignedTo"
+                              name="campaign"
                               control={control}
                               rules={{ required: 'Campaign is required' }}
                               render={({ field }) => (
-
-                                <Autocomplete
+                                <TextField
+                                  select
+                                  fullWidth
+                                  size="small"
+                                  label="Campaign"
                                   {...field}
-                                  size='small'
-                                  id="assigned-to"
-                                  options={donorData}
-                                  getOptionLabel={(option) => option.label}
-                                  onChange={(event, value) => {
-                                    setValue('assignedTo', value ? value.value : '');
-                                  }}
-                                  onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
-                                  renderInput={(params) => (
-                                    <TextField
-                                      {...params}
-                                      label="Assigned To"
-                                      error={!!errors.assignedTo}
-                                      helperText={errors.assignedTo?.message}
-                                    />
-                                  )}
-                                  defaultValue={null}
-                                />
+                                  error={!!errors.campaign}
+                                  helperText={errors.campaign?.message}
+                                >
+                                  {campaignTypeOptions.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </MenuItem>
+                                  ))}
+                                </TextField>
                               )}
                             />
-                          </FormControl>
-                        </Grid>
+                          </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                          <Controller
-                            name="campaign"
-                            control={control}
-                            rules={{ required: 'Campaign is required' }}
-                            render={({ field }) => (
-                              <TextField
-                                select
-                                fullWidth
-                                size="small"
-                                label="Campaign"
-                                {...field}
-                                error={!!errors.campaign}
-                                helperText={errors.campaign?.message}
-                              >
-                                {campaignTypeOptions.map((option) => (
-                                  <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Processing Costs"
+                              {...register('processingCost', {
+                                required: 'Only number required',
+                                pattern: {
+                                  value: /^[0-9]+$/,
+                                  message: 'Only numbers allowed'
+                                }
+                              })}
+                              onInput={(e) => {
+                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                              }}
+                              error={!!errors.processingCost}
+                              helperText={errors.processingCost?.message}
+                            />
+                          </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Processing Cost"
-                            {...register('processingCost', {
-                              required: 'only number Required',
-                              pattern: {
-                                value: /^[0-9]+$/,
-                                message: 'Only numbers allowed'
-                              }
-                            })}
-                            onInput={(e) => {
-                              e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                            }}
-                            error={!!errors.processingCost}
-                            helperText={errors.processingCost?.message}
-                          />
+                          <Grid item xs={12} sm={6}>
+                            <Controller
+                              name="currency"
+                              control={control}
+                              rules={{ required: 'Currency is required' }}
+                              render={({ field }) => (
+                                <TextField
+                                  select
+                                  fullWidth
+                                  size="small"
+                                  label="Currency"
+                                  {...field}
+                                  error={!!errors.currency}
+                                  helperText={errors.currency?.message}
+                                >
+                                  {currency.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </MenuItem>
+                                  ))}
+                                </TextField>
+                              )}
+                            />
+                          </Grid>
                         </Grid>
+                      </Box>
+                    </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                          <Controller
-                            name="currency"
-                            control={control}
-                            rules={{ required: 'Currency is required' }}
-                            render={({ field }) => (
-                              <TextField
-                                select
-                                fullWidth
-                                size="small"
-                                label="Currency"
-                                {...field}
-                                error={!!errors.currency}
-                                helperText={errors.currency?.message}
-                              >
-                                <MenuItem value="USD">USD</MenuItem>
-                                <MenuItem value="INR">INR</MenuItem>
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <Card sx={{ boxShadow: 1, borderRadius: 2, p: 0 }}>
-                    <CardContent>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Amount Paid"
-                            {...register('amountPaid', {
-                              required: ' only number Required',
-                              pattern: {
-                                value: /^[0-9]+$/,
-                                message: 'Only numbers allowed'
-                              }
-                            })}
-                            onInput={(e) => {
-                              e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                            }}
-                            error={!!errors.amountPaid}
-                            helperText={errors.amountPaid?.message}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <Controller
-                            name="paymentMethod"
-                            control={control}
-                            rules={{
-                              required: 'Payment Method is required'
-                            }}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                select
-                                fullWidth
-                                label="Payment Method"
-                                size="small"
-                                error={!!errors.paymentMethod}
-                                helperText={errors.paymentMethod?.message}
-                              >
-                                {serviceType?.map((option) => (
-                                  <MenuItem key={option._id} value={option._id}>
-                                    {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            )}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Receipt No."
-                            {...register('receiptNumber', {
-                              pattern: {
-                                value: /^[a-zA-Z0-9]*$/,
-                                message: 'Only alphanumeric characters allowed'
-                              },
-                              maxLength: {
-                                value: 40,
-                                message: 'Maximum 40 characters allowed'
-                              }
-                            })}
-                            error={!!errors.receiptNumber}
-                            helperText={errors.receiptNumber?.message}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            label="Transaction ID"
-                            {...register('transactionId', {
-                              pattern: {
-                                value: /^[a-zA-Z0-9]*$/,
-                                message: 'Only alphanumeric characters allowed'
-                              },
-                              maxLength: {
-                                value: 40,
-                                message: 'Maximum 40 characters allowed'
-                              }
-                            })}
-                            error={!!errors.transactionId}
-                            helperText={errors.transactionId?.message}
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            )}
-
-            {/* {tabIndex === 1 && (
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
-                  <Controller
-                    name="preferredContact"
-                    control={control}
-                    rules={{ required: 'Product is required' }}
-                    render={({ field }) => (
-                      <TextField
-                        select
-                        fullWidth
-                        size="small"
-                        label="Product"
-                        {...field}
-                        error={!!errors.preferredContact}
-                        helperText={errors.preferredContact?.message}
+                    <Grid item xs={12}>
+                      <Box
+                        sx={{
+                          borderRadius: 3,
+                          p: 2,
+                          border: '1px solid #e0e0e0'
+                        }}
                       >
-                        <MenuItem value="Dog Food">Dog Food</MenuItem>
-                        <MenuItem value="Cat Food">Cat Food</MenuItem>
-                      </TextField>
-                    )}
-                  />
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Amount Paid"
+                              {...register('amountPaid', {
+                                required: 'Only number required',
+                                pattern: {
+                                  value: /^[0-9]+$/,
+                                  message: 'Only numbers allowed'
+                                }
+                              })}
+                              onInput={(e) => {
+                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                              }}
+                              error={!!errors.amountPaid}
+                              helperText={errors.amountPaid?.message}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <Controller
+                              name="paymentMethod"
+                              control={control}
+                              rules={{ required: 'Payment Method is required' }}
+                              render={({ field }) => (
+                                <TextField
+                                  {...field}
+                                  select
+                                  fullWidth
+                                  label="Payment Method"
+                                  size="small"
+                                  error={!!errors.paymentMethod}
+                                  helperText={errors.paymentMethod?.message}
+                                >
+                                  {serviceType?.map((option) => (
+                                    <MenuItem key={option._id} value={option._id}>
+                                      {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                    </MenuItem>
+                                  ))}
+                                </TextField>
+                              )}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Receipt No."
+                              {...register('receiptNumber', {
+                                pattern: {
+                                  value: /^[a-zA-Z0-9]*$/,
+                                  message: 'Only alphanumeric characters allowed'
+                                },
+                                maxLength: {
+                                  value: 40,
+                                  message: 'Maximum 40 characters allowed'
+                                }
+                              })}
+                              error={!!errors.receiptNumber}
+                              helperText={errors.receiptNumber?.message}
+                            />
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Transaction ID"
+                              {...register('transactionId', {
+                                pattern: {
+                                  value: /^[a-zA-Z0-9]*$/,
+                                  message: 'Only alphanumeric characters allowed'
+                                },
+                                maxLength: {
+                                  value: 40,
+                                  message: 'Maximum 40 characters allowed'
+                                }
+                              })}
+                              error={!!errors.transactionId}
+                              helperText={errors.transactionId?.message}
+                            />
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+
+              {tabIndex === 1 && (
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 2,
+                      p: 2
+                    }}
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <Controller
+                          name="product"
+                          control={control}
+                          rules={{ required: 'Product is required' }}
+                          render={({ field }) => (
+                            <TextField
+                              {...field}
+                              select
+                              fullWidth
+                              label="Product"
+                              size="small"
+                              error={!!errors.product}
+                              helperText={errors.product?.message}
+                            >
+                              {products?.map((option) => (
+                                <MenuItem key={option._id} value={option._id}>
+                                  {option.name.charAt(0).toUpperCase() + option.name.slice(1)}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          )}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Quantity"
+                          {...register('contactPurpose', {
+                            required: 'Quantity is required',
+                            pattern: {
+                              value: /^[0-9]+$/,
+                              message: 'Only numbers allowed'
+                            }
+                          })}
+                          error={!!errors.contactPurpose}
+                          helperText={errors.contactPurpose?.message}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Amount Due"
+                          {...register('reason', {
+                            required: 'Amount Due is required',
+                            pattern: {
+                              value: /^[0-9]+$/,
+                              message: 'Only numbers allowed'
+                            }
+                          })}
+                          error={!!errors.reason}
+                          helperText={errors.reason?.message}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
                 </Grid>
- 
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Quantity"
-                    {...register('contactPurpose', {
-                      required: 'Quantity is required',
-                      pattern: {
-                        value: /^[0-9]+$/,
-                        message: 'Only numbers allowed'
-                      }
-                    })}
-                    error={!!errors.contactPurpose}
-                    helperText={errors.contactPurpose?.message}
-                  />
-                </Grid>
- 
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Amount Due"
-                    {...register('reason', {
-                      required: 'Amount Due is required',
-                      pattern: {
-                        value: /^[0-9]+$/,
-                        message: 'Only numbers allowed'
-                      }
-                    })}
-                    error={!!errors.reason}
-                    helperText={errors.reason?.message}
-                  />
-                </Grid>
-              </Grid>
-            )} */}
+              )}
+            </Grid>
 
             <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
               <Grid item>
@@ -424,7 +470,18 @@ const AddCaseForm = ({ onCancel }) => {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="outlined" color="error" onClick={() => navigate('/financial')}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    borderColor: '#a6a9ff',
+                    color: '#a6a9ff',
+                    '&:hover': {
+                      borderColor: '#a6a9ff',
+                      backgroundColor: '#f0f1ff'
+                    }
+                  }}
+                  onClick={onCancel}
+                >
                   CANCEL
                 </Button>
               </Grid>

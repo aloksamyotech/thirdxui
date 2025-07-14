@@ -9,6 +9,9 @@ import FilterPanel from 'components/FilterPanel.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import AddCaseForm from 'views/AddTransaction';
+import { Dialog } from '@mui/material';
+import CustomHeader from 'components/CustomHeader';
 
 const dateAddedFilters = [
   { value: 'today', label: 'Today' },
@@ -17,44 +20,13 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const CustomHeader = () => {
-  return (
-    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-      <GridToolbarContainer
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid #ddd',
-          width: '100%',
-          height: '100%',
-          padding: '0 12px'
-        }}
-      >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: '400',
-            color: '#333',
-            fontSize: '13px',
-            lineHeight: '36px'
-          }}
-        >
-          Donation Transactions
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <GridToolbarExport />
-        </Box>
-      </GridToolbarContainer>
-    </Box>
-  );
-};
-
 const Financial = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
   const [nameFilters, setNameFilters] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [campaign, setCampaignFilter] = useState('');
   const [user, setUser] = useState([]);
   const [assignedTo, setAssignedTo] = useState('');
@@ -71,6 +43,11 @@ const Financial = () => {
   const [campaignTypeOptions, setCampaignTypeOptions] = useState([]);
   const [donorOptions, setDonorOptions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const columns = [
     {
@@ -108,7 +85,30 @@ const Financial = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => <Typography sx={{ color: 'green' }}>{params.value || '-'}</Typography>
+      renderCell: (params) => {
+        const rawValue = params.value;
+
+        const formatAmount = (amount) => {
+          if (!amount) return '-';
+
+          // Remove currency symbol if any
+          const numericValue = parseFloat(String(amount).replace(/[^0-9.]/g, ''));
+
+          if (isNaN(numericValue)) return '-';
+
+          if (numericValue >= 1_000_000_000) {
+            return `$${(numericValue / 1_000_000_000).toFixed(1)}B`;
+          } else if (numericValue >= 1_000_000) {
+            return `$${(numericValue / 1_000_000).toFixed(1)}M`;
+          } else if (numericValue >= 1_000) {
+            return `$${(numericValue / 1_000).toFixed(1)}K`;
+          }
+
+          return `$${numericValue}`;
+        };
+
+        return <Typography sx={{ color: 'green' }}>{formatAmount(rawValue)}</Typography>;
+      }
     },
     {
       field: 'more',
@@ -192,59 +192,55 @@ const Financial = () => {
     }
   }, [assignedTo, dateOpenedFilter, searchQuery, campaignName]);
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await getApi(
+        `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
+      );
+      const allTransaction = response?.data?.data || [];
+
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formattedTransactions = allTransaction?.map((item, index) => ({
+        id: item._id || index,
+        title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+        type:
+          [item?.donorId?.personalInfo?.firstName, item?.donorId?.personalInfo?.lastName, item?.donorId?.companyInformation?.companyName] ||
+          '',
+
+        code: item.campaign?.name || item.campaign || '',
+        status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
+        more: item.transactionId || ''
+      }));
+
+      setRows(formattedTransactions);
+
+      setTotalRows(pagination?.total);
+      const nameOptions = allTransaction
+        .filter((item) => item?.donorId)
+        .map((item) => {
+          const donor = item.donorId;
+          const hasPersonalInfo = donor?.personalInfo?.firstName || donor?.personalInfo?.lastName;
+          const label = hasPersonalInfo
+            ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
+            : donor.companyInformation?.companyName || '';
+
+          return {
+            value: donor._id || '',
+            label
+          };
+        })
+        .filter((option) => option.value && option.label);
+
+      setNameFilters(nameOptions);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await getApi(
-          `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
-        );
-        const allTransaction = response?.data?.data || [];
-
-        const pagination = response?.data?.meta || { total: 0 };
-
-        const formattedTransactions = allTransaction?.map((item, index) => ({
-          id: item._id || index,
-          title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-          type:
-            [
-              item?.donorId?.personalInfo?.firstName,
-              item?.donorId?.personalInfo?.lastName,
-              item?.donorId?.companyInformation?.companyName
-            ] || '',
-
-          code: item.campaign?.name || item.campaign || '',
-          status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
-          more: item.transactionId || ''
-        }));
-
-        setRows(formattedTransactions);
-
-        setTotalRows(pagination?.total);
-        const nameOptions = allTransaction
-          .filter((item) => item?.donorId)
-          .map((item) => {
-            const donor = item.donorId;
-            const hasPersonalInfo = donor?.personalInfo?.firstName || donor?.personalInfo?.lastName;
-            const label = hasPersonalInfo
-              ? `${donor.personalInfo?.firstName || ''} ${donor.personalInfo?.lastName || ''}`.trim()
-              : donor.companyInformation?.companyName || '';
-
-            return {
-              value: donor._id || '',
-              label
-            };
-          })
-          .filter((option) => option.value && option.label);
-
-        setNameFilters(nameOptions);
-      } catch (err) {
-        console.error('Failed to fetch data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [paginationModel]);
 
@@ -289,10 +285,10 @@ const Financial = () => {
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
           <Tooltip title="Add" arrow>
             <IconButton
-              onClick={() => navigate('/add-transaction')}
+              onClick={handleOpen}
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
@@ -304,9 +300,9 @@ const Financial = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
+                padding: '22px',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                  color: '#ffffff'
+                  backgroundColor: '#009fc7'
                 }
               }}
             >
@@ -314,6 +310,9 @@ const Financial = () => {
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+            <AddCaseForm onCancel={handleClose} />
+          </Dialog>
 
           <Box
             sx={{
@@ -324,7 +323,7 @@ const Financial = () => {
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
               width: '489px',
-              height: '40px'
+              height: '45px'
             }}
           >
             <InputBase
@@ -380,9 +379,9 @@ const Financial = () => {
             campaigns={campaignTypeOptions}
             campaignFilter={campaignName}
             setCampaignFilter={(value) => setCampaignName(value)}
-            selectedFilters={['nameFilter', 'dateOpenedFilter', 'campaignFilter']}
+            selectedFilters={['dateOpenedFilter']}
             onReset={handleReset}
-            customDateLabel="Start Date"
+            customDateLabel="By Date"
           />
 
           <Grid item xs={9}>
@@ -407,9 +406,22 @@ const Financial = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
+                    onRowSelectionModelChange={(newSelection) => {
+                      setSelectedIds(newSelection);
+                    }}
                     pageSizeOptions={[5, 10, 25, 50]}
                     slots={{
-                      toolbar: () => <CustomHeader />,
+                      toolbar: () => (
+                        <CustomHeader
+                          entityType="donationTransaction"
+                          title="Donation Transactions"
+                          selectedIds={selectedIds}
+                          enableBulkActions={false}
+                          exportEnabled={true}
+                          extraActions={null}
+                          refetchData={fetchData}
+                        />
+                      ),
                       loadingOverlay: () => (
                         <Box
                           sx={{

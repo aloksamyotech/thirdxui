@@ -11,11 +11,14 @@ import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import CustomHeader from 'components/CustomHeader';
 
 const Mail = () => {
   const navigate = useNavigate();
   const [listName, setListName] = useState('');
   const [listFilters, setListFilters] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [tag, setTag] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
@@ -34,40 +37,6 @@ const Mail = () => {
     { value: 'urgent', label: 'Urgent' },
     { value: 'follow-up', label: 'Follow-up' }
   ];
-
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Mailing List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
 
   const columns = [
     {
@@ -221,7 +190,7 @@ const Mail = () => {
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
           <Tooltip title="Add" arrow>
             <IconButton
               onClick={() => navigate('/add-mail')}
@@ -236,9 +205,9 @@ const Mail = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
+                padding: '22px',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                  color: '#ffffff'
+                  backgroundColor: '#009fc7'
                 }
               }}
             >
@@ -255,7 +224,7 @@ const Mail = () => {
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
               width: '489px',
-              height: '40px'
+              height: '45px'
             }}
           >
             <InputBase
@@ -329,11 +298,24 @@ const Mail = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
+                onRowSelectionModelChange={(newSelection) => {
+                  setSelectedIds(newSelection);
+                }}
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 slots={{
-                  toolbar: () => <CustomHeader />,
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType="mailingList"
+                      title="Mailing List"
+                      selectedIds={selectedIds}
+                      enableBulkActions={false}
+                      exportEnabled={true}
+                      extraActions={null}
+                      refetchData={fetchMails}
+                    />
+                  ),
                   loadingOverlay: () => (
                     <Box
                       sx={{

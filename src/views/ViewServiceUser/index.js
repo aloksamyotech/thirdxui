@@ -41,6 +41,42 @@ import { urls } from 'common/urls';
 import { imageUrl } from 'common/urls';
 import './index.css';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+import TimelineActivity from 'components/TimelineActivity';
+
+const timelineData = [
+  {
+    date: '27 Nov 2024',
+    type: 'Survey completed',
+    color: 'error',
+    description: 'Mentee satisfaction form',
+    file: 'Invoices.pdf'
+  },
+  {
+    date: '27 Nov 2024',
+    type: 'Attended a session',
+    color: 'secondary',
+    description: 'Group work – Ether – Sammy Odoi - Soapbox',
+    avatars: ['/avatars/user1.png'],
+    sessionTitle: 'Create a new session',
+    members: '50 members in a sessions'
+  },
+  {
+    date: '27 Nov 2024',
+    type: 'Attended a session',
+    color: 'warning',
+    description: 'Group work – Ether – Sammy Odoi - Soapbox',
+    avatars: ['/avatars/user1.png', '/avatars/user2.png', '/avatars/user3.png'],
+    extraCount: 3,
+    sessionTitle: 'Create a new session',
+    members: '50 members in a sessions'
+  },
+  {
+    date: '27 Nov 2024',
+    type: 'Volunteering Activity',
+    color: 'primary',
+    description: 'Mentee satisfaction form'
+  }
+];
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -85,8 +121,7 @@ const UserProfileCard = () => {
       try {
         const response = await getApi(urls.tag.getAllTags);
         const allTags = response?.data?.allTags || [];
-        
-        
+
         const combinedData = [
           ...(userData?.otherInfo?.benificiary ?? []),
           ...(userData?.otherInfo?.campaigns ?? []),
@@ -96,7 +131,6 @@ const UserProfileCard = () => {
           ...(userData?.otherInfo?.fundraisingActivities ?? [])
         ];
 
-        
         const allIds = combinedData.map((item) => {
           const id = typeof item === 'object' && item !== null ? item._id : item;
           if (!id) {
@@ -105,10 +139,8 @@ const UserProfileCard = () => {
           return id;
         });
 
-        
         const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
 
-        
         const grouped = {};
         relatedTags.forEach((tag) => {
           const category = tag.tagCategoryName || 'Uncategorized';
@@ -116,7 +148,6 @@ const UserProfileCard = () => {
           grouped[category].push(tag.name);
         });
 
-      
         const formatted = Object.entries(grouped).map(([category, tags]) => ({
           category,
           tags
@@ -131,7 +162,7 @@ const UserProfileCard = () => {
     if (userData?.otherInfo) {
       fetchAndGroupTags();
     } else {
-      console.log('⛔ userData.otherInfo not found, skipping tag fetch.');
+      console.warn('⛔ userData.otherInfo not found, skipping tag fetch.');
     }
   }, [userData]);
   const createdAt = userData?.createdAt;
@@ -147,6 +178,7 @@ const UserProfileCard = () => {
   const emergencyContact = userData?.emergencyContact || {};
   const contactPreferences = userData?.contactPreferences || {};
   const otherInfo = userData?.otherInfo || {};
+  const service = userData?.Service || [];
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -197,20 +229,21 @@ const UserProfileCard = () => {
     : '';
 
   const handleBackClick = () => {
-    if (location.state?.isArchive) {
-      navigate('/archives');
-    } else if (userData?.role === 'volunteer') {
-      navigate('/volunteer');
-    } else {
-      navigate('/people');
-    }
+    navigate(-1);
+    // if (location.state?.isArchive) {
+    //   navigate('/archives');
+    // } else if (userData?.role === 'volunteer') {
+    //   navigate('/volunteer');
+    // } else {
+    //   navigate('/people');
+    // }
   };
 
   return (
     <>
       <Grid item xs={12}>
         <Stack direction="row" alignItems="center">
-          <Typography fontWeight="bold" display="flex" alignItems="center">
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
             <IconButton onClick={handleBackClick}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
@@ -282,7 +315,17 @@ const UserProfileCard = () => {
                     <Button
                       variant="contained"
                       onClick={handleClick}
-                      sx={{ mb: 1, borderRadius: '6px', width: '35%', height: 'auto', fontSize: '10px', backgroundColor: '#009fc7' }}
+                      sx={{
+                        mb: 1,
+                        borderRadius: '6px',
+                        width: '35%',
+                        height: 'auto',
+                        fontSize: '10px',
+                        backgroundColor: '#009fc7',
+                        '&:hover': {
+                          backgroundColor: '#009fc7'
+                        }
+                      }}
                     >
                       MANAGE
                     </Button>
@@ -335,40 +378,53 @@ const UserProfileCard = () => {
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={300} />
                     ) : (
                       <CardContent>
-                        <Typography variant="h5" fontWeight="600" gutterBottom mb={1}>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1
+                          }}
+                          gutterBottom
+                        >
                           ABOUT
                         </Typography>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={5}>
                           <Grid item xs={6}>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>
-                                <Typography component="span" className="text">{`${personalInfo?.firstName ?? ''} ${
-                                  personalInfo?.lastName ?? ''
-                                }`}</Typography>
+                                <Typography component="span" className="text" marginLeft={1}>
+                                  {`${personalInfo?.firstName ?? ''} ${personalInfo?.lastName ?? ''}`}
+                                </Typography>
                               </Typography>
                             </Box>{' '}
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
-                                <span>User ID:</span> <Typography component="span" className="text">{`${uniqueid ?? ''}`}</Typography>
+                                <span>User ID:</span>{' '}
+                                <Typography marginLeft={1} component="span" className="text">{`${uniqueid ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Ethnicity:</span>{' '}
-                                <Typography component="span" className="text">{`${personalInfo?.ethnicity ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  personalInfo?.ethnicity ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Language:</span>{' '}
-                                <Typography component="span" className="text">{`${contactInfo?.firstLanguage ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  contactInfo?.firstLanguage ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Contact:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${contactInfo?.phone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -376,7 +432,9 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Address:</span>{' '}
-                                <Typography component="span" className="text">{`${contactInfo?.addressLine1 ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  contactInfo?.addressLine1 ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -385,13 +443,13 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Gender:</span>{' '}
-                                <Typography component="span" className="text">{`${personalInfo?.gender ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${personalInfo?.gender ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>DOB:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {personalInfo?.dateOfBirth ? new Date(personalInfo.dateOfBirth).toLocaleDateString('en-GB') : ''}
                                 </Typography>
                               </Typography>
@@ -400,7 +458,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Age:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {personalInfo?.dateOfBirth
                                     ? Math.floor((new Date() - new Date(personalInfo.dateOfBirth)) / (365.25 * 24 * 60 * 60 * 1000))
                                     : ''}
@@ -410,13 +468,14 @@ const UserProfileCard = () => {
 
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
-                                <span>Alternative Id:</span> <Typography component="span" fontSize="12px">{`${uniqueid ?? ''}`}</Typography>
+                                <span>Alternative Id:</span>{' '}
+                                <Typography marginLeft={1} component="span" fontSize="12px">{`${uniqueid ?? ''}`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Telephone no:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${contactInfo?.homePhone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -440,53 +499,67 @@ const UserProfileCard = () => {
                           overflowY: 'auto'
                         }}
                       >
-                        <Typography variant="h6" fontWeight={600} gutterBottom>
-                          Risk Assessment
-                        </Typography>
+                        {userData?.role === 'volunteer' || (
+                          <>
+                            <Typography
+                              sx={{
+                                fontWeight: 500,
+                                fontSize: '14px',
+                                color: '#053146',
+                                mb: 1
+                              }}
+                              gutterBottom
+                            >
+                              Risk Assessment
+                            </Typography>
 
-                        <Typography variant="body2" color="textSecondary" mb={2} className="text">
-                          {otherInfo?.description ?? 'No description available.'}
-                        </Typography>
+                            <Typography variant="body2" color="textSecondary" mb={2} className="text">
+                              {otherInfo?.description ?? 'No description available.'}
+                            </Typography>
 
-                        <Typography variant="subtitle1" sx={{ color: '#009fc7', mb: 1 }} className="text">
-                          Key Indicator Concern
-                        </Typography>
+                            {userData?.riskAssessment?.keyIndicators.length === 0 ? (
+                              <Typography variant="body2" color="textSecondary">
+                                No Keys found.
+                              </Typography>
+                            ) : (
+                              <Box sx={{ bgcolor: '#F7F7F7', p: 1, marginRight: 2, borderRadius: 2 }}>
+                                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                  Key Indicator Concern
+                                </Typography>
 
-                        <Grid container spacing={1}>
-                          {[
-                            'Attendance and Engagement',
-                            'Poor school',
-                            'Learning disability',
-                            'Subtractive Mixture',
-                            'Learning disability'
-                          ].map((label, index) => (
-                            <Grid item key={index}>
-                              <Chip
-                                label={label}
-                                onDelete={() => {}}
-                                deleteIcon={
-                                  <CancelIcon
-                                    sx={{
-                                      fontSize: 16,
-                                      color: '#666'
-                                    }}
-                                  />
-                                }
-                                sx={{
-                                  bgcolor: '#009FC7',
-                                  color: '#fff',
-                                  fontSize: '12px',
-                                  fontWeight: 400,
-                                  borderRadius: '20px',
-                                  height: 28,
-                                  '& .MuiChip-deleteIcon': {
-                                    marginLeft: '4px'
-                                  }
-                                }}
-                              />
-                            </Grid>
-                          ))}
-                        </Grid>
+                                <Grid container spacing={1}>
+                                  {userData?.riskAssessment?.keyIndicators?.map((label, index) => (
+                                    <Grid item key={index}>
+                                      <Chip
+                                        label={label?.name}
+                                        onDelete={() => {}}
+                                        deleteIcon={
+                                          <CancelIcon
+                                            sx={{
+                                              fontSize: 16,
+                                              color: '#666'
+                                            }}
+                                          />
+                                        }
+                                        sx={{
+                                          bgcolor: '#009FC7',
+                                          color: '#fff',
+                                          fontSize: '12px',
+                                          fontWeight: 400,
+                                          borderRadius: '20px',
+                                          height: 28,
+                                          '& .MuiChip-deleteIcon': {
+                                            marginLeft: '4px'
+                                          }
+                                        }}
+                                      />
+                                    </Grid>
+                                  ))}
+                                </Grid>
+                              </Box>
+                            )}
+                          </>
+                        )}
 
                         <Box display="flex" alignItems="center" mb={1} mt={2}>
                           <Typography variant="subtitle1" sx={{ color: '#009fc7' }} className="text">
@@ -506,15 +579,13 @@ const UserProfileCard = () => {
                                 mb={2}
                                 p={2}
                                 sx={{
-                                  backgroundColor: '#f5f5f5',
-                                  borderRadius: 1,
+                                  backgroundColor: '#F7F7F7',
+                                  borderRadius: 2,
                                   width: '100%'
                                 }}
                               >
                                 <Box display="flex" alignItems="center" mb={1}>
-                                  <Typography variant="subtitle2" fontWeight={600}>
-                                    {group.category}
-                                  </Typography>
+                                  <Typography sx={{ fontSize: '12px', fontWeight: '500' }}>{group.category}</Typography>
                                 </Box>
 
                                 <Box display="flex" flexWrap="wrap" gap={1}>
@@ -558,7 +629,15 @@ const UserProfileCard = () => {
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
                     ) : (
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight="600" gutterBottom mb={1}>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1
+                          }}
+                          gutterBottom
+                        >
                           Next of Kin Details
                         </Typography>
                         <Grid container spacing={2}>
@@ -566,7 +645,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Full Name:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${
+                                <Typography marginLeft={1} component="span" className="text">{`${emergencyContact?.firstName ?? ''} ${
                                   emergencyContact?.lastName ?? ''
                                 }`}</Typography>
                               </Typography>
@@ -574,19 +653,25 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Gender:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.gender ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  emergencyContact?.gender ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Relationship to Service User:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.relationshipToUser ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  emergencyContact?.relationshipToUser ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Address:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.addressLine1 ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  emergencyContact?.addressLine1 ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -595,7 +680,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Home no:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${emergencyContact?.homePhone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -603,7 +688,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Mobile no:</span>{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   +{`${emergencyContact?.phone ?? ''}`}
                                 </Typography>
                               </Typography>
@@ -611,7 +696,9 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography variant="body1" className="heading">
                                 <span>Email:</span>{' '}
-                                <Typography component="span" className="text">{`${emergencyContact?.email ?? ''}`}</Typography>
+                                <Typography marginLeft={1} component="span" className="text">{`${
+                                  emergencyContact?.email ?? ''
+                                }`}</Typography>
                               </Typography>
                             </Box>
                           </Grid>
@@ -627,7 +714,15 @@ const UserProfileCard = () => {
                       <SectionSkeleton lines={1} variant="rectangular" width="100%" height={200} />
                     ) : (
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight="600" color="#042E4C" gutterBottom mb={1}>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1
+                          }}
+                          gutterBottom
+                        >
                           Contact Preferences
                         </Typography>
                         <Grid container spacing={2}>
@@ -635,7 +730,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Email:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.email ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -643,7 +738,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Telephone:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.telephone ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -651,7 +746,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 SMS:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.sms ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -659,7 +754,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Letter:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactMethods?.letter ? 'Yes' : 'No'}
                                 </Typography>
                               </Typography>
@@ -670,7 +765,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Reason:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.reason?.name || '-'}
                                 </Typography>
                               </Typography>
@@ -678,7 +773,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Contact purposes:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.contactPurposes?.name || '-'}
                                 </Typography>
                               </Typography>
@@ -686,7 +781,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Preferred Method of Contact:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.preferredMethod?.name || '-'}
                                 </Typography>
                               </Typography>
@@ -694,7 +789,7 @@ const UserProfileCard = () => {
                             <Box display="flex" alignItems="center" mb={1}>
                               <Typography className="heading" variant="body1">
                                 Date of confirmation:{' '}
-                                <Typography component="span" className="text">
+                                <Typography marginLeft={1} component="span" className="text">
                                   {contactPreferences?.dateOfConfirmation
                                     ? new Date(contactPreferences?.dateOfConfirmation).toLocaleDateString('en-GB')
                                     : '-'}
@@ -707,6 +802,132 @@ const UserProfileCard = () => {
                     )}
                   </Card>
                 </Grid>
+
+                {service.map((item, index) => (
+                  <Grid item xs={12} md={6} key={item._id || index}>
+                    <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '300px' }}>
+                      {' '}
+                      <CardContent>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1
+                          }}
+                          gutterBottom
+                        >
+                          Service Details
+                        </Typography>
+
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Service Name:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.serviceName?.name}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Start Date:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {new Date(item?.startDate).toLocaleDateString('en-GB')}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Last Date:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {new Date(item?.lastDate).toLocaleDateString('en-GB')}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Emergency Phone:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.emergencyPhone}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Emergency Email:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.emergencyEmail}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
+
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Name:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerName}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Job Title:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerJob}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Phone:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerPhone}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Email:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerEmail}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referral Type:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referralType}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referred Date:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {new Date(item?.referredDate).toLocaleDateString('en-GB')}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
             )}
 
@@ -714,7 +935,7 @@ const UserProfileCard = () => {
               <Grid container spacing={2} p={2}>
                 <Grid item xs={12}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} gap={2}>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography fontWeight="600" fontSize="16px">
                       Activity Timeline
                     </Typography>
 
@@ -723,7 +944,12 @@ const UserProfileCard = () => {
                         variant="contained"
                         size="small"
                         onClick={() => setAddItemOpen(true)}
-                        sx={{ backgroundColor: '#009fc7' }}
+                        sx={{
+                          backgroundColor: '#009fc7',
+                          '&:hover': {
+                            backgroundColor: '#009fc7'
+                          }
+                        }}
                         endIcon={<AddIcon />}
                       >
                         Add Item
@@ -746,64 +972,7 @@ const UserProfileCard = () => {
                 />
 
                 <Grid item xs={9}>
-                  <Card>
-                    <Timeline position="alternate">
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-03-01</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="error" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Survey Completed</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Mentee Satisfaction Form
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-02-20</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="secondary" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Attended a Session</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Leadership Training Workshop
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-02-20</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="warning" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Attended a Session</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Leadership Training Workshop
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-01-15</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="primary" />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Volunteering Activity</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Mentee Satisfaction Form
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </Timeline>
-                  </Card>
+                  <TimelineActivity timelineData={timelineData} />
                 </Grid>
 
                 <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />

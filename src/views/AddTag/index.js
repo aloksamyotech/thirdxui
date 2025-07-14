@@ -17,18 +17,17 @@ import {
   InputLabel,
   Select,
   OutlinedInput,
-  InputBase,
   Chip,
-  MenuItem
+  MenuItem,
+  Tooltip
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
 import AntSwitch from 'components/AntSwitch.js';
 import AddIcon from '@mui/icons-material/Add';
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import { useNavigate } from 'react-router-dom';
+import { DataGrid, GridToolbarContainer } from '@mui/x-data-grid';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { postApi, getApi, updateApi } from 'common/apiClient';
@@ -36,13 +35,12 @@ import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { useEffect } from 'react';
 import { GridToolbarQuickFilter } from '@mui/x-data-grid';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { TagCategoryAppliedToOptions } from 'common/constants';
 
 const TagForm = () => {
   const navigate = useNavigate();
-  const [description, setDescription] = useState('');
-  const [tags, setTags] = useState([]);
   const [filteredTags, setFilteredTags] = useState([]);
-  const [toggle, setToggle] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsloading] = useState(true);
@@ -51,8 +49,47 @@ const TagForm = () => {
     pageSize: 10
   });
   const [totalRows, setTotalRows] = useState(0);
-
   const [tagName, setTagName] = useState('');
+
+  const [categoryData, setCategoryData] = useState({
+    name: '',
+    appliedTo: [],
+    isActive: true
+  });
+
+  const location = useLocation();
+  const { id } = location.state || {};
+
+  const fetchTagCategoryData = async () => {
+    try {
+      const res = await getApi(`${urls.tagCategory.getById}/${id}`);
+      const data = {
+        name: res.data?.tagCategoryData?.name,
+        appliedTo: res.data?.tagCategoryData?.appliedTo,
+        isActive: res.data?.tagCategoryData?.isActive
+      };
+      setCategoryData(data);
+    } catch (error) {
+      console.log("Error===>", error);
+    }
+  }
+
+  const handleEdit = async () => {
+    try {
+      const res = await updateApi(`${urls.tagCategory.editTagCategory}/${id}`, categoryData);
+      if (res.success == true) {
+        toast.success('Tag created successfully');
+      } else {
+        toast.error('Something went wrong');
+      }
+    } catch (error) {
+      toast.error('Internal server error');
+    }
+  }
+
+  useEffect(() => {
+    if (id) fetchTagCategoryData();
+  }, [id]);
 
   const {
     control,
@@ -63,9 +100,8 @@ const TagForm = () => {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      tagDescription: '',
-      tagCategoryName: '',
       name: '',
+      tagCategoryId: id,
       startDate: null,
       endDate: null,
       note: ''
@@ -76,26 +112,21 @@ const TagForm = () => {
     try {
       const response = await postApi(urls.tag.create, data);
       toast.success('Tag created successfully');
-
       setIsModalOpen(false);
       reset();
     } catch (error) {
-      console.error('Error creating tag:', error);
+      toast.error('Internal server error, Try again');
     } finally {
       setIsloading(false);
     }
   };
 
-  const handleTagChange = async (selectedTagCategory) => {
-    setTagName(selectedTagCategory);
-  };
   const fetchTags = async () => {
     setIsloading(true);
     try {
-      const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}&categoryId=${id}`);
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
-      setTags(allTags);
       setFilteredTags(allTags);
       setTotalRows(pagination?.total);
     } catch (error) {
@@ -128,7 +159,6 @@ const TagForm = () => {
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
-      setTags(allTags);
       setFilteredTags(allTags);
       setTotalRows(pagination?.total);
     } catch (error) {
@@ -136,10 +166,6 @@ const TagForm = () => {
     } finally {
       setIsloading(false);
     }
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
   };
 
   useEffect(() => {
@@ -162,7 +188,7 @@ const TagForm = () => {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Configuration', flex: 1 },
+    { field: 'name', headerName: 'Tag Name', flex: 1 },
     {
       field: 'isActive',
       headerName: 'Status',
@@ -176,15 +202,6 @@ const TagForm = () => {
         return <AntSwitch defaultChecked={params.value} color="primary" onChange={handleToggle} />;
       }
     }
-  ];
-
-  const categoryOptions = [
-    'Beneficiary Information',
-    'Campaigns Supported',
-    'Engagement',
-    'Event Attended',
-    'Funding Interests',
-    'Fundraising Activities'
   ];
 
   const CustomHeader = () => {
@@ -268,49 +285,70 @@ const TagForm = () => {
   return (
     <Grid>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" sx={{ fontWeight: '450', color: '#333' }}>
-          Add Tag Category
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          <IconButton onClick={() => navigate(-1)}>
+            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+          </IconButton>
+          Edit Tag Category
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'grey',
-            borderRadius: '50%',
-            width: 32,
-            height: 32,
-            cursor: 'pointer'
-          }}
-          onClick={() => navigate('/tags')}
-        >
-          <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
-        </Box>
       </Box>
 
       <Card sx={{ position: 'relative', p: 2, mt: 2 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={6}>
-            <Controller
-              name="tagDescription"
-              control={control}
-              rules={{ required: 'Tag Description is required' }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Description"
-                  size="small"
-                  error={!!errors.tagDescription}
-                  helperText={errors.tagDescription?.message}
-                />
-              )}
+            <TextField
+              fullWidth
+              label="Category Name"
+              size="medium"
+              value={categoryData.name}
+              onChange={(e) =>
+                setCategoryData((prev) => ({ ...prev, name: e.target.value }))
+              }
             />
           </Grid>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Tags can be applied to</InputLabel>
+              <Select
+                multiple
+                value={categoryData.appliedTo}
+                onChange={(e) =>
+                  setCategoryData((prev) => ({ ...prev, appliedTo: e.target.value }))
+                }
+                input={<OutlinedInput label="Tags can be applied to" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {TagCategoryAppliedToOptions.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
             <FormControlLabel
-              control={<AntSwitch checked={toggle} onChange={() => setToggle(!toggle)} color="primary" />}
+              control={
+                <AntSwitch
+                  checked={categoryData.isActive}
+                  onChange={(e) =>
+                    setCategoryData((prev) => ({
+                      ...prev,
+                      isActive: e.target.checked
+                    }))
+                  }
+                  color="primary"
+                  size="medium"
+                />
+              }
               label="Active?"
               labelPlacement="start"
               sx={{
@@ -320,132 +358,144 @@ const TagForm = () => {
               }}
             />
           </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Controller
-              name="tagCategoryName"
-              control={control}
-              rules={{ required: 'Tag Category is required' }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  select
-                  fullWidth
-                  label="Tags can be applied to"
-                  size="small"
-                  error={!!errors.tagCategoryName}
-                  helperText={errors.tagCategoryName?.message}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    handleTagChange(e.target.value);
-                  }}
-                >
-                  {categoryOptions?.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-          </Grid>
         </Grid>
 
-        <Grid item xs={12} mt={2}>
+
+        <Grid item xs={12} mt={3}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2} spacing={2} sx={{ width: '100%' }}>
             <Typography sx={{ fontWeight: '450' }}>Tags in this Category</Typography>
 
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography>Add Tags</Typography>
-              <IconButton
-                onClick={() => setIsModalOpen(true)}
-                sx={{
-                  backgroundColor: '#41C048',
-                  borderRadius: '50%',
-                  width: '25px',
-                  height: '25px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: 3,
-                  color: 'white',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: '#41C048',
-                    color: '#ffffff'
-                  }
-                }}
-              >
-                <AddIcon />
-              </IconButton>
+
+              <Tooltip title="Add" arrow>
+                <IconButton
+                  onClick={() => setIsModalOpen(true)}
+                  sx={{
+                    backgroundColor: '#009fc7',
+                    borderRadius: '8px',
+                    width: '119px',
+                    height: '36px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: 'white',
+                    gap: 1,
+                    fontSize: '14px',
+                    // padding: '22px',
+                    '&:hover': {
+                      backgroundColor: '#009fc7'
+                    }
+                  }}
+                >
+                  Add Tags
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Stack>
           </Stack>
         </Grid>
 
         <Box width="100%" sx={{ mt: 1 }}>
-          <Card style={{ height: 'auto' }}>
-            <DataGrid
-              rows={
-                isLoading
-                  ? []
-                  : filteredTags.map((row, index) => ({
+
+          <Card style={{ height: 'auto', maxHeight: '377px', overflow: 'auto' }}>
+            <Box sx={{ height: '350px', minHeight: '350px' }}>
+              <DataGrid
+                rows={
+                  isLoading
+                    ? []
+                    : filteredTags.map((row, index) => ({
                       ...row,
                       sNo: paginationModel.page * paginationModel.pageSize + index + 1
                     }))
-              }
-              columns={columns}
-              rowCount={totalRows}
-              loading={isLoading}
-              pagination
-              paginationMode="server"
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-              pageSizeOptions={[5, 10, 25, 50]}
-              getRowId={(row) => row._id}
-              slots={{
-                toolbar: () => <CustomHeader />,
-                loadingOverlay: () => (
-                  <Box
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      alignItems: 'self-start',
-                      justifyContent: 'center',
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                    }}
-                  >
-                    <SingleRowLoader />
-                  </Box>
-                ),
-                noRowsOverlay: () => (isLoading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
-              }}
-              sx={{
-                '& .MuiDataGrid-cell': {
-                  textAlign: 'left',
-                  fontSize: '14px'
                 }
-              }}
-              disableSelectionOnClick
-            />
+                columns={columns}
+                rowCount={totalRows}
+                loading={isLoading}
+                pagination
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[5, 10, 25, 50]}
+                getRowId={(row) => row._id}
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'self-start',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () =>
+                    isLoading ? null : (
+                      <Box sx={{ padding: 2, textAlign: 'center' }}>
+                        No data available.
+                      </Box>
+                    )
+                }}
+                sx={{
+                  '& .MuiDataGrid-cell': {
+                    textAlign: 'left',
+                    fontSize: '14px'
+                  }
+                }}
+                disableSelectionOnClick
+              />
+            </Box>
           </Card>
+
 
           <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
             <Grid item>
-              <Button variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'SAVE  CHANGES'}
+              <Button
+                variant="contained" sx={{
+                  background: '#053146', borderRadius: '8px',
+                  // paddingInline: 4,
+                  '&:hover': {
+                    backgroundColor: '#053146'
+                  },
+                  px: 4,
+                  py: 1,
+                  fontWeight: 600,
+                }}
+                onClick={handleEdit}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Saving...' : 'SAVE CHANGES'}
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="error" onClick={() => navigate('/tags')}>
+              <Button
+                onClick={() => navigate(-1)}
+                sx={{
+                  border: '1px solid #c5c5ff',
+                  borderRadius: '8px',
+                  color: '#5c5cff',
+                  textTransform: 'none',
+                  px: 4,
+                  py: 1,
+                  fontWeight: 600,
+                  backgroundColor: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#f8f8ff'
+                  }
+                }}
+              >
                 CANCEL
               </Button>
             </Grid>
           </Grid>
         </Box>
 
-        <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} >
           <DialogTitle>
-            <Typography variant="h4">Add Tags</Typography>
+            <Typography fontWeight="600" fontSize="16px">Add Tags</Typography>
           </DialogTitle>
 
           <DialogContent>
@@ -459,7 +509,7 @@ const TagForm = () => {
                     <TextField
                       {...field}
                       fullWidth
-                      label="Description"
+                      label="Tag Name"
                       size="small"
                       error={!!errors.name}
                       helperText={errors.name?.message}
@@ -539,11 +589,37 @@ const TagForm = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" sx={{ background: '#053146' }} onClick={handleSubmit(onSubmit)} disabled={isLoading}>
+            <Button
+              variant="contained" sx={{
+                background: '#053146', borderRadius: '8px',
+                paddingInline: 3,
+                paddingBlock: 1,
+                '&:hover': {
+                  backgroundColor: '#053146'
+                },
+              }}
+              onClick={handleSubmit(onSubmit)}
+              disabled={isLoading}
+            >
               {isLoading ? 'Saving...' : 'SAVE CHANGES'}
             </Button>
 
-            <Button onClick={() => setIsModalOpen(false)} variant="outlined" color="error">
+            <Button
+              onClick={() => setIsModalOpen(false)}
+              sx={{
+                border: '1px solid #c5c5ff',
+                borderRadius: '8px',
+                color: '#5c5cff',
+                textTransform: 'none',
+                px: 4,
+                py: 1,
+                fontWeight: 600,
+                backgroundColor: '#fff',
+                '&:hover': {
+                  backgroundColor: '#f8f8ff'
+                }
+              }}
+            >
               CANCEL
             </Button>
           </DialogActions>

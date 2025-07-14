@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Tabs, Tab, Grid } from '@mui/material';
-import Chart from './Chart.js';
 import DonorList from './DonorList';
 
 const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
@@ -14,14 +13,6 @@ const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
     <Grid>
       <Tabs value={value} onChange={handleChange} sx={{ mb: 2 }}>
         <Tab
-          label="Chart View"
-          sx={{
-            marginRight: 2,
-            borderRadius: 1,
-            textTransform: 'none'
-          }}
-        />
-        <Tab
           label="List View"
           sx={{
             marginRight: 2,
@@ -32,8 +23,7 @@ const Service = ({ selectedName, status, caseId, dateOpenedFilter }) => {
       </Tabs>
 
       <Box>
-        {value === 0 && <Chart />}
-        {value === 1 && <DonorList selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />}
+        {value === 0 && <DonorList selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />}
       </Box>
     </Grid>
   );

@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, Button, Avatar, Tooltip, Grid, Stack, IconButton, Tabs, Tab, Divider, Chip } from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Avatar,
+  Tooltip,
+  Grid,
+  Stack,
+  IconButton,
+  Tabs,
+  Tab,
+  Divider,
+  Chip
+} from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Timeline from '@mui/lab/Timeline';
@@ -24,6 +39,36 @@ import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { imageUrl } from 'common/urls';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import { SUBROLES } from 'common/constants';
+import TimelineActivity from 'components/TimelineActivity';
+
+const timelineData = [
+  {
+    date: '27 Nov 2024',
+    type: 'Donated $500',
+    color: 'error',
+    description: 'Monthly recurring donation',
+    file: 'Invoices.pdf'
+  },
+  {
+    date: '28 Nov 2024',
+    type: 'Email sent (Thank You)',
+    color: 'secondary',
+    description: 'Acknowledgement email sent'
+  },
+  {
+    date: '13 Jan 2025',
+    type: 'Donated $1,500',
+    color: 'warning',
+    description: 'Special fundraising campaign',
+    file: 'Invoices.pdf'
+  },
+  {
+    date: '21 Feb 2025',
+    type: 'Attended Volunteer Event',
+    color: 'primary',
+    description: 'Charity marathon participation'
+  }
+];
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -69,9 +114,7 @@ const UserProfileCard = () => {
       try {
         const response = await getApi(urls.tag.getAllTags);
         const allTags = response?.data?.allTags || [];
-    
 
-    
         const combinedData = [
           ...(userData?.otherInfo?.benificiary ?? []),
           ...(userData?.otherInfo?.campaigns ?? []),
@@ -81,7 +124,6 @@ const UserProfileCard = () => {
           ...(userData?.otherInfo?.fundraisingActivities ?? [])
         ];
 
-    
         const allIds = combinedData.map((item) => {
           const id = typeof item === 'object' && item !== null ? item._id : item;
           if (!id) {
@@ -90,10 +132,8 @@ const UserProfileCard = () => {
           return id;
         });
 
-    
         const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
 
-    
         const grouped = {};
         relatedTags.forEach((tag) => {
           const category = tag.tagCategoryName || 'Uncategorized';
@@ -101,7 +141,6 @@ const UserProfileCard = () => {
           grouped[category].push(tag.name);
         });
 
-    
         const formatted = Object.entries(grouped).map(([category, tags]) => ({
           category,
           tags
@@ -116,7 +155,7 @@ const UserProfileCard = () => {
     if (userData?.otherInfo) {
       fetchAndGroupTags();
     } else {
-      console.log('⛔ userData.otherInfo not found, skipping tag fetch.');
+      console.warn('⛔ userData.otherInfo not found, skipping tag fetch.');
     }
   }, [userData]);
   const createdAt = userData?.createdAt;
@@ -700,7 +739,7 @@ const UserProfileCard = () => {
               <Grid container spacing={2} p={2}>
                 <Grid item xs={12}>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt={1} gap={2}>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography fontWeight="600" fontSize="16px">
                       Activity Timeline
                     </Typography>
 
@@ -709,10 +748,15 @@ const UserProfileCard = () => {
                         variant="contained"
                         size="small"
                         onClick={() => setAddItemOpen(true)}
-                        sx={{ backgroundColor: '#009fc7' }}
+                        sx={{
+                          backgroundColor: '#009fc7',
+                          '&:hover': {
+                            backgroundColor: '#009fc7'
+                          }
+                        }}
                         endIcon={<AddIcon />}
                       >
-                        Add Item
+                        Add Case Note
                       </Button>
                     </Box>
                   </Box>
@@ -723,73 +767,16 @@ const UserProfileCard = () => {
                   setActivityTypeFilter={setActivityType}
                   sessionNames={sessionNames}
                   setSessionNameFilter={setSessionName}
-                  dateAddedFilters={dateAddedFilters}
-                  setDateAddedFilter={setDateOpenedFilter}
+                  dateOpenedFilter={dateOpenedFilter}
+                  setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
                   includeArchives={includeArchives}
                   setIncludeArchives={setIncludeArchives}
-                  selectedFilters={['activityTypeFilter', 'sessionNameFilter', 'dateOpenedFilter', 'includeArchives']}
-                  customDateLabel="By Date Added"
+                  selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+                  customDateLabel="By Date"
                 />
 
                 <Grid item xs={9}>
-                  <Card>
-                    <Timeline position="alternate">
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-03-01</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="error" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Survey Completed</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Mentee Satisfaction Form
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-02-20</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="secondary" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Attended a Session</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Leadership Training Workshop
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-02-20</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="warning" />
-                          <TimelineConnector />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Attended a Session</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Leadership Training Workshop
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-
-                      <TimelineItem>
-                        <TimelineOppositeContent color="text.secondary">2024-01-15</TimelineOppositeContent>
-                        <TimelineSeparator>
-                          <TimelineDot color="primary" />
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <Typography variant="h6">Volunteering Activity</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Mentee Satisfaction Form
-                          </Typography>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </Timeline>
-                  </Card>
+                  <TimelineActivity timelineData={timelineData} />
                 </Grid>
 
                 <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />

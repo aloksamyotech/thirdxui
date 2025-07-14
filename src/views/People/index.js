@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-undef */
 import { useState, useEffect, useMemo } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase, Button, Menu, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,8 +10,12 @@ import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import { IconTrash } from '@tabler/icons';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import Service from 'views/Report/Tabs/Service';
+import CustomHeader from 'components/CustomHeader';
 
 const districts = [
   { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
@@ -48,6 +52,7 @@ const PeopleManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -68,40 +73,6 @@ const PeopleManagement = () => {
       label: type.label
     }));
   }, []);
-
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400px',
-              color: '#101010',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            People List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
 
   const columns = [
     {
@@ -244,14 +215,14 @@ const PeopleManagement = () => {
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
           <Tooltip title="Add" arrow>
             <IconButton
               onClick={() => navigate('/add-serviceuser')}
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
-                width: '220px',
+                // width: '220px',
                 height: '35px',
                 display: 'flex',
                 justifyContent: 'center',
@@ -259,9 +230,11 @@ const PeopleManagement = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
+                padding: '22px',
+                // paddingInline: '55px',
+                // paddingBlock:'25px',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                  color: '#ffffff'
+                  backgroundColor: '#009fc7'
                 }
               }}
             >
@@ -277,7 +250,7 @@ const PeopleManagement = () => {
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
               width: '489px',
-              height: '40px'
+              height: '45px'
             }}
           >
             <InputBase
@@ -358,12 +331,25 @@ const PeopleManagement = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
+                onRowSelectionModelChange={(newSelection) => {
+                  setSelectedIds(newSelection);
+                }}
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
                 slots={{
-                  toolbar: () => <CustomHeader />,
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType="service_user"
+                      title="Service Users"
+                      selectedIds={selectedIds}
+                      enableBulkActions={false}
+                      exportEnabled={true}
+                      extraActions={null}
+                      refetchData={fetchpeople}
+                    />
+                  ),
                   loadingOverlay: () => (
                     <Box
                       sx={{

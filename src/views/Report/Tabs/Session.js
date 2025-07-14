@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Tabs, Tab, Grid } from '@mui/material';
-import Chart from './CaseChart.js';
+import Chart from './SessionChart.js';
 import SessionList from './SessionList';
 
 const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {

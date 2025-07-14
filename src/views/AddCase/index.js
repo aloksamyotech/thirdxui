@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Grid, TextField, Box, Paper, Button, InputAdornment, Card, Typography, FormControlLabel, Autocomplete } from '@mui/material';
+import {
+  Grid,
+  TextField,
+  Box,
+  Paper,
+  Button,
+  InputAdornment,
+  Card,
+  Typography,
+  FormControlLabel,
+  Autocomplete,
+  IconButton
+} from '@mui/material';
 import { MenuItem, Select, Chip, FormControl, InputLabel } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -13,10 +27,12 @@ import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
-
+import { useLocation } from 'react-router-dom';
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const sessionData = location.state?.sessionData;
   const [isLoading, setIsloading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = React.useRef(null);
@@ -30,6 +46,8 @@ const AddCaseForm = () => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const [searchQueryService, setSearchQueryService] = useState('');
   const [searchQueryCaseOwner, setSearchQueryCaseOwner] = useState('');
 
@@ -94,6 +112,57 @@ const AddCaseForm = () => {
     };
     fetchTags();
   }, []);
+  useEffect(() => {
+    if (sessionData) {
+      console.log('sessionData', {
+        serviceUserId: sessionData?.serviceUserId || '',
+        serviceId: sessionData?.serviceId || '',
+        caseOwner: sessionData?.caseOwner || '',
+        caseOpened: dayjs(sessionData?.caseOpened) || dayjs(),
+        caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
+        Beneficiary: sessionData?.benificiary || [],
+        Campaigns: sessionData?.campaigns || [],
+        engagement: sessionData?.engagement || [],
+        eventsAttended: sessionData?.eventAttanded || [],
+        fundingInterests: sessionData?.fundingInterest || [],
+        fundraisingActivities: sessionData?.fundraisingActivities || [],
+        description: sessionData?.description || '',
+        serviceStatus: sessionData?.status || 'pending',
+        file: null // Do not pre-fill file inputs
+      });
+
+      reset({
+        serviceUserId: sessionData?.serviceUserId || '',
+        serviceId: sessionData?.serviceId || '',
+        caseOwner: sessionData?.caseOwner || '',
+        caseOpened: dayjs(sessionData?.caseOpened) || dayjs(),
+        caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
+        Beneficiary: sessionData?.benificiary || [],
+        Campaigns: sessionData?.campaigns || [],
+        engagement: sessionData?.engagement || [],
+        eventsAttended: sessionData?.eventAttanded || [],
+        fundingInterests: sessionData?.fundingInterest || [],
+        fundraisingActivities: sessionData?.fundraisingActivities || [],
+        description: sessionData?.description || '',
+        serviceStatus: sessionData?.status || 'pending',
+        file: null // Do not pre-fill file inputs
+      });
+    }
+  }, [sessionData, reset]);
+  useEffect(() => {
+    if (sessionData?.serviceUserId && rows.length > 0) {
+      const match = rows.find((user) => user.id === sessionData.serviceUserId);
+      if (match) setValue('serviceUserId', match.id);
+    }
+  }, [sessionData, rows, setValue]);
+
+  useEffect(() => {
+    if (sessionData?.caseOwner && caseOwner.length > 0) {
+      const match = caseOwner.find((owner) => owner.id === sessionData.caseOwner);
+      if (match) setValue('caseOwner', match.id);
+    }
+  }, [sessionData, caseOwner, setValue]);
+
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -249,7 +318,12 @@ const AddCaseForm = () => {
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Adding New Case</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+          <IconButton onClick={() => navigate(-1)} size="small">
+            <ArrowBackIcon />
+          </IconButton>
+          Adding New Case
+        </Typography>
 
         <Box
           sx={{
@@ -262,7 +336,7 @@ const AddCaseForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/case')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -279,15 +353,15 @@ const AddCaseForm = () => {
                     control={control}
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
-                      const selectedUser = rows?.find((user) => user.id === field.value);
-                      
+                      const selectedUser = rows.find((user) => user.id === field.value);
+
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                           <Autocomplete
-                            value={selectedUser}
-                            onChange={(_, value) => field.onChange(value ? value.id : '')}
-                            onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
-                            options={rows || []}
+                            value={selectedUser || null}
+                            onChange={(_, value) => field.onChange(value?.id || '')}
+                            // onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                            options={rows}
                             getOptionLabel={(option) => option.name || ''}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                             renderInput={(params) => (
@@ -343,18 +417,17 @@ const AddCaseForm = () => {
                     control={control}
                     rules={{ required: 'Case owner is required' }}
                     render={({ field }) => {
-                      const selectedCaseOwner = caseOwner?.find((owner) => owner.id === field.value);
+                      const selectedOwner = caseOwner.find((owner) => owner.id === field.value);
+
                       return (
                         <FormControl fullWidth size="small" error={!!errors.caseOwner}>
                           <Autocomplete
-                            value={selectedCaseOwner}
-                            onChange={(_, value) => {
-                              field.onChange(value ? value.id : '');
-                            }}
-                            onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
-                            options={caseOwner || []}
+                            value={selectedOwner || null}
+                            onChange={(_, value) => field.onChange(value?.id || '')}
+                            // onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
+                            options={caseOwner}
                             getOptionLabel={(option) => option.name || ''}
-                            isOptionEqualToValue={(option, value) => option._id === value._id}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
                             renderInput={(params) => (
                               <TextField {...params} label="Case Owner" variant="outlined" size="small" error={!!errors.caseOwner} />
                             )}
@@ -369,7 +442,7 @@ const AddCaseForm = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={4}>
                   <Controller
                     name="caseOpened"
@@ -431,7 +504,72 @@ const AddCaseForm = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
-                  <Controller
+                  <Box mb={2} display="flex" justifyContent="space-between">
+                    <Controller
+                      name="file"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          value={field.value ? field.value.name : ''}
+                          placeholder="Attachments"
+                          InputProps={{
+                            readOnly: true,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AttachFileIcon fontSize="small" />
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                  <Link component="span">Upload a file</Link>
+                                  <input
+                                    type="file"
+                                    hidden
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      const allowedTypes = [
+                                        'application/pdf',
+                                        'application/msword',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                      ];
+                                      const maxSizeInBytes = 25 * 1024 * 1024;
+
+                                      if (file) {
+                                        if (!allowedTypes.includes(file.type)) {
+                                          toast.error('Only PDF, DOC, and DOCX files are allowed.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        if (file.size > maxSizeInBytes) {
+                                          toast.error('File size must be less than or equal to 25MB.');
+                                          e.target.value = null;
+                                          field.onChange(null);
+                                          return;
+                                        }
+
+                                        field.onChange(file);
+                                      } else {
+                                        field.onChange(null);
+                                      }
+                                    }}
+                                  />
+                                </Button>
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  {/* <Controller
                     name="serviceStatus"
                     control={control}
                     defaultValue="pending"
@@ -496,7 +634,7 @@ const AddCaseForm = () => {
                         </Select>
                       </FormControl>
                     )}
-                  />
+                  /> */}
                 </Grid>
               </Grid>
             </Grid>
@@ -573,71 +711,6 @@ const AddCaseForm = () => {
 
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                  <Box mb={2} display="flex" justifyContent="space-between">
-                    <Controller
-                      name="file"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          value={field.value ? field.value.name : ''}
-                          placeholder="Attachments"
-                          InputProps={{
-                            readOnly: true,
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <AttachFileIcon fontSize="small" />
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                  <Link component="span">Upload a file</Link>
-                                  <input
-                                    type="file"
-                                    hidden
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      const allowedTypes = [
-                                        'application/pdf',
-                                        'application/msword',
-                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                                      ];
-                                      const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                      if (file) {
-                                        if (!allowedTypes.includes(file.type)) {
-                                          toast.error('Only PDF, DOC, and DOCX files are allowed.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        if (file.size > maxSizeInBytes) {
-                                          toast.error('File size must be less than or equal to 25MB.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        field.onChange(file);
-                                      } else {
-                                        field.onChange(null);
-                                      }
-                                    }}
-                                  />
-                                </Button>
-                              </InputAdornment>
-                            )
-                          }}
-                        />
-                      )}
-                    />
-                  </Box>
-
                   <Controller
                     name="description"
                     control={control}
@@ -647,7 +720,7 @@ const AddCaseForm = () => {
                         {...field}
                         label="Notes"
                         multiline
-                        minRows={12}
+                        minRows={15}
                         fullWidth
                         variant="outlined"
                         error={!!errors.description}
@@ -684,7 +757,7 @@ const AddCaseForm = () => {
               color="error"
               onClick={() => {
                 reset();
-                navigate('/case');
+                navigate(-1);
               }}
             >
               CANCEL

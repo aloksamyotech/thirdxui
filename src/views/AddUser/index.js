@@ -473,7 +473,7 @@ const AddCaseForm = ({ onCancel }) => {
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4">{editdata ? 'Edit User' : 'Add New User'}</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">{editdata ? 'Edit User' : 'Add New User'}</Typography>
 
           <Box
             sx={{
@@ -486,7 +486,7 @@ const AddCaseForm = ({ onCancel }) => {
               height: 32,
               cursor: 'pointer'
             }}
-            onClick={() => navigate('/users')}
+            onClick={() => navigate(-1)}
           >
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
           </Box>
@@ -2097,7 +2097,7 @@ const AddCaseForm = ({ onCancel }) => {
                   </Grid>
                   <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
                     <Grid item>
-                      <Button variant="outlined" color="error" onClick={() => navigate('/users')}>
+                      <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                         CANCEL
                       </Button>
                     </Grid>

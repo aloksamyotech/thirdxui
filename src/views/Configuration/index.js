@@ -36,7 +36,9 @@ const defaultTabTypes = [
   'Location',
   'Reason',
   'Service Types',
-  'Form Types'
+  'Form Types',
+  'Product',
+  'Currency'
 ];
 
 const TabbedDataGrid = () => {
@@ -387,7 +389,9 @@ const TabbedDataGrid = () => {
         cancelText="Cancel"
       />
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h5">Configurations</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          Configurations
+        </Typography>
         <Box
           sx={{
             display: 'flex',

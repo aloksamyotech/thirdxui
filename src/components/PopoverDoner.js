@@ -92,8 +92,8 @@ const OptionsPopoverDonor = ({ anchorEl, open, onClose, data }) => {
 
   const options = [
     { label: 'Edit', icon: <EditIcon /> },
-    { label: 'Archive', icon: <ArchiveIcon /> },
-    { label: 'Merge', icon: <MergeTypeIcon /> },
+    // { label: 'Archive', icon: <ArchiveIcon /> },
+    // { label: 'Merge', icon: <MergeTypeIcon /> },
     {
       label: 'Delete',
       icon: (

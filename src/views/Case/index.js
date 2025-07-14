@@ -13,6 +13,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import StatusChip from 'views/AboutCase/StatusChip';
+import CustomHeader from 'components/CustomHeader';
 
 const Case = () => {
   const navigate = useNavigate();
@@ -20,9 +21,11 @@ const Case = () => {
   const [serviceTypeFilter, setServiceTypeFilterOptions] = useState([]);
   const [ownerFilters, setOwnerFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
-  const [owner, setOwner] = useState('');
+  const [caseOwner, setOwner] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFiltered, setIsFiltered] = useState(false);
@@ -36,8 +39,9 @@ const Case = () => {
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   const statusFilter = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' }
+    { value: 'open', label: 'Open' },
+    { value: 'close', label: 'Close' },
+    { value: 'pending', label: 'Pending' }
   ];
 
   const dateAddedFilters = [
@@ -46,39 +50,6 @@ const Case = () => {
     { value: 'month', label: 'Last 30 Days' },
     { value: 'year', label: 'Last 1 Year' }
   ];
-
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px',
-              fontWeight: '400'
-            }}
-          >
-            Case List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
 
   const columns = [
     {
@@ -94,7 +65,7 @@ const Case = () => {
       valueGetter: (params) => params.value || '-'
     },
     {
-      field: 'owner',
+      field: 'caseOwner',
       headerName: 'Owner',
       width: 90,
       valueGetter: (params) => params.value || '-'
@@ -104,9 +75,7 @@ const Case = () => {
       field: 'status',
       headerName: 'Status',
       width: 120,
-      renderCell: (params) => (
-        <StatusChip status={params.value} />
-      )
+      renderCell: (params) => <StatusChip status={params.value} />
     },
     {
       field: 'service',
@@ -129,9 +98,9 @@ const Case = () => {
       if (serviceType && serviceType !== '') {
         queryParams.append('serviceId', serviceType);
       }
-      if (status) queryParams.append('status', status === 'active');
-      if (owner && owner !== '') {
-        queryParams.append('serviceType', owner);
+      if (status) queryParams.append('status', status);
+      if (caseOwner && caseOwner !== '') {
+        queryParams.append('caseOwner', caseOwner);
       }
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
@@ -166,7 +135,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
-          owner: user?.caseOwner?.personalInfo?.firstName || '',
+          caseOwner: user?.caseOwner?.personalInfo?.firstName || '',
           status: user?.status
         };
       });
@@ -190,10 +159,10 @@ const Case = () => {
   };
 
   useEffect(() => {
-    if (serviceType || status || owner || dateOpenedFilter || searchQuery || isFiltered) {
+    if (serviceType || status || caseOwner || dateOpenedFilter || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [serviceType, status, owner, dateOpenedFilter, searchQuery]);
+  }, [serviceType, status, caseOwner, dateOpenedFilter, searchQuery]);
 
   const fetchInitialData = async () => {
     setLoading(true);
@@ -221,7 +190,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
+          caseOwner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
           status: user?.status
         };
       });
@@ -246,10 +215,20 @@ const Case = () => {
 
       setServiceTypeFilterOptions(uniqueServiceTypes);
 
-      const uniqueOwners = [...new Set(allCases.map((item) => item.serviceType).filter(Boolean))].map((value) => ({
-        value,
-        label: value
-      }));
+      const uniqueOwners = [
+        ...new Map(
+          allCases
+            .filter((item) => item?.caseOwner?._id)
+            .map((item) => [
+              item.caseOwner._id,
+              {
+                value: item.caseOwner._id,
+                label: `${item.caseOwner.personalInfo.firstName ?? ''} ${item.caseOwner.personalInfo.lastName ?? ''}`.trim()
+              }
+            ])
+        ).values()
+      ];
+
       setOwnerFilters(uniqueOwners);
     } catch (error) {
       console.error('Failed to fetch services:', error);
@@ -269,7 +248,7 @@ const Case = () => {
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
           <Tooltip title="Add" arrow>
             <IconButton
               onClick={() => navigate('/add-case')}
@@ -284,9 +263,9 @@ const Case = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
+                padding: '22px',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                  color: '#ffffff'
+                  backgroundColor: '#009fc7'
                 }
               }}
             >
@@ -302,7 +281,7 @@ const Case = () => {
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
               width: '489px',
-              height: '40px'
+              height: '45px'
             }}
           >
             <InputBase
@@ -358,7 +337,7 @@ const Case = () => {
             dateOpenedFilter={dateOpenedFilter}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             owners={ownerFilters}
-            ownerFilter={owner}
+            ownerFilter={caseOwner}
             setOwnerFilter={(value) => setOwner(value)}
             selectedFilters={['serviceFilter', 'statusFilter', 'dateOpenedFilter', 'ownerFilter']}
             customDateLabel="Date Opened"
@@ -374,9 +353,9 @@ const Case = () => {
                       loading
                         ? []
                         : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                            ...row,
+                            sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                          }))
                     }
                     columns={columns}
                     rowCount={totalRows}
@@ -385,10 +364,23 @@ const Case = () => {
                     paginationMode="server"
                     paginationModel={paginationModel}
                     onPaginationModelChange={setPaginationModel}
+                    onRowSelectionModelChange={(newSelection) => {
+                      setSelectedIds(newSelection);
+                    }}
                     rowHeight={65}
                     getRowId={(row) => row.id}
                     slots={{
-                      toolbar: () => <CustomHeader />,
+                      toolbar: () => (
+                        <CustomHeader
+                          entityType="cases"
+                          title="Case List"
+                          selectedIds={selectedIds}
+                          enableBulkActions={false}
+                          exportEnabled={true}
+                          extraActions={null}
+                          refetchData={fetchInitialData}
+                        />
+                      ),
                       loadingOverlay: () => (
                         <Box
                           sx={{
@@ -404,7 +396,6 @@ const Case = () => {
                       ),
                       noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                     }}
-                    checkboxSelection
                     onRowClick={(params) => navigate('/view-case', { state: { id: params.row.id } })}
                     sx={{
                       '& .MuiDataGrid-row': {

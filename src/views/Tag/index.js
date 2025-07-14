@@ -8,10 +8,11 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { getApi, updateApi } from 'common/apiClient';
+import { getApi, postApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import AddTagCategoryDialog from './AddTagCategoryDialog';
 
 const Tag = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Tag = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [configurationNameFilter, setConfigurationNameFilter] = useState('');
   const [configurationNames, setconfigurationNames] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [tagCategory, setTagCategory] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
@@ -28,6 +29,7 @@ const Tag = () => {
   const [loading, setLoading] = useState(true);
   const [totalRows, setTotalRows] = useState(0);
   const [isFiltered, setIsFiltered] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const statusFilter = [
     { value: 'active', label: 'Active' },
@@ -57,7 +59,7 @@ const Tag = () => {
               lineHeight: '36px'
             }}
           >
-            Tag List
+            Tag Category List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -84,11 +86,12 @@ const Tag = () => {
       flex: 1,
       renderCell: (params) => {
         const handleToggle = (event) => {
+          event.stopPropagation();
           const newStatus = event.target.checked;
           handleStatusChange(params.row._id, newStatus);
         };
 
-        return <AntSwitch defaultChecked={params?.value} color="primary" onChange={handleToggle} />;
+        return <AntSwitch defaultChecked={params?.value} onClick={(e) => e.stopPropagation()} color="primary" onChange={handleToggle} />;
       }
     }
   ];
@@ -98,21 +101,21 @@ const Tag = () => {
       setLoading(true);
       const queryParams = new URLSearchParams();
 
-      if (status) queryParams.append('status', status === 'active' ? 'true' : 'false');
+      if (status) queryParams.append('status', status === 'active' ? true : false);
       if (searchQuery) queryParams.append('search', searchQuery);
-      if (configurationNameFilter) queryParams.append('categoryName', configurationNameFilter);
+      if (configurationNameFilter) queryParams.append('name', configurationNameFilter);
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-      const url = `${urls.tag.fetchWithPagination}?${queryParams.toString()}`;
+      const url = `${urls.tagCategory.fetchWithPagination}?${queryParams.toString()}`;
       const response = await getApi(url);
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
-      setTags(allTags);
+      setTagCategory(allTags);
       setTotalRows(pagination?.total);
       setIsFiltered(true);
     } catch (error) {
-      toast.error('Failed to fetch filtered tags');
+      toast.error('Failed to fetch filtered tagCategory');
     } finally {
       setLoading(false);
     }
@@ -143,19 +146,19 @@ const Tag = () => {
   const fetchTags = async () => {
     setLoading(true);
     try {
-      const response = await getApi(`${urls.tag.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const response = await getApi(`${urls.tagCategory.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
       const allTags = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
 
-      setTags(allTags);
+      setTagCategory(allTags);
       setTotalRows(pagination?.total);
-      const uniqueList = [...new Set(allTags.map((item) => item.tagCategoryName).filter(Boolean))].map((value) => ({
+      const uniqueList = [...new Set(allTags.map((item) => item.name).filter(Boolean))].map((value) => ({
         value,
         label: value
       }));
       setconfigurationNames(uniqueList);
     } catch (error) {
-      toast.error('Failed to fetch tags');
+      toast.error('Failed to fetch tagCategory');
     } finally {
       setLoading(false);
     }
@@ -167,22 +170,35 @@ const Tag = () => {
 
   const handleStatusChange = async (tagId, newStatus) => {
     try {
-      await updateApi(`${urls.tag.updateStatus}/${tagId}`, {
+      await updateApi(`${urls.tagCategory.updateStatus}/${tagId}`, {
         isActive: newStatus
       });
-      toast.success('Tag update successfully');
+      toast.success('Tag Category update successfully');
     } catch (error) {
       console.error('Error updating status:', error);
+    }
+  };
+
+  const handleTagCategorySave = async (data) => {
+    try {
+      const res = await postApi(urls.tagCategory.create, data);
+      if (res.success == true) {
+        fetchTags();
+        toast.success("Tag Category Created");
+      }
+    } catch (error) {
+      console.error("Error while creating tag category => ", error);
+      toast.error("Internal Server Error");
     }
   };
 
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
           <Tooltip title="Add" arrow>
             <IconButton
-              onClick={() => navigate('/add-tag')}
+              onClick={() => setOpen(true)}
               sx={{
                 backgroundColor: '#009fc7',
                 borderRadius: '4px',
@@ -194,13 +210,13 @@ const Tag = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
+                padding: '22px',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                  color: '#ffffff'
+                  backgroundColor: '#009fc7'
                 }
               }}
             >
-              Add New Tag
+              Add Tag Category
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -214,7 +230,7 @@ const Tag = () => {
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
               width: '489px',
-              height: '40px'
+              height: '45px'
             }}
           >
             <InputBase
@@ -279,7 +295,7 @@ const Tag = () => {
                     rows={
                       loading
                         ? []
-                        : tags.map((row, index) => ({
+                        : tagCategory.map((row, index) => ({
                           ...row,
                           sNo: paginationModel.page * paginationModel.pageSize + index + 1
                         }))
@@ -294,6 +310,7 @@ const Tag = () => {
                     pageSizeOptions={[5, 10, 25, 50]}
                     rowHeight={65}
                     getRowId={(row) => row._id}
+                    onRowClick={(params) => navigate('/add-tag', { state: { id: params.row._id } })}
                     slots={{
                       toolbar: () => <CustomHeader />,
                       loadingOverlay: () => (
@@ -314,7 +331,8 @@ const Tag = () => {
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                     sx={{
                       '& .MuiDataGrid-row': {
-                        borderBottom: '1px solid #ccc'
+                        borderBottom: '1px solid #ccc',
+                        cursor: 'pointer'
                       }
                     }}
                   />
@@ -324,6 +342,11 @@ const Tag = () => {
           </Grid>
         </Grid>
       </Grid>
+      <AddTagCategoryDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onSave={handleTagCategorySave}
+      />
     </Card>
   );
 };

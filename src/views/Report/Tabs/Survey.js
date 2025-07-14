@@ -1,27 +1,49 @@
-import React from 'react';
-import { Box, Stack } from '@mui/system';
+import React, { useState } from 'react';
+import { Box, Tabs, Tab, Grid } from '@mui/material';
 import { Button, TextField, Typography } from '@mui/material';
+import Chart from './SurveyChart';
+import CaseList from './SurveyList';
 
-const Survey = () => {
+const Survey = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
   return (
-    <>
-      <Stack direction="row" sx={{ marginX: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Stack>
-          <Typography sx={{ fontSize: '12px', mb: '4px' }}>Which Survey / Questionare Would you like to run a report on ?</Typography>
-          <TextField placeholder="please choose a survey......."></TextField>
-        </Stack>
-        <Stack>
-          <Box>
-            <Button variant="contained" sx={{ background: '#053146' }}>
-              APPLY
-            </Button>
-            <Button variant="outlined" color="error" sx={{ ml: '10px' }}>
-              CLEAR
-            </Button>
-          </Box>
-        </Stack>
-      </Stack>
-    </>
+    <Grid>
+      <Tabs value={value} onChange={handleChange} sx={{ mb: 2 }}>
+        <Tab
+          label="Chart View"
+          sx={{
+            marginRight: 2,
+            borderRadius: 1,
+            textTransform: 'none'
+          }}
+        />
+        <Tab
+          label="List View"
+          sx={{
+            marginRight: 2,
+            borderRadius: 1,
+            textTransform: 'none'
+          }}
+        />
+      </Tabs>
+
+      <Box>
+        {value === 0 && <Chart />}
+        {value === 1 && (
+          <CaseList
+            countryOfOriginFilter={countryOfOriginFilter}
+            selectedName={selectedName}
+            status={status}
+            caseId={caseId}
+            dateOpenedFilter={dateOpenedFilter}
+          />
+        )}
+      </Box>
+    </Grid>
   );
 };
 

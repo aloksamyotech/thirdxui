@@ -29,18 +29,23 @@ export const urls = Object.freeze({
   },
   service: {
     create: `${baseUrl}/services/addServices`,
+    deleteService: `${baseUrl}/services/deleteService/`,
     fetch: `${baseUrl}/services/all`,
     fetchWithPagination: `${baseUrl}/services/allwithpagination`,
     getById: `${baseUrl}/services/getServiceById/:id`,
-    filterType: `${baseUrl}/services/search`
+    filterType: `${baseUrl}/services/search`,
+    editServices: `${baseUrl}/services/editServices/`,
+    toggleArchive: `${baseUrl}/services/toggleArchive/`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,
     fetch: `${baseUrl}/cases/getAllCases`,
-    delete: `${baseUrl}/cases/deleteCase/:id`,
+    delete: `${baseUrl}/cases/deleteCase/`,
     filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,
-    fetchWithPagination: `${baseUrl}/cases/allwithpagination`
+    fetchWithPagination: `${baseUrl}/cases/allwithpagination`,
+    toggleArchive: `${baseUrl}/cases/toggleArchive/:id`,
+    bulkUpload: `${baseUrl}/cases/bulkUpload`
   },
   mail: {
     create: `${baseUrl}/mail/addmail`,
@@ -53,6 +58,13 @@ export const urls = Object.freeze({
     fetch: `${baseUrl}/transaction/getalltransaction`,
     filterType: `${baseUrl}/transaction/filter`,
     fetchWithPagination: `${baseUrl}/transaction/allwithpagination`
+  },
+  tagCategory: {
+    create: `${baseUrl}/tagCategory`,
+    fetchWithPagination: `${baseUrl}/tagCategory/allwithpagination`,
+    updateStatus: `${baseUrl}/tagCategory/updateStatus`,
+    getById: `${baseUrl}/tagCategory`,
+    editTagCategory: `${baseUrl}/tagCategory/edit`
   },
   tag: {
     create: `${baseUrl}/tag/`,
@@ -73,7 +85,11 @@ export const urls = Object.freeze({
   },
   casenote: {
     create: `${baseUrl}/caseNote/add`,
-    fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`
+    fetchWithPagination: `${baseUrl}/caseNote/getAllWithPagination`,
+    getById: `${baseUrl}/caseNote/getById/:id`,
+    update: `${baseUrl}/caseNote/edit/`,
+    toggleArchive: `${baseUrl}/caseNote/toggleArchive/`,
+    delete: `${baseUrl}/caseNote/delete/`
   },
   forms: {
     add: `${baseUrl}/forms`,
@@ -85,7 +101,9 @@ export const urls = Object.freeze({
   },
   attendees: {
     create: `${baseUrl}/attendees/addAttendee`,
-    getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`
+    getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`,
+    fetchWithPagination: `${baseUrl}/attendees/getwithpagination`,
+    fetch: `${baseUrl}/attendees/getwithpagination`
   },
   dashboard: {
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,
@@ -96,7 +114,9 @@ export const urls = Object.freeze({
     createTask: `${baseUrl}/dashboard/createTask`,
     edittask: `${baseUrl}/dashboard/editTask/:id`,
     deleteTask: `${baseUrl}/dashboard/delete/:id`,
-    getMedia: `${baseUrl}/dashboard/allMedia`
+    getMedia: `${baseUrl}/dashboard/allMedia`,
+    getAllTasksWithPagination: `${baseUrl}/dashboard/getAllTasksWithPagination`,
+    getAllCasesWithPagination: `${baseUrl}/dashboard/getAllCasesWithPagination`
   },
   login: {
     login: `${baseUrl}/admin/login`,
@@ -108,6 +128,10 @@ export const urls = Object.freeze({
     getAllAdmin: `${baseUrl}/admin/getAllAdmin`,
     forgotPassword: `${baseUrl}/admin/forgot-password`,
     otpvarify: `${baseUrl}/admin/verify-otp`,
-    resetPassword:`${baseUrl}/admin/reset-password`
+    resetPassword: `${baseUrl}/admin/reset-password`
+  },
+  bulkFuntions: {
+    delete: `${baseUrl}/bulk/delete`,
+    archive: `${baseUrl}/bulk/archive`
   }
 });

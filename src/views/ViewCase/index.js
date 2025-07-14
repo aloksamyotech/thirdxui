@@ -12,6 +12,7 @@ import CaseNoteDialog from 'components/AddCaseNote';
 import UserProfileDialog from './userProfile.js';
 import { useLocation } from 'react-router-dom';
 import { getApi } from 'common/apiClient.js';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { urls } from 'common/urls';
 import dayjs from 'dayjs';
 import { imageUrl } from 'common/urls';
@@ -19,6 +20,7 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 import { decodedToken } from 'utils/adminData.js';
+import StatusChip from 'views/AboutCase/StatusChip.js';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -87,7 +89,6 @@ const CaseDetailsPage = () => {
       </Box>
     );
   };
-
   const dobRaw = serviceuserDetails?.personalInfo?.dateOfBirth;
   const dobFormatted = dobRaw ? dayjs(dobRaw).format('DD/MM/YYYY') : '';
   const age = dobRaw ? dayjs().diff(dayjs(dobRaw), 'year') : '';
@@ -155,7 +156,7 @@ const CaseDetailsPage = () => {
     },
     {
       field: 'hidden',
-      headerName: 'Hide',
+      headerName: 'View More',
       flex: 0.7,
       renderCell: (params) => <IconButton>{params.value ? <VisibilityOff /> : <Visibility />}</IconButton>
     }
@@ -265,6 +266,7 @@ const CaseDetailsPage = () => {
           subject: note.subject || '-',
           createdBy: note?.createdBy?.userName || '-',
           configurationName: configName,
+          time: note?.time,
           sNo: paginationModel.page * paginationModel.pageSize + index + 1
         };
       });
@@ -307,7 +309,20 @@ const CaseDetailsPage = () => {
     };
     fetchData();
   }, []);
-  
+
+  const handleClick = () => {
+    navigate('/about-case', {
+      state: {
+        caseData
+      }
+    });
+  };
+
+  const viewUser = () => {
+    navigate('/view-people', {
+      state: { id: serviceuserDetails?._id }
+    });
+  };
   return (
     <>
       <Box>
@@ -319,7 +334,7 @@ const CaseDetailsPage = () => {
                   <IconButton onClick={() => navigate('/case')}>
                     <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
                   </IconButton>
-                  {serviceDetails?.name}
+                  {serviceDetails?.name} Case
                 </Typography>
               </Stack>
 
@@ -358,7 +373,7 @@ const CaseDetailsPage = () => {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <Card sx={{ mb: 2, backgroundColor: '#042E4C', color: 'white' }}>
+            <Card sx={{ mb: 2, backgroundColor: '#052c3f33', color: 'black', border: '1px solid #0080A1' }}>
               {loading ? (
                 <Box
                   sx={{
@@ -374,22 +389,27 @@ const CaseDetailsPage = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      width: '100%',
-                      padding: '4px 0'
+                      width: '100%'
                     }}
                   >
-                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 500 }}>
+                    <Typography variant="h6" sx={{ color: 'black', fontWeight: 500 }}>
                       Service User Summary
                     </Typography>
 
                     <Chip
                       label="View"
                       size="small"
-                      onClick={() => setOpen(true)}
+                      onClick={viewUser}
                       sx={{
                         backgroundColor: 'white',
                         color: '#042E4C',
                         fontWeight: 300,
+                        fontSize: '0.65rem',
+                        height: 22,
+                        padding: '0 6px',
+                        '& .MuiChip-label': {
+                          padding: 0
+                        },
                         '&:hover': {
                           backgroundColor: 'white',
                           color: '#042E4C'
@@ -398,29 +418,29 @@ const CaseDetailsPage = () => {
                     />
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                      <strong>Name:</strong> {serviceuserDetails?.personalInfo?.firstName || ''}{' '}
+                    <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                      <span style={{ fontWeight: 600 }}>Name:</span> {serviceuserDetails?.personalInfo?.firstName || '-'}
                       {serviceuserDetails?.personalInfo?.lastName || ''}
                     </Typography>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>User ID :</strong> 01231
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>User ID:</span> {serviceuserDetails?.uniqueId || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>Gender:</strong> {serviceuserDetails?.personalInfo?.gender || ''}
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>Gender:</span> {serviceuserDetails?.personalInfo?.gender || '-'}
                       </Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>Contact:</strong> {serviceuserDetails?.contactInfo?.phone || ''}
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>Contact:</span> {serviceuserDetails?.contactInfo?.phone || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'white', fontSize: '0.6rem' }}>
-                        <strong>DOB:</strong>{' '}
+                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                        <span style={{ fontWeight: 600 }}>DOB:</span>
                         {serviceuserDetails?.personalInfo?.dateOfBirth
                           ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
-                          : ''}
+                          : '-'}
                       </Typography>
                     </Box>
                   </Box>
@@ -435,38 +455,152 @@ const CaseDetailsPage = () => {
                 <SectionSkeleton lines={1} variant="rectangular" width="100%" height={130} />
               </Box>
             ) : (
+              // <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
+              //   <TableContainer component={Paper} elevation={0}>
+              //     <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+              //       <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
+              //         <TableRow>
+              //           {[
+              //             'Case Id',
+              //             'Service User',
+              //             'Owner',
+              //             'Date Opened',
+              //             'Date Closed',
+              //             'Attachments',
+              //             'Total Hours',
+              //             'Status',
+              //             'View More'
+              //           ].map((header) => (
+              //             <TableCell
+              //               key={header}
+              //               sx={{
+              //                 fontSize: '12px',
+              //                 whiteSpace: 'nowrap',
+              //                 padding: '4px',
+              //                 borderBottom: 'none',
+              //                 height: '50px',
+              //                 ...(header === 'Total Hours' && { pr: 2 })
+              //               }}
+              //             >
+              //               {header}
+              //             </TableCell>
+              //           ))}
+              //         </TableRow>
+              //       </TableHead>
+              //       <TableBody
+              //         sx={{
+              //           height: '73px',
+              //           cursor: 'pointer',
+              //           '&:hover': {
+              //             backgroundColor: 'grey.200'
+              //           }
+              //         }}
+              //         onClick={handleClick}
+              //       >
+              //         <TableRow key={row.caseId}>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {serviceuserDetails?.uniqueId || '-'}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {serviceuserDetails?.personalInfo?.firstName || '-'}
+              //             </Typography>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {serviceuserDetails?.personalInfo?.lastName || ''}
+              //             </Typography>
+              //           </TableCell>
+
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {caseData?.caseOwnerDetails?.[0]?.personalInfo?.firstName || '-'}
+              //             </Typography>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {caseData?.caseOwnerDetails?.[0]?.personalInfo?.lastName || ''}
+              //             </Typography>
+              //           </TableCell>
+
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {formatDate(caseData?.caseOpened || '')}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {formatDate(caseData?.caseClosed || '')}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {(() => {
+              //               if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
+              //               const startDate = new Date(caseData.caseOpened);
+              //               const endDate = new Date(caseData.caseClosed);
+              //               const diffTime = Math.abs(endDate - startDate);
+              //               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+              //               return `${diffHours} hrs`;
+              //             })()}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '14px', borderBottom: 'none' }}>
+              //             <StatusChip status={caseData?.status.charAt(0).toUpperCase() + caseData?.status.slice(1).toLowerCase()} />
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
+              //             <IconButton>
+              //               {' '}
+              //               <Visibility />
+              //             </IconButton>
+              //           </TableCell>
+              //         </TableRow>
+              //       </TableBody>
+              //     </Table>
+              //   </TableContainer>
+              // </Box>
+
               <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
                 <TableContainer component={Paper} elevation={0}>
                   <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
                     <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
                       <TableRow>
-                        {['Case Id', 'Service User', 'Owner', 'Date Opened', 'Date Closed', 'Attachments', 'Total Hours', 'Status'].map(
-                          (header) => (
-                            <TableCell
-                              key={header}
-                              sx={{
-                                fontSize: '12px',
-                                whiteSpace: 'nowrap',
-                                padding: '6px',
-                                borderBottom: 'none',
-                                height: '50px'
-                              }}
-                            >
-                              {header}
-                            </TableCell>
-                          )
-                        )}
+                        {[
+                          'Case Id',
+                          'Service User',
+                          'Owner',
+                          'Date Opened',
+                          'Date Closed',
+                          'Attachments',
+                          'Total Hours',
+                          'Status',
+                          'View More'
+                        ].map((header) => (
+                          <TableCell
+                            key={header}
+                            sx={{
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap',
+                              padding: '4px',
+                              borderBottom: 'none',
+                              height: '50px',
+                              ...(header === 'Total Hours' && { pr: 3 })
+                            }}
+                          >
+                            {header}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     </TableHead>
-                    <TableBody sx={{
-                      height: '73px', cursor: 'pointer', '&:hover': {
-                        backgroundColor: 'grey.200',
-                      },
-                    }}
-                      onClick={() => navigate('/about-case')}
+
+                    <TableBody
+                      sx={{
+                        height: '73px',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: 'grey.200'
+                        }
+                      }}
+                      onClick={handleClick}
                     >
                       <TableRow key={row.caseId}>
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>RD-758</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+                          {serviceuserDetails?.uniqueId || '-'}
+                        </TableCell>
+
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           <Typography variant="body2" sx={{ fontSize: '12px' }}>
                             {serviceuserDetails?.personalInfo?.firstName || '-'}
@@ -488,13 +622,23 @@ const CaseDetailsPage = () => {
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {formatDate(caseData?.caseOpened || '')}
                         </TableCell>
+
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {formatDate(caseData?.caseClosed || '')}
                         </TableCell>
+
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+
+                        <TableCell
+                          sx={{
+                            fontSize: '12px',
+                            padding: '6px',
+                            borderBottom: 'none',
+                            pr: 3
+                          }}
+                        >
                           {(() => {
                             if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
                             const startDate = new Date(caseData.caseOpened);
@@ -504,26 +648,27 @@ const CaseDetailsPage = () => {
                             return `${diffHours} hrs`;
                           })()}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
-                          <Chip
-                            label={row.serviceStatus === 'Active' ? 'Open' : 'Close'}
-                            icon={
-                              row.serviceStatus === 'Active' ? (
-                                <CheckIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                              ) : (
-                                <LoopIcon sx={{ color: 'gray', fontSize: '16px' }} />
-                              )
-                            }
-                            variant="outlined"
-                            sx={{
-                              borderColor: 'gray',
-                              color: 'gray',
-                              backgroundColor: 'transparent',
-                              fontSize: '10px',
-                              height: '20px',
-                              paddingRight: '4px'
-                            }}
-                          />
+
+                        <TableCell
+                          sx={{
+                            fontSize: '14px',
+                            padding: '2px',
+                            borderBottom: 'none'
+                          }}
+                        >
+                          <StatusChip status={caseData?.status.charAt(0).toUpperCase() + caseData?.status.slice(1).toLowerCase()} />
+                        </TableCell>
+
+                        <TableCell
+                          sx={{
+                            fontSize: '14px',
+                            padding: '4px',
+                            borderBottom: 'none'
+                          }}
+                        >
+                          <IconButton>
+                            <Visibility />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -555,9 +700,9 @@ const CaseDetailsPage = () => {
                   loading2
                     ? []
                     : row.map((row, index) => ({
-                      ...row,
-                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                    }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                 }
                 columns={columns}
                 rowCount={totalRows}
@@ -568,8 +713,8 @@ const CaseDetailsPage = () => {
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={70}
                 getRowId={(row) => row.id}
-                onRowClick={(params) => {
-                  navigate(`/about-case-note`);
+                onRowClick={(row) => {
+                  navigate('/about-case-note', { state: { caseData: row?.row } });
                 }}
                 slots={{
                   toolbar: () => <CustomHeader />,
@@ -595,8 +740,8 @@ const CaseDetailsPage = () => {
                     fontWeight: 'bold'
                   },
                   '& .MuiDataGrid-row:hover': {
-                    cursor: 'pointer',
-                  },
+                    cursor: 'pointer'
+                  }
                 }}
               />
             </Box>

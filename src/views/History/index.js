@@ -173,7 +173,7 @@ export default function TabbedDataGrid() {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography sx={{ fontsize: '14px', fontWeight: '400', color: '#636365' }}>History</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">History</Typography>
         <Box
           sx={{
             display: 'flex',

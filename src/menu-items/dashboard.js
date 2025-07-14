@@ -72,15 +72,15 @@ const dashboard = {
           breadcrumbs: false,
           role: 'volunteer',
           childrenUrls: ['/add-volunteer', '/view-people']
-        },
-        {
-          id: '04',
-          parentId: '01',
-          title: 'New Referral',
-          type: 'item',
-          url: '/referral',
-          breadcrumbs: false
         }
+        // {
+        //   id: '04',
+        //   parentId: '01',
+        //   title: 'New Referral',
+        //   type: 'item',
+        //   url: '/referral',
+        //   breadcrumbs: false
+        // }
       ]
     },
 
@@ -101,15 +101,6 @@ const dashboard = {
       icon: icons.IconFileInvoice,
       breadcrumbs: false,
       childrenUrls: ['/add-case', '/view-case']
-    },
-    {
-      id: '07',
-      title: 'Mailing List',
-      type: 'item',
-      url: '/mail',
-      icon: icons.IconMail,
-      breadcrumbs: false,
-      childrenUrls: ['/add-mail']
     },
     {
       id: '08',
@@ -134,16 +125,25 @@ const dashboard = {
           url: '/financial',
           breadcrumbs: false,
           childrenUrls: ['/add-transaction']
-        },
-        {
-          id: '11',
-          parentId: '08',
-          title: 'Mailing Lists',
-          type: 'item',
-          url: '/mailing-list',
-          breadcrumbs: false
         }
+        // {
+        //   id: '11',
+        //   parentId: '08',
+        //   title: 'Mailing Lists',
+        //   type: 'item',
+        //   url: '/mailing-list',
+        //   breadcrumbs: false
+        // }
       ]
+    },
+    {
+      id: '07',
+      title: 'Mailing List',
+      type: 'item',
+      url: '/mail',
+      icon: icons.IconMail,
+      breadcrumbs: false,
+      childrenUrls: ['/add-mail']
     },
 
     {
@@ -204,23 +204,31 @@ const dashboard = {
         {
           id: '19',
           parentId: '17',
-          title: 'Duplicate',
+          title: 'Duplicates',
           type: 'item',
           url: '/duplicate',
           breadcrumbs: false
         },
+        // {
+        //   id: '20',
+        //   parentId: '17',
+        //   title: 'Bulk Delete',
+        //   type: 'item',
+        //   url: '/bulkdelete',
+        //   breadcrumbs: false
+        // },
         {
-          id: '20',
+          id: '22',
           parentId: '17',
-          title: 'Bulk Delete',
+          title: 'Lists',
           type: 'item',
-          url: '/bulkdelete',
+          url: '/list',
           breadcrumbs: false
         },
         {
           id: '21',
           parentId: '17',
-          title: 'Archives',
+          title: 'Archives List',
           type: 'item',
           url: '/archives',
           breadcrumbs: false
@@ -228,22 +236,22 @@ const dashboard = {
       ]
     },
     {
-      id: '22',
+      id: '23',
       title: 'Configuration',
       type: 'collapse',
       icon: icons.IconSettings,
       children: [
         {
-          id: '23',
-          parentId: '22',
+          id: '24',
+          parentId: '23',
           title: 'Configuration',
           type: 'item',
           url: '/configuration',
           breadcrumbs: false
         },
         {
-          id: '24',
-          parentId: '22',
+          id: '25',
+          parentId: '23',
           title: 'Tags',
           type: 'item',
           url: '/tags',
@@ -251,8 +259,8 @@ const dashboard = {
           childrenUrls: ['/add-tag']
         },
         {
-          id: '25',
-          parentId: '22',
+          id: '26',
+          parentId: '23',
           title: 'Users',
           type: 'item',
           url: '/users',
@@ -260,8 +268,8 @@ const dashboard = {
           childrenUrls: ['/add-user']
         },
         {
-          id: '26',
-          parentId: '22',
+          id: '27',
+          parentId: '23',
           title: 'Account',
           type: 'item',
           url: '/account',

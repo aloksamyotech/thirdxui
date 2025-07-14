@@ -176,7 +176,7 @@ export default function SessionRegisterPage() {
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex" alignItems="center">
-          <IconButton onClick={() => navigate('/view-session', { state: { session: session } })}>
+          <IconButton onClick={() => navigate(-1)}>
             <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>
           <Typography fontWeight="bold">Attendee List</Typography>

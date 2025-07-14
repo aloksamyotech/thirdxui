@@ -13,6 +13,8 @@ import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairService
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import { imageUrl } from 'common/urls';
 import OptionsPopover from 'components/AddFilter';
+import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
+
 const ServiceDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,13 +38,12 @@ const ServiceDetails = () => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
-  
+
   useEffect(() => {
     const fetchServiceDetails = async () => {
       if (!session?._id) return;
       try {
         const res = await getApi(urls.session.getById.replace(':id', session?._id));
-  
         setSessionData(res?.data?.userData || {});
       } catch (error) {
         console.error('Failed to fetch service details', error);
@@ -53,7 +54,7 @@ const ServiceDetails = () => {
 
     fetchServiceDetails();
   }, [session?._id]);
-  
+
   useEffect(() => {
     const fetchServiceTypeName = async () => {
       try {
@@ -80,18 +81,18 @@ const ServiceDetails = () => {
   useEffect(() => {
     const fetchAndGroupTags = async () => {
       try {
-  
+
         const session = sessionData?.[0]; // Only using the first item
         if (!session) {
           console.warn('No session data found');
           return;
         }
 
-  
+
         const allTagsResponse = await getApi(urls.tag.getAllTags);
-  
+
         const allTags = allTagsResponse?.data?.allTags || [];
-  
+
         const allIds = [
           ...session.benificiary,
           ...session.campaigns,
@@ -104,14 +105,14 @@ const ServiceDetails = () => {
           return normalizedId;
         });
 
-  
+
         const relatedTags = allTags.filter((tag) => {
           const tagId = tag._id;
           const isRelated = allIds.includes(tagId);
           return isRelated;
         });
 
-  
+
         const grouped = {};
         relatedTags.forEach((tag) => {
           const category = tag.tagCategoryName || 'Uncategorized';
@@ -119,13 +120,13 @@ const ServiceDetails = () => {
           grouped[category].push(tag.name);
         });
 
-  
+
         const formatted = Object.entries(grouped).map(([category, tags]) => ({
           category,
           tags
         }));
 
-  
+
         setGroupedTags(formatted);
       } catch (err) {
         console.error('Error fetching tags:', err);
@@ -142,16 +143,50 @@ const ServiceDetails = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Grid item xs={12} mb={2}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <IconButton onClick={() => navigate(-1)}>
-            <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
-          </IconButton>
-          <Typography fontWeight="bold">View Service Details</Typography>
+
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={1}
+          sx={{ width: '100%' }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <IconButton onClick={() => navigate(-1)}>
+              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+            </IconButton>
+            <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+              {sessionData?.[0].serviceId?.name} Session
+            </Typography>
+          </Stack>
+
+          <Button
+            variant="text"
+            sx={{
+              color: '#333333',
+              borderRadius: '6px',
+              fontWeight: '500',
+              fontSize: '14px',
+              padding: 1,
+              paddingInline: 2,
+              backgroundColor: '#E6E6E6',
+              '&:hover': {
+                backgroundColor: '#E6E6E6'
+              }
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              navigate('/attendees', { state: { session: sessionData?.[0] } });
+            }}
+          >
+            View Attendees List
+          </Button>
         </Stack>
+
       </Grid>
 
-      <Grid container spacing={2} sx={{ height: 420 }}>
-        <Grid item xs={12} md={6} sx={{ height: '70%' }}>
+      <Grid container spacing={2} sx={{ height: 560 }}>
+        <Grid item xs={12} md={6} sx={{ height: '50%' }}>
           <Paper
             variant="outlined"
             sx={{
@@ -161,53 +196,93 @@ const ServiceDetails = () => {
               flexDirection: 'column'
             }}
           >
-            {/* Header */}
+
             <Box display="flex" alignItems="center" mb={2}>
-              <HomeRepairServiceOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
+              <Diversity2OutlinedIcon fontSize="small" sx={{ mr: 1 }} />
               <Typography variant="subtitle1">ABOUT SESSION</Typography>
             </Box>
             <Divider sx={{ mb: 2 }} />
-            {/* Scrollable content */}
+
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              <Stack spacing={1}>
-                {[
-                  { label: 'Location:', value: sessionData?.[0]?.country || '-' },
-                  {
-                    label: 'Session Lead:',
-                    value: [sessionData?.[0]?.serviceuser?.personalInfo?.firstName, sessionData?.[0]?.serviceuser?.personalInfo?.lastName]
-                      .filter(Boolean)
-                      .join(' ')
-                  },
-                  { label: 'Service Type:', value: sessionData?.[0]?.serviceId?.name || '-' },
-                  { label: 'Date:', value: formatDate(sessionData?.[0]?.timestamp) || '-' },
-                  { label: 'Time:', value: sessionData?.[0]?.serviceId?.name || '-' },
-                  { label: 'Attachment:', value: (sessionData?.[0]?.file ? 1 : 0) + ' File' }
-                ].map(({ label, value }, idx) => (
-                  <Box
-                    key={idx}
-                    sx={{
-                      display: 'flex',
-                      gap: 1,
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Typography
-                      component="span"
-                      sx={{
-                        width: 110,
-                        fontWeight: 'bold',
-                        flexShrink: 0
-                      }}
-                    >
-                      {label}
-                    </Typography>
-                    <Typography component="span" sx={{ flexGrow: 1 }}>
-                      {value}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
+              <Grid container spacing={2}>
+
+                <Grid item xs={6}>
+                  <Stack spacing={2}>
+                    {[
+                      { label: 'Location:', value: sessionData?.[0]?.country || '-' },
+                      {
+                        label: 'Session Lead:',
+                        value: [sessionData?.[0]?.serviceuser?.personalInfo?.firstName, sessionData?.[0]?.serviceuser?.personalInfo?.lastName]
+                          .filter(Boolean)
+                          .join(' ')
+                      },
+                      { label: 'Service Type:', value: sessionData?.[0]?.serviceId?.name || '-' }
+                    ].map(({ label, value }, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          display: 'flex',
+                          gap: 1,
+                          alignItems: 'center',
+                          '& > *:first-of-type': {
+                            width: 110,
+                            fontWeight: 600,
+                            flexShrink: 0,
+                            fontSize: '12px',
+                            lineHeight: '24px',
+                          },
+                          '& > *:last-of-type': {
+                            flexGrow: 1,
+                            fontWeight: 400,
+                            fontSize: '12px',
+                            lineHeight: '24px',
+                          }
+                        }}
+                      >
+                        <Typography component="span">{label}</Typography>
+                        <Typography component="span">{value}</Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Stack spacing={2}>
+                    {[
+                      { label: 'Date:', value: formatDate(sessionData?.[0]?.timestamp) || '-' },
+                      { label: 'Time:', value: sessionData?.[0]?.serviceId?.name || '-' },
+                      { label: 'Attachment:', value: (sessionData?.[0]?.file ? 1 : 0) + ' File' }
+                    ].map(({ label, value }, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          display: 'flex',
+                          gap: 1,
+                          alignItems: 'center',
+                          '& > *:first-of-type': {
+                            width: 110,
+                            fontWeight: 600,
+                            flexShrink: 0,
+                            fontSize: '12px',
+                            lineHeight: '24px',
+                          },
+                          '& > *:last-of-type': {
+                            flexGrow: 1,
+                            fontWeight: 400,
+                            fontSize: '12px',
+                            lineHeight: '24px',
+                          }
+                        }}
+                      >
+                        <Typography component="span">{label}</Typography>
+                        <Typography component="span">{value}</Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Grid>
+              </Grid>
             </Box>
+
           </Paper>
         </Grid>
 
@@ -255,7 +330,7 @@ const ServiceDetails = () => {
                           key={i}
                           label={tag}
                           size="small"
-                          onDelete={() => {}}
+                          onDelete={() => { }}
                           deleteIcon={
                             <CancelIcon
                               sx={{
@@ -287,40 +362,7 @@ const ServiceDetails = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-        <Button
-          variant="contained"
-          onClick={handleClick}
-          sx={{
-            borderRadius: '6px',
-            width: '100px',
-            height: '36px',
-            fontSize: '12px',
-            backgroundColor: '#009fc7',
-            '&:hover': {
-              backgroundColor: '#009fc7'
-            }
-          }}
-        >
-          Manage
-        </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={() => navigate(-1)}
-          sx={{
-            borderRadius: '6px',
-            width: '100px',
-            height: '36px',
-            fontSize: '12px'
-          }}
-        >
-          CLOSE
-        </Button>
-      </Box>
-
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={session?._id} />
-    </Box>
+    </Box >
   );
 };
 

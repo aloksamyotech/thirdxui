@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, InputBase, IconButton, Tooltip } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, InputBase, IconButton, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
@@ -12,18 +12,8 @@ import DonorTypeDialog from './donorType.js';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
-
-const statusFilter = [
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' }
-];
-
-const dateAddedFilters = [
-  { value: 'today', label: 'Today' },
-  { value: 'week', label: 'Last 7 Days' },
-  { value: 'month', label: 'Last 30 Days' },
-  { value: 'year', label: 'Last 1 Year' }
-];
+import CustomHeader from 'components/CustomHeader.js';
+import { dateAddedFilters, statusFilter } from 'common/constants.js';
 
 const Donor = () => {
   const navigate = useNavigate();
@@ -31,6 +21,8 @@ const Donor = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [name, setNameFilter] = useState('');
   const [campaign, setCampaignFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,40 +37,6 @@ const Donor = () => {
     page: 0,
     pageSize: 10
   });
-
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Donor List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
 
   const columns = [
     {
@@ -269,7 +227,7 @@ const Donor = () => {
     <>
       <Card sx={{ backgroundColor: '#eef2f6' }}>
         <Grid>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
             <Tooltip title="Add" arrow>
               <IconButton
                 onClick={() => setOpenDialog(true)}
@@ -284,9 +242,9 @@ const Donor = () => {
                   color: 'white',
                   gap: 1,
                   fontSize: '14px',
+                  padding: '22px',
                   '&:hover': {
-                    backgroundColor: '#1565c0',
-                    color: '#ffffff'
+                    backgroundColor: '#009fc7'
                   }
                 }}
               >
@@ -302,7 +260,7 @@ const Donor = () => {
                 paddingLeft: '16px',
                 border: '1px solid #e0e0e0',
                 width: '489px',
-                height: '40px'
+                height: '45px'
               }}
             >
               <InputBase
@@ -362,8 +320,8 @@ const Donor = () => {
               setCampaignFilter={setCampaignFilter}
               includeArchives={includeArchives}
               setIncludeArchives={setIncludeArchives}
-              selectedFilters={['nameFilter', 'statusFilter', 'dateOpenedFilter', 'campaignFilter', 'includeArchives']}
-              customDateLabel="Start Date"
+              selectedFilters={['statusFilter', 'dateOpenedFilter']}
+              customDateLabel="By Date"
               onReset={handleReset}
             />
 
@@ -385,11 +343,24 @@ const Donor = () => {
                   paginationMode="server"
                   paginationModel={paginationModel}
                   onPaginationModelChange={setPaginationModel}
+                  onRowSelectionModelChange={(newSelection) => {
+                    setSelectedIds(newSelection);
+                  }}
                   rowHeight={70}
                   getRowId={(row) => row._id}
                   onRowClick={(params) => navigate('/view-donor', { state: params.row })}
                   slots={{
-                    toolbar: () => <CustomHeader />,
+                    toolbar: () => (
+                      <CustomHeader
+                        entityType="donor"
+                        title="Donor List"
+                        selectedIds={selectedIds}
+                        enableBulkActions={false}
+                        exportEnabled={true}
+                        extraActions={null}
+                        refetchData={fetchDonor}
+                      />
+                    ),
                     loadingOverlay: () => (
                       <Box
                         sx={{

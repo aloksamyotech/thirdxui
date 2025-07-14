@@ -6,11 +6,14 @@ import React, { useState } from 'react';
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { useEffect } from 'react';
-import { getApi } from 'common/apiClient';
+import { getApi, updateApiPatch } from 'common/apiClient';
 import moment from 'moment';
 import ReadMoreIcon from '@mui/icons-material/ReadMore';
 import { useNavigate } from 'react-router';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import SubmissionDialog from './SubmissionDialog';
+import toast from 'react-hot-toast';
+import { IconTrash } from '@tabler/icons';
 
 const campaignFilter = [
   { value: 'campaign1', label: 'Campaign 1' },
@@ -63,6 +66,34 @@ const Lead = () => {
     pageSize: 10
   });
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedRowId, setSelectedRowId] = useState(null);
+
+  const handleOpenDialog = (params) => {
+    setSelectedRowId(params.row.id);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleAccept = async () => {
+    const url = `${urls?.responses?.submit}/${selectedRowId}`;
+    await updateApiPatch(url, { status: 'APPROVED' });
+    getAllResponse();
+    toast.success('Submission Accepted');
+    setDialogOpen(false);
+  };
+
+  const handleDecline = async () => {
+    const url = `${urls?.responses?.submit}/${selectedRowId}`;
+    await updateApiPatch(url, { status: 'REJECTED' });
+    getAllResponse();
+    toast.success('Submission Rejected');
+    setDialogOpen(false);
+  };
+
   const navigate = useNavigate();
   const handleNavigate = (id) => {
     navigate(`${id}`);
@@ -72,7 +103,8 @@ const Lead = () => {
     setLoading(true);
     const queryParams = new URLSearchParams({
       page: paginationModel.page + 1,
-      limit: paginationModel.pageSize
+      limit: paginationModel.pageSize,
+      status: 'PENDING'
     });
     if (searchQuery) {
       queryParams.append('search', searchQuery);
@@ -88,7 +120,7 @@ const Lead = () => {
       let data = {
         id: item?._id,
         index: index + 1,
-        description: item?.formId?.title,
+        type: item?.formId?.title,
         campaign: item?.template,
         title: 'help',
         submissionDate,
@@ -119,12 +151,22 @@ const Lead = () => {
 
   const columns = [
     {
-      field: 'description',
+      field: 'type',
       headerName: 'Form Type',
       flex: 0.8,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
           {params.value || '-'}
+        </Typography>
+      )
+    },
+    {
+      field: 'title',
+      headerName: 'Form Display Title',
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+          {/* {params.value} */} Volunteer Form
         </Typography>
       )
     },
@@ -138,48 +180,43 @@ const Lead = () => {
         </Typography>
       )
     },
-    {
-      field: 'campaign',
-      headerName: 'Form Campaign',
-      flex: 1,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */}-
-        </Typography>
-      )
-    },
-    {
-      field: 'title',
-      headerName: 'Form Display Title',
-      flex: 0.8,
-      renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      flex: 0.8,
-      renderCell: (params) => (
-        <Button
-          size="small"
-          variant="contained"
-          sx={{
-            color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
-            backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
-            boxShadow: 'none',
-            borderRadius: '10px',
-            padding: '0px',
-            fontWeight: '400',
-            '&:hover': {
-              color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
-              backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
-              boxShadow: 'none'
-            }
-          }}
-        >
-          {params?.value || '-'}
-        </Button>
-      )
-    },
+    // {
+    //   field: 'campaign',
+    //   headerName: 'Form Campaign',
+    //   flex: 1,
+    //   renderCell: (params) => (
+    //     <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+    //       {/* {params.value} */} Beach cleaning - Corporate volunteer project 2019
+    //     </Typography>
+    //   )
+    // },
+
+    // {
+    //   field: 'status',
+    //   headerName: 'Status',
+    //   flex: 0.8,
+    //   renderCell: (params) => (
+    //     <Button
+    //       size="small"
+    //       variant="contained"
+    //       sx={{
+    //         color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
+    //         backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
+    //         boxShadow: 'none',
+    //         borderRadius: '10px',
+    //         padding: '0px',
+    //         fontWeight: '400',
+    //         '&:hover': {
+    //           color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
+    //           backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
+    //           boxShadow: 'none'
+    //         }
+    //       }}
+    //     >
+    //       {params?.value || '-'}
+    //     </Button>
+    //   )
+    // },
     {
       field: 'edit',
       headerName: 'Edit',
@@ -188,9 +225,14 @@ const Lead = () => {
       headerAlign: 'center',
       sortable: false,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <ReadMoreIcon sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.id)} />
-          <EditOutlinedIcon sx={{ color: 'red' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+
+          <IconTrash
+            onClick={() => handleTrustAction(params.row)}
+            size={18}
+            style={{ color: 'red', cursor: 'pointer', verticalAlign: 'middle' }}
+          />
         </Box>
       )
     }
@@ -206,7 +248,9 @@ const Lead = () => {
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
             <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-              <Typography sx={{ fontSize: '14px', fontWeight: '400px' }}>Submitted Form</Typography>
+              <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+                Submitted Form
+              </Typography>
               <Box
                 sx={{
                   display: 'flex',
@@ -281,6 +325,7 @@ const Lead = () => {
                   }
                   columns={columns}
                   loading={loading}
+                  onRowClick={handleOpenDialog}
                   slots={{
                     toolbar: () => <CustomHeader />,
                     loadingOverlay: () => (
@@ -301,19 +346,12 @@ const Lead = () => {
                   getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                   rowHeight={65}
                   // getRowHeight={() => 'auto'}
-                  // sx={{
-                  //   '& .MuiDataGrid-cell': {
-                  //     whiteSpace: 'normal',
-                  //     lineHeight: '1.4rem',
-                  //     py: 1
-                  //   },
-                  //   '& .MuiDataGrid-row': {
-                  //     borderBottom: '1px solid #ccc'
-                  //   },
-                  //   '& .MuiDataGrid-columnHeader': {
-                  //     backgroundColor: '#f5f5f5'
-                  //   }
-                  // }}
+                  sx={{
+                    '& .MuiDataGrid-row': {
+                      borderBottom: '1px solid #ccc',
+                      cursor: 'pointer'
+                    }
+                  }}
                   rowCount={totalRows}
                   pagination
                   paginationMode="server"
@@ -326,6 +364,13 @@ const Lead = () => {
           </Grid>
         </Card>
       </Grid>
+      <SubmissionDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        id={selectedRowId}
+      />
     </>
   );
 };

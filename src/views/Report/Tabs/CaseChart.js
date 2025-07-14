@@ -1,84 +1,337 @@
-import React from 'react';
-import { Box, Stack } from '@mui/system';
-import {
-  Grid,
-  Typography,
-  TextField,
-  IconButton,
-  Tooltip
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import { LineChart } from '@mui/x-charts/LineChart';
+import React, { useState, useEffect } from 'react';
+import { Box, Grid, Typography } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
-
+import { BarChart } from '@mui/x-charts/BarChart';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 const Chart = () => {
-  return (
-    <Grid container spacing={4}>
-     
+  const [ethnicityData, setEthnicityData] = useState([]);
+  const [ageRangePieData, setAgeRangePieData] = useState([]);
+  const [ageBarData, setAgeBarData] = useState([0, 0, 0, 0, 0]);
+  const [genderData, setGenderData] = useState([0, 0, 0, 0]);
 
-      <Grid item xs={8}>
-        <Typography sx={{ fontSize: 16, fontWeight: 500, mb: 1 }}>
-          Contact type breakdown
-        </Typography>
+  useEffect(() => {
+    getApi(urls.case.fetch)
+      .then((response) => {
+        const cases = response.data;
+        const ethnicityCount = {
+          'Black / Black British - Caribbean / African': 0,
+          'Asian / Asian British': 0,
+          'White British': 0,
+          'Mixed Other': 0,
+          'Mixed White And Black Caribbean / African': 0,
+          Arab: 0,
+          Other: 0
+        };
+
+        cases.forEach((item) => {
+          const ethnicity = item?.userServiceDetails?.personalInfo?.ethnicity || 'Other';
+
+          if (ethnicity.includes('Black')) {
+            ethnicityCount['Black / Black British - Caribbean / African']++;
+          } else if (ethnicity.includes('Asian')) {
+            ethnicityCount['Asian / Asian British']++;
+          } else if (ethnicity.includes('White – British') || ethnicity.includes('White British')) {
+            ethnicityCount['White British']++;
+          } else if (ethnicity.includes('Mixed – White and Black Caribbean') || ethnicity.includes('Mixed – White and Black African')) {
+            ethnicityCount['Mixed White And Black Caribbean / African']++;
+          } else if (ethnicity.includes('Mixed')) {
+            ethnicityCount['Mixed Other']++;
+          } else if (ethnicity.includes('Arab')) {
+            ethnicityCount['Arab']++;
+          } else {
+            ethnicityCount['Other']++;
+          }
+        });
+
+        // const finalEthnicityData = staticEthnicityConfig.map((item) => ({
+        //   id: item.id,
+        //   value: ethnicityCount[item.label],
+        //   label: `${item.label} ${ethnicityCount[item.label]}%`,
+        //   color: item.color
+        // }));
+        const finalEthnicityData = staticEthnicityConfig.map((item) => ({
+          id: item.id,
+          value: ethnicityCount[item.label],
+          label: `${item.label} ${ethnicityCount[item.label]}%`,
+          color: item.color,
+          labelColor: item.labelColor
+        }));
+        setEthnicityData(finalEthnicityData);
+
+        const ageRangeCount = {
+          '15 - 24': 0,
+          '25 - 39': 0,
+          '40 - 54': 0,
+          '55 - 69': 0,
+          '70+': 0
+        };
+
+        const today = new Date();
+
+        cases.forEach((item) => {
+          const dobStr = item?.userServiceDetails?.personalInfo?.dateOfBirth;
+          if (dobStr) {
+            const dob = new Date(dobStr);
+            const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+            if (age >= 15 && age <= 24) ageRangeCount['15 - 24']++;
+            else if (age <= 39) ageRangeCount['25 - 39']++;
+            else if (age <= 54) ageRangeCount['40 - 54']++;
+            else if (age <= 69) ageRangeCount['55 - 69']++;
+            else if (age >= 70) ageRangeCount['70+']++;
+          }
+        });
+
+        const finalAgeRangeData = ageRangeConfig.map((item) => ({
+          id: item.id,
+          value: ageRangeCount[item.label],
+          label: `${item.label}\n${ageRangeCount[item.label]}%`,
+          color: item.color
+        }));
+
+        setAgeRangePieData(finalAgeRangeData);
+
+        // ===== 3. Age Group Bar Chart Data (with Static Labels) =====
+        const barAgeGroupCount = {
+          Adults: 0,
+          Infants: 0,
+          Seniors: 0,
+          Kids: 0,
+          Anyone: 0
+        };
+
+        cases.forEach((item) => {
+          const dobStr = item?.userServiceDetails?.personalInfo?.dateOfBirth;
+          if (dobStr) {
+            const dob = new Date(dobStr);
+            const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+            if (age <= 5) barAgeGroupCount['Infants']++;
+            else if (age >= 6 && age <= 14) barAgeGroupCount['Kids']++;
+            else if (age >= 15 && age <= 59) barAgeGroupCount['Adults']++;
+            else if (age >= 60) barAgeGroupCount['Seniors']++;
+            else barAgeGroupCount['Anyone']++;
+          }
+        });
+        const barLabels = ['Adults', 'Infants', 'Seniors', 'Kids', 'Anyone'];
+        const finalBarData = barLabels.map((label) => barAgeGroupCount[label] ?? 0);
+        setAgeBarData(finalBarData);
+
+        // ===== 4. Gender Count =====
+        const genderCount = {
+          Male: 0,
+          Female: 0,
+          Binary: 0,
+          'Not prefer to say': 0
+        };
+
+        cases.forEach((item) => {
+          const gender = item?.userServiceDetails?.personalInfo?.gender?.toLowerCase().trim();
+
+          if (gender === 'male') genderCount.Male++;
+          else if (gender === 'female') genderCount.Female++;
+          else if (gender === 'binary') genderCount.Binary++;
+          else if (gender === 'not prefer to say') genderCount['Not prefer to say']++;
+        });
+
+        const finalGenderBarData = [genderCount.Male, genderCount.Female, genderCount.Binary, genderCount['Not prefer to say']];
+
+        setGenderData(finalGenderBarData);
+      })
+      .catch((error) => {
+        console.error('API Error:', error);
+      });
+  }, []);
+  const staticEthnicityConfig = [
+    { id: 1, label: 'Black / Black British - Caribbean / African', color: '#133144', labelColor: '#fff' },
+    { id: 2, label: 'Asian / Asian British', color: '#86E5FC', labelColor: '#000' },
+    { id: 3, label: 'White British', color: '#3E8EB6', labelColor: '#fff' },
+    { id: 4, label: 'Mixed Other', color: '#B3F0FD', labelColor: '#000' },
+    { id: 5, label: 'Mixed White And Black Caribbean / African', color: '#61CFF4', labelColor: '#000' },
+    { id: 6, label: 'Arab', color: '#2A5B77', labelColor: '#fff' },
+    { id: 7, label: 'Other', color: '#327193', labelColor: '#fff' }
+  ];
+  const ageRangeConfig = [
+    { id: 0, label: '15 - 24', color: '#0C3149' },
+    { id: 1, label: '25 - 39', color: '#2A5B77' },
+    { id: 2, label: '40 - 54', color: '#86D6FF' },
+    { id: 3, label: '55 - 69', color: '#61CFF4' },
+    { id: 4, label: '70+', color: '#44B5DD' }
+  ];
+  const genderCount = {
+    Male: 0,
+    Female: 0,
+    Binary: 0,
+    'Not Prefer to Say': 0,
+    Other: 0
+  };
+
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={6}>
         <Box
           sx={{
-            borderRadius: '12px',
             backgroundColor: '#fff',
             boxShadow: '0px 4px 10px rgba(0,0,0,0.05)',
-            padding: 2
+            borderRadius: '12px',
+            mt: 1
           }}
         >
-          <LineChart
-            height={300}
+          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Ethnicity</Typography>
+          <Box sx={{ paddingLeft: '50px' }}>
+            <PieChart
+              series={[
+                {
+                  arcLabel: (item) => item.label,
+                  arcLabelMinAngle: 15,
+                  paddingAngle: 1,
+                  data: ethnicityData,
+                  arcLabelStyle: (item) => ({
+                    fill: item.labelColor,
+                    fontSize: 14
+                  })
+                }
+              ]}
+              width={360}
+              height={340}
+              slotProps={{ legend: { hidden: true } }}
+              sx={{
+                [`& .MuiPieArcLabel-root`]: {
+                  fill: '#fff',
+                  fontSize: '10px'
+                }
+              }}
+            />
+          </Box>
+        </Box>
+      </Grid>
+
+      <Grid item xs={6}>
+        <Box
+          sx={{
+            backgroundColor: '#fff',
+            boxShadow: '1px 1px 5px #d4d4d4',
+            borderRadius: '10px',
+            mt: 1
+          }}
+        >
+          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Age Range</Typography>
+          <Box sx={{ paddingLeft: '50px' }}>
+            <PieChart
+              series={[
+                {
+                  data: ageRangePieData,
+                  arcLabel: (item) => item.label,
+                  arcLabelMinAngle: 10,
+                  paddingAngle: 1
+                }
+              ]}
+              width={360}
+              height={340}
+              slotProps={{ legend: { hidden: true } }}
+              sx={{
+                [`& .MuiPieArcLabel-root`]: {
+                  fill: '#fff',
+                  fontSize: '14px'
+                }
+              }}
+            />
+          </Box>
+        </Box>
+      </Grid>
+
+      <Grid item xs={6}>
+        <Box
+          sx={{
+            backgroundColor: '#fff',
+            boxShadow: '0px 4px 10px rgba(0,0,0,0.05)',
+            borderRadius: '12px'
+          }}
+        >
+          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Age Range</Typography>
+
+          <BarChart
+            layout="horizontal"
             series={[
               {
-                data: [150, 300, 450, 600, 800, 550, 400],
-                label: 'Contacts',
-                color: '#666CFF',
-                curve: 'monotoneX'
+                id: 'bar-series-1',
+                data: ageBarData,
+                color: '#009FC7'
               }
             ]}
-            xAxis={[{ scaleType: 'point', data: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'] }]}
-            sx={{
-              '.MuiLineElement-root': { strokeWidth: 3 },
-              '.MuiMarkElement-root': { display: 'none' },
-              '.MuiChartsAxisLine-root, .MuiChartsTick-root': { display: 'none' },
-              '.MuiChartsGrid-line': { display: 'none' }
-            }}
+            xAxis={[
+              {
+                id: 'x-axis',
+                scaleType: 'linear',
+                label: 'Units of measure'
+              }
+            ]}
+            yAxis={[
+              {
+                id: 'y-axis',
+                scaleType: 'band',
+                data: ['Adults', 'Infants', 'Seniors', 'Kids', 'Anyone']
+              }
+            ]}
+            height={300}
+            margin={{ top: 10, bottom: 30, left: 60, right: 20 }}
           />
         </Box>
       </Grid>
 
-      <Grid item xs={4}>
-        <Typography sx={{ fontSize: 16, fontWeight: 500, mb: 1 }}>
-          Data
-        </Typography>
+      <Grid item xs={6}>
         <Box
           sx={{
-            borderRadius: '12px',
             backgroundColor: '#fff',
             boxShadow: '0px 4px 10px rgba(0,0,0,0.05)',
-            padding: 2
+            borderRadius: '12px'
           }}
         >
-          <PieChart
+          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>
+            Cases By Gender{' '}
+            <Box
+              component="span"
+              sx={{
+                fontWeight: 400,
+                fontSize: 14,
+                ml: 2,
+                px: 1,
+                backgroundColor: 'black',
+                borderRadius: 1,
+                color: 'white',
+                marginLeft: '60px'
+              }}
+            >
+              34
+            </Box>
+            Total
+          </Typography>
+
+          <BarChart
+            layout="horizontal"
             series={[
               {
-                innerRadius: 50,
-                outerRadius: 100,
-                paddingAngle: 5,
-                cornerRadius: 5,
-                data: [
-                  { id: 0, value: 240, color: '#673AB7' },
-                  { id: 1, value: 36,  color: '#E91E63' },
-                  { id: 2, value: 284,  color: '#FF9800' }
-                ]
+                id: 'bar-series-2',
+                data: genderData,
+                color: '#1B4B66'
               }
             ]}
-            width={300}
+            xAxis={[
+              {
+                id: 'x-axis',
+                scaleType: 'linear'
+              }
+            ]}
+            yAxis={[
+              {
+                id: 'y-axis',
+                scaleType: 'band',
+                data: ['Male', 'Female', 'Binary', 'Not prefer to say']
+              }
+            ]}
             height={300}
+            margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
           />
         </Box>
       </Grid>

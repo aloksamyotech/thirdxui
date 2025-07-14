@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairServiceOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import { imageUrl } from 'common/urls';
-import OptionsPopover from 'components/AddFilter';
+import ManageServicePopover from 'components/ManageServicePopover';
 const ServiceDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const ServiceDetails = () => {
 
     fetchServiceDetails();
   }, [serviceid]);
-  
+
   useEffect(() => {
     const fetchServiceTypeName = async () => {
       try {
@@ -122,11 +122,11 @@ const ServiceDetails = () => {
           <IconButton onClick={() => navigate(-1)}>
             <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>
-          <Typography fontWeight="bold">View Service Details</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">View Service Details</Typography>
         </Stack>
       </Grid>
 
-      <Grid container spacing={2} sx={{ height: 420 }}>
+      <Grid container spacing={2} sx={{ height: 574 }}>
         <Grid item xs={12} md={6} sx={{ height: '100%' }}>
           <Paper
             variant="outlined"
@@ -140,56 +140,110 @@ const ServiceDetails = () => {
             {/* Header */}
             <Box display="flex" alignItems="center" mb={2}>
               <HomeRepairServiceOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
-              <Typography variant="subtitle1">Service Information</Typography>
+              <Typography
+                sx={{
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                Service Information
+              </Typography>
             </Box>
             <Divider sx={{ mb: 2 }} />
-            {/* Scrollable content */}
+
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              <Grid container spacing={1}>
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  '& > *:not(:last-child)': {
+                    marginBottom: '10px'
+                  }
+                }}
+              >
                 <Grid item xs={6}>
                   <Typography>
-                    <strong>Service Name:</strong> {serviceData?.name}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography>
-                    <strong>Service Status:</strong> {serviceData?.isActive ? 'Active' : 'Inactive'}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <Typography>
-                    <strong>Service Code:</strong> {serviceData?.code}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography>
-                    <strong>Start Date:</strong>
-                    {formatDate(serviceData?.createdAt)}
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Service Name:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {serviceData?.name}
+                    </Box>
                   </Typography>
                 </Grid>
 
                 <Grid item xs={6}>
                   <Typography>
-                    <strong>Service Type:</strong>
-                    {serviceTypeName}
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Service Status:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {serviceData?.isActive ? 'Active' : 'Inactive'}
+                    </Box>
                   </Typography>
                 </Grid>
+
                 <Grid item xs={6}>
                   <Typography>
-                    <strong>Attachment:</strong> {serviceData?.file ? 1 : 0} File
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Service Code:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {serviceData?.code}
+                    </Box>
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Start Date:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {formatDate(serviceData?.createdAt)}
+                    </Box>
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Service Type:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {serviceTypeName}
+                    </Box>
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Attachment:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {serviceData?.file ? 1 : 0} File
+                    </Box>
                   </Typography>
                 </Grid>
 
                 <Grid item xs={12}>
                   <Typography>
-                    <strong>Description:</strong> {serviceData?.description}
+                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                      Description:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                      {serviceData?.description}
+                    </Box>
                   </Typography>
                 </Grid>
 
                 <Grid item xs={12} mt={1}>
-                  <Typography>
-                    <strong>Image:</strong>
+                  <Typography sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginBottom: 1 }}>
+                    Image:
                   </Typography>
                   <Box mt={1}>
                     {serviceData?.file ? (
@@ -209,6 +263,7 @@ const ServiceDetails = () => {
                 </Grid>
               </Grid>
             </Box>
+
           </Paper>
         </Grid>
 
@@ -222,7 +277,6 @@ const ServiceDetails = () => {
               flexDirection: 'column'
             }}
           >
-            {/* Header */}
             <Box display="flex" alignItems="center" mb={2}>
               <LocalOfferOutlinedIcon fontSize="small" sx={{ mr: 1 }} />
               <Typography variant="subtitle1">Service Tags</Typography>
@@ -241,8 +295,8 @@ const ServiceDetails = () => {
                     mb={2}
                     p={2}
                     sx={{
-                      backgroundColor: '#f5f5f5',
-                      borderRadius: 1,
+                      backgroundColor: '#F7F7F7',
+                      borderRadius: 2,
                       width: '100%'
                     }}
                   >
@@ -255,7 +309,7 @@ const ServiceDetails = () => {
                         <Chip
                           key={i}
                           label={tag}
-                          onDelete={() => {}}
+                          onDelete={() => { }}
                           deleteIcon={
                             <CancelIcon
                               sx={{
@@ -293,7 +347,10 @@ const ServiceDetails = () => {
             width: '100px',
             height: '36px',
             fontSize: '12px',
-            backgroundColor: '#009fc7'
+            backgroundColor: '#009fc7',
+            '&:hover': {
+              backgroundColor: '#009fc7'
+            }
           }}
         >
           Manage
@@ -313,7 +370,7 @@ const ServiceDetails = () => {
         </Button>
       </Box>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} />
+      <ManageServicePopover open={open} anchorEl={anchorEl} onClose={handleClose} data={serviceid} />
     </Box>
   );
 };

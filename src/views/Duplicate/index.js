@@ -1,31 +1,18 @@
 import React, { useState } from 'react';
-import { Avatar, Button, Grid, Stack, Box, TextField, Typography, InputBase, IconButton, Checkbox } from '@mui/material';
-import FilterPanel from 'components/FilterPanel';
+import { Button, Grid, Stack, Box, Typography, InputBase, IconButton, Checkbox } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
+import { Visibility } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+
 import { IconTrash } from '@tabler/icons';
-
-const statusFilter = [
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' }
-];
-
-const dateAddedFilters = [
-  { value: 'today', label: 'Today' },
-  { value: 'week', label: 'Last 7 Days' },
-  { value: 'month', label: 'Last 30 Days' },
-  { value: 'year', label: 'Last 1 Year' }
-];
-
-const nameFilter = [
-  { value: 'name1', label: 'Name 1' },
-  { value: 'name2', label: 'Name 2' }
-];
 
 const Duplicate = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [status, setStatus] = useState('');
+  const navigate = useNavigate();
+
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [name, setNameFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
@@ -63,7 +50,7 @@ const Duplicate = () => {
     },
     {
       field: 'no',
-      headerName: 'Contact No.',
+      headerName: 'Phone',
       flex: 1,
       renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
     },
@@ -75,21 +62,17 @@ const Duplicate = () => {
     },
     {
       field: 'select',
-      headerName: '',
+      headerName: 'View',
       flex: 1,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderHeader: () => (
-        <Checkbox
-          // checked={isAllSelected}
-          // indeterminate={isIndeterminate}
-          // onChange={handleSelectAllChange}
-          size="small"
-        />
-      ),
-      renderCell: (params) => (
-        <Checkbox checked={selectedIds.includes(params.row.id)} onChange={() => handleCheckboxChange(params.row.id)} size="small" />
+      renderCell: () => (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate('/view-duplicates');
+          }}
+        >
+          <Visibility />
+        </IconButton>
       )
     }
   ];
@@ -131,7 +114,9 @@ const Duplicate = () => {
     <>
       <Box>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="h5">Duplicates</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+            Duplicates
+          </Typography>
           <Box
             sx={{
               display: 'flex',
@@ -186,19 +171,7 @@ const Duplicate = () => {
         </Stack>
 
         <Grid container spacing={2}>
-          <FilterPanel
-            showFilter={showFilter}
-            statuses={statusFilter}
-            setStatusFilter={setStatus}
-            dateAddedFilters={dateAddedFilters}
-            setDateAddedFilter={setDateOpenedFilter}
-            names={nameFilter}
-            setNameFilter={setNameFilter}
-            selectedFilters={['nameFilter', 'dateOpenedFilter', 'statusFilter']}
-            customDateLabel="By Date"
-          />
-
-          <Grid item xs={9}>
+          <Grid item xs={12}>
             <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff' }}>
               <DataGrid
                 rows={rows}
@@ -219,32 +192,6 @@ const Duplicate = () => {
                   }
                 }}
               />
-              <Stack direction="row" justifyContent="flex-end" spacing={2} p={2}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  endIcon={<CallMergeIcon />}
-                  sx={{
-                    color: 'black',
-                    borderColor: 'black',
-                    borderRadius: '8px'
-                  }}
-                >
-                  Merge
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  endIcon={<IconTrash size={16} />}
-                  sx={{
-                    color: 'red',
-                    borderColor: 'red',
-                    borderRadius: '8px'
-                  }}
-                >
-                  Delete
-                </Button>
-              </Stack>
             </Box>
           </Grid>
         </Grid>

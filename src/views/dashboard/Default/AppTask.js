@@ -45,10 +45,14 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   const [adminList, setAdminList] = useState([]);
   const [myTasks, setMyTasks] = useState([]);
   const [search, setSearch] = useState('');
+  const [range, setRange] = useState('This Year');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [editMode, setEditMode] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteTask, setDeleteTask] = useState('');
+  const limit = 10;
   const initialTaskState = {
     details: '',
     assignedTo: '',
@@ -102,30 +106,53 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   };
 
   const fetchTasks = async () => {
-    const res = await getApi(urls.dashboard.getmyTasks);
-    const allTasks = res?.data?.allTask;
-    const formattedTasks = allTasks?.map((item) => ({
-      id: item?._id,
-      date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-      label: item.details || '',
-      assignedTo: item.assignedTo || '',
-      dueDate: item.dueDate || '',
-      isCompleted: item.isCompleted || false,
-      notification: item.notification || false
-    }));
-    setMyTasks(formattedTasks);
+    try {
+      const queryParams = {
+        name: search,
+        range: range?.toLowerCase().replace(/\s/g, '-'),
+        page,
+        limit
+      };
+
+      const queryString = new URLSearchParams(queryParams).toString();
+      const res = await getApi(`${urls.dashboard.getAllTasksWithPagination}?${queryString}`);
+      const allTasks = res?.data?.data;
+      const formattedTasks = allTasks?.map((item) => ({
+        id: item?._id,
+        date: item?.createdAt
+          ? new Date(item.createdAt).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })
+          : '',
+        label: item?.details || '',
+        assignedTo: item?.assignedTo?.userName || 'N/A',
+        dueDate: item?.dueDate
+          ? new Date(item.dueDate).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            })
+          : '',
+        isCompleted: item?.isCompleted || false,
+        notification: item?.notification || false
+      }));
+      setMyTasks(formattedTasks);
+    } catch (err) {
+      console.error('Error fetching task:', err);
+    }
   };
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [search, range, page]);
   useEffect(() => {
     if (location.state?.taskAdded) {
       fetchTasks();
     }
   }, [location.state]);
 
-  const filteredTasks = myTasks.filter((task) => task.label.toLowerCase().includes(search.toLowerCase()));
   const handleDelete = (taskId) => {
     setDeleteTask(taskId);
     setConfirmOpen(true);
@@ -165,12 +192,26 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
           boxShadow: '0 1px 6px rgba(0,0,0,0.1)'
         }}
       >
-        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="center" spacing={2} sx={{ p: 2 }}>
-          <Typography variant="h5" fontWeight={600}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          spacing={2}
+          sx={{ mb: 2, p: 2 }}
+        >
+          <Typography variant="h5" fontWeight={500} fontSize={14}>
             My Task
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
-            <Select value="This Week" size="small" onPointerDown={(e) => e.stopPropagation()}>
+            <Select
+              value={range}
+              size="small"
+              onChange={(e) => {
+                setPage(1);
+                setRange(e.target.value);
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
               <MenuItem value="This Week">This Week</MenuItem>
               <MenuItem value="This Month">This Month</MenuItem>
               <MenuItem value="This Year">This Year</MenuItem>
@@ -179,7 +220,19 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               variant="outlined"
               placeholder="Search"
               size="small"
+              value={search}
+              onChange={(e) => {
+                setPage(1);
+                setSearch(e.target.value);
+              }}
               onPointerDown={(e) => e.stopPropagation()}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
               sx={{
                 maxWidth: 120,
                 '& input::placeholder': {
@@ -187,15 +240,6 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
                   color: 'black',
                   opacity: 1
                 }
-              }}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <SearchIcon />
-                  </InputAdornment>
-                )
               }}
             />
           </Stack>
@@ -211,9 +255,19 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               const onSelected = (taskId) =>
                 field.value.includes(taskId) ? field.value.filter((id) => id !== taskId) : [...field.value, taskId];
 
+              if (myTasks.length === 0) {
+                return (
+                  <Stack alignItems="center" justifyContent="center" sx={{ py: 5 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No tasks found in this range
+                    </Typography>
+                  </Stack>
+                );
+              }
+
               return (
                 <>
-                  {filteredTasks.map((task) => (
+                  {myTasks.map((task) => (
                     <div key={task.id}>
                       <TaskItem
                         task={task}
@@ -222,7 +276,6 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
                         onEdit={() => handleEditTask(task.id)}
                         onDelete={() => handleDelete(task.id)}
                       />
-
                       <Divider />
                     </div>
                   ))}
@@ -426,15 +479,15 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
       <FormControlLabel
         control={<Checkbox checked={checked} onChange={onChange} onPointerDown={(e) => e.stopPropagation()} />}
         label={
-          <Typography variant="body2" sx={{ m: 0 }}>
-            Call due for {task?.assignedTo?.userName} on <strong>{formatDate(task?.dueDate)}</strong>
+          <Typography variant="body2" sx={{ m: 0, color: '#26262680' }}>
+            Call due for {task?.assignedTo} on <strong>{formatDate(task?.dueDate)}</strong>
           </Typography>
         }
       />
 
       <Box>
         <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit} onPointerDown={(e) => e.stopPropagation()}>
-          <Iconify icon={'eva:edit-fill'} />
+          <Iconify icon={'material-symbols:edit-outline'} />
         </IconButton>
         <IconButton size="large" color="error" onClick={onDelete} onPointerDown={(e) => e.stopPropagation()}>
           <Iconify icon={'eva:trash-2-outline'} />

@@ -33,7 +33,8 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
-import { ROLES } from 'common/constants';
+import CustomHeader from 'components/CustomHeader';
+import { dateAddedFilters, entityTypeMap, listTypeFilter, ROLES, sessionNames } from 'common/constants';
 
 const Archives = () => {
   const navigate = useNavigate();
@@ -43,11 +44,14 @@ const Archives = () => {
   const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [listType, setListType] = useState('Service user');
   const [searchQuery, setSearchQuery] = useState('');
+  const [includeServiceuser, setIncludeServiceuser] = useState(false);
   const [confirmUnarchiveOpen, setConfirmUnarchiveOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [rows, setRows] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [isFiltered, setIsFiltered] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -59,10 +63,191 @@ const Archives = () => {
     { value: 'training', label: 'Training' }
   ];
 
-  const sessionNames = [
-    { value: 'sessionA', label: 'Session A' },
-    { value: 'sessionB', label: 'Session B' }
-  ];
+  const fetchListData = async () => {
+    setLoading(true);
+    try {
+      let filtered = [];
+      let formattedData = [];
+
+      switch (listType) {
+        case 'Service user': {
+          const queryParams = new URLSearchParams({
+            role: ROLES.SERVICE_USER,
+            isArchive: 'true'
+          });
+          const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+          formattedData = filtered.map((item) => ({
+            id: item._id,
+            name: item?.personalInfo?.firstName || '-',
+            lastName: item?.personalInfo?.lastName || '-',
+            uniqueId: item.uniqueId || '-',
+            address: item?.contactInfo?.addressLine1 || '-',
+            district: item?.contactInfo?.district || '-',
+            country: item?.contactInfo?.country || '-',
+            postcode: item?.contactInfo?.postcode || '-'
+          }));
+
+          break;
+        }
+
+        case 'Volunteer': {
+          const queryParams = new URLSearchParams({
+            role: ROLES.VOLUNTEER,
+            isArchive: 'true'
+          });
+          const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+          formattedData = filtered.map((item) => ({
+            id: item._id,
+            name: item?.personalInfo?.firstName || '-',
+            lastName: item?.personalInfo?.lastName || '-',
+            uniqueId: item.uniqueId || '-',
+            address: item?.contactInfo?.addressLine1 || '-',
+            district: item?.contactInfo?.district || '-',
+            country: item?.contactInfo?.country || '-',
+            postcode: item?.contactInfo?.postcode || '-'
+          }));
+          break;
+        }
+
+        case 'Donor': {
+          const queryParams = new URLSearchParams({
+            role: ROLES.DONOR,
+            isArchive: 'true'
+          });
+
+          const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+          formattedData = filtered.map((item) => {
+            const fullName =
+              item?.personalInfo?.firstName || item?.personalInfo?.lastName
+                ? `${item?.personalInfo?.firstName || ''} ${item?.personalInfo?.lastName || ''}`.trim()
+                : item?.companyInformation?.companyName || '-';
+
+            return {
+              id: item._id,
+              name: fullName,
+              lastName: item?.personalInfo?.lastName || '-',
+              uniqueId: item.uniqueId || '-',
+              address: item?.contactInfo?.addressLine1 || '-',
+              district: item?.contactInfo?.district || '-',
+              country: item?.contactInfo?.country || '-',
+              postcode: item?.contactInfo?.postcode || '-'
+            };
+          });
+
+          break;
+        }
+
+        case 'Service': {
+          const queryParams = new URLSearchParams({
+            isArchive: 'true'
+          });
+          const response = await getApi(`${urls.service.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+          formattedData = filtered.map((item) => ({
+            id: item._id,
+            name: item.name || '-',
+            uniqueId: item.code || '-'
+          }));
+
+          break;
+        }
+
+        case 'Case': {
+          const queryParams = new URLSearchParams({
+            isArchive: 'true'
+          });
+
+          if (dateOpenedFilter && dateOpenedFilter !== '') {
+            const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
+            queryParams.append('createdAt', formattedDate);
+          }
+
+          const response = await getApi(`${urls.case.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+
+          formattedData = filtered.map((item) => ({
+            id: item._id,
+            name: item?.serviceUserId?.personalInfo?.firstName || '-',
+            lastName: item?.serviceUserId?.personalInfo?.lastName || '-',
+            uniqueId: item?.uniqueId || '-',
+            address: item?.serviceUserId?.contactInfo?.addressLine1 || '-',
+            district: item?.serviceUserId?.contactInfo?.district || '-',
+            country: item?.serviceUserId?.contactInfo?.country || '-',
+            postcode: item?.serviceUserId?.contactInfo?.postcode || '-'
+          }));
+          break;
+        }
+
+        case 'Mailing List': {
+          const queryParams = new URLSearchParams({
+            isArchive: 'true'
+          });
+          const response = await getApi(`${urls.mail.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+          formattedData = filtered.map((item) => ({
+            id: item._id,
+            listName: item.name || '-'
+          }));
+          break;
+        }
+
+        case 'Donation': {
+          const queryParams = new URLSearchParams({
+            isArchive: 'true'
+          });
+          const response = await getApi(`${urls.transaction.fetchWithPagination}?${queryParams.toString()}`);
+          const filtered = response?.data?.data || [];
+          formattedData = filtered.map((item) => {
+            const fullName =
+              item?.donorId?.personalInfo?.firstName || item?.donorId?.personalInfo?.lastName
+                ? `${item?.donorId?.personalInfo?.firstName || ''} ${item?.donorId?.personalInfo?.lastName || ''}`.trim()
+                : item?.donorId?.companyInformation?.companyName || '-';
+
+            return {
+              id: item._id,
+              name: fullName,
+              uniqueId: item?.donorId?.uniqueId || '-',
+              address: item?.donorId?.contactInfo?.addressLine1 || '-',
+              district: item?.donorId?.contactInfo?.district || '-',
+              country: item?.donorId?.contactInfo?.country || '-',
+              postcode: item?.donorId?.contactInfo?.postcode || '-'
+            };
+          });
+          break;
+        }
+
+        case 'Form': {
+          const res = await getApi(urls.forms.getAll);
+          filtered = (res?.data?.data || []).filter((item) => item?.isArchive === true);
+          formattedData = filtered.map((item) => ({
+            id: item._id,
+            title: item.title || '-',
+            publicId: item.publicId || '-',
+            template: item.template || '-'
+          }));
+          break;
+        }
+
+        default:
+          console.error('⚠️ No matching listType');
+          return;
+      }
+
+      setRows(formattedData);
+      setLoading(false);
+    } catch (error) {
+      console.error('❌ API call error:', error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (listType) {
+      fetchListData();
+    }
+  }, [listType]);
 
   const handleConfirmUnarchive = async () => {
     try {
@@ -95,13 +280,6 @@ const Archives = () => {
     }
   };
 
-  const dateAddedFilters = [
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'Last 7 Days' },
-    { value: 'month', label: 'Last 30 Days' },
-    { value: 'year', label: 'Last 1 Year' }
-  ];
-
   const fetchpeople = async () => {
     try {
       setLoading(true);
@@ -119,7 +297,7 @@ const Archives = () => {
 
       queryParams.append('page', paginationModel.page + 1);
       queryParams.append('limit', paginationModel.pageSize);
-      queryParams.append('archive', 'true');
+      queryParams.append('isArchive', 'true');
 
       const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
       const allUser = response?.data?.data || [];
@@ -158,41 +336,6 @@ const Archives = () => {
     }
   };
 
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '450',
-              color: '#333',
-              ml: 2,
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            People List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
-
   const handleFilter = () => {
     setPaginationModel({
       page: 0,
@@ -209,8 +352,8 @@ const Archives = () => {
       page: 0,
       pageSize: 10
     });
+    setListType('Service user');
   };
-
   const columns = [
     {
       field: 'person',
@@ -250,7 +393,9 @@ const Archives = () => {
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
-        <Typography variant="h5">Archives</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          Archives
+        </Typography>
         <Stack direction="row" spacing={2} alignItems="center">
           <Box
             sx={{
@@ -309,16 +454,16 @@ const Archives = () => {
       <Grid container spacing={2}>
         <FilterPanel
           showFilter={showFilter}
-          activityTypes={activityTypes}
-          setActivityTypeFilter={setActivityTypeFilter}
+          listType={listTypeFilter}
+          setListType={setListType}
           sessionNames={sessionNames}
           setSessionNameFilter={setSessionNameFilter}
           dateAddedFilters={dateAddedFilters}
           dateOpenedFilter={dateOpenedFilter}
           setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-          includeArchives={includeArchives}
-          setIncludeArchives={setIncludeArchives}
-          selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+          includeServiceuser={includeServiceuser}
+          setIncludeServiceuser={setIncludeServiceuser}
+          selectedFilters={['listTypeFilter', 'dateOpenedFilter']}
           customDateLabel="By Date"
           onReset={handleReset}
         />
@@ -331,8 +476,22 @@ const Archives = () => {
                 loading={loading}
                 rowHeight={65}
                 getRowId={(row) => row.id}
+                onRowSelectionModelChange={(newSelection) => {
+                  setSelectedIds(newSelection);
+                }}
                 slots={{
-                  toolbar: () => <CustomHeader />,
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType={entityTypeMap[listType] || 'service_user'}
+                      title={`${listType} List`}
+                      selectedIds={selectedIds}
+                      enableBulkActions={false}
+                      exportEnabled={true}
+                      extraActions={null}
+                      refetchData={fetchListData}
+                      isCompletlyDelete={true}
+                    />
+                  ),
                   loadingOverlay: () => (
                     <Box
                       sx={{

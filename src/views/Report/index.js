@@ -6,6 +6,7 @@ import Cases from './Tabs/Cases';
 import Session from './Tabs/Session';
 import Survey from './Tabs/Survey';
 import Donor from './Tabs/Donor';
+import Attendee from './Tabs/Attendee'
 import FilterPanel from 'components/FilterPanel';
 import { urls } from 'common/urls';
 import { getApi } from 'common/apiClient';
@@ -122,70 +123,81 @@ const Report = () => {
 
         <Grid item xs={9}>
           <TabContext value={value}>
-            <TabList
-              onChange={handleChange}
-              sx={{
-                display: 'flex'
-              }}
-            >
-              <Tab
-                label="Service User Report"
-                value="1"
-                sx={(theme) => ({
-                  backgroundColor: value === '1' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease',
-                  marginRight: 2,
-                  fontWeight: '600',
-                  fontSize: '14px'
-                })}
-              />
-
-              <Tab
-                label="Cases Report"
-                value="2"
-                sx={(theme) => ({
-                  backgroundColor: value === '2' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease',
-                  marginRight: 2,
-                  fontWeight: '600',
-                  fontSize: '14px'
-                })}
-              />
-
-              <Tab
-                label="Sessions Report"
-                value="3"
-                sx={(theme) => ({
-                  backgroundColor: value === '3' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease',
-                  marginRight: 2,
-                  fontWeight: '600',
-                  fontSize: '14px'
-                })}
-              />
-
-              <Tab
-                label="Surveys Report"
-                value="4"
-                sx={(theme) => ({
-                  backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease',
-                  fontWeight: '600',
-                  fontSize: '14px'
-                })}
-              />
-              <Tab
-                label="Donor Report"
-                value="5"
-                sx={(theme) => ({
-                  backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
-                  transition: 'background-color 0.3s ease',
-                  fontWeight: '600',
-                  fontSize: '14px'
-                })}
-              />
-            </TabList>
-
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', overflowX: 'auto' }}>
+              <TabList
+                onChange={handleChange}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                <Tab
+                  label="Service User Report"
+                  value="1"
+                  sx={{
+                    backgroundColor: value === '1' ? '#e3f2fd' : 'transparent',
+                    transition: 'background-color 0.3s ease',
+                    marginRight: 2,
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
+                />
+                <Tab
+                  label="Cases Report"
+                  value="2"
+                  sx={{
+                    backgroundColor: value === '2' ? '#e3f2fd' : 'transparent',
+                    transition: 'background-color 0.3s ease',
+                    marginRight: 2,
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
+                />
+                <Tab
+                  label="Sessions Report"
+                  value="3"
+                  sx={{
+                    backgroundColor: value === '3' ? '#e3f2fd' : 'transparent',
+                    transition: 'background-color 0.3s ease',
+                    marginRight: 2,
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
+                />
+                <Tab
+                  label="Key Indicators Report"
+                  value="4"
+                  sx={{
+                    backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
+                    transition: 'background-color 0.3s ease',
+                    marginRight: 2,
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
+                />
+                <Tab
+                  label="Attendance Report"
+                  value="5"
+                  sx={{
+                    backgroundColor: value === '5' ? '#e3f2fd' : 'transparent',
+                    transition: 'background-color 0.3s ease',
+                    marginRight: 2,
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
+                />
+                <Tab
+                  label="Donor Report"
+                  value="6"
+                  sx={{
+                    backgroundColor: value === '6' ? '#e3f2fd' : 'transparent',
+                    transition: 'background-color 0.3s ease',
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
+                />
+              </TabList>
+            </Box>
             <TabPanel value="1" sx={{ px: 0 }}>
               <Service
                 countryOfOriginFilter={countryOfOriginFilter}
@@ -217,6 +229,15 @@ const Report = () => {
               <Survey />
             </TabPanel>
             <TabPanel value="5" sx={{ px: 0 }}>
+              <Attendee
+                countryOfOriginFilter={countryOfOriginFilter}
+                selectedName={selectedName}
+                status={status}
+                caseId={caseId}
+                dateOpenedFilter={dateOpenedFilter}
+              />
+            </TabPanel>
+            <TabPanel value="6" sx={{ px: 0 }}>
               <Donor selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />
             </TabPanel>
           </TabContext>

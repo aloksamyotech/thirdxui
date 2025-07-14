@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase } from '@mui/material';
+import { Stack, Grid, Typography, Box, Card, TextField, IconButton, Tooltip, InputBase, Menu, MenuItem, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -8,8 +8,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import InfoIcon from '@mui/icons-material/Info';
 import FilterPanel from 'components/FilterPanel';
 import { getApi } from 'common/apiClient';
+import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import { IconTrash } from '@tabler/icons';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import CustomHeader from 'components/CustomHeader';
 
 const districts = [
   { label: 'Adur and Worthing Borough', value: 'adur_worthing_borough' },
@@ -41,6 +45,8 @@ const Volunteer = () => {
   const [districtFilter, setDistrictFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [isFiltered, setIsFiltered] = useState(false);
   const [dateOpenedFilter, setDateOpenedFilter] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,40 +72,6 @@ const Volunteer = () => {
       label: type.label
     }));
   }, []);
-
-  const CustomHeader = () => {
-    return (
-      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-        <GridToolbarContainer
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#f5f5f5',
-            borderBottom: '1px solid #ddd',
-            width: '100%',
-            height: '100%',
-            padding: '0 12px'
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: '400',
-              color: '#333',
-              fontSize: '14px',
-              lineHeight: '36px'
-            }}
-          >
-            Volunteer List
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <GridToolbarExport />
-          </Box>
-        </GridToolbarContainer>
-      </Box>
-    );
-  };
 
   const columns = [
     {
@@ -242,7 +214,7 @@ const Volunteer = () => {
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <Grid>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
           <Tooltip title="Add" arrow>
             <IconButton
               onClick={() => navigate('/add-volunteer')}
@@ -257,9 +229,9 @@ const Volunteer = () => {
                 color: 'white',
                 gap: 1,
                 fontSize: '14px',
+                padding: '22px',
                 '&:hover': {
-                  backgroundColor: '#1565c0',
-                  color: '#ffffff'
+                  backgroundColor: '#009fc7'
                 }
               }}
             >
@@ -276,7 +248,7 @@ const Volunteer = () => {
               paddingLeft: '16px',
               border: '1px solid #e0e0e0',
               width: '489px',
-              height: '40px'
+              height: '45px'
             }}
           >
             <InputBase
@@ -357,12 +329,25 @@ const Volunteer = () => {
                 paginationMode="server"
                 paginationModel={paginationModel}
                 onPaginationModelChange={setPaginationModel}
+                onRowSelectionModelChange={(newSelection) => {
+                  setSelectedIds(newSelection);
+                }}
                 pageSizeOptions={[5, 10, 25, 50]}
                 rowHeight={65}
                 getRowId={(row) => row.id}
                 onRowClick={(params) => navigate('/view-people', { state: params.row })}
                 slots={{
-                  toolbar: () => <CustomHeader />,
+                  toolbar: () => (
+                    <CustomHeader
+                      entityType="volunteer"
+                      title="Volunteer List"
+                      selectedIds={selectedIds}
+                      enableBulkActions={false}
+                      exportEnabled={true}
+                      extraActions={null}
+                      refetchData={fetchpeople}
+                    />
+                  ),
                   loadingOverlay: () => (
                     <Box
                       sx={{

@@ -15,6 +15,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 import { useNavigate } from 'react-router-dom';
 import AntSwitch from 'components/AntSwitch.js';
 import { useForm, Controller } from 'react-hook-form';
@@ -171,7 +173,12 @@ const MailingListForm = () => {
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Create list of Service User</Typography>
+        <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" gap={1}>
+          <IconButton onClick={() => navigate(-1)} size="small">
+            <ArrowBackIcon />
+          </IconButton>
+          Create list of Service User
+        </Typography>
 
         <Box
           sx={{
@@ -184,7 +191,7 @@ const MailingListForm = () => {
             height: 32,
             cursor: 'pointer'
           }}
-          onClick={() => navigate('/mail')}
+          onClick={() => navigate(-1)}
         >
           <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
         </Box>
@@ -362,7 +369,7 @@ const MailingListForm = () => {
               </Button>
             </Grid>
             <Grid item>
-              <Button variant="outlined" color="error" onClick={() => navigate('/mail')}>
+              <Button variant="outlined" color="error" onClick={() => navigate(-1)}>
                 CANCEL
               </Button>
             </Grid>

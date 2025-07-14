@@ -1,72 +1,95 @@
 import { Box, Stack } from '@mui/system';
 import React from 'react';
-import { Grid, TextField, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { PieChart } from '@mui/x-charts';
+import { PieChart } from '@mui/x-charts/PieChart';
 
 const Chart = () => {
+  const data = [3, 7, 10, 12, 6];
+  const labels = ['Sammy', 'Tasmin', 'James', 'Carl', 'Bradley'];
+
   return (
-    <>
-      <Grid container spacing={4}>
-        <Grid item xs={8}>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Traffic Source</Typography>
-            <Stack direction="row" spacing={2}>
-              <Typography sx={{ fontSize: '12px' }}>
-                Total Service User - <span style={{ color: '#666cff' }}>654</span>
-              </Typography>
-              <Typography sx={{ fontSize: '12px' }}>
-                Total Referred Accepted - <span style={{ color: '#666cff' }}>14</span>
-              </Typography>
-            </Stack>
-          </Stack>
+    <Grid container spacing={4}>
+      <Grid item xs={6}>
+        <Box
+          sx={{
+            backgroundColor: '#fff',
+            boxShadow: '1px 1px 5px #d4d4d4',
+            borderRadius: '10px',
+            mt: 1
+          }}
+        >
+          <Typography sx={{ fontWeight: 'bold', fontSize: '16px', px: 2, pt: 2 }}>Random</Typography>
+          <BarChart
+            layout="horizontal"
+            series={[
+              {
+                id: 'bar-series-1',
+                data: [3, 7, 10, 12, 6],
+                color: '#009FC7'
+              }
+            ]}
+            xAxis={[
+              {
+                id: 'x-axis',
+                scaleType: 'linear',
+                label: 'Units of measure'
+              }
+            ]}
+            yAxis={[
+              {
+                id: 'y-axis',
+                scaleType: 'band',
+                data: ['Sammy', 'Tasmin', 'James', 'Carl', 'Bradley']
+              }
+            ]}
+            height={300}
+            margin={{ top: 10, bottom: 30, left: 80, right: 20 }}
+          />
+        </Box>
+      </Grid>
 
-          <Box
-            sx={{
-              backgroundColor: '#fff',
-              boxShadow: '1px 1px 5px #d4d4d4',
-              borderRadius: '10px',
-              padding: '10px',
-              mt: 2
-            }}
-          >
-            <BarChart
-              series={[{ data: [35, 44, 24, 34] }, { data: [51, 6, 49, 30] }, { data: [15, 25, 30, 50] }, { data: [60, 50, 15, 25] }]}
-              height={290}
-              xAxis={[{ data: ['Q1', 'Q2', 'Q3', 'Q4'], scaleType: 'band' }]}
-              margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
-            />
-          </Box>
-        </Grid>
+      <Grid item xs={6}>
+        <Box
+          sx={{
+            backgroundColor: '#fff',
+            boxShadow: '1px 1px 5px #d4d4d4',
+            borderRadius: '10px',
+            mt: 1
+          }}
+        >
+          <Typography sx={{ fontWeight: 'bold', fontSize: '16px', px: 2, pt: 2 }}>Random</Typography>
 
-        <Grid item xs={4}>
-          <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>Income</Typography>
-          <Box
-            sx={{
-              backgroundColor: '#fff',
-              boxShadow: '1px 1px 5px #d4d4d4',
-              borderRadius: '10px',
-              mt: 2
-            }}
-          >
+          <Box sx={{ paddingLeft: '50px' }}>
             <PieChart
               series={[
                 {
                   data: [
-                    { id: 0, value: 10 },
-                    { id: 1, value: 15 },
-                    { id: 2, value: 20 }
-                  ]
+                    { id: 0, value: 1, label: '1%', color: '#B9EAFE' },
+                    { id: 1, value: 5, label: '5%', color: '#8DD8F8' },
+                    { id: 2, value: 11, label: '14 - 15\n11%', color: '#4C9BB8' },
+                    { id: 3, value: 64, label: '16 - 17\n64%', color: '#092E43' },
+                    { id: 4, value: 19, label: '18 - 19\n19%', color: '#44B5DD' }
+                  ],
+                  arcLabel: (item) => item.label,
+                  arcLabelMinAngle: 10,
+                  paddingAngle: 1
                 }
               ]}
-              width={300}
+              width={320}
               height={300}
-              sx={{ ml: 1 }}
+              slotProps={{ legend: { hidden: true } }}
+              sx={{
+                [`& .MuiPieArcLabel-root`]: {
+                  fill: '#fff',
+                  fontSize: '14px'
+                }
+              }}
             />
           </Box>
-        </Grid>
+        </Box>
       </Grid>
-    </>
+    </Grid>
   );
 };
 

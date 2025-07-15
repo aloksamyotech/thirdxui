@@ -48,6 +48,7 @@ const AboutCase = Loadable(lazy(() => import('views/AboutCase')));
 const AboutCaseNote = Loadable(lazy(() => import('views/AboutCaseNote')));
 const List = Loadable(lazy(() => import('views/List')));
 const AddConfigUser = Loadable(lazy(() => import('views/AddConfigUser')));
+const DuplicatesView = Loadable(lazy(() => import('views/Duplicate/view')));
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -244,6 +245,10 @@ const MainRoutes = {
         {
           path: 'add-config-user',
           element: <AddConfigUser />
+        },
+        {
+          path: 'view-duplicates',
+          element: <DuplicatesView />
         }
       ]
     }

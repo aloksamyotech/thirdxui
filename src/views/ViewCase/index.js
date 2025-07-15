@@ -156,7 +156,7 @@ const CaseDetailsPage = () => {
     },
     {
       field: 'hidden',
-      headerName: 'Hide',
+      headerName: 'View More',
       flex: 0.7,
       renderCell: (params) => <IconButton>{params.value ? <VisibilityOff /> : <Visibility />}</IconButton>
     }
@@ -455,29 +455,137 @@ const CaseDetailsPage = () => {
                 <SectionSkeleton lines={1} variant="rectangular" width="100%" height={130} />
               </Box>
             ) : (
+              // <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
+              //   <TableContainer component={Paper} elevation={0}>
+              //     <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+              //       <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
+              //         <TableRow>
+              //           {[
+              //             'Case Id',
+              //             'Service User',
+              //             'Owner',
+              //             'Date Opened',
+              //             'Date Closed',
+              //             'Attachments',
+              //             'Total Hours',
+              //             'Status',
+              //             'View More'
+              //           ].map((header) => (
+              //             <TableCell
+              //               key={header}
+              //               sx={{
+              //                 fontSize: '12px',
+              //                 whiteSpace: 'nowrap',
+              //                 padding: '4px',
+              //                 borderBottom: 'none',
+              //                 height: '50px',
+              //                 ...(header === 'Total Hours' && { pr: 2 })
+              //               }}
+              //             >
+              //               {header}
+              //             </TableCell>
+              //           ))}
+              //         </TableRow>
+              //       </TableHead>
+              //       <TableBody
+              //         sx={{
+              //           height: '73px',
+              //           cursor: 'pointer',
+              //           '&:hover': {
+              //             backgroundColor: 'grey.200'
+              //           }
+              //         }}
+              //         onClick={handleClick}
+              //       >
+              //         <TableRow key={row.caseId}>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {serviceuserDetails?.uniqueId || '-'}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {serviceuserDetails?.personalInfo?.firstName || '-'}
+              //             </Typography>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {serviceuserDetails?.personalInfo?.lastName || ''}
+              //             </Typography>
+              //           </TableCell>
+
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {caseData?.caseOwnerDetails?.[0]?.personalInfo?.firstName || '-'}
+              //             </Typography>
+              //             <Typography variant="body2" sx={{ fontSize: '12px' }}>
+              //               {caseData?.caseOwnerDetails?.[0]?.personalInfo?.lastName || ''}
+              //             </Typography>
+              //           </TableCell>
+
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {formatDate(caseData?.caseOpened || '')}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {formatDate(caseData?.caseClosed || '')}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+              //             {(() => {
+              //               if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
+              //               const startDate = new Date(caseData.caseOpened);
+              //               const endDate = new Date(caseData.caseClosed);
+              //               const diffTime = Math.abs(endDate - startDate);
+              //               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+              //               return `${diffHours} hrs`;
+              //             })()}
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '14px', borderBottom: 'none' }}>
+              //             <StatusChip status={caseData?.status.charAt(0).toUpperCase() + caseData?.status.slice(1).toLowerCase()} />
+              //           </TableCell>
+              //           <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
+              //             <IconButton>
+              //               {' '}
+              //               <Visibility />
+              //             </IconButton>
+              //           </TableCell>
+              //         </TableRow>
+              //       </TableBody>
+              //     </Table>
+              //   </TableContainer>
+              // </Box>
+
               <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
                 <TableContainer component={Paper} elevation={0}>
                   <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
                     <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
                       <TableRow>
-                        {['Case Id', 'Service User', 'Owner', 'Date Opened', 'Date Closed', 'Attachments', 'Total Hours', 'Status'].map(
-                          (header) => (
-                            <TableCell
-                              key={header}
-                              sx={{
-                                fontSize: '12px',
-                                whiteSpace: 'nowrap',
-                                padding: '6px',
-                                borderBottom: 'none',
-                                height: '50px'
-                              }}
-                            >
-                              {header}
-                            </TableCell>
-                          )
-                        )}
+                        {[
+                          'Case Id',
+                          'Service User',
+                          'Owner',
+                          'Date Opened',
+                          'Date Closed',
+                          'Attachments',
+                          'Total Hours',
+                          'Status',
+                          'View More'
+                        ].map((header) => (
+                          <TableCell
+                            key={header}
+                            sx={{
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap',
+                              padding: '4px',
+                              borderBottom: 'none',
+                              height: '50px',
+                              ...(header === 'Total Hours' && { pr: 3 })
+                            }}
+                          >
+                            {header}
+                          </TableCell>
+                        ))}
                       </TableRow>
                     </TableHead>
+
                     <TableBody
                       sx={{
                         height: '73px',
@@ -492,6 +600,7 @@ const CaseDetailsPage = () => {
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {serviceuserDetails?.uniqueId || '-'}
                         </TableCell>
+
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           <Typography variant="body2" sx={{ fontSize: '12px' }}>
                             {serviceuserDetails?.personalInfo?.firstName || '-'}
@@ -513,13 +622,23 @@ const CaseDetailsPage = () => {
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {formatDate(caseData?.caseOpened || '')}
                         </TableCell>
+
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {formatDate(caseData?.caseClosed || '')}
                         </TableCell>
+
                         <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
                           {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
+
+                        <TableCell
+                          sx={{
+                            fontSize: '12px',
+                            padding: '6px',
+                            borderBottom: 'none',
+                            pr: 3
+                          }}
+                        >
                           {(() => {
                             if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
                             const startDate = new Date(caseData.caseOpened);
@@ -529,8 +648,27 @@ const CaseDetailsPage = () => {
                             return `${diffHours} hrs`;
                           })()}
                         </TableCell>
-                        <TableCell sx={{ fontSize: '14px', padding: '6px', borderBottom: 'none' }}>
+
+                        <TableCell
+                          sx={{
+                            fontSize: '14px',
+                            padding: '2px',
+                            borderBottom: 'none'
+                          }}
+                        >
                           <StatusChip status={caseData?.status.charAt(0).toUpperCase() + caseData?.status.slice(1).toLowerCase()} />
+                        </TableCell>
+
+                        <TableCell
+                          sx={{
+                            fontSize: '14px',
+                            padding: '4px',
+                            borderBottom: 'none'
+                          }}
+                        >
+                          <IconButton>
+                            <Visibility />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     </TableBody>

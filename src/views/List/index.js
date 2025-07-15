@@ -17,7 +17,7 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
-import { ROLES } from 'common/constants';
+import { dateAddedFilters, entityTypeMap, listTypeFilter, ROLES, sessionNames } from 'common/constants';
 import CustomHeader from 'components/CustomHeader';
 const List = () => {
   const navigate = useNavigate();
@@ -43,30 +43,9 @@ const List = () => {
     { value: 'outreach', label: 'Outreach' },
     { value: 'training', label: 'Training' }
   ];
-  const sessionNames = [
-    { value: 'sessionA', label: 'Session A' },
-    { value: 'sessionB', label: 'Session B' }
-  ];
-  const listTypeFilter = [
-    { value: 'Service user', label: 'Service user' },
-    { value: 'Volunteer', label: 'Volunteer ' },
-    { value: 'Service', label: 'Service ' },
-    { value: 'Case', label: 'Case' },
-    { value: 'Donor', label: 'Donor' },
-    { value: 'Mailing List', label: 'Mailing List' },
-    { value: 'Donation', label: 'Donation' },
-    { value: 'Form', label: 'Form' }
-  ];
-  const entityTypeMap = {
-    'Service user': 'service_user',
-    Volunteer: 'volunteer',
-    Service: 'services',
-    Case: 'cases',
-    Donor: 'donor',
-    'Mailing List': 'mailing_list',
-    Donation: 'donation',
-    Form: 'form'
-  };
+  
+  
+  
 
   const handleConfirmUnarchive = async () => {
     try {
@@ -99,12 +78,7 @@ const List = () => {
     }
   };
 
-  const dateAddedFilters = [
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'Last 7 Days' },
-    { value: 'month', label: 'Last 30 Days' },
-    { value: 'year', label: 'Last 1 Year' }
-  ];
+  
   const fetchListData = async () => {
     setLoading(true);
     try {

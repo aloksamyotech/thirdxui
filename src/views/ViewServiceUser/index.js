@@ -178,6 +178,7 @@ const UserProfileCard = () => {
   const emergencyContact = userData?.emergencyContact || {};
   const contactPreferences = userData?.contactPreferences || {};
   const otherInfo = userData?.otherInfo || {};
+  const service = userData?.Service || [];
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -801,6 +802,132 @@ const UserProfileCard = () => {
                     )}
                   </Card>
                 </Grid>
+
+                {service.map((item, index) => (
+                  <Grid item xs={12} md={6} key={item._id || index}>
+                    <Card sx={{ m: 1, border: '1px solid #e0e0e0', height: '300px' }}>
+                      {' '}
+                      <CardContent>
+                        <Typography
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            color: '#053146',
+                            mb: 1
+                          }}
+                          gutterBottom
+                        >
+                          Service Details
+                        </Typography>
+
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Service Name:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.serviceName?.name}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Start Date:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {new Date(item?.startDate).toLocaleDateString('en-GB')}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Last Date:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {new Date(item?.lastDate).toLocaleDateString('en-GB')}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Emergency Phone:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.emergencyPhone}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Emergency Email:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.emergencyEmail}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
+
+                          <Grid item xs={6}>
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Name:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerName}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Job Title:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerJob}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Phone:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerPhone}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referrer Email:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referrerEmail}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referral Type:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {item?.referralType}
+                                </Typography>
+                              </Typography>
+                            </Box>
+
+                            <Box display="flex" alignItems="center" mb={1}>
+                              <Typography className="heading" variant="body1">
+                                Referred Date:{' '}
+                                <Typography marginLeft={1} component="span" className="text">
+                                  {new Date(item?.referredDate).toLocaleDateString('en-GB')}
+                                </Typography>
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
             )}
 

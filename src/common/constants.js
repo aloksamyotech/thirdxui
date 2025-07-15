@@ -69,3 +69,17 @@ export const statusFilter = [
 ];
 
 export const TagCategoryAppliedToOptions = ['Service Users', 'Staff', 'Volunteers', 'Donors'];
+
+export const accountTypes = [
+    { label: 'Admin', value: 'admin' },
+    { label: 'User', value: 'user' },
+];
+
+export const permissionsList = [
+    { label: 'People', key: 'people' },
+    { label: 'Cases', key: 'cases' },
+    { label: 'Services', key: 'services' },
+    { label: 'Forms', key: 'forms' },
+    { label: 'Donor management', key: 'donorManagement' },
+    { label: 'Mailing List', key: 'mailingList' }
+];

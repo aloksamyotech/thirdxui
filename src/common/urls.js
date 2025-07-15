@@ -128,7 +128,8 @@ export const urls = Object.freeze({
     getAllAdmin: `${baseUrl}/admin/getAllAdmin`,
     forgotPassword: `${baseUrl}/admin/forgot-password`,
     otpvarify: `${baseUrl}/admin/verify-otp`,
-    resetPassword: `${baseUrl}/admin/reset-password`
+    resetPassword: `${baseUrl}/admin/reset-password`,
+    createConfigUser: `${baseUrl}/admin/create-user`
   },
   bulkFuntions: {
     delete: `${baseUrl}/bulk/delete`,

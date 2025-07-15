@@ -355,7 +355,7 @@ const User = () => {
           <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
             <Tooltip title="Add" arrow>
               <IconButton
-                onClick={() => navigate('/add-user')}
+                onClick={() => navigate('/add-config-user')}
                 sx={{
                   backgroundColor: '#009fc7',
                   borderRadius: '4px',

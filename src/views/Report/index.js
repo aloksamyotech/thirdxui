@@ -24,16 +24,6 @@ const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
-const nameFilter = [
-  { value: 'name1', label: 'Name 1' },
-  { value: 'name2', label: 'Name 2' }
-];
-
-const caseIds = [
-  { value: 'case001', label: 'Case 001' },
-  { value: 'case002', label: 'Case 002' }
-];
-
 const Report = () => {
   const [value, setValue] = useState('1');
   const [showFilter, setShowFilter] = useState(true);
@@ -100,7 +90,7 @@ const Report = () => {
   return (
     <>
       <Grid container spacing={2}>
-        <FilterPanel
+        {/* <FilterPanel
           showFilter={showFilter}
           statuses={statusFilter}
           statusFilter={status}
@@ -119,9 +109,9 @@ const Report = () => {
           setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
           selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter']}
           customDateLabel="By Date"
-        />
+        /> */}
 
-        <Grid item xs={9}>
+        <Grid item xs={12}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', overflowX: 'auto' }}>
               <TabList
@@ -130,115 +120,482 @@ const Report = () => {
                 scrollButtons="auto"
                 allowScrollButtonsMobile
                 sx={{ whiteSpace: 'nowrap' }}
+                TabIndicatorProps={{ style: { backgroundColor: '#666CFF' } }}
               >
                 <Tab
                   label="Service User Report"
                   value="1"
                   sx={{
-                    backgroundColor: value === '1' ? '#e3f2fd' : 'transparent',
+                    backgroundColor: value === '1' ? '#666CFF1A' : 'transparent',
                     transition: 'background-color 0.3s ease',
                     marginRight: 2,
                     fontWeight: '600',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    color: '#2E2E30E5',
+                    '&.Mui-selected': {
+                      color: '#666CFF',
+                      backgroundColor: '#666CFF1A',
+                      borderColor: '#666CFF'
+                    }
                   }}
                 />
                 <Tab
                   label="Cases Report"
                   value="2"
                   sx={{
-                    backgroundColor: value === '2' ? '#e3f2fd' : 'transparent',
+                    backgroundColor: value === '2' ? '#666CFF1A' : 'transparent',
                     transition: 'background-color 0.3s ease',
                     marginRight: 2,
                     fontWeight: '600',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    color: '#2E2E30E5',
+                    '&.Mui-selected': {
+                      color: '#666CFF',
+                      backgroundColor: '#666CFF1A',
+                      borderColor: '#666CFF'
+                    }
                   }}
                 />
                 <Tab
                   label="Sessions Report"
                   value="3"
                   sx={{
-                    backgroundColor: value === '3' ? '#e3f2fd' : 'transparent',
+                    backgroundColor: value === '3' ? '#666CFF1A' : 'transparent',
                     transition: 'background-color 0.3s ease',
                     marginRight: 2,
                     fontWeight: '600',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    color: '#2E2E30E5',
+                    '&.Mui-selected': {
+                      color: '#666CFF',
+                      backgroundColor: '#666CFF1A',
+                      borderColor: '#666CFF'
+                    }
                   }}
                 />
                 <Tab
                   label="Key Indicators Report"
                   value="4"
                   sx={{
-                    backgroundColor: value === '4' ? '#e3f2fd' : 'transparent',
+                    backgroundColor: value === '4' ? '#666CFF1A' : 'transparent',
                     transition: 'background-color 0.3s ease',
                     marginRight: 2,
                     fontWeight: '600',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    color: '#2E2E30E5',
+                    '&.Mui-selected': {
+                      color: '#666CFF',
+                      backgroundColor: '#666CFF1A',
+                      borderColor: '#666CFF'
+                    }
                   }}
                 />
                 <Tab
                   label="Attendance Report"
                   value="5"
                   sx={{
-                    backgroundColor: value === '5' ? '#e3f2fd' : 'transparent',
+                    backgroundColor: value === '5' ? '#666CFF1A' : 'transparent',
                     transition: 'background-color 0.3s ease',
                     marginRight: 2,
                     fontWeight: '600',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    color: '#2E2E30E5',
+                    '&.Mui-selected': {
+                      color: '#666CFF',
+                      backgroundColor: '#666CFF1A',
+                      borderColor: '#666CFF'
+                    }
                   }}
                 />
                 <Tab
                   label="Donor Report"
                   value="6"
                   sx={{
-                    backgroundColor: value === '6' ? '#e3f2fd' : 'transparent',
+                    backgroundColor: value === '6' ? '#666CFF1A' : 'transparent',
                     transition: 'background-color 0.3s ease',
                     fontWeight: '600',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    color: '#2E2E30E5',
+                    '&.Mui-selected': {
+                      color: '#666CFF',
+                      backgroundColor: '#666CFF1A',
+                      borderColor: '#666CFF'
+                    }
                   }}
                 />
               </TabList>
             </Box>
-            <TabPanel value="1" sx={{ px: 0 }}>
-              <Service
-                countryOfOriginFilter={countryOfOriginFilter}
-                selectedName={selectedName}
-                status={status}
-                caseId={caseId}
-                dateOpenedFilter={dateOpenedFilter}
-              />
+
+            <TabPanel
+              value="1"
+              sx={{
+                px: 0,
+                display: 'flex',
+                gap: 2,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 300,
+                  flexShrink: 0,
+                  minWidth: 300,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important',
+                  },
+                  // marginTop:9
+                }}
+              >
+                <FilterPanel
+                  {...{
+                    showFilter,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Service
+                  countryOfOriginFilter={countryOfOriginFilter}
+                  selectedName={selectedName}
+                  status={status}
+                  caseId={caseId}
+                  dateOpenedFilter={dateOpenedFilter}
+                />
+              </Box>
             </TabPanel>
-            <TabPanel value="2" sx={{ px: 0 }}>
-              <Cases
-                countryOfOriginFilter={countryOfOriginFilter}
-                selectedName={selectedName}
-                status={status}
-                caseId={caseId}
-                dateOpenedFilter={dateOpenedFilter}
-              />
+
+            <TabPanel
+              value="2"
+              sx={{
+                px: 0,
+                display: 'flex',
+                gap: 2,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 300,
+                  flexShrink: 0,
+                  minWidth: 300,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important',
+                  },
+                  // marginTop:9
+                }}
+              >
+                <FilterPanel
+                  {...{
+                    showFilter,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Cases
+                  countryOfOriginFilter={countryOfOriginFilter}
+                  selectedName={selectedName}
+                  status={status}
+                  caseId={caseId}
+                  dateOpenedFilter={dateOpenedFilter}
+                />
+              </Box>
             </TabPanel>
-            <TabPanel value="3" sx={{ px: 0 }}>
-              <Session
-                countryOfOriginFilter={countryOfOriginFilter}
-                selectedName={selectedName}
-                status={status}
-                caseId={caseId}
-                dateOpenedFilter={dateOpenedFilter}
-              />
+
+            <TabPanel
+              value="3"
+              sx={{
+                px: 0,
+                display: 'flex',
+                gap: 2,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 300,
+                  flexShrink: 0,
+                  minWidth: 300,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important',
+                  },
+                  // marginTop:9
+                }}
+              >
+                <FilterPanel
+                  {...{
+                    showFilter,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Session
+                  countryOfOriginFilter={countryOfOriginFilter}
+                  selectedName={selectedName}
+                  status={status}
+                  caseId={caseId}
+                  dateOpenedFilter={dateOpenedFilter}
+                />
+              </Box>
             </TabPanel>
-            <TabPanel value="4" sx={{ px: 0 }}>
-              <Survey />
+
+            <TabPanel
+              value="4"
+              sx={{
+                px: 0,
+                display: 'flex',
+                gap: 2,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 300,
+                  flexShrink: 0,
+                  minWidth: 300,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important',
+                  },
+                  // marginTop:9
+                }}
+              >
+                <FilterPanel
+                  {...{
+                    showFilter,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Survey />
+              </Box>
             </TabPanel>
-            <TabPanel value="5" sx={{ px: 0 }}>
-              <Attendee
-                countryOfOriginFilter={countryOfOriginFilter}
-                selectedName={selectedName}
-                status={status}
-                caseId={caseId}
-                dateOpenedFilter={dateOpenedFilter}
-              />
+
+            <TabPanel
+              value="5"
+              sx={{
+                px: 0,
+                display: 'flex',
+                gap: 2,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 300,
+                  flexShrink: 0,
+                  minWidth: 300,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important',
+                  },
+                  // marginTop:9
+                }}
+              >
+                <FilterPanel
+                  {...{
+                    showFilter,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Attendee
+                  countryOfOriginFilter={countryOfOriginFilter}
+                  selectedName={selectedName}
+                  status={status}
+                  caseId={caseId}
+                  dateOpenedFilter={dateOpenedFilter}
+                />
+              </Box>
             </TabPanel>
-            <TabPanel value="6" sx={{ px: 0 }}>
-              <Donor selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />
+
+            <TabPanel
+              value="6"
+              sx={{
+                px: 0,
+                display: 'flex',
+                gap: 2,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 300,
+                  flexShrink: 0,
+                  minWidth: 300,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important',
+                  },
+                  // marginTop:9
+                }}
+              >
+                <FilterPanel
+                  {...{
+                    showFilter,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}
+              >
+                <Donor selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />
+              </Box>
             </TabPanel>
           </TabContext>
         </Grid>

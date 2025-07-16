@@ -248,7 +248,7 @@ const Dashboard = () => {
               }
 
               setError('');
-              navigate('/view-service', {
+              navigate('/add-session', {
                 state: {
                   serviceId: selectedService._id,
                   serviceName: selectedService.name

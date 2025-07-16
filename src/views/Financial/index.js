@@ -48,13 +48,16 @@ const Financial = () => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const renderWithDash = (value) => {
+    return value !== 'N/A' && value !== undefined && value !== null && value !== '' ? value : '-';
+  };
 
   const columns = [
     {
       field: 'title',
       headerName: 'Date',
       flex: 1,
-      renderCell: (params) => <Typography>{params.value || '-'}</Typography>
+      renderCell: (params) => <Typography>{renderWithDash(params.value)}</Typography>
     },
     {
       field: 'type',
@@ -69,7 +72,7 @@ const Financial = () => {
             overflowWrap: 'break-word'
           }}
         >
-          {params.value || '-'}
+          {renderWithDash(params.value)}
         </Typography>
       )
     },
@@ -77,7 +80,7 @@ const Financial = () => {
       field: 'code',
       headerName: 'Campaign',
       flex: 1,
-      renderCell: (params) => <Typography>{params.value || '-'}</Typography>
+      renderCell: (params) => <Typography>{renderWithDash(params.value)}</Typography>
     },
     {
       field: 'status',
@@ -90,24 +93,15 @@ const Financial = () => {
 
         const formatAmount = (amount) => {
           if (!amount) return '-';
-
-          // Remove currency symbol if any
           const numericValue = parseFloat(String(amount).replace(/[^0-9.]/g, ''));
-
           if (isNaN(numericValue)) return '-';
-
-          if (numericValue >= 1_000_000_000) {
-            return `$${(numericValue / 1_000_000_000).toFixed(1)}B`;
-          } else if (numericValue >= 1_000_000) {
-            return `$${(numericValue / 1_000_000).toFixed(1)}M`;
-          } else if (numericValue >= 1_000) {
-            return `$${(numericValue / 1_000).toFixed(1)}K`;
-          }
-
+          if (numericValue >= 1_000_000_000) return `$${(numericValue / 1_000_000_000).toFixed(1)}B`;
+          if (numericValue >= 1_000_000) return `$${(numericValue / 1_000_000).toFixed(1)}M`;
+          if (numericValue >= 1_000) return `$${(numericValue / 1_000).toFixed(1)}K`;
           return `$${numericValue}`;
         };
 
-        return <Typography sx={{ color: 'green' }}>{formatAmount(rawValue)}</Typography>;
+        return <Typography sx={{ color: 'green' }}>{renderWithDash(formatAmount(rawValue))}</Typography>;
       }
     },
     {
@@ -116,7 +110,7 @@ const Financial = () => {
       flex: 1,
       headerAlign: 'center',
       align: 'center',
-      renderCell: (params) => <Typography>{params.value || '-'}</Typography>
+      renderCell: (params) => <Typography>{renderWithDash(params.value)}</Typography>
     }
   ];
 
@@ -159,11 +153,11 @@ const Financial = () => {
 
         return {
           id: item._id || index,
-          title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-          type: donorName || 'N/A',
-          code: item.campaign?.name || '',
-          status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
-          more: item.transactionId || ''
+          title: renderWithDash(item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''),
+          type: renderWithDash(donorName),
+          code: renderWithDash(item.campaign?.name),
+          status: renderWithDash(item.amountPaid != null ? `₹${item.amountPaid}` : ''),
+          more: renderWithDash(item.transactionId)
         };
       });
 
@@ -199,20 +193,22 @@ const Financial = () => {
         `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
       );
       const allTransaction = response?.data?.data || [];
-
       const pagination = response?.data?.meta || { total: 0 };
+      const formattedTransactions = allTransaction?.map((item, index) => {
+        const donorName =
+          item?.donorId?.subRole === 'donar_individual'
+            ? `${item?.donorId?.personalInfo?.firstName || ''} ${item?.donorId?.personalInfo?.lastName || ''}`.trim()
+            : item?.donorId?.companyInformation?.companyName;
 
-      const formattedTransactions = allTransaction?.map((item, index) => ({
-        id: item._id || index,
-        title: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-        type:
-          [item?.donorId?.personalInfo?.firstName, item?.donorId?.personalInfo?.lastName, item?.donorId?.companyInformation?.companyName] ||
-          '',
-
-        code: item.campaign?.name || item.campaign || '',
-        status: item.amountPaid != null ? `₹${item.amountPaid}` : '',
-        more: item.transactionId || ''
-      }));
+        return {
+          id: item._id || index,
+          title: renderWithDash(item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''),
+          type: renderWithDash(donorName),
+          code: renderWithDash(item.campaign?.name || item.campaign),
+          status: renderWithDash(item.amountPaid != null ? `₹${item.amountPaid}` : ''),
+          more: renderWithDash(item.transactionId)
+        };
+      });
 
       setRows(formattedTransactions);
 

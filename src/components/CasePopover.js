@@ -25,7 +25,7 @@ import { IconTrash } from '@tabler/icons';
 import { useNavigate } from 'react-router-dom';
 import { urls } from 'common/urls';
 import toast from 'react-hot-toast';
-import { postApi } from 'common/apiClient';
+import { postApi, updateApiPatch } from 'common/apiClient';
 import CaseNoteDialog from 'components/AddCaseNote';
 
 const CasePopover = ({ open, anchorEl, onClose, data }) => {
@@ -70,11 +70,11 @@ const CasePopover = ({ open, anchorEl, onClose, data }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await postApi(`${urls.casenote.delete}${data?.id}`);
+      await updateApiPatch(`${urls.casenote.delete}${data?.id}`);
       setConfirmDeleteOpen(false);
       onClose();
-      toast.success('Service deleted successfully!');
-      navigate('/services');
+      toast.success('case deleted successfully!');
+      navigate('/case');
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error('Failed to delete the user.');
@@ -89,8 +89,8 @@ const CasePopover = ({ open, anchorEl, onClose, data }) => {
       });
       setConfirmArchiveOpen(false);
       onClose();
-      toast.success('Service archived successfully!');
-      navigate('/services');
+      toast.success('case archived successfully!');
+      navigate('/case');
     } catch (error) {
       console.error('Error archiving user:', error);
       toast.error('Failed to archive the user.');

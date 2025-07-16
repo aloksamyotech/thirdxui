@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Box, Tabs, Tab, Grid } from '@mui/material';
 import Chart from './SessionChart.js';
 import SessionList from './SessionList';
+import FilterPanel from 'components/FilterPanel.js';
 
-const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
+const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter, FilterPanelProp }) => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -40,15 +41,80 @@ const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpen
       </Tabs>
 
       <Box>
-        {value === 0 && <Chart />}
+        {value === 0 && (
+          <Box
+            sx={{
+              px: 0,
+              display: 'flex',
+              gap: 4,
+              alignItems: 'flex-start',
+              width: '100%',
+              flexWrap: 'nowrap'
+            }}
+          >
+            <Box
+              sx={{
+                mt: 1,
+                width: 300,
+                flexShrink: 0,
+                '& .MuiGrid-root': {
+                  width: '100% !important',
+                  minWidth: '300px !important'
+                }
+              }}
+            >
+              <FilterPanel {...FilterPanelProp} />
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 2,
+                flexShrink: 1,
+                minWidth: 0
+              }}
+            >
+              <Chart />
+            </Box>
+          </Box>
+        )}
         {value === 1 && (
-          <SessionList
-            countryOfOriginFilter={countryOfOriginFilter}
-            selectedName={selectedName}
-            status={status}
-            caseId={caseId}
-            dateOpenedFilter1={dateOpenedFilter}
-          />
+          <Box
+            sx={{
+              px: 0,
+              display: 'flex',
+              gap: 4,
+              alignItems: 'flex-start',
+              width: '100%',
+              flexWrap: 'nowrap'
+            }}
+          >
+            <Box
+              sx={{
+                width: 300,
+                flexShrink: 0,
+                '& .MuiGrid-root': {
+                  width: '100% !important',
+                  minWidth: '300px !important'
+                }
+              }}
+            >
+              <FilterPanel {...FilterPanelProp} />
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 2,
+                flexShrink: 1,
+                minWidth: 0
+              }}
+            >
+              <SessionList
+                countryOfOriginFilter={countryOfOriginFilter}
+                selectedName={selectedName}
+                status={status}
+                caseId={caseId}
+                dateOpenedFilter1={dateOpenedFilter}
+              />
+            </Box>
+          </Box>
         )}
       </Box>
     </Grid>

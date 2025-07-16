@@ -209,7 +209,7 @@ const ServiceDetails = () => {
                 <Grid item xs={6}>
                   <Stack spacing={2}>
                     {[
-                      { label: 'Location:', value: sessionData?.[0]?.country || '-' },
+                      { label: 'Location:', value: sessionData?.[0]?.country?.name || '-' },
                       {
                         label: 'Session Lead:',
                         value: [sessionData?.[0]?.serviceuser?.personalInfo?.firstName, sessionData?.[0]?.serviceuser?.personalInfo?.lastName]

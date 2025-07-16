@@ -48,7 +48,7 @@ const User = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [nameFilterOptions, setNameFilterOptions] = useState([]);
   const [selectedName, setSelectedName] = useState('');
-
+  const [users, setusers] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -59,6 +59,27 @@ const User = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getApi(urls.login.getAllAdmin);
+        const filteredAdmins = response?.data?.allAdmins?.map((admin, index) => ({
+          id: admin._id || index,
+          name: admin.name,
+          email: admin.email,
+          role: admin.accountType,
+          lastLogin: new Date(admin.createdAt).toLocaleDateString()
+        }));
+        setusers(filteredAdmins);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
   const columns = [
     {
       field: 'name',
@@ -66,70 +87,42 @@ const User = () => {
       flex: 2,
       renderCell: (params) => (
         <Box>
-          <Typography sx={{ fontWeight: '450' }} mb={1}>
-            {params.row.name || '-'}
-          </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email || '-'}</Typography>
+          <Typography sx={{ color: '#555', fontSize: '14px'  }}>{params.row.name || '-'}</Typography>
         </Box>
       )
     },
     {
-      field: 'date',
-      headerName: 'Date',
-      flex: 1.2,
-      valueGetter: (params) => params.value || '-'
+      field: 'email',
+      headerName: 'Email',
+      flex: 2,
+      renderCell: (params) => <Typography sx={{ color: '#555', fontSize: '14px' }}>{params.row.email || '-'}</Typography>
     },
     {
-      field: 'status',
-      headerName: 'Status',
+      field: 'role',
+      headerName: 'Role',
       flex: 1.5,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-          variant="outlined"
-          sx={{
-            borderColor: params.value === 'Open' ? '#808080' : '#808080',
-            backgroundColor: 'transparent',
-            color: params.value === 'Open' ? '#808080' : '#808080'
-          }}
-        />
-      )
+      renderCell: (params) => <Typography sx={{ color: '#555', fontSize: '14px' }}>{params.row.role || '-'}</Typography>
     },
     {
-      field: 'country',
-      headerName: 'Country',
+      field: 'lastLogin',
+      headerName: 'Last Log in',
       flex: 1.5,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {params.row.countryFlag && (
-            <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
-          )}
-          <Typography>{params.row.country || '-'}</Typography>
-        </Box>
-      )
-    },
-    {
-      field: 'age',
-      headerName: 'Age',
-      flex: 1,
-      valueGetter: (params) => (params.value != null ? params.value : '-')
+      renderCell: (params) => <Typography sx={{ color: '#666', fontSize: '14px' }}>{params.row.lastLogin || '-'}</Typography>
     },
     {
       field: 'actions',
       headerName: 'Manage',
       flex: 1,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', width: '100%', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <IconButton color="error" size="small" onClick={() => handleDelete(params.row.id)}>
             <IconTrash color="orangered" size={18} />
           </IconButton>
           <IconButton
-            color="error"
             size="small"
             onClick={() => {
               const fullUser = allData.find((user) => user._id === params.row.id);
-              navigate('/add-user', { state: fullUser });
+              navigate('/add-config-user', { state: fullUser });
             }}
           >
             <IconPencil color="orangered" size={18} />
@@ -451,7 +444,7 @@ const User = () => {
                       rows={
                         loading
                           ? []
-                          : rows.map((row, index) => ({
+                          : users.map((row, index) => ({
                               ...row,
                               sNo: paginationModel.page * paginationModel.pageSize + index + 1
                             }))

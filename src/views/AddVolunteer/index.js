@@ -178,16 +178,38 @@ const AddCaseForm = ({ onCancel }) => {
           setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
           setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
           setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
+          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? true);
         }
       }
     }
   }, [editdata, setValue]);
 
-  const restrictAccessValue = watch('restrictAccess');
-  const telephoneValue = watch('telephone');
-  const emailConsentValue = watch('emailConsent');
-  const smsValue = watch('sms');
-  const whatsappValue = watch('whatsapp');
+  useEffect(() => {
+    if (editdata?.contactPreferences?.contactMethods) {
+      const methods = editdata.contactPreferences.contactMethods;
+
+      const updatedStates = {
+        Telephone: methods.telephone ? 1 : 0,
+        Email: methods.email ? 1 : 0,
+        SMS: methods.sms ? 1 : 0,
+        Whatsapp: methods.whatsapp ? 1 : 0,
+        Letter: methods.letter ? 1 : 0
+      };
+
+      setContactMethodStates(updatedStates);
+
+      setValue('telephone', methods.telephone);
+      setValue('emailConsent', methods.email);
+      setValue('sms', methods.sms);
+      setValue('whatsapp', methods.whatsapp);
+      setValue('letter', methods.letter);
+    }
+  }, [editdata, setValue]);
+  useEffect(() => {
+    ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
+      register(field);
+    });
+  }, [register]);
 
   const ethnicityOptions = [
     'Arabic or North African',
@@ -533,29 +555,19 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   useEffect(() => {
-    if (editdata) {
-      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+    if (contactpurpose?.length && editdata?.contactPreferences?.contactPurposes) {
+      const selectedIds = editdata.contactPreferences.contactPurposes.map((item) => item._id);
 
-      setContactMethodStates({
-        donerTag: booleanToState(contactMethods?.donor),
-        Email: booleanToState(contactMethods?.email),
-        SMS: booleanToState(contactMethods?.sms),
-        Whatsapp: booleanToState(contactMethods?.whatsapp),
-        letter: booleanToState(contactMethods?.letter)
-      });
-    }
-  }, [editdata, reset]);
-
-  useEffect(() => {
-    if (contactpurpose?.length) {
       const initStates = contactpurpose.reduce((acc, item) => {
-        acc[item._id] = 0;
+        acc[item._id] = selectedIds.includes(item._id) ? 1 : 0;
         return acc;
       }, {});
-      setPurposeStates(initStates);
-    }
-  }, [contactpurpose]);
 
+      setPurposeStates(initStates);
+      setValue('contactPurposeStates', initStates);
+      setValue('contactPurpose', selectedIds);
+    }
+  }, [contactpurpose, editdata]);
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -2090,7 +2102,6 @@ const AddCaseForm = ({ onCancel }) => {
                           );
                         })}
                       </Box>
-
                       <Grid item xs={12} mb={2}>
                         <Box>
                           <Typography variant="subtitle2" mb={1}>

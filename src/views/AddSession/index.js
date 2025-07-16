@@ -142,7 +142,7 @@ const AddCaseForm = ({ onCancel }) => {
         if (searchQuery && searchQuery !== '') {
           queryParams.append('search', searchQuery);
         }
-        queryParams.append('role', 'service_user');
+        queryParams.append('role', 'user');
 
         const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
         const allUser = response?.data?.data || [];

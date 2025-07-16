@@ -86,32 +86,30 @@ const Report = () => {
   useEffect(() => {
     fetchUserName();
   }, []);
-
+const FilterPanelProp ={
+                    showFilter:true,
+                    statuses: statusFilter,
+                    statusFilter: status,
+                    setStatusFilter: setStatus,
+                    dateAddedFilters,
+                    dateOpenedFilter,
+                    setDateOpenedFilter,
+                    names: nameFilterOptions,
+                    nameFilter: selectedName,
+                    setNameFilter: setSelectedName,
+                    caseIds: uniqueIds,
+                    caseIdFilter: caseId,
+                    setCaseIdFilter,
+                    countriesWithFlags,
+                    countryOfOriginFilter,
+                    setCountryOfOriginFilter,
+                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
+                    customDateLabel: 'By Date',
+                  }
   return (
     <>
       <Grid container spacing={2}>
-        {/* <FilterPanel
-          showFilter={showFilter}
-          statuses={statusFilter}
-          statusFilter={status}
-          setStatusFilter={setStatus}
-          dateAddedFilters={dateAddedFilters}
-          dateOpenedFilter={dateOpenedFilter}
-          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-          names={nameFilterOptions}
-          nameFilter={selectedName}
-          setNameFilter={setSelectedName}
-          caseIds={uniqueIds}
-          caseIdFilter={caseId}
-          setCaseIdFilter={setCaseIdFilter}
-          countriesWithFlags={countriesWithFlags}
-          countryOfOriginFilter={countryOfOriginFilter}
-          setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
-          selectedFilters={['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter']}
-          customDateLabel="By Date"
-        /> */}
-
-        <Grid item xs={12}>
+           <Grid item xs={12}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider', overflowX: 'auto' }}>
               <TabList
@@ -226,7 +224,7 @@ const Report = () => {
               </TabList>
             </Box>
 
-            <TabPanel
+           {value === '1' && ( <TabPanel
               value="1"
               sx={{
                 px: 0,
@@ -237,42 +235,6 @@ const Report = () => {
                 flexWrap: 'nowrap',
               }}
             >
-              <Box
-                sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  minWidth: 300,
-                  '& .MuiGrid-root': {
-                    width: '100% !important',
-                    minWidth: '300px !important',
-                  },
-                  // marginTop:9
-                }}
-              >
-                <FilterPanel
-                  {...{
-                    showFilter,
-                    statuses: statusFilter,
-                    statusFilter: status,
-                    setStatusFilter: setStatus,
-                    dateAddedFilters,
-                    dateOpenedFilter,
-                    setDateOpenedFilter,
-                    names: nameFilterOptions,
-                    nameFilter: selectedName,
-                    setNameFilter: setSelectedName,
-                    caseIds: uniqueIds,
-                    caseIdFilter: caseId,
-                    setCaseIdFilter,
-                    countriesWithFlags,
-                    countryOfOriginFilter,
-                    setCountryOfOriginFilter,
-                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
-                    customDateLabel: 'By Date',
-                  }}
-                />
-              </Box>
-
               <Box
                 sx={{
                   flexGrow: 1,
@@ -286,10 +248,12 @@ const Report = () => {
                   status={status}
                   caseId={caseId}
                   dateOpenedFilter={dateOpenedFilter}
+                  FilterPanelProp={FilterPanelProp}
                 />
               </Box>
             </TabPanel>
-
+              )}
+              {value === '2' && (
             <TabPanel
               value="2"
               sx={{
@@ -303,42 +267,6 @@ const Report = () => {
             >
               <Box
                 sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  minWidth: 300,
-                  '& .MuiGrid-root': {
-                    width: '100% !important',
-                    minWidth: '300px !important',
-                  },
-                  // marginTop:9
-                }}
-              >
-                <FilterPanel
-                  {...{
-                    showFilter,
-                    statuses: statusFilter,
-                    statusFilter: status,
-                    setStatusFilter: setStatus,
-                    dateAddedFilters,
-                    dateOpenedFilter,
-                    setDateOpenedFilter,
-                    names: nameFilterOptions,
-                    nameFilter: selectedName,
-                    setNameFilter: setSelectedName,
-                    caseIds: uniqueIds,
-                    caseIdFilter: caseId,
-                    setCaseIdFilter,
-                    countriesWithFlags,
-                    countryOfOriginFilter,
-                    setCountryOfOriginFilter,
-                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
-                    customDateLabel: 'By Date',
-                  }}
-                />
-              </Box>
-
-              <Box
-                sx={{
                   flexGrow: 1,
                   flexShrink: 1,
                   minWidth: 0,
@@ -350,10 +278,12 @@ const Report = () => {
                   status={status}
                   caseId={caseId}
                   dateOpenedFilter={dateOpenedFilter}
+                  FilterPanelProp={FilterPanelProp}
                 />
               </Box>
             </TabPanel>
-
+            )}
+            {value === '3' && (
             <TabPanel
               value="3"
               sx={{
@@ -367,42 +297,6 @@ const Report = () => {
             >
               <Box
                 sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  minWidth: 300,
-                  '& .MuiGrid-root': {
-                    width: '100% !important',
-                    minWidth: '300px !important',
-                  },
-                  // marginTop:9
-                }}
-              >
-                <FilterPanel
-                  {...{
-                    showFilter,
-                    statuses: statusFilter,
-                    statusFilter: status,
-                    setStatusFilter: setStatus,
-                    dateAddedFilters,
-                    dateOpenedFilter,
-                    setDateOpenedFilter,
-                    names: nameFilterOptions,
-                    nameFilter: selectedName,
-                    setNameFilter: setSelectedName,
-                    caseIds: uniqueIds,
-                    caseIdFilter: caseId,
-                    setCaseIdFilter,
-                    countriesWithFlags,
-                    countryOfOriginFilter,
-                    setCountryOfOriginFilter,
-                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
-                    customDateLabel: 'By Date',
-                  }}
-                />
-              </Box>
-
-              <Box
-                sx={{
                   flexGrow: 1,
                   flexShrink: 1,
                   minWidth: 0,
@@ -414,10 +308,12 @@ const Report = () => {
                   status={status}
                   caseId={caseId}
                   dateOpenedFilter={dateOpenedFilter}
+                  FilterPanelProp={FilterPanelProp}
                 />
               </Box>
             </TabPanel>
-
+              )}
+              {value === '4' && (
             <TabPanel
               value="4"
               sx={{
@@ -431,52 +327,23 @@ const Report = () => {
             >
               <Box
                 sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  minWidth: 300,
-                  '& .MuiGrid-root': {
-                    width: '100% !important',
-                    minWidth: '300px !important',
-                  },
-                  // marginTop:9
-                }}
-              >
-                <FilterPanel
-                  {...{
-                    showFilter,
-                    statuses: statusFilter,
-                    statusFilter: status,
-                    setStatusFilter: setStatus,
-                    dateAddedFilters,
-                    dateOpenedFilter,
-                    setDateOpenedFilter,
-                    names: nameFilterOptions,
-                    nameFilter: selectedName,
-                    setNameFilter: setSelectedName,
-                    caseIds: uniqueIds,
-                    caseIdFilter: caseId,
-                    setCaseIdFilter,
-                    countriesWithFlags,
-                    countryOfOriginFilter,
-                    setCountryOfOriginFilter,
-                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
-                    customDateLabel: 'By Date',
-                  }}
-                />
-              </Box>
-
-              <Box
-                sx={{
                   flexGrow: 1,
                   flexShrink: 1,
                   minWidth: 0,
                 }}
               >
-                <Survey />
+                <Survey 
+                  countryOfOriginFilter={countryOfOriginFilter}
+                  selectedName={selectedName}
+                  status={status}
+                  caseId={caseId}
+                  dateOpenedFilter={dateOpenedFilter}
+                  FilterPanelProp={FilterPanelProp}/>
               </Box>
             </TabPanel>
-
-            <TabPanel
+            )}
+            {value === '5' && (
+              <TabPanel
               value="5"
               sx={{
                 px: 0,
@@ -486,43 +353,7 @@ const Report = () => {
                 width: '100%',
                 flexWrap: 'nowrap',
               }}
-            >
-              <Box
-                sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  minWidth: 300,
-                  '& .MuiGrid-root': {
-                    width: '100% !important',
-                    minWidth: '300px !important',
-                  },
-                  // marginTop:9
-                }}
               >
-                <FilterPanel
-                  {...{
-                    showFilter,
-                    statuses: statusFilter,
-                    statusFilter: status,
-                    setStatusFilter: setStatus,
-                    dateAddedFilters,
-                    dateOpenedFilter,
-                    setDateOpenedFilter,
-                    names: nameFilterOptions,
-                    nameFilter: selectedName,
-                    setNameFilter: setSelectedName,
-                    caseIds: uniqueIds,
-                    caseIdFilter: caseId,
-                    setCaseIdFilter,
-                    countriesWithFlags,
-                    countryOfOriginFilter,
-                    setCountryOfOriginFilter,
-                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
-                    customDateLabel: 'By Date',
-                  }}
-                />
-              </Box>
-
               <Box
                 sx={{
                   flexGrow: 1,
@@ -536,10 +367,12 @@ const Report = () => {
                   status={status}
                   caseId={caseId}
                   dateOpenedFilter={dateOpenedFilter}
+                 FilterPanelProp={FilterPanelProp}
                 />
               </Box>
             </TabPanel>
-
+            )}
+            {value === '6' && (
             <TabPanel
               value="6"
               sx={{
@@ -553,50 +386,14 @@ const Report = () => {
             >
               <Box
                 sx={{
-                  width: 300,
-                  flexShrink: 0,
-                  minWidth: 300,
-                  '& .MuiGrid-root': {
-                    width: '100% !important',
-                    minWidth: '300px !important',
-                  },
-                  // marginTop:9
-                }}
-              >
-                <FilterPanel
-                  {...{
-                    showFilter,
-                    statuses: statusFilter,
-                    statusFilter: status,
-                    setStatusFilter: setStatus,
-                    dateAddedFilters,
-                    dateOpenedFilter,
-                    setDateOpenedFilter,
-                    names: nameFilterOptions,
-                    nameFilter: selectedName,
-                    setNameFilter: setSelectedName,
-                    caseIds: uniqueIds,
-                    caseIdFilter: caseId,
-                    setCaseIdFilter,
-                    countriesWithFlags,
-                    countryOfOriginFilter,
-                    setCountryOfOriginFilter,
-                    selectedFilters: ['countryOfOriginFilter', 'dateOpenedFilter', 'nameFilter', 'statusFilter', 'caseIdFilter'],
-                    customDateLabel: 'By Date',
-                  }}
-                />
-              </Box>
-
-              <Box
-                sx={{
                   flexGrow: 1,
                   flexShrink: 1,
                   minWidth: 0,
                 }}
               >
-                <Donor selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} />
+                <Donor selectedName={selectedName} status={status} caseId={caseId} dateOpenedFilter={dateOpenedFilter} FilterPanelProp={FilterPanelProp} />
               </Box>
-            </TabPanel>
+            </TabPanel>)}
           </TabContext>
         </Grid>
       </Grid>

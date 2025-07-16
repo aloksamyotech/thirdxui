@@ -91,7 +91,7 @@ const AddDonorForm = () => {
       lastname: editdata?.personalInfo?.lastName || '',
       phone: editdata?.contactInfo?.phone || '',
       mobilePhone: editdata?.contactInfo?.homePhone || '',
-      email: editdata?.contactInfo?.email || '',
+      Contact_email: editdata?.contactInfo?.email || '',
       gender: editdata?.personalInfo?.gender || '',
       dob: editdata?.personalInfo?.dateOfBirth ? dayjs(editdata.personalInfo.dateOfBirth) : null,
       address: editdata?.contactInfo?.addressLine1 || '',
@@ -262,7 +262,7 @@ const AddDonorForm = () => {
     fd.append('personalInfo[dateOfBirth]', data.dob ? new Date(data.dob).toISOString() : '');
     fd.append('contactInfo[phone]', data.phone || '');
     fd.append('contactInfo[homePhone]', data.mobilePhone || '');
-    fd.append('contactInfo[email]', data.email || '');
+    fd.append('contactInfo[email]', data.Contact_email || '');
     fd.append('contactInfo[addressLine1]', data.address || '');
     fd.append('contactInfo[addressLine2]', data.address2 || '');
     fd.append('contactInfo[district]', data.district || '');
@@ -313,6 +313,7 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][donor]', data.donerTag ? 'true' : 'false');
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
@@ -757,7 +758,7 @@ const AddDonorForm = () => {
 
                             <Grid item xs={12} sm={4}>
                               <Controller
-                                name="email"
+                                name="Contact_email"
                                 control={control}
                                 rules={{
                                   required: 'Email is required',

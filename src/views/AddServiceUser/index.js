@@ -78,6 +78,92 @@ const AddCaseForm = ({ onCancel }) => {
       return { ...prev, [label]: nextState };
     });
   };
+  const defaultFormValues = {
+    personalInfo: {
+      title: editdata?.personalInfo?.title || '',
+      firstName: editdata?.personalInfo?.firstName || '',
+      lastName: editdata?.personalInfo?.lastName || '',
+      nickName: editdata?.personalInfo?.nickName || '',
+      gender: editdata?.personalInfo?.gender || '',
+      dateOfBirth: editdata?.personalInfo?.dateOfBirth || null,
+      ethnicity: editdata?.personalInfo?.ethnicity || '',
+      profileImage: editdata?.personalInfo?.profileImage || ''
+    },
+    phone: editdata?.contactInfo?.homePhone || '',
+    mobilePhone: editdata?.contactInfo?.phone || '',
+    email: editdata?.contactInfo?.email || '',
+    address: editdata?.contactInfo?.addressLine1 || '',
+    address2: editdata?.contactInfo?.addressLine2 || '',
+    town: editdata?.contactInfo?.town || '',
+    district: editdata?.contactInfo?.district || '',
+    pinCode: editdata?.contactInfo?.postcode || '',
+    country: editdata?.contactInfo?.country || '',
+    language: editdata?.contactInfo?.firstLanguage || '',
+    otherId: editdata?.contactInfo?.otherId || '',
+    riskNotes: editdata?.otherInfo?.description || '',
+    file: editdata?.otherInfo?.file || '',
+    Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
+    Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
+    engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
+    eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
+    fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
+    fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
+    restrictAccess: editdata?.otherInfo?.restrictAccess || false,
+    title: editdata?.emergencyContact?.title || '',
+    gender: editdata?.emergencyContact?.gender || '',
+    firstname: editdata?.emergencyContact?.firstName || '',
+    lastname: editdata?.emergencyContact?.lastName || '',
+    preferred: editdata?.emergencyContact?.relationshipToUser || '',
+    emergencyhomePhone: editdata?.emergencyContact?.homePhone || '',
+    emergencyphone: editdata?.emergencyContact?.phone || '',
+    emergencyemail: editdata?.emergencyContact?.email || '',
+    emergencyaddress: editdata?.emergencyContact?.addressLine1 || '',
+    emergencyaddress2: editdata?.emergencyContact?.addressLine2 || '',
+    emergencytown: editdata?.emergencyContact?.town || '',
+    emergencypinCode: editdata?.emergencyContact?.postcode || '',
+    emergencycountry: editdata?.emergencyContact?.country || '',
+    preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
+    reason: editdata?.contactPreferences?.reason?._id || '',
+    contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
+    confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
+    telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
+    emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
+    sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
+    whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+    letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
+    riskAssessmentNotes: editdata?.riskAssessment?.riskAssessmentNotes || '',
+    keyIndicators: editdata?.riskAssessment?.keyIndicators?.map((val) => (typeof val === 'object' ? val._id || val.id : val)) || [],
+    serviceSections: editdata?.Service?.length
+      ? editdata.Service.map((item) => ({
+          serviceName: item.serviceName?._id || '',
+          startDate: item.startDate || null,
+          lastDate: item.lastDate || null,
+          referrerName: item.referrerName || '',
+          referrerJob: item.referrerJob || '',
+          referrerPhone: item.referrerPhone || '',
+          referrerEmail: item.referrerEmail || '',
+          emergencyPhone: item.emergencyPhone || '',
+          emergencyEmail: item.emergencyEmail || '',
+          referralType: item.referralType || '',
+          referredDate: item.referredDate || null
+        }))
+      : [
+          {
+            serviceName: '',
+            startDate: null,
+            lastDate: null,
+            referrerName: '',
+            referrerJob: '',
+            referrerPhone: '',
+            referrerEmail: '',
+            emergencyPhone: '',
+            emergencyEmail: '',
+            referralType: '',
+            referredDate: null
+          }
+        ]
+  };
+
 
   const {
     register,
@@ -90,89 +176,7 @@ const AddCaseForm = ({ onCancel }) => {
     formState: { errors }
   } = useForm({
     mode: 'all',
-    defaultValues: {
-      personalInfo: {
-        title: editdata?.personalInfo?.title || '',
-        firstName: editdata?.personalInfo?.firstName || '',
-        lastName: editdata?.personalInfo?.lastName || '',
-        nickName: editdata?.personalInfo?.nickName || '',
-        gender: editdata?.personalInfo?.gender || '',
-        dateOfBirth: editdata?.personalInfo?.dateOfBirth || null,
-        ethnicity: editdata?.personalInfo?.ethnicity || '',
-        profileImage: editdata?.personalInfo?.profileImage || ''
-      },
-      phone: editdata?.contactInfo?.homePhone || '',
-      mobilePhone: editdata?.contactInfo?.phone || '',
-      email: editdata?.contactInfo?.email || '',
-      address: editdata?.contactInfo?.addressLine1 || '',
-      address2: editdata?.contactInfo?.addressLine2 || '',
-      town: editdata?.contactInfo?.town || '',
-      district: editdata?.contactInfo?.district || '',
-      pinCode: editdata?.contactInfo?.postcode || '',
-      country: editdata?.contactInfo?.country || '',
-      language: editdata?.contactInfo?.firstLanguage || '',
-      otherId: editdata?.contactInfo?.otherId || '',
-      riskNotes: editdata?.otherInfo?.description || '',
-      file: editdata?.otherInfo?.file || '',
-      Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-      Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-      engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-      eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-      fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
-      restrictAccess: editdata?.otherInfo?.restrictAccess || false,
-      title: editdata?.emergencyContact?.title || '',
-      gender: editdata?.emergencyContact?.gender || '',
-      firstname: editdata?.emergencyContact?.firstName || '',
-      lastname: editdata?.emergencyContact?.lastName || '',
-      preferred: editdata?.emergencyContact?.relationshipToUser || '',
-      emergencyhomePhone: editdata?.emergencyContact?.homePhone || '',
-      emergencyphone: editdata?.emergencyContact?.phone || '',
-      emergencyemail: editdata?.emergencyContact?.email || '',
-      emergencyaddress: editdata?.emergencyContact?.addressLine1 || '',
-      emergencyaddress2: editdata?.emergencyContact?.addressLine2 || '',
-      emergencytown: editdata?.emergencyContact?.town || '',
-      emergencypinCode: editdata?.emergencyContact?.postcode || '',
-      emergencycountry: editdata?.emergencyContact?.country || '',
-      preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
-      reason: editdata?.contactPreferences?.reason?._id || '',
-      contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
-      confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-
-      serviceSections: editdata?.Service?.length
-        ? editdata.Service.map((item) => ({
-            serviceName: item.serviceName || '',
-            startDate: item.startDate || null,
-            lastDate: item.lastDate || null,
-            referrerName: item.referrerName || '',
-            referrerJob: item.referrerJob || '',
-            referrerPhone: item.referrerPhone || '',
-            referrerEmail: item.referrerEmail || '',
-            emergencyPhone: item.emergencyPhone || '',
-            emergencyEmail: item.emergencyEmail || '',
-            referralType: item.referralType || '',
-            referredDate: item.referredDate || null
-          }))
-        : [
-            {
-              serviceName: '',
-              startDate: null,
-              lastDate: null,
-              referrerName: '',
-              referrerJob: '',
-              referrerPhone: '',
-              referrerEmail: '',
-              emergencyPhone: '',
-              emergencyEmail: '',
-              referralType: '',
-              referredDate: null
-            }
-          ]
-    }
+    defaultValues: defaultFormValues
   });
   const { fields, append, remove } = useFieldArray({
     control,
@@ -202,6 +206,7 @@ const AddCaseForm = ({ onCancel }) => {
           setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
           setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
           setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
+          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? true);
         }
       }
     }
@@ -379,9 +384,8 @@ const AddCaseForm = ({ onCancel }) => {
         Letter: methods.letter ? 1 : 0
       };
 
-      setContactMethodStates(updatedStates); // 👈 update button UI states
+      setContactMethodStates(updatedStates);
 
-      // Also update react-hook-form fields
       setValue('telephone', methods.telephone);
       setValue('emailConsent', methods.email);
       setValue('sms', methods.sms);
@@ -411,7 +415,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('personalInfo[dateOfBirth]', dob ? new Date(dob).toISOString() : '');
     fd.append('personalInfo[nickName]', formData.personalInfo.nickName || '');
     fd.append('personalInfo[ethnicity]', formData.personalInfo.ethnicity || '');
-    if (formData.personalInfo?.profileImage) {
+    if (formData.personalInfo?.profileImage instanceof File) {
       fd.append('profileImage', formData.personalInfo.profileImage);
     }
     fd.append('contactInfo[homePhone]', formData.phone || '');
@@ -624,29 +628,19 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   useEffect(() => {
-    if (editdata) {
-      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+    if (contactpurpose?.length && editdata?.contactPreferences?.contactPurposes) {
+      const selectedIds = editdata.contactPreferences.contactPurposes.map((item) => item._id);
 
-      setContactMethodStates({
-        donerTag: booleanToState(contactMethods?.donor),
-        Email: booleanToState(contactMethods?.email),
-        SMS: booleanToState(contactMethods?.sms),
-        Whatsapp: booleanToState(contactMethods?.whatsapp),
-        letter: booleanToState(contactMethods?.letter)
-      });
-    }
-  }, [editdata, reset]);
-
-  useEffect(() => {
-    if (contactpurpose?.length) {
       const initStates = contactpurpose.reduce((acc, item) => {
-        acc[item._id] = 0;
+        acc[item._id] = selectedIds.includes(item._id) ? 1 : 0;
         return acc;
       }, {});
-      setPurposeStates(initStates);
-    }
-  }, [contactpurpose]);
 
+      setPurposeStates(initStates);
+      setValue('contactPurposeStates', initStates);
+      setValue('contactPurpose', selectedIds);
+    }
+  }, [contactpurpose, editdata]);
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -892,79 +886,78 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.profileImage"
                                 control={control}
-                                render={({ field }) => (
-                                  <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    size="small"
-                                    value={
-                                      field.value
-                                        ? typeof field.value === 'object'
-                                          ? field.value.name || ''
-                                          : typeof field.value === 'string'
-                                          ? field.value.split('/').pop() // extract file name from string
-                                          : ''
-                                        : ''
-                                    }
-                                    placeholder="Profile image"
-                                    inputProps={{
-                                      readOnly: true,
-                                      sx: {
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        '&::placeholder': {
-                                          fontSize: '12px',
-                                          color: '#7a7b7c',
-                                          opacity: 1,
+                                render={({ field }) => {
+                                  const currentValue = field.value;
+
+                                  const displayName =
+                                    typeof currentValue === 'object'
+                                      ? currentValue?.name
+                                      : typeof currentValue === 'string'
+                                      ? currentValue?.split('/').pop()
+                                      : '';
+
+                                  return (
+                                    <TextField
+                                      fullWidth
+                                      variant="outlined"
+                                      size="small"
+                                      value={displayName}
+                                      placeholder="Profile image"
+                                      inputProps={{
+                                        readOnly: true,
+                                        sx: {
                                           whiteSpace: 'nowrap',
-
+                                          overflow: 'hidden',
                                           textOverflow: 'ellipsis',
-                                          overflow: 'hidden'
+                                          '&::placeholder': {
+                                            fontSize: '12px',
+                                            color: '#7a7b7c',
+                                            opacity: 1
+                                          }
                                         }
-                                      }
-                                    }}
-                                    InputProps={{
-                                      endAdornment: (
-                                        <InputAdornment position="end">
-                                          <IconButton component="label" sx={{ p: 0, mr: '-10px' }}>
-                                            <AttachFileIcon sx={{ fontSize: 18, color: '#7a7b7c' }} />
-                                            <input
-                                              type="file"
-                                              hidden
-                                              accept="image/jpeg,image/png,image/jpg"
-                                              onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024;
+                                      }}
+                                      InputProps={{
+                                        endAdornment: (
+                                          <InputAdornment position="end">
+                                            <IconButton component="label" sx={{ p: 0, mr: '-10px' }}>
+                                              <AttachFileIcon sx={{ fontSize: 18, color: '#7a7b7c' }} />
+                                              <input
+                                                type="file"
+                                                hidden
+                                                accept="image/jpeg,image/png,image/jpg"
+                                                onChange={(e) => {
+                                                  const file = e.target.files?.[0];
+                                                  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                                  const maxSizeInBytes = 25 * 1024 * 1024;
 
-                                                if (file) {
-                                                  if (!allowedTypes.includes(file.type)) {
-                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                    e.target.value = null;
+                                                  if (file) {
+                                                    if (!allowedTypes.includes(file.type)) {
+                                                      toast.error('Only JPG, JPEG, or PNG image files are allowed.');
+                                                      e.target.value = null;
+                                                      field.onChange(null);
+                                                      return;
+                                                    }
+
+                                                    if (file.size > maxSizeInBytes) {
+                                                      toast.error('File size must be ≤ 25MB.');
+                                                      e.target.value = null;
+                                                      field.onChange(null);
+                                                      return;
+                                                    }
+
+                                                    field.onChange(file);
+                                                  } else {
                                                     field.onChange(null);
-                                                    return;
                                                   }
-
-                                                  if (file.size > maxSizeInBytes) {
-                                                    toast.error('File size must be ≤ 25MB.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  field.onChange(file);
-                                                } else {
-                                                  field.onChange(null);
-                                                }
-                                              }}
-                                            />
-                                          </IconButton>
-                                        </InputAdornment>
-                                      )
-                                    }}
-                                  />
-                                )}
+                                                }}
+                                              />
+                                            </IconButton>
+                                          </InputAdornment>
+                                        )
+                                      }}
+                                    />
+                                  );
+                                }}
                               />
                             </Grid>
 
@@ -2271,10 +2264,12 @@ const AddCaseForm = ({ onCancel }) => {
                                     fullWidth
                                     size="small"
                                     options={serviceNames}
-                                    getOptionLabel={(option) => option.name || ''}
-                                    isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                                    value={serviceNames.find((service) => service.id === field.value) || null}
-                                    onChange={(_, selected) => field.onChange(selected?.id || '')}
+                                    getOptionLabel={(option) => option?.name || ''}
+                                    isOptionEqualToValue={(option, value) => option?.id === value}
+                                    value={serviceNames.find((s) => s.id === field.value) || null}
+                                    onChange={(_, selected) => {
+                                      field.onChange(selected?.id || '');
+                                    }}
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}

@@ -66,7 +66,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   const subRole = location?.state?.subRole;
   const editdata = location?.state || {};
-  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+   const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
     acc[curr._id] = 0;
     return acc;
   }, {});
@@ -110,11 +110,10 @@ const AddCaseForm = ({ onCancel }) => {
       referrerEmail: editdata?.referrer?.email || '',
       referrerPhone: editdata?.referrer?.phone || '',
       referralType: editdata?.referrer?.referralType || '',
-      donerTag: editdata?.contactPreferences?.contactMethods?.donerTag ?? true,
+      donor: editdata?.contactPreferences?.contactMethods?.donor ?? true,
       letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      donortag: editdata?.contactPreferences?.contactMethods?.donortag ?? true,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
       preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
       reason: editdata?.contactPreferences?.reason?._id || '',
@@ -199,6 +198,8 @@ const AddCaseForm = ({ onCancel }) => {
       return { ...prev, [label]: nextState };
     });
   };
+
+
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller
       name={name}
@@ -307,13 +308,12 @@ const AddCaseForm = ({ onCancel }) => {
     }
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
 
-    fd.append('contactPreferences[contactMethods][donortag]', data.donortag ? 'true' : 'false');
+    // fd.append('contactPreferences[contactMethods][donortag]', data.donortag ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donerTag]', data.donerTag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donor]', data.donor ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
-
     fd.append('companyInformation[companyName]', data.companyname || '');
     fd.append('companyInformation[mainContactName]', data.contactname || '');
     fd.append('companyInformation[otherId]', data.otherId || '');
@@ -409,15 +409,21 @@ const AddCaseForm = ({ onCancel }) => {
   }, [editdata, reset]);
 
   useEffect(() => {
-    if (contactpurpose?.length) {
-      const initStates = contactpurpose.reduce((acc, item) => {
-        acc[item._id] = 0;
+    if (editdata?.contactPreferences?.contactPurposes && contactpurpose.length > 0) {
+      const selected = Array.isArray(editdata.contactPreferences.contactPurposes)
+        ? editdata.contactPreferences.contactPurposes.map((p) => p._id || p)
+        : [editdata.contactPreferences.contactPurposes._id || editdata.contactPreferences.contactPurposes];
+
+      const restoredStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = selected.includes(item._id) ? 1 : 0;
         return acc;
       }, {});
-      setPurposeStates(initStates);
-    }
-  }, [contactpurpose]);
 
+      setPurposeStates(restoredStates);
+      setValue('contactPurposeStates', restoredStates);
+      setValue('contactPurpose', selected);
+    }
+  }, [editdata, contactpurpose]);
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>

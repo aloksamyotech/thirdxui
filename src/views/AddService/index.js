@@ -27,6 +27,7 @@ import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 import { useLocation } from 'react-router-dom';
+import { validateFile } from 'utils/filevalidator';
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
@@ -464,6 +465,9 @@ const AddCaseForm = () => {
                       <Controller
                         name="attachment"
                         control={control}
+                        rules={{
+                          validate: (file) => validateFile(file)
+                        }}
                         render={({ field }) => (
                           <TextField
                             variant="outlined"
@@ -488,34 +492,15 @@ const AddCaseForm = () => {
                                       accept="image/*"
                                       onChange={(e) => {
                                         const file = e.target.files?.[0];
-                                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                        const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                        if (file) {
-                                          if (!allowedTypes.includes(file.type)) {
-                                            toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
-                                            e.target.value = null;
-                                            field.onChange(null);
-                                            return;
-                                          }
-
-                                          if (file.size > maxSizeInBytes) {
-                                            toast.error('File size must be less than or equal to 25MB.');
-                                            e.target.value = null;
-                                            field.onChange(null);
-                                            return;
-                                          }
-
-                                          field.onChange(file);
-                                        } else {
-                                          field.onChange(null);
-                                        }
+                                        field.onChange(file);
                                       }}
                                     />
                                   </Button>
                                 </InputAdornment>
                               )
                             }}
+                            error={!!errors.attachment}
+                            helperText={errors.attachment?.message}
                           />
                         )}
                       />
@@ -524,6 +509,9 @@ const AddCaseForm = () => {
                       <Controller
                         name="file"
                         control={control}
+                        rules={{
+                          validate: (file) => validateFile(file)
+                        }}
                         render={({ field }) => (
                           <TextField
                             variant="outlined"
@@ -548,34 +536,15 @@ const AddCaseForm = () => {
                                       accept="image/*"
                                       onChange={(e) => {
                                         const file = e.target.files?.[0];
-                                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                        const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                        if (file) {
-                                          if (!allowedTypes.includes(file.type)) {
-                                            toast.error('Only image files (JPG, JPEG, PNG) are allowed.');
-                                            e.target.value = null;
-                                            field.onChange(null);
-                                            return;
-                                          }
-
-                                          if (file.size > maxSizeInBytes) {
-                                            toast.error('File size must be less than or equal to 25MB.');
-                                            e.target.value = null;
-                                            field.onChange(null);
-                                            return;
-                                          }
-
-                                          field.onChange(file);
-                                        } else {
-                                          field.onChange(null);
-                                        }
+                                        field.onChange(file);
                                       }}
                                     />
                                   </Button>
                                 </InputAdornment>
                               )
                             }}
+                             error={!!errors.file}
+                            helperText={errors.file?.message}
                           />
                         )}
                       />

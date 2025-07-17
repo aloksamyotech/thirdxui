@@ -28,6 +28,7 @@ import AntSwitch from 'components/AntSwitch';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { useLocation } from 'react-router-dom';
+import { validateFile } from 'utils/filevalidator';
 
 const AddCaseForm = () => {
   const navigate = useNavigate();
@@ -506,8 +507,11 @@ const AddCaseForm = () => {
                 <Grid item xs={12} sm={4}>
                   <Box mb={2} display="flex" justifyContent="space-between">
                     <Controller
-                      name="file"
+                      name="files"
                       control={control}
+                      rules={{
+                        validate: (file) => validateFile(file)
+                      }}
                       render={({ field }) => (
                         <TextField
                           variant="outlined"
@@ -532,38 +536,15 @@ const AddCaseForm = () => {
                                     accept=".pdf,.doc,.docx"
                                     onChange={(e) => {
                                       const file = e.target.files?.[0];
-                                      const allowedTypes = [
-                                        'application/pdf',
-                                        'application/msword',
-                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                                      ];
-                                      const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                      if (file) {
-                                        if (!allowedTypes.includes(file.type)) {
-                                          toast.error('Only PDF, DOC, and DOCX files are allowed.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        if (file.size > maxSizeInBytes) {
-                                          toast.error('File size must be less than or equal to 25MB.');
-                                          e.target.value = null;
-                                          field.onChange(null);
-                                          return;
-                                        }
-
-                                        field.onChange(file);
-                                      } else {
-                                        field.onChange(null);
-                                      }
+                                      field.onChange(file);
                                     }}
                                   />
                                 </Button>
                               </InputAdornment>
                             )
                           }}
+                          error={!!errors.files}
+                          helperText={errors.files?.message}
                         />
                       )}
                     />

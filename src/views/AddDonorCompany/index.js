@@ -35,6 +35,7 @@ import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
 import { stateStyles } from 'common/constants';
+import { validateFile } from 'utils/filevalidator';
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
@@ -691,6 +692,9 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="file"
                                   control={control}
+                                  rules={{
+                                    validate: (file) => validateFile(file)
+                                  }}
                                   render={({ field }) => (
                                     <TextField
                                       variant="outlined"
@@ -723,34 +727,15 @@ const AddCaseForm = ({ onCancel }) => {
                                                 accept="image/jpeg,image/png,image/jpg"
                                                 onChange={(e) => {
                                                   const file = e.target.files?.[0];
-                                                  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                  const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                                  if (file) {
-                                                    if (!allowedTypes.includes(file.type)) {
-                                                      toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                      e.target.value = null;
-                                                      field.onChange(null);
-                                                      return;
-                                                    }
-
-                                                    if (file.size > maxSizeInBytes) {
-                                                      toast.error('File size must be less than or equal to 25MB.');
-                                                      e.target.value = null;
-                                                      field.onChange(null);
-                                                      return;
-                                                    }
-
-                                                    field.onChange(file);
-                                                  } else {
-                                                    field.onChange(null);
-                                                  }
+                                                  field.onChange(file);
                                                 }}
                                               />
                                             </Button>
                                           </InputAdornment>
                                         )
                                       }}
+                                      error={!!errors.file}
+                                      helperText={errors.file?.message}
                                     />
                                   )}
                                 />

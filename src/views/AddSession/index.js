@@ -28,6 +28,7 @@ import dayjs from 'dayjs';
 import { useLocation } from 'react-router-dom';
 import config from '../../config';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { validateFile } from 'utils/filevalidator';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -511,6 +512,9 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="file"
                         control={control}
+                         rules={{
+                          validate: (file) => validateFile(file)
+                        }}
                         render={({ field }) => (
                           <Box mb={2} display="flex" justifyContent="space-between">
                             <TextField
@@ -536,38 +540,15 @@ const AddCaseForm = ({ onCancel }) => {
                                         accept=".pdf,.doc,.docx"
                                         onChange={(e) => {
                                           const file = e.target.files?.[0];
-                                          const allowedTypes = [
-                                            'application/pdf',
-                                            'application/msword',
-                                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                                          ];
-                                          const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                          if (file) {
-                                            if (!allowedTypes.includes(file.type)) {
-                                              toast.error('Only PDF, DOC, or DOCX files are allowed.');
-                                              e.target.value = null;
-                                              field.onChange('');
-                                              return;
-                                            }
-
-                                            if (file.size > maxSizeInBytes) {
-                                              toast.error('File size must be less than or equal to 25MB.');
-                                              e.target.value = null;
-                                              field.onChange('');
-                                              return;
-                                            }
-
-                                            field.onChange(file);
-                                          } else {
-                                            field.onChange('');
-                                          }
+                                           field.onChange(file);
                                         }}
                                       />
                                     </Button>
                                   </InputAdornment>
                                 )
                               }}
+                               error={!!errors.file}
+                            helperText={errors.file?.message}
                             />
                           </Box>
                         )}

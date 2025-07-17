@@ -29,7 +29,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
-import { getApi, updateApi } from 'common/apiClient';
+import { getApi, updateApiPatch } from 'common/apiClient';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import toast from 'react-hot-toast';
 import config from '../../config';
@@ -59,27 +59,31 @@ const User = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getApi(urls.login.getAllAdmin);
-        const filteredAdmins = response?.data?.allAdmins?.map((admin, index) => ({
-          id: admin._id || index,
-          name: admin.name,
-          email: admin.email,
-          role: admin.accountType,
-          lastLogin: new Date(admin.createdAt).toLocaleDateString()
-        }));
-        setusers(filteredAdmins);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const response = await getApi(`${urls.login.getUserswithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const filteredAdmins = response?.data?.data?.map((admin) => ({
+        ...admin,
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.accountType,
+        lastLogin: new Date(admin.createdAt).toLocaleDateString()
+      }));
 
+      setusers(filteredAdmins);
+      setTotalRows(response?.data?.meta?.total); // For server-side pagination
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
+
   const columns = [
     {
       field: 'name',
@@ -87,7 +91,7 @@ const User = () => {
       flex: 2,
       renderCell: (params) => (
         <Box>
-          <Typography sx={{ color: '#555', fontSize: '14px'  }}>{params.row.name || '-'}</Typography>
+          <Typography sx={{ color: '#555', fontSize: '14px' }}>{params.row.name || '-'}</Typography>
         </Box>
       )
     },
@@ -121,8 +125,8 @@ const User = () => {
           <IconButton
             size="small"
             onClick={() => {
-              const fullUser = allData.find((user) => user._id === params.row.id);
-              navigate('/add-config-user', { state: fullUser });
+              const User = users.find((user) => user._id === params.row.id);
+              navigate('/add-config-user', { state: User });
             }}
           >
             <IconPencil color="orangered" size={18} />
@@ -321,9 +325,9 @@ const User = () => {
   const handleConfirmDelete = async () => {
     if (userIdToDelete) {
       try {
-        await updateApi(urls.serviceuser.deleteUser.replace(':userId', userIdToDelete));
+        await updateApiPatch(urls.login.delete.replace(':adminId', userIdToDelete));
         toast.success('User deleted successfully!');
-        fetchUser();
+        fetchData();
       } catch (error) {
         console.error('Error deleting user:', error);
       } finally {
@@ -417,26 +421,7 @@ const User = () => {
             </Box>
           </Stack>
           <Grid container spacing={2}>
-            <FilterPanel
-              showFilter={showFilter}
-              statuses={statusFilter}
-              statusFilter={status}
-              setStatusFilter={(value) => setStatus(value)}
-              dateAddedFilters={dateAddedFilters}
-              dateOpenedFilter={dateOpenedFilter}
-              setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-              names={nameFilterOptions}
-              nameFilter={selectedName}
-              setNameFilter={setSelectedName}
-              countriesWithFlags={countriesWithFlags}
-              countryOfOriginFilter={countryOfOriginFilter}
-              setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
-              selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
-              onReset={handleReset}
-              customDateLabel="By Date"
-              onApply={fetchUser}
-            />
-            <Grid item xs={9}>
+            <Grid item xs={12}>
               <TableStyle>
                 <Box width="100%">
                   <Card style={{ height: '100vh' }}>

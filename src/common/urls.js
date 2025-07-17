@@ -122,14 +122,16 @@ export const urls = Object.freeze({
     login: `${baseUrl}/admin/login`,
     register: `${baseUrl}/admin/`,
     getUserProfile: `${baseUrl}/admin/`,
-    updateUserById: `${baseUrl}/admin/`,
+    updateUserById: `${baseUrl}/admin`,
     changePassword: `${baseUrl}/admin/change-password`,
     googleSignin: `${baseUrl}/admin/google-auth`,
     getAllAdmin: `${baseUrl}/admin/getAllAdmin`,
     forgotPassword: `${baseUrl}/admin/forgot-password`,
     otpvarify: `${baseUrl}/admin/verify-otp`,
     resetPassword: `${baseUrl}/admin/reset-password`,
-    createConfigUser: `${baseUrl}/admin/create-user`
+    createConfigUser: `${baseUrl}/admin/create-user`,
+    delete: `${baseUrl}/admin/delete/:adminId`,
+    getUserswithPagination: `${baseUrl}/admin/allwithpagination`
   },
   bulkFuntions: {
     delete: `${baseUrl}/bulk/delete`,

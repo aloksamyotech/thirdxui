@@ -39,6 +39,7 @@ import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
 import { contactMethodInitial, districts, ethnicityOptions, stateStyles } from 'common/constants';
+import { validateFile } from 'utils/filevalidator';
 
 const AddCaseForm = ({ onCancel }) => {
   const navigate = useNavigate();
@@ -886,26 +887,34 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="personalInfo.profileImage"
                                 control={control}
-                                render={({ field }) => {
-                                  const currentValue = field.value;
-
-                                  const displayName =
-                                    typeof currentValue === 'object'
-                                      ? currentValue?.name
-                                      : typeof currentValue === 'string'
-                                      ? currentValue?.split('/').pop()
-                                      : '';
-
-                                  return (
-                                    <TextField
-                                      fullWidth
-                                      variant="outlined"
-                                      size="small"
-                                      value={displayName}
-                                      placeholder="Profile image"
-                                      inputProps={{
-                                        readOnly: true,
-                                        sx: {
+                                rules={{
+                                  validate: (file) => validateFile(file)
+                                }}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    size="small"
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object'
+                                          ? field.value.name || ''
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop() // extract file name from string
+                                          : ''
+                                        : ''
+                                    }
+                                    placeholder="Profile image"
+                                    inputProps={{
+                                      readOnly: true,
+                                      sx: {
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        '&::placeholder': {
+                                          fontSize: '12px',
+                                          color: '#7a7b7c',
+                                          opacity: 1,
                                           whiteSpace: 'nowrap',
                                           overflow: 'hidden',
                                           textOverflow: 'ellipsis',
@@ -915,49 +924,30 @@ const AddCaseForm = ({ onCancel }) => {
                                             opacity: 1
                                           }
                                         }
-                                      }}
-                                      InputProps={{
-                                        endAdornment: (
-                                          <InputAdornment position="end">
-                                            <IconButton component="label" sx={{ p: 0, mr: '-10px' }}>
-                                              <AttachFileIcon sx={{ fontSize: 18, color: '#7a7b7c' }} />
-                                              <input
-                                                type="file"
-                                                hidden
-                                                accept="image/jpeg,image/png,image/jpg"
-                                                onChange={(e) => {
-                                                  const file = e.target.files?.[0];
-                                                  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                  const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                                  if (file) {
-                                                    if (!allowedTypes.includes(file.type)) {
-                                                      toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                      e.target.value = null;
-                                                      field.onChange(null);
-                                                      return;
-                                                    }
-
-                                                    if (file.size > maxSizeInBytes) {
-                                                      toast.error('File size must be ≤ 25MB.');
-                                                      e.target.value = null;
-                                                      field.onChange(null);
-                                                      return;
-                                                    }
-
-                                                    field.onChange(file);
-                                                  } else {
-                                                    field.onChange(null);
-                                                  }
-                                                }}
-                                              />
-                                            </IconButton>
-                                          </InputAdornment>
-                                        )
-                                      }}
-                                    />
-                                  );
-                                }}
+                                      }
+                                    }}
+                                    InputProps={{
+                                      endAdornment: (
+                                        <InputAdornment position="end">
+                                          <IconButton component="label" sx={{ p: 0, mr: '-10px' }}>
+                                            <AttachFileIcon sx={{ fontSize: 18, color: '#7a7b7c' }} />
+                                            <input
+                                              type="file"
+                                              hidden
+                                              accept="image/jpeg,image/png,image/jpg"
+                                              onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                field.onChange(file);
+                                              }}
+                                            />
+                                          </IconButton>
+                                        </InputAdornment>
+                                      )
+                                    }}
+                                    error={!!errors?.personalInfo?.profileImage}
+                                    helperText={errors.personalInfo?.profileImage?.message}
+                                  />
+                                )}
                               />
                             </Grid>
 
@@ -1537,6 +1527,9 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="file"
                                 control={control}
+                                rules={{
+                                  validate: (file) => validateFile(file)
+                                }}
                                 render={({ field }) => (
                                   <TextField
                                     variant="outlined"
@@ -1569,34 +1562,16 @@ const AddCaseForm = ({ onCancel }) => {
                                               accept="image/jpeg,image/png,image/jpg"
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0];
-                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024;
 
-                                                if (file) {
-                                                  if (!allowedTypes.includes(file.type)) {
-                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  if (file.size > maxSizeInBytes) {
-                                                    toast.error('File size must be less than or equal to 25MB.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  field.onChange(file);
-                                                } else {
-                                                  field.onChange(null);
-                                                }
+                                                field.onChange(file);
                                               }}
                                             />
                                           </Button>
                                         </InputAdornment>
                                       )
                                     }}
+                                    error={!!errors.file}
+                                    helperText={errors.file?.message}
                                   />
                                 )}
                               />

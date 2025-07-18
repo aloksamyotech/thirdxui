@@ -91,8 +91,7 @@ const UserProfileCard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
-  const [groupedTags, setGroupedTags] = useState([]);
-  const [role, setRole] = useState('');
+
   const id = location?.state?.id;
   const uniqueid = location?.state?.serialNumber;
 
@@ -116,55 +115,6 @@ const UserProfileCard = () => {
     }
   }, [id]);
 
-  useEffect(() => {
-    const fetchAndGroupTags = async () => {
-      try {
-        const response = await getApi(urls.tag.getAllTags);
-        const allTags = response?.data?.allTags || [];
-
-        const combinedData = [
-          ...(userData?.otherInfo?.benificiary ?? []),
-          ...(userData?.otherInfo?.campaigns ?? []),
-          ...(userData?.otherInfo?.eventAttanded ?? []),
-          ...(userData?.otherInfo?.engagement ?? []),
-          ...(userData?.otherInfo?.fundingInterest ?? []),
-          ...(userData?.otherInfo?.fundraisingActivities ?? [])
-        ];
-
-        const allIds = combinedData.map((item) => {
-          const id = typeof item === 'object' && item !== null ? item._id : item;
-          if (!id) {
-            console.warn('⚠️ Invalid ID in item:', item);
-          }
-          return id;
-        });
-
-        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
-
-        const grouped = {};
-        relatedTags.forEach((tag) => {
-          const category = tag.tagCategoryName || 'Uncategorized';
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(tag.name);
-        });
-
-        const formatted = Object.entries(grouped).map(([category, tags]) => ({
-          category,
-          tags
-        }));
-
-        setGroupedTags(formatted);
-      } catch (err) {
-        console.error('❌ Error fetching tags:', err);
-      }
-    };
-
-    if (userData?.otherInfo) {
-      fetchAndGroupTags();
-    } else {
-      console.warn('⛔ userData.otherInfo not found, skipping tag fetch.');
-    }
-  }, [userData]);
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
@@ -216,6 +166,23 @@ const UserProfileCard = () => {
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
+
+  const groupedTags = (userData?.otherInfo?.tags || []).reduce((acc, tag) => {
+    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+
+    acc[categoryName].push(tag.name);
+
+    return acc;
+  }, {});
+
+  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+    category,
+    tags
+  }));
 
   const handleSave = (data) => {
     setCaseNoteOpen(false);
@@ -567,12 +534,12 @@ const UserProfileCard = () => {
                         </Box>
 
                         <Grid>
-                          {groupedTags.length === 0 ? (
+                          {groupedTagsArray.length === 0 ? (
                             <Typography variant="body2" color="textSecondary">
                               No tags found.
                             </Typography>
                           ) : (
-                            groupedTags.map((group, idx) => (
+                            groupedTagsArray.map((group, idx) => (
                               <Box
                                 key={idx}
                                 mb={2}

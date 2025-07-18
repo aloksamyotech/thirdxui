@@ -136,5 +136,15 @@ export const urls = Object.freeze({
   bulkFuntions: {
     delete: `${baseUrl}/bulk/delete`,
     archive: `${baseUrl}/bulk/archive`
+  },
+  timeline: {
+    giftaidCreate: `${baseUrl}/giftAid/:id`,
+    attendeesCreate: `${baseUrl}/userTimeline/register-attendance/:id`,
+    emailinboundCreate: `${baseUrl}/userTimeline/email-inbound/:id`,
+    emailOutboundCreate: `${baseUrl}/userTimeline/email-outbound/:id`,
+    phoneinboundCreate: `${baseUrl}/userTimeline/phone-inbound/:id`,
+    phoneoutboundCreate: `${baseUrl}/userTimeline/phone-outbound/:id`,
+    letterRecivedCreate: `${baseUrl}/userTimeline/letter-received/:id`,
+    lettersendCreate: `${baseUrl}/userTimeline/letter-sent/:id`
   }
 });

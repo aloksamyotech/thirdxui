@@ -12,29 +12,29 @@ export const ROLES = {
 };
 
 export const entityTypeMap = {
-    'Service user': 'service_user',
-    Volunteer: 'volunteer',
-    Service: 'services',
-    Case: 'cases',
-    Donor: 'donor',
-    'Mailing List': 'mailing_list',
-    Donation: 'donation',
-    Form: 'form'
-  };
+  'Service user': 'service_user',
+  Volunteer: 'volunteer',
+  Service: 'services',
+  Case: 'cases',
+  Donor: 'donor',
+  'Mailing List': 'mailing_list',
+  Donation: 'donation',
+  Form: 'form'
+};
 export const sessionNames = [
-    { value: 'sessionA', label: 'Session A' },
-    { value: 'sessionB', label: 'Session B' }
-  ];
+  { value: 'sessionA', label: 'Session A' },
+  { value: 'sessionB', label: 'Session B' }
+];
 export const listTypeFilter = [
-    { value: 'Service user', label: 'Service user' },
-    { value: 'Volunteer', label: 'Volunteer ' },
-    { value: 'Service', label: 'Service ' },
-    { value: 'Case', label: 'Case' },
-    { value: 'Donor', label: 'Donor' },
-    { value: 'Mailing List', label: 'Mailing List' },
-    { value: 'Donation', label: 'Donation' },
-    { value: 'Form', label: 'Form' }
-  ];
+  { value: 'Service user', label: 'Service user' },
+  { value: 'Volunteer', label: 'Volunteer ' },
+  { value: 'Service', label: 'Service ' },
+  { value: 'Case', label: 'Case' },
+  { value: 'Donor', label: 'Donor' },
+  { value: 'Mailing List', label: 'Mailing List' },
+  { value: 'Donation', label: 'Donation' },
+  { value: 'Form', label: 'Form' }
+];
 export const ethnicityOptions = [
   'Arabic or North African',
   'Asian or Asian British – Indian',
@@ -92,18 +92,18 @@ export const statusFilter = [
   { value: 'inactive', label: 'Inactive' }
 ];
 
-export const TagCategoryAppliedToOptions = ['Service Users', 'Staff', 'Volunteers', 'Donors'];
+export const TagCategoryAppliedToOptions = ['Service Users', 'Volunteers', 'Services', 'Cases', 'Donors'];
 
 export const accountTypes = [
-    { label: 'Admin', value: 'admin' },
-    { label: 'User', value: 'user' },
+  { label: 'Admin', value: 'admin' },
+  { label: 'User', value: 'user' }
 ];
 
 export const permissionsList = [
-    { label: 'People', key: 'people' },
-    { label: 'Cases', key: 'cases' },
-    { label: 'Services', key: 'services' },
-    { label: 'Forms', key: 'forms' },
-    { label: 'Donor management', key: 'donorManagement' },
-    { label: 'Mailing List', key: 'mailingList' }
+  { label: 'People', key: 'people' },
+  { label: 'Cases', key: 'cases' },
+  { label: 'Services', key: 'services' },
+  { label: 'Forms', key: 'forms' },
+  { label: 'Donor management', key: 'donorManagement' },
+  { label: 'Mailing List', key: 'mailingList' }
 ];

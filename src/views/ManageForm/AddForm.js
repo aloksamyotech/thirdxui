@@ -23,6 +23,7 @@ const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
   const [preview, setPreview] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [templateData, setTemplateData] = useState([]);
+  const [formValues, setFormValues] = useState()
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='md'>
@@ -32,7 +33,9 @@ const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
           templateData={templateData}
           setTemplateData={setTemplateData}
           setPreset={setPreset}
-          onClose={onClose} />}
+          onClose={onClose}
+          setFormValues={setFormValues}
+        />}
       {
         !preview &&
         !preset &&
@@ -55,6 +58,7 @@ const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
       {
         selectedTemplate === 1 &&
         <TemplateOne
+          formValues={formValues}
           formData={formData}
           setFormData={setFormData}
           setSelectedTemplate={setSelectedTemplate}

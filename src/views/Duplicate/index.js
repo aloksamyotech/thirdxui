@@ -268,7 +268,7 @@ const Duplicate = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff' }}>
+            <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff', height: '500px' }}>
               <DataGrid
                 rows={loading ? [] : user}
                 columns={columns}

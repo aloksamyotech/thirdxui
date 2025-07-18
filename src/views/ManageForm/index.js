@@ -70,9 +70,9 @@ const Lead = () => {
       let data = {
         id: item?._id,
         index: index + 1,
-        description: item?.title,
-        campaign: item?.template,
-        title: 'help',
+        title: item?.title,
+        description: item?.description,
+        formType: item?.type,
         link: item?.publicId
       };
       return data;
@@ -103,21 +103,21 @@ const Lead = () => {
       field: 'title',
       headerName: 'Form Display Title',
       flex: 0.8,
-      renderCell: () => <Chip label="HELP US..." sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
+      renderCell: (params) => <Chip label={params.value} sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
     },
     {
-      field: 'campaign',
+      field: 'description',
       headerName: 'Form Description',
       flex: 0.8,
       renderCell: (params) => (
         <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */}-
+          {params.value}
         </Typography>
       )
     },
 
     {
-      field: 'description',
+      field: 'formType',
       headerName: 'Form Type',
       flex: 0.8,
       renderCell: (params) => (
@@ -245,9 +245,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                   }
                   columns={columns}
                   loading={loading}

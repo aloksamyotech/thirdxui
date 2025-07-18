@@ -88,6 +88,7 @@ const UserProfileCard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     const fetchUserById = async () => {
@@ -97,6 +98,7 @@ const UserProfileCard = () => {
 
         if (user) {
           setUserData(user);
+          setRole(user?.role);
         }
       } catch (error) {
         console.error('Error fetching user by ID:', error);
@@ -227,7 +229,6 @@ const UserProfileCard = () => {
       navigate('/donor');
     }
   };
-
   return (
     <>
       <Grid item xs={12}>
@@ -756,7 +757,7 @@ const UserProfileCard = () => {
                         }}
                         endIcon={<AddIcon />}
                       >
-                        Add Case Note
+                        Add Item
                       </Button>
                     </Box>
                   </Box>
@@ -779,7 +780,13 @@ const UserProfileCard = () => {
                   <TimelineActivity timelineData={timelineData} />
                 </Grid>
 
-                <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />
+                <AddItemDialog
+                  open={addItemOpen}
+                  onClose={() => setAddItemOpen(false)}
+                  onSelect={handleSelectItem}
+                  userId={id}
+                  role={role}
+                />
 
                 <CaseNoteDialog
                   open={caseNoteOpen}

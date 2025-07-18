@@ -33,6 +33,42 @@ const Duplicate = () => {
       gender: 'Male',
       ethicity: 'Black',
       no: '1234561234'
+    },
+    {
+      id: 1,
+      userid: 'D-123',
+      name: 'Snow',
+      email: 'bob@gmail.com',
+      dob: '27-03-04',
+      age: '20',
+      country: 'India',
+      gender: 'Male',
+      ethicity: 'Black',
+      no: '1234561234'
+    },
+    {
+      id: 1,
+      userid: 'D-123',
+      name: 'Snow',
+      email: 'bob@gmail.com',
+      dob: '27-03-04',
+      age: '20',
+      country: 'India',
+      gender: 'Male',
+      ethicity: 'Black',
+      no: '1234561234'
+    },
+    {
+      id: 1,
+      userid: 'D-123',
+      name: 'Snow',
+      email: 'bob@gmail.com',
+      dob: '27-03-04',
+      age: '20',
+      country: 'India',
+      gender: 'Male',
+      ethicity: 'Black',
+      no: '1234561234'
     }
   ];
   const columns = [
@@ -56,7 +92,7 @@ const Duplicate = () => {
     },
     {
       field: 'dob',
-      headerName: 'Date',
+      headerName: 'Date Added',
       flex: 1,
       renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
     },

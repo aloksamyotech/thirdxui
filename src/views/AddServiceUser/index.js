@@ -51,12 +51,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [contactpurpose, setContactpurpose] = useState([]);
   const [reason, setReason] = useState([]);
   const [contactmethod, setContactmethod] = useState([]);
-  const [benificiary, setBenificiary] = useState([]);
-  const [Campaigns, setCampaigns] = useState([]);
-  const [engagement, setengagement] = useState([]);
-  const [eventsAttended, seteventsAttended] = useState([]);
-  const [fundingInterests, setfundingInterests] = useState([]);
-  const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [allTags, setAllTages] = useState([]);
+  const [allCategory, setAllCategory] = useState([]);
   const [serviceData, setServiceData] = useState([]);
   const [serviceNames, setServiceNames] = useState([]);
   const [serviceNameSearchQuery, setServiceNameSearchQuery] = useState('');
@@ -103,12 +99,6 @@ const AddCaseForm = ({ onCancel }) => {
     otherId: editdata?.contactInfo?.otherId || '',
     riskNotes: editdata?.otherInfo?.description || '',
     file: editdata?.otherInfo?.file || '',
-    Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-    Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-    engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-    eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-    fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-    fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
     restrictAccess: editdata?.otherInfo?.restrictAccess || false,
     title: editdata?.emergencyContact?.title || '',
     gender: editdata?.emergencyContact?.gender || '',
@@ -164,7 +154,6 @@ const AddCaseForm = ({ onCancel }) => {
           }
         ]
   };
-
 
   const {
     register,
@@ -255,26 +244,19 @@ const AddCaseForm = ({ onCancel }) => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaigns(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Volunteers'
+        });
+        setAllCategory(allCategory?.data?.data);
+        console.log(`all Category`, allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
     };
     fetchTags();
   }, []);
+
+  console.log(`allCategory---->>>`, allCategory);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -298,18 +280,30 @@ const AddCaseForm = ({ onCancel }) => {
 
     fetchServices();
   }, [serviceNameSearchQuery]);
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
       render={({ field }) => (
         <Autocomplete
           multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+          options={options || []}
+          getOptionLabel={(option) => option?.name || 'Unknown'}
+          groupBy={(option) => option.categoryName ?? label}
+          isOptionEqualToValue={(option, value) => option._id === value.tagId}
+          value={field.value || []}
+          onChange={(_, selectedOptions) => {
+            const updatedTags = selectedOptions.map((opt) => ({
+              categoryId: categoryId,
+              tagId: opt._id
+            }));
+            // Update the beneficiaryTags field with categoryId and tagId
+            setValue('beneficiaryTags', [
+              ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+              ...updatedTags
+            ]);
+            field.onChange(selectedOptions);
+          }}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
               <Chip
@@ -432,29 +426,6 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactInfo[otherId]', formData.otherId || '');
 
     fd.append('otherInfo[description]', formData.riskNotes || '');
-    (formData.Beneficiary || []).forEach((id) => {
-      fd.append('otherInfo[benificiary][]', id);
-    });
-
-    (formData.Campaigns || []).forEach((id) => {
-      fd.append('otherInfo[campaigns][]', id);
-    });
-
-    (formData.engagement || []).forEach((id) => {
-      fd.append('otherInfo[engagement][]', id);
-    });
-
-    (formData.eventsAttended || []).forEach((id) => {
-      fd.append('otherInfo[eventAttanded][]', id);
-    });
-
-    (formData.fundingInterests || []).forEach((id) => {
-      fd.append('otherInfo[fundingInterest][]', id);
-    });
-
-    (formData.fundraisingActivities || []).forEach((id) => {
-      fd.append('otherInfo[fundraisingActivities][]', id);
-    });
 
     fd.append('otherInfo[restrictAccess]', formData.restrictAccess ? 'true' : 'false');
 
@@ -512,6 +483,10 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('role', 'service_user');
     fd.append('isActive', true);
 
+    (formData.beneficiaryTags || []).forEach((tag, index) => {
+      fd.append(`beneficiaryTags[${index}][categoryId]`, tag.categoryId);
+      fd.append(`beneficiaryTags[${index}][tagId]`, tag.tagId);
+    });
     if (formData.file) {
       fd.append('file', formData.file || '');
     }
@@ -1445,70 +1420,20 @@ const AddCaseForm = ({ onCancel }) => {
                               Service User Tag
                             </Typography>
                             <Grid container spacing={2}>
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Beneficiary',
-                                  'Beneficiary Information',
-                                  benificiary,
-                                  errors.Beneficiary,
-                                  errors.Beneficiary?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Campaigns',
-                                  'Campaigns Supported',
-                                  Campaigns,
-                                  errors.Campaigns,
-                                  errors.Campaigns?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'engagement',
-                                  'Engagement',
-                                  engagement,
-                                  errors.engagement,
-                                  errors.engagement?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'eventsAttended',
-                                  'Events Attended',
-                                  eventsAttended,
-                                  errors.eventsAttended,
-                                  errors.eventsAttended?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundingInterests',
-                                  'Funding Interests',
-                                  fundingInterests,
-                                  errors.fundingInterests,
-                                  errors.fundingInterests?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundraisingActivities',
-                                  'Fundraising Activities',
-                                  fundraisingActivities,
-                                  errors.fundraisingActivities,
-                                  errors.fundraisingActivities?.message,
-                                  control
-                                )}
+                              <Grid container spacing={2}>
+                                {allCategory?.map((category, index) => (
+                                  <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                                    {renderAutocomplete(
+                                      `Beneficiary.${index}`,
+                                      category.name,
+                                      category._id,
+                                      control,
+                                      category.tags,
+                                      errors?.Beneficiary?.[index],
+                                      errors?.Beneficiary?.[index]?.message
+                                    )}
+                                  </Grid>
+                                ))}
                               </Grid>
                             </Grid>
                           </Paper>

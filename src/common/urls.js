@@ -149,5 +149,8 @@ export const urls = Object.freeze({
     phoneoutboundCreate: `${baseUrl}/userTimeline/phone-outbound/:id`,
     letterRecivedCreate: `${baseUrl}/userTimeline/letter-received/:id`,
     lettersendCreate: `${baseUrl}/userTimeline/letter-sent/:id`
+  },
+  duplicate: {
+    getallDuplicateUsers: `${baseUrl}/duplicate/getallduplicate`
   }
 });

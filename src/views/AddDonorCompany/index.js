@@ -35,7 +35,7 @@ import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
 import { stateStyles } from 'common/constants';
-import { validateFile } from 'utils/filevalidator';
+
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
@@ -67,7 +67,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   const subRole = location?.state?.subRole;
   const editdata = location?.state || {};
-   const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
+  const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
     acc[curr._id] = 0;
     return acc;
   }, {});
@@ -199,7 +199,6 @@ const AddCaseForm = ({ onCancel }) => {
       return { ...prev, [label]: nextState };
     });
   };
-
 
   const renderAutocomplete = (name, label, options, error, helperText, control) => (
     <Controller

@@ -51,12 +51,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [contactpurpose, setContactpurpose] = useState([]);
   const [reason, setReason] = useState([]);
   const [contactmethod, setContactmethod] = useState([]);
-  const [benificiary, setBenificiary] = useState([]);
-  const [Campaigns, setCampaigns] = useState([]);
-  const [engagement, setengagement] = useState([]);
-  const [eventsAttended, seteventsAttended] = useState([]);
-  const [fundingInterests, setfundingInterests] = useState([]);
-  const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [allTags, setAllTages] = useState([]);
+  const [allCategory, setAllCategory] = useState([]);
   const [serviceData, setServiceData] = useState([]);
   const [serviceNames, setServiceNames] = useState([]);
   const [serviceNameSearchQuery, setServiceNameSearchQuery] = useState('');
@@ -103,12 +99,6 @@ const AddCaseForm = ({ onCancel }) => {
     otherId: editdata?.contactInfo?.otherId || '',
     riskNotes: editdata?.otherInfo?.description || '',
     file: editdata?.otherInfo?.file || '',
-    Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-    Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-    engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-    eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-    fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-    fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
     restrictAccess: editdata?.otherInfo?.restrictAccess || false,
     title: editdata?.emergencyContact?.title || '',
     gender: editdata?.emergencyContact?.gender || '',
@@ -134,6 +124,12 @@ const AddCaseForm = ({ onCancel }) => {
     letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
     riskAssessmentNotes: editdata?.riskAssessment?.riskAssessmentNotes || '',
     keyIndicators: editdata?.riskAssessment?.keyIndicators?.map((val) => (typeof val === 'object' ? val._id || val.id : val)) || [],
+
+    beneficiaryTags:
+      editdata?.otherInfo?.tags?.map((tag) => ({
+        categoryId: tag.tagCategoryId._id,
+        tagId: tag._id
+      })) || [],
     serviceSections: editdata?.Service?.length
       ? editdata.Service.map((item) => ({
           serviceName: item.serviceName?._id || '',
@@ -164,7 +160,6 @@ const AddCaseForm = ({ onCancel }) => {
           }
         ]
   };
-
 
   const {
     register,
@@ -228,9 +223,6 @@ const AddCaseForm = ({ onCancel }) => {
 
   const fileInputRef = useRef(null);
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
   };
@@ -255,20 +247,10 @@ const AddCaseForm = ({ onCancel }) => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaigns(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Service Users'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
@@ -298,48 +280,78 @@ const AddCaseForm = ({ onCancel }) => {
 
     fetchServices();
   }, [serviceNameSearchQuery]);
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+
+  useEffect(() => {
+    if (editdata?.otherInfo?.tags && allCategory?.length) {
+      allCategory.forEach((category) => {
+        const categoryTags = editdata.otherInfo.tags
+          .filter((tag) => tag.tagCategoryId?._id === category._id || tag.tagCategoryId === category._id)
+          .map((tag) => category.tags.find((t) => t._id === tag._id))
+          .filter(Boolean);
+        setValue(`Beneficiary.${category._id}`, categoryTags);
+      });
+    }
+  }, [editdata, allCategory, setValue]);
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                label={option.name}
-                {...getTagProps({ index })}
-                key={option._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
-
   const renderAutocomplete2 = (name, label, options, errorObject, errorMessage, control) => (
     <Controller
       name={name}
@@ -370,8 +382,6 @@ const AddCaseForm = ({ onCancel }) => {
       )}
     />
   );
-
-  const handleToggle = () => setRestrictAccess(!restrictAccess);
 
   useEffect(() => {
     if (editdata?.contactPreferences?.contactMethods) {
@@ -432,29 +442,6 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactInfo[otherId]', formData.otherId || '');
 
     fd.append('otherInfo[description]', formData.riskNotes || '');
-    (formData.Beneficiary || []).forEach((id) => {
-      fd.append('otherInfo[benificiary][]', id);
-    });
-
-    (formData.Campaigns || []).forEach((id) => {
-      fd.append('otherInfo[campaigns][]', id);
-    });
-
-    (formData.engagement || []).forEach((id) => {
-      fd.append('otherInfo[engagement][]', id);
-    });
-
-    (formData.eventsAttended || []).forEach((id) => {
-      fd.append('otherInfo[eventAttanded][]', id);
-    });
-
-    (formData.fundingInterests || []).forEach((id) => {
-      fd.append('otherInfo[fundingInterest][]', id);
-    });
-
-    (formData.fundraisingActivities || []).forEach((id) => {
-      fd.append('otherInfo[fundraisingActivities][]', id);
-    });
 
     fd.append('otherInfo[restrictAccess]', formData.restrictAccess ? 'true' : 'false');
 
@@ -512,6 +499,10 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('role', 'service_user');
     fd.append('isActive', true);
 
+    (formData.beneficiaryTags || []).forEach((tag, index) => {
+      fd.append(`otherInfo[tags][${index}]`, tag.tagId);
+    });
+
     if (formData.file) {
       fd.append('file', formData.file || '');
     }
@@ -549,52 +540,6 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLetters = /^[A-Za-z\s]*$/;
   const onlyLetterNumberSpace = /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
-
-  const tabFieldMap = {
-    0: [
-      'personalInfo.firstName',
-      'personalInfo.lastName',
-      'personalInfo.dateOfBirth',
-      'personalInfo.title',
-      'personalInfo.gender',
-      'personalInfo.ethnicity',
-      'personalInfo.nickName',
-      'homePhone',
-      'phone',
-      'email',
-      'addressLine1',
-      'town',
-      'district',
-      'postcode',
-      'country',
-      'firstLanguage',
-      'otherId',
-      'Beneficiary',
-      'Campaigns',
-      'riskNotes',
-      'engagement',
-      'eventsAttended',
-      'fundingInterests',
-      'fundraisingActivities',
-      'restrictAccess'
-    ],
-    1: [
-      'firstName',
-      'lastName',
-      'phone',
-      'title',
-      'gender',
-      'preferred',
-      'emergencyhomePhone',
-      'emergencyphone',
-      'emergencyemail',
-      'emergencyaddress',
-      'emergencycountry',
-      'emergencytown',
-      'emergencypinCode'
-    ],
-    2: ['preferredContact', 'reason', 'contactPurpose', 'confirmDate', 'telephone', 'emailConsent', 'sms', 'letter', 'whatsapp']
-  };
 
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
@@ -1440,75 +1385,25 @@ const AddCaseForm = ({ onCancel }) => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2 }}>
-                            <Typography variant="subtitle1" mb={2}>
+                          <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                            <Typography variant="subtitle1" mb={4}>
                               Service User Tag
                             </Typography>
                             <Grid container spacing={2}>
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Beneficiary',
-                                  'Beneficiary Information',
-                                  benificiary,
-                                  errors.Beneficiary,
-                                  errors.Beneficiary?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Campaigns',
-                                  'Campaigns Supported',
-                                  Campaigns,
-                                  errors.Campaigns,
-                                  errors.Campaigns?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'engagement',
-                                  'Engagement',
-                                  engagement,
-                                  errors.engagement,
-                                  errors.engagement?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'eventsAttended',
-                                  'Events Attended',
-                                  eventsAttended,
-                                  errors.eventsAttended,
-                                  errors.eventsAttended?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundingInterests',
-                                  'Funding Interests',
-                                  fundingInterests,
-                                  errors.fundingInterests,
-                                  errors.fundingInterests?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundraisingActivities',
-                                  'Fundraising Activities',
-                                  fundraisingActivities,
-                                  errors.fundraisingActivities,
-                                  errors.fundraisingActivities?.message,
-                                  control
-                                )}
+                              <Grid container spacing={2}>
+                                {allCategory?.map((category, index) => (
+                                  <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                                    {renderAutocomplete(
+                                      `Beneficiary.${index}`,
+                                      category.name,
+                                      category.tags,
+                                      errors?.Beneficiary?.[index],
+                                      errors?.Beneficiary?.[index]?.message,
+                                      control,
+                                      category._id
+                                    )}
+                                  </Grid>
+                                ))}
                               </Grid>
                             </Grid>
                           </Paper>

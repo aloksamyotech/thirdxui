@@ -1,171 +1,112 @@
-import React, { useState } from 'react';
-import { Button, Grid, Stack, Box, Typography, InputBase, IconButton, Checkbox } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import CallMergeIcon from '@mui/icons-material/CallMerge';
-import { Visibility } from '@mui/icons-material';
-import { IconTrash } from '@tabler/icons';
+import React from 'react';
+import { Box, Typography, Grid, Button, Divider, IconButton } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import CustomHeader from 'components/CustomHeader';
+import { useNavigate } from 'react-router-dom';
+import WestIcon from '@mui/icons-material/West';
+import EastIcon from '@mui/icons-material/East';
 
-const Duplicate = () => {
-  const [showFilter, setShowFilter] = useState(true);
-  const [status, setStatus] = useState('');
-  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [name, setNameFilter] = useState('');
-  const [selectedIds, setSelectedIds] = useState([]);
+const DuplicateDetails = () => {
+  const navigate = useNavigate();
 
-  const handleCheckboxChange = (id) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+  const recordA = {
+    added: '29/01/2020',
+    firstName: 'A',
+    lastName: 'Test',
+    email: 'family@test.com',
+    address: ''
   };
 
-  const rows = [
-    {
-      id: 1,
-      userid: 'D-123',
-      name: 'Snow',
-      email: 'bob@gmail.com',
-      dob: '27-03-04',
-      age: '20',
-      country: 'India',
-      gender: 'Male',
-      ethicity: 'Black',
-      no: '1234561234'
-    }
-  ];
-  const columns = [
-    {
-      field: 'name',
-      headerName: 'Name',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.row?.name || '-'}</Typography>
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'no',
-      headerName: 'Phone',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'dob',
-      headerName: 'Date',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'select',
-      headerName: 'View',
-      flex: 1,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <IconButton>
-          <Visibility />
-        </IconButton>
-      )
-    }
-  ];
+  const recordB = {
+    added: '29/01/2020',
+    firstName: 'B',
+    lastName: 'Test',
+    email: 'family@test.com',
+    address: ''
+  };
+
+  const rowLabelStyle = { fontWeight: 'bold', color: '#555' };
+  const rowDataStyle = { color: '#333' };
 
   return (
-    <>
-      <Box>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/services')}>
-              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
-            </IconButton>
-            Duplicates
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '30px',
-              paddingLeft: '16px',
-              border: '1px solid #e0e0e0',
-              width: '489px',
-              height: '40px'
-            }}
-          >
-            <InputBase
-              placeholder="Search..."
-              sx={{
-                '& .MuiInputBase-input::placeholder': {
-                  fontSize: '12 px',
-                  opacity: 1
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '14px'
-                },
-                '& .MuiInputLabel-root': {
-                  fontSize: '13px'
-                },
-                '& .MuiInputBase-root.Mui-focused': {
-                  backgroundColor: '#e0e0e0'
-                },
-                flex: 1,
-                color: 'text.primary'
-              }}
-            />
-            <IconButton
-              // onClick={handleFilter}
-              sx={{
-                marginRight: '8px',
-                width: 18,
-                height: 18,
-                cursor: 'pointer'
-              }}
-            >
-              <SearchIcon />
-            </IconButton>
-          </Box>
-        </Stack>
+    <Box sx={{ p: 1 }}>
+      <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center" mb={2}>
+        <IconButton onClick={() => navigate(-1)}>
+          <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
+        </IconButton>
+        Duplicates
+      </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff' }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                getRowId={(row) => row.id}
-                pagination={false}
-                hideFooterPagination
-                hideFooter
-                components={{
-                  toolbar: () => (
-                    <CustomHeader
-                      entityType="duplicates"
-                      title="Duplicates"
-                      selectedIds={selectedIds}
-                      enableBulkActions={false}
-                      exportEnabled={true}
-                      extraActions={null}
-                    />
-                  )
-                }}
-                sx={{
-                  '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #ccc'
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor: '#f5f5f5'
-                  }
-                }}
-              />
-            </Box>
-          </Grid>
+      <Grid container spacing={2}>
+        {/* Main Content */}
+        <Grid item xs={10}>
+          <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+            <Grid container sx={{ bgcolor: '#f9f9f9', p: 2 }}>
+              <Grid item xs={4}>
+                <Typography sx={{ fontWeight: 500 }}>
+                  Matched on <strong>Email, Last Name</strong>
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography sx={{ fontWeight: 600 }}>Test, A (2042)</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography sx={{ fontWeight: 600 }}>Test, B (2043)</Typography>
+              </Grid>
+            </Grid>
+            <Divider />
+
+            {['Added', 'First Name', 'Last Name', 'Email', 'Address'].map((label, index) => (
+              <React.Fragment key={index}>
+                <Grid container sx={{ p: 2 }}>
+                  <Grid item xs={4}>
+                    <Typography sx={rowLabelStyle}>{label}</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography sx={rowDataStyle}>{recordA[label.toLowerCase().replace(/ /g, '')]}</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography sx={rowDataStyle}>{recordB[label.toLowerCase().replace(/ /g, '')]}</Typography>
+                  </Grid>
+                </Grid>
+                <Divider />
+              </React.Fragment>
+            ))}
+          </Box>
         </Grid>
-      </Box>
-    </>
+
+        {/* Vertical Buttons */}
+        <Grid item xs={2}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Button variant="outlined" color="inherit" sx={{ fontSize: '0.75rem' }} fullWidth>
+              NO ACTION
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ backgroundColor: '#009FC7', fontSize: '0.75rem', '&:hover': { backgroundColor: '#007FA3' } }}
+            >
+              <WestIcon fontSize="small" sx={{ mr: 1 }} />
+              MERGE
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ backgroundColor: '#009FC7', fontSize: '0.75rem', '&:hover': { backgroundColor: '#007FA3' } }}
+            >
+              <EastIcon sx={{ mr: 1 }} fontSize="small" /> MERGE
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ backgroundColor: '#053146', fontSize: '0.75rem', '&:hover': { backgroundColor: '#041F2C' } }}
+            >
+              NOT DUPLICATES
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
-export default Duplicate;
+export default DuplicateDetails;

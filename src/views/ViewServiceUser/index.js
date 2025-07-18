@@ -42,7 +42,6 @@ import { imageUrl } from 'common/urls';
 import './index.css';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import TimelineActivity from 'components/TimelineActivity';
-
 const timelineData = [
   {
     date: '27 Nov 2024',
@@ -93,6 +92,7 @@ const UserProfileCard = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const [groupedTags, setGroupedTags] = useState([]);
+  const [role, setRole] = useState('');
   const id = location?.state?.id;
   const uniqueid = location?.state?.serialNumber;
 
@@ -101,9 +101,9 @@ const UserProfileCard = () => {
       try {
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
         const user = response?.data;
-
         if (user) {
           setUserData(user);
+          setRole(user?.role);
         }
       } catch (error) {
         console.error('Error fetching user by ID:', error);
@@ -238,7 +238,6 @@ const UserProfileCard = () => {
     //   navigate('/people');
     // }
   };
-
   return (
     <>
       <Grid item xs={12}>
@@ -975,7 +974,13 @@ const UserProfileCard = () => {
                   <TimelineActivity timelineData={timelineData} />
                 </Grid>
 
-                <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />
+                <AddItemDialog
+                  open={addItemOpen}
+                  onClose={() => setAddItemOpen(false)}
+                  onSelect={handleSelectItem}
+                  userId={id}
+                  role={role}
+                />
 
                 <CaseNoteDialog
                   open={caseNoteOpen}
@@ -989,7 +994,7 @@ const UserProfileCard = () => {
         </Grid>
       </Card>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData} />
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData}/>
     </>
   );
 };

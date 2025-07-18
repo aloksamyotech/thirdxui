@@ -5,8 +5,7 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import { Visibility } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-
-import { IconTrash } from '@tabler/icons';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
@@ -14,6 +13,7 @@ const Duplicate = () => {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState([]);
   const [user, setUser] = useState('');
+  const [loading, setLoading] = useState(true);
   const handleCheckboxChange = (id) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
@@ -21,6 +21,7 @@ const Duplicate = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        setLoading(true);
         const response = await getApi(urls.duplicate.getallDuplicateUsers);
 
         const formatted = [];
@@ -52,10 +53,11 @@ const Duplicate = () => {
             added
           });
         });
-        console.log('Formatted Users:', formatted);
         setUser(formatted);
       } catch (error) {
         console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -268,15 +270,30 @@ const Duplicate = () => {
           <Grid item xs={12}>
             <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff' }}>
               <DataGrid
-                rows={user}
+                rows={loading ? [] : user}
                 columns={columns}
+                loading={loading}
                 getRowId={(row) => row.id}
                 pagination={false}
                 getRowHeight={() => 'auto'}
                 hideFooterPagination
                 hideFooter
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 sx={{
                   '& .MuiDataGrid-row': {

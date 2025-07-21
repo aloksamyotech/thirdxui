@@ -962,7 +962,7 @@ const UserProfileCard = () => {
         </Grid>
       </Card>
 
-      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData}/>
+      <OptionsPopover open={open} anchorEl={anchorEl} onClose={handleClose} data={userData} />
     </>
   );
 };

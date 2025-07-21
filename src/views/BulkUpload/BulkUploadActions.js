@@ -27,7 +27,7 @@ const sampleFiles = {
     },
     donors: {
         name: 'donors-template.xlsx',
-        path: '/templates/donors-template.xlsx'
+        path: '/sampleFiles/service_donorSample_file.xlsx'
     }
 };
 

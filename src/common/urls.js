@@ -25,7 +25,9 @@ export const urls = Object.freeze({
     deleteUser: `${baseUrl}/user/deleteuser/:userId`,
     fetchWithPagination: `${baseUrl}/user/allwithpagination`,
     archive: `${baseUrl}/user/archive`,
-    unarchive: `${baseUrl}/user/unarchive`
+    unarchive: `${baseUrl}/user/unarchive`,
+    bulkUploadUsers: `${baseUrl}/user/bulkUploadUsers`,
+    bulkUploadDonors: `${baseUrl}/user/bulkUploadDonors`
   },
   service: {
     create: `${baseUrl}/services/addServices`,
@@ -35,7 +37,8 @@ export const urls = Object.freeze({
     getById: `${baseUrl}/services/getServiceById/:id`,
     filterType: `${baseUrl}/services/search`,
     editServices: `${baseUrl}/services/editServices/`,
-    toggleArchive: `${baseUrl}/services/toggleArchive/`
+    toggleArchive: `${baseUrl}/services/toggleArchive/`,
+     bulkUpload: `${baseUrl}/services/bulkUpload`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,

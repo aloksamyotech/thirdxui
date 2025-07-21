@@ -23,8 +23,12 @@ const BulkUploadFile = () => {
         skipEmptyLines: true,
         complete: ({ data }) => {
           switch (uploadType) {
+            case 'users':
+              return validateAndUploadServiceUser(data);
             case 'services':
               return validateAndUploadServices(data);
+            case 'donors':
+              return validateAndUploadDonor(data);
             case 'cases':
               return validateAndUploadCases(data);
             default:
@@ -55,8 +59,12 @@ const BulkUploadFile = () => {
       });
 
       switch (uploadType) {
-        // case 'services':
-        //     return validateAndUploadServices(data);
+        case 'users':
+            return validateAndUploadServiceUser(data);
+        case 'services':
+            return validateAndUploadServices(data);
+        case 'donors':
+            return validateAndUploadDonor(data);
         case 'cases':
           return validateAndUploadCases(data);
         default:
@@ -93,6 +101,91 @@ const BulkUploadFile = () => {
     } catch (error) {
       console.log('error in cases bulkUpload===========>', error);
       toast.error('Error uploading case data, make sure data is correct');
+    }
+  };
+  const validateAndUploadServices = async (rows) => {
+    const requiredFields = ['service_name',	'service_code',	'service_type'];
+    const errors = [];
+
+    rows.forEach((row, i) => {
+      requiredFields.forEach((field) => {
+        if (!row[field]) {
+          errors.push(`Row ${i + 2}: Missing ${field}`);
+        }
+      });
+    });
+
+    if (errors.length) {
+      console.error(errors);
+      alert('Validation failed. See console.');
+      return;
+    }
+
+    try {
+    
+      const res = await postApi(urls.service.bulkUpload, rows);
+      if (res.success == true) {
+        toast.success('Successfully uploaded service data');
+      }
+    } catch (error) {
+      console.log('error in service bulkUpload===========>', error);
+      toast.error('Error uploading service data, make sure data is correct');
+    }
+  };
+  const validateAndUploadServiceUser = async (rows) => {
+    const requiredFields = ['personalInfo_gender', 'personalInfo_firstname',	'personalInfo_lastname',	'personalInfo_ethnicity',	'contactInfo_homephone',	'contactInfo_phone', 'contactInfo_email'];
+    const errors = [];
+
+    rows.forEach((row, i) => {
+      requiredFields.forEach((field) => {
+        if (!row[field]) {
+          errors.push(`Row ${i + 2}: Missing ${field}`);
+        }
+      });
+    });
+
+    if (errors.length) {
+      console.error(errors);
+      alert('Validation failed. See console.');
+      return;
+    }
+
+    try {
+      const res = await postApi(urls.serviceuser.bulkUploadUsers, rows);
+      if (res.success == true) {
+        toast.success('Successfully uploaded service data');
+      }
+    } catch (error) {
+      console.log('error in service user bulkUpload===========>', error);
+      toast.error('Error uploading service user data, make sure data is correct');
+    }
+  };
+   const validateAndUploadDonor= async (rows) => {
+    const requiredFields = ['personalInfo_gender', 'personalInfo_firstname',	'personalInfo_lastname',	'contactInfo_homephone',	'contactInfo_phone', 'contactInfo_email'];
+    const errors = [];
+
+    rows.forEach((row, i) => {
+      requiredFields.forEach((field) => {
+        if (!row[field]) {
+          errors.push(`Row ${i + 2}: Missing ${field}`);
+        }
+      });
+    });
+
+    if (errors.length) {
+      console.error(errors);
+      alert('Validation failed. See console.');
+      return;
+    }
+
+    try {
+      const res = await postApi(urls.serviceuser.bulkUploadDonors, rows);
+      if (res.success == true) {
+        toast.success('Successfully uploaded service data');
+      }
+    } catch (error) {
+      console.log('error in service user bulkUpload===========>', error);
+      toast.error('Error uploading service user data, make sure data is correct');
     }
   };
   return (

@@ -35,18 +35,14 @@ const AddCaseForm = ({ onCancel }) => {
   const [countryList, setCountryList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [serviceid, setServiceid] = useState();
-  const [benificiary, setBenificiary] = useState([]);
   const [sessionLocation, setsessionLocation] = useState([]);
-  const [Campaigns, setCampaigns] = useState([]);
-  const [engagement, setengagement] = useState([]);
-  const [eventsAttended, seteventsAttended] = useState([]);
-  const [fundingInterests, setfundingInterests] = useState([]);
-  const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [serviceUser, setServiceUser] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [allCategory, setAllCategory] = useState([]);
 
   const location = useLocation();
   const session = location?.state?.session;
+
   const serviceId = session?.serviceId || location?.state?.serviceId;
 
   const {
@@ -54,6 +50,7 @@ const AddCaseForm = ({ onCancel }) => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
     setValue
   } = useForm({
     mode: 'all',
@@ -61,12 +58,7 @@ const AddCaseForm = ({ onCancel }) => {
       date: dayjs(),
       countryOfOrigin: '',
       type: '',
-      beneficiary: [],
-      campaigns: [],
-      engagement: [],
-      eventsAttended: [],
-      fundingInterests: [],
-      fundraisingActivities: [],
+      tags: [],
       time: dayjs().format('HH:mm'),
       description: '',
       file: '',
@@ -75,46 +67,51 @@ const AddCaseForm = ({ onCancel }) => {
   });
 
   useEffect(() => {
+    const beneficiaryTags = [];
+
     if (session && Object.keys(session).length > 0) {
       const formData = {
         countryOfOrigin: session?.country || '',
         date: session?.date ? dayjs(session.date) : dayjs(),
         time: session?.time || dayjs().format('HH:mm'),
         description: session?.description || '',
-        beneficiary: session?.benificiary || [],
-        campaigns: session?.campaigns || [],
-        engagement: session?.engagement || [],
-        eventsAttended: session?.eventAttanded || [],
-        fundingInterests: session?.fundingInterest || [],
-        fundraisingActivities: session?.fundraisingActivities || [],
         serviceId: serviceId || '',
         file: session?.file || '',
-        serviceUserId: session?.serviceuser?._id || ''
+        // serviceUserId: session?.serviceuser?._id || ''
+        serviceUserId: session?.serviceuser
+          ? {
+              label: session.serviceuser.name,
+              value: session.serviceuser._id
+            }
+          : ''
       };
+
+      allCategory.forEach((category) => {
+        category.tags.forEach((tag) => {
+          if (session.tags?.includes(tag._id)) {
+            beneficiaryTags.push({
+              categoryId: category._id,
+              tagId: tag._id
+            });
+          }
+        });
+      });
 
       Object.entries(formData).forEach(([key, value]) => {
         setValue(key, value);
       });
+
+      setValue('beneficiaryTags', beneficiaryTags);
     }
-  }, [session, setValue]);
+  }, [session, setValue, serviceId, allCategory]);
 
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaigns(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Session'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
@@ -135,22 +132,14 @@ const AddCaseForm = ({ onCancel }) => {
     fetchData();
   }, []);
 
-
   useEffect(() => {
     const fetchserviceUser = async () => {
       try {
-        const queryParams = new URLSearchParams();
-        if (searchQuery && searchQuery !== '') {
-          queryParams.append('search', searchQuery);
-        }
-        queryParams.append('role', 'user');
-
-        const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
-        const allUser = response?.data?.data || [];
+        const response = await getApi(`${urls.login.getAllAdmin}`);
+        const allUser = response?.data?.allAdmins || [];
         const formattedUsers = allUser.map((user) => ({
           id: user._id,
-          name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
-          // name: user.personalInfo?.firstName || ''
+          name: user.name
         }));
         setServiceUser(formattedUsers);
       } catch (error) {
@@ -160,45 +149,64 @@ const AddCaseForm = ({ onCancel }) => {
     fetchserviceUser();
   }, [searchQuery]);
 
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options || []}
-          getOptionLabel={(option) => option?.name || ''}
-          isOptionEqualToValue={(option, value) => option?._id === value?._id}
-          value={options?.filter((opt) => field.value?.includes(opt?._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions?.map((opt) => opt?._id) || [])}
-          renderTags={(value, getTagProps) =>
-            value?.map((option, index) => (
-              <Chip
-                label={option?.name || ''}
-                {...getTagProps({ index })}
-                key={option?._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
   const onSubmit = async (data) => {
@@ -213,31 +221,9 @@ const AddCaseForm = ({ onCancel }) => {
       formData.append('date', data.date ? dayjs(data.date).format('YYYY-MM-DD') : '');
       formData.append('time', data.time || '');
       formData.append('description', data.description || '');
-
-      (data.beneficiary || []).forEach((id) => {
-        formData.append('benificiary[]', id);
+      (data.beneficiaryTags || []).forEach((tagId) => {
+        formData.append('tags[]', tagId.tagId);
       });
-
-      (data.campaigns || []).forEach((id) => {
-        formData.append('campaigns[]', id);
-      });
-
-      (data.engagement || []).forEach((id) => {
-        formData.append('engagement[]', id);
-      });
-
-      (data.eventsAttended || []).forEach((id) => {
-        formData.append('eventAttanded[]', id);
-      });
-
-      (data.fundingInterests || []).forEach((id) => {
-        formData.append('fundingInterest[]', id);
-      });
-
-      (data.fundraisingActivities || []).forEach((id) => {
-        formData.append('fundraisingActivities[]', id);
-      });
-
       if (session?._id) {
         const sessionServiceId = session.serviceId?._id || session.serviceId;
         if (!sessionServiceId) {
@@ -386,17 +372,19 @@ const AddCaseForm = ({ onCancel }) => {
                     control={control}
                     rules={{ required: 'Service user is required' }}
                     render={({ field }) => {
-                      const selectedUser = serviceUser?.find((user) => user.id === field.value);
+                      const selectedUser = serviceUser?.find((user) => user._id === field.value);
 
                       return (
                         <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
                           <Autocomplete
-                            value={selectedUser}
-                            onChange={(_, value) => field.onChange(value ? value.id : '')}
-                            onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
                             options={serviceUser || []}
+                            value={selectedUser || null}
+                            onChange={(_, value) => field.onChange(value ? value._id : '')}
+                            onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
                             getOptionLabel={(option) => option.name || ''}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            isOptionEqualToValue={(option, value) =>
+                              typeof value === 'string' ? option._id === value : option._id === value._id
+                            }
                             renderInput={(params) => (
                               <TextField {...params} label="Session Lead" variant="outlined" size="small" error={!!errors.serviceUserId} />
                             )}
@@ -420,65 +408,13 @@ const AddCaseForm = ({ onCancel }) => {
                   <Typography variant="subtitle1" mb={2}>
                     Session Tag
                   </Typography>
-
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'beneficiary',
-                        'Beneficiary Information',
-                        benificiary,
-                        errors.beneficiary,
-                        errors.beneficiary?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'campaigns',
-                        'Campaigns Supported',
-                        Campaigns,
-                        errors.campaigns,
-                        errors.campaigns?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete('engagement', 'Engagement', engagement, errors.engagement, errors.engagement?.message, control)}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'eventsAttended',
-                        'Events Attended',
-                        eventsAttended,
-                        errors.eventsAttended,
-                        errors.eventsAttended?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'fundingInterests',
-                        'Funding Interests',
-                        fundingInterests,
-                        errors.fundingInterests,
-                        errors.fundingInterests?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'fundraisingActivities',
-                        'Fundraising Activities',
-                        fundraisingActivities,
-                        errors.fundraisingActivities,
-                        errors.fundraisingActivities?.message,
-                        control
-                      )}
+                    <Grid container spacing={2}>
+                      {allCategory?.map((category, index) => (
+                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                          {renderAutocomplete(`Beneficiary.${index}`, category.name, category.tags, null, null, control, category._id)}
+                        </Grid>
+                      ))}
                     </Grid>
                   </Grid>
                 </Paper>
@@ -540,15 +476,15 @@ const AddCaseForm = ({ onCancel }) => {
                                         accept=".pdf,.doc,.docx"
                                         onChange={(e) => {
                                           const file = e.target.files?.[0];
-                                           field.onChange(file);
+                                          field.onChange(file);
                                         }}
                                       />
                                     </Button>
                                   </InputAdornment>
                                 )
                               }}
-                               error={!!errors.file}
-                            helperText={errors.file?.message}
+                              error={!!errors.file}
+                              helperText={errors.file?.message}
                             />
                           </Box>
                         )}

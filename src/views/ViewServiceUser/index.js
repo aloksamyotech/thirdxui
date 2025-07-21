@@ -90,6 +90,7 @@ const UserProfileCard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState('');
   const location = useLocation();
 
   const id = location?.state?.id;

@@ -46,6 +46,7 @@ const AddCaseForm = () => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [allCategory, setAllCategory] = useState([]);
 
   const textOnlyRegex = /^[A-Za-z\s]+$/;
   const numberOnlyRegex = /^[0-9]+$/;
@@ -106,6 +107,7 @@ const AddCaseForm = () => {
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors }
   } = useForm({
     mode: 'all',
@@ -113,12 +115,7 @@ const AddCaseForm = () => {
       name: '',
       code: '',
       serviceType: '',
-      benificiary: [],
-      Campaigns: [],
-      engagement: [],
-      eventsAttended: [],
-      fundingInterests: [],
-      fundraisingActivities: [],
+      tags: [],
       notes: '',
       attachment: null,
       file: null,
@@ -132,13 +129,28 @@ const AddCaseForm = () => {
       setValue('code', serviceData?.code || '');
       setValue('serviceType', serviceData?.serviceType || '');
 
-      setValue('benificiary', serviceData?.benificiary || []);
-      setValue('Campaigns', serviceData?.campaigns || []);
-      setValue('engagement', serviceData?.engagement || []);
-      setValue('eventsAttended', serviceData?.eventAttanded || []);
-      setValue('fundingInterests', serviceData?.fundingInterest || []);
-      setValue('fundraisingActivities', serviceData?.fundraisingActivities || []);
+      // setValue('benificiary', serviceData?.benificiary || []);
+      // setValue('Campaigns', serviceData?.campaigns || []);
+      // setValue('engagement', serviceData?.engagement || []);
+      // setValue('eventsAttended', serviceData?.eventAttanded || []);
+      // setValue('fundingInterests', serviceData?.fundingInterest || []);
+      // setValue('fundraisingActivities', serviceData?.fundraisingActivities || []);
+      if (Array.isArray(serviceData.tags) && allCategory.length > 0) {
+        const beneficiaryTags = [];
 
+        allCategory.forEach((category) => {
+          category.tags.forEach((tag) => {
+            if (serviceData.tags.includes(tag._id)) {
+              beneficiaryTags.push({
+                categoryId: category._id,
+                tagId: tag._id
+              });
+            }
+          });
+        });
+
+        setValue('beneficiaryTags', beneficiaryTags);
+      }
       setValue('notes', serviceData?.description || '');
       setValue('attachment', serviceData?.attachment || null);
       setValue('file', serviceData?.file || null);
@@ -149,65 +161,75 @@ const AddCaseForm = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaigns(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Services'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
     };
     fetchTags();
   }, []);
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                label={option.name}
-                {...getTagProps({ index })}
-                key={option._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
   const onSubmit = async (data) => {
@@ -218,31 +240,9 @@ const AddCaseForm = () => {
       formData.append('name', data.name || '');
       formData.append('code', data.code || '');
       formData.append('serviceType', data.serviceType || '');
-
-      (data.benificiary || []).forEach((id) => {
-        formData.append('benificiary[]', id);
+      (data.beneficiaryTags || []).forEach((tagId) => {
+        formData.append('tags[]', tagId.tagId);
       });
-
-      (data.Campaigns || []).forEach((id) => {
-        formData.append('campaigns[]', id);
-      });
-
-      (data.engagement || []).forEach((id) => {
-        formData.append('engagement[]', id);
-      });
-
-      (data.eventsAttended || []).forEach((id) => {
-        formData.append('eventAttanded[]', id);
-      });
-
-      (data.fundingInterests || []).forEach((id) => {
-        formData.append('fundingInterest[]', id);
-      });
-
-      (data.fundraisingActivities || []).forEach((id) => {
-        formData.append('fundraisingActivities[]', id);
-      });
-
       formData.append('description', data.notes || '');
       formData.append('isActive', restrictAccess || false);
 
@@ -269,7 +269,7 @@ const AddCaseForm = () => {
       navigate('/services');
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.error('Service code already exists');
+      toast.error('Error submitting form');
     } finally {
       setIsloading(false);
     }
@@ -395,63 +395,12 @@ const AddCaseForm = () => {
                   </Typography>
 
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'benificiary',
-                        'Beneficiary Information',
-                        benificiary,
-                        errors.benificiary,
-                        errors.benificiary?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'Campaigns',
-                        'Campaigns Supported',
-                        Campaigns,
-                        errors.Campaigns,
-                        errors.Campaigns?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete('engagement', 'Engagement', engagement, errors.engagement, errors.engagement?.message, control)}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'eventsAttended',
-                        'Events Attended',
-                        eventsAttended,
-                        errors.eventsAttended,
-                        errors.eventsAttended?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'fundingInterests',
-                        'Funding Interests',
-                        fundingInterests,
-                        errors.fundingInterests,
-                        errors.fundingInterests?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'fundraisingActivities',
-                        'Fundraising Activities',
-                        fundraisingActivities,
-                        errors.fundraisingActivities,
-                        errors.fundraisingActivities?.message,
-                        control
-                      )}
+                    <Grid container spacing={2}>
+                      {allCategory?.map((category, index) => (
+                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                          {renderAutocomplete(`Beneficiary.${index}`, category.name, category.tags, null, null, control, category._id)}
+                        </Grid>
+                      ))}
                     </Grid>
                   </Grid>
                 </Paper>
@@ -543,7 +492,7 @@ const AddCaseForm = () => {
                                 </InputAdornment>
                               )
                             }}
-                             error={!!errors.file}
+                            error={!!errors.file}
                             helperText={errors.file?.message}
                           />
                         )}

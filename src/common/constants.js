@@ -92,7 +92,7 @@ export const statusFilter = [
   { value: 'inactive', label: 'Inactive' }
 ];
 
-export const TagCategoryAppliedToOptions = ['Service Users', 'Volunteers', 'Services', 'Cases', 'Donors'];
+export const TagCategoryAppliedToOptions = ['Service Users', 'Volunteers', 'Services', 'Cases', 'Donors', 'Session'];
 
 export const accountTypes = [
   { label: 'Admin', value: 'admin' },

@@ -135,7 +135,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
           service: user?.serviceId?.name || '',
-          caseOwner: user?.caseOwner?.personalInfo?.firstName || '',
+          caseOwner: user?.caseOwner?.name || '',
           status: user?.status
         };
       });
@@ -171,7 +171,6 @@ const Case = () => {
       const response = await getApi(`${urls.case.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
 
       const allCases = response?.data?.data || [];
-
       const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
@@ -181,8 +180,7 @@ const Case = () => {
       const formattedUsers = allCases?.map((user, index) => {
         const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
         const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
-        const caseOwnerFirstName = user?.caseOwner?.personalInfo?.firstName || '';
-        const caseOwnerLastName = user?.caseOwner?.personalInfo?.lastName || '';
+        const caseOwnerFirstName = user?.caseOwner?.name|| '';
         return {
           id: user?._id,
           serialNumber: user?.uniqueId,
@@ -190,7 +188,7 @@ const Case = () => {
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          caseOwner: `${caseOwnerFirstName} ${caseOwnerLastName}`.trim() || '',
+          caseOwner: caseOwnerFirstName || '',
           status: user?.status
         };
       });
@@ -223,7 +221,7 @@ const Case = () => {
               item.caseOwner._id,
               {
                 value: item.caseOwner._id,
-                label: `${item.caseOwner.personalInfo.firstName ?? ''} ${item.caseOwner.personalInfo.lastName ?? ''}`.trim()
+                label: item.caseOwner.name ?? ''
               }
             ])
         ).values()

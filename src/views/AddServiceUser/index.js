@@ -2119,208 +2119,296 @@ const AddCaseForm = ({ onCancel }) => {
 
               {tabIndex === 3 && (
                 <>
-                  {fields.map((item, index) => (
-                    <Grid container spacing={2} key={item.id}>
-                      <Grid item xs={12} md={4}>
-                        <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                              <Controller
-                                name={`serviceSections[${index}].serviceName`}
-                                control={control}
-                                rules={{ required: 'Service Name is required' }}
-                                render={({ field }) => (
-                                  <Autocomplete
-                                    fullWidth
-                                    size="small"
-                                    options={serviceNames}
-                                    getOptionLabel={(option) => option?.name || ''}
-                                    isOptionEqualToValue={(option, value) => option?.id === value}
-                                    value={serviceNames.find((s) => s.id === field.value) || null}
-                                    onChange={(_, selected) => {
-                                      field.onChange(selected?.id || '');
-                                    }}
-                                    renderInput={(params) => (
-                                      <TextField
-                                        {...params}
-                                        label="Service Name"
-                                        variant="outlined"
-                                        size="small"
-                                        error={!!errors?.serviceSections?.[index]?.serviceName}
-                                        helperText={errors?.serviceSections?.[index]?.serviceName?.message}
-                                      />
-                                    )}
-                                  />
-                                )}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Controller
-                                name={`serviceSections[${index}].startDate`}
-                                control={control}
-                                rules={{
-                                  required: 'Start Date is required',
-                                  validate: (value) => (dayjs(value).isBefore(dayjs(), 'day') ? 'Start Date cannot be in the past' : true)
-                                }}
-                                render={({ field, fieldState: { error } }) => (
-                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                      label="Start Date"
-                                      value={field.value || null}
-                                      onChange={(newValue) => field.onChange(newValue)}
-                                      disablePast
-                                      renderInput={(params) => (
-                                        <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
-                                      )}
-                                    />
-                                  </LocalizationProvider>
-                                )}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Controller
-                                name={`serviceSections[${index}].lastDate`}
-                                control={control}
-                                rules={{
-                                  required: 'Last Date is required',
-                                  validate: (value) => {
-                                    const startDate = watch(`serviceSections[${index}].startDate`);
-                                    if (!startDate) return true;
-                                    return dayjs(value).isBefore(dayjs(startDate), 'day') ? 'Last Date cannot be before Start Date' : true;
-                                  }
-                                }}
-                                render={({ field, fieldState: { error } }) => (
-                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                      label="Last Date"
-                                      value={field.value || null}
-                                      onChange={(newValue) => field.onChange(newValue)}
-                                      minDate={watch(`serviceSections[${index}].startDate`) || undefined}
-                                      renderInput={(params) => (
-                                        <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
-                                      )}
-                                    />
-                                  </LocalizationProvider>
-                                )}
-                              />
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      </Grid>
-
-                      <Grid item xs={12} md={8}>
-                        <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 2, p: 2 }}>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Referrer Name"
-                                {...register(`serviceSections[${index}].referrerName`)}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Referrer Job Title"
-                                {...register(`serviceSections[${index}].referrerJob`)}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Referrer Phone No."
-                                {...register(`serviceSections[${index}].referrerPhone`)}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Referrer Email"
-                                {...register(`serviceSections[${index}].referrerEmail`)}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Emergency Phone No."
-                                {...register(`serviceSections[${index}].emergencyPhone`)}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                size="small"
-                                label="Emergency Email"
-                                {...register(`serviceSections[${index}].emergencyEmail`)}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <Controller
-                                name={`serviceSections[${index}].referralType`}
-                                control={control}
-                                render={({ field }) => (
-                                  <TextField select fullWidth size="small" label="Referral Type" {...field}>
-                                    <MenuItem value="Family Member">Family Member</MenuItem>
-                                    <MenuItem value="Community Member">Community Member</MenuItem>
-                                    <MenuItem value="Parent">Parent</MenuItem>
-                                    <MenuItem value="School">School</MenuItem>
-                                    <MenuItem value="Self Referral">Self Referral</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                  </TextField>
-                                )}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <Controller
-                                name={`serviceSections[${index}].referredDate`}
-                                control={control}
-                                render={({ field, fieldState: { error } }) => (
-                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                      label="Referred Date"
-                                      value={field.value || null}
-                                      onChange={(newValue) => field.onChange(newValue)}
+                  <Box sx={{ px: 2, py: 2, maxWidth: '1200px', mx: 'auto' }}>
+                    {fields.map((item, index) => (
+                      <Grid
+                        container
+                        spacing={2}
+                        key={item.id}
+                        sx={{
+                          backgroundColor: '#F7F7F7',
+                          borderRadius: 2,
+                          p: 2,
+                          mb: 5
+                        }}
+                      >
+                        <Grid item xs={12} md={4} sx={{ p: 0 }}>
+                          <Box
+                            sx={{
+                              border: '1px solid #e0e0e0',
+                              borderRadius: 2,
+                              p: 2,
+                              backgroundColor: 'white',
+                              height: '100%'
+                            }}
+                          >
+                            <Grid container spacing={2}>
+                              <Grid item xs={12}>
+                                <Controller
+                                  name={`serviceSections[${index}].serviceName`}
+                                  control={control}
+                                  rules={{ required: 'Service Name is required' }}
+                                  render={({ field }) => (
+                                    <Autocomplete
+                                      fullWidth
+                                      size="small"
+                                      options={serviceNames}
+                                      getOptionLabel={(option) => option?.name || ''}
+                                      isOptionEqualToValue={(option, value) => option?.id === value}
+                                      value={serviceNames.find((s) => s.id === field.value) || null}
+                                      onChange={(_, selected) => {
+                                        field.onChange(selected?.id || '');
+                                      }}
                                       renderInput={(params) => (
                                         <TextField
                                           {...params}
-                                          fullWidth
+                                          label="Service Name"
+                                          variant="outlined"
                                           size="small"
-                                          InputLabelProps={{ shrink: true }}
-                                          error={!!error}
-                                          helperText={error?.message}
+                                          error={!!errors?.serviceSections?.[index]?.serviceName}
+                                          helperText={errors?.serviceSections?.[index]?.serviceName?.message}
                                         />
                                       )}
                                     />
-                                  </LocalizationProvider>
-                                )}
-                              />
+                                  )}
+                                />
+                              </Grid>
+
+                              <Grid item xs={6}>
+                                <Controller
+                                  name={`serviceSections[${index}].startDate`}
+                                  control={control}
+                                  rules={{
+                                    required: 'Start Date is required',
+                                    validate: (value) => (dayjs(value).isBefore(dayjs(), 'day') ? 'Start Date cannot be in the past' : true)
+                                  }}
+                                  render={({ field, fieldState: { error } }) => (
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <DatePicker
+                                        label="Start Date"
+                                        value={field.value || null}
+                                        onChange={(newValue) => field.onChange(newValue)}
+                                        disablePast
+                                        renderInput={(params) => (
+                                          <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
+                                        )}
+                                      />
+                                    </LocalizationProvider>
+                                  )}
+                                />
+                              </Grid>
+
+                              <Grid item xs={6}>
+                                <Controller
+                                  name={`serviceSections[${index}].lastDate`}
+                                  control={control}
+                                  rules={{
+                                    required: 'Last Date is required',
+                                    validate: (value) => {
+                                      const startDate = watch(`serviceSections[${index}].startDate`);
+                                      if (!startDate) return true;
+                                      return dayjs(value).isBefore(dayjs(startDate), 'day')
+                                        ? 'Last Date cannot be before Start Date'
+                                        : true;
+                                    }
+                                  }}
+                                  render={({ field, fieldState: { error } }) => (
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <DatePicker
+                                        label="Last Date"
+                                        value={field.value || null}
+                                        onChange={(newValue) => field.onChange(newValue)}
+                                        minDate={watch(`serviceSections[${index}].startDate`) || undefined}
+                                        renderInput={(params) => (
+                                          <TextField {...params} fullWidth size="small" error={!!error} helperText={error?.message} />
+                                        )}
+                                      />
+                                    </LocalizationProvider>
+                                  )}
+                                />
+                              </Grid>
                             </Grid>
-                          </Grid>
-                        </Box>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={8}>
+                          <Box
+                            sx={{
+                              border: '1px solid #e0e0e0',
+                              borderRadius: 2,
+                              p: 2,
+                              backgroundColor: 'white',
+                              height: '100%'
+                            }}
+                          >
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} sm={6}>
+                                <TextField
+                                  fullWidth
+                                  size="small"
+                                  label="Referrer Name"
+                                  {...register(`serviceSections[${index}].referrerName`)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <TextField
+                                  fullWidth
+                                  size="small"
+                                  label="Referrer Job Title"
+                                  {...register(`serviceSections[${index}].referrerJob`)}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12} sm={6}>
+                                <TextField
+                                  fullWidth
+                                  size="small"
+                                  label="Referrer Phone No."
+                                  {...register(`serviceSections[${index}].referrerPhone`)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <TextField
+                                  fullWidth
+                                  size="small"
+                                  label="Referrer Email"
+                                  {...register(`serviceSections[${index}].referrerEmail`)}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12} sm={6}>
+                                <TextField
+                                  fullWidth
+                                  size="small"
+                                  label="Emergency Phone No."
+                                  {...register(`serviceSections[${index}].emergencyPhone`)}
+                                />
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <TextField
+                                  fullWidth
+                                  size="small"
+                                  label="Emergency Email"
+                                  {...register(`serviceSections[${index}].emergencyEmail`)}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12} sm={6}>
+                                <Controller
+                                  name={`serviceSections[${index}].referralType`}
+                                  control={control}
+                                  render={({ field }) => (
+                                    <TextField select fullWidth size="small" label="Referral Type" {...field}>
+                                      <MenuItem value="Family Member">Family Member</MenuItem>
+                                      <MenuItem value="Community Member">Community Member</MenuItem>
+                                      <MenuItem value="Parent">Parent</MenuItem>
+                                      <MenuItem value="School">School</MenuItem>
+                                      <MenuItem value="Self Referral">Self Referral</MenuItem>
+                                      <MenuItem value="Other">Other</MenuItem>
+                                    </TextField>
+                                  )}
+                                />
+                              </Grid>
+
+                              <Grid item xs={12} sm={6}>
+                                <Controller
+                                  name={`serviceSections[${index}].referredDate`}
+                                  control={control}
+                                  render={({ field, fieldState: { error } }) => (
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                      <DatePicker
+                                        label="Referred Date"
+                                        value={field.value || null}
+                                        onChange={(newValue) => field.onChange(newValue)}
+                                        renderInput={(params) => (
+                                          <TextField
+                                            {...params}
+                                            fullWidth
+                                            size="small"
+                                            InputLabelProps={{ shrink: true }}
+                                            error={!!error}
+                                            helperText={error?.message}
+                                          />
+                                        )}
+                                      />
+                                    </LocalizationProvider>
+                                  )}
+                                />
+                              </Grid>
+                            </Grid>
+
+                            <Box display="flex" justifyContent="flex-end" mt={2}>
+                              <Button
+                                onClick={() => remove(index)}
+                                endIcon={
+                                  <CloseIcon
+                                    sx={{
+                                      width: '18.33px',
+                                      height: '18.33px',
+                                      opacity: 1,
+                                      backgroundColor: '#4C4E6442',
+                                      borderRadius: '50%',
+                                      padding: '2px'
+                                    }}
+                                  />
+                                }
+                                sx={{
+                                  borderRadius: '999px',
+                                  border: '1px solid #ccc',
+                                  backgroundColor: '#f9f9f9',
+                                  color: '#5c5f71',
+                                  textTransform: 'none',
+                                  fontWeight: 400,
+                                  fontSize: '13px',
+                                  px: 1.5,
+                                  py: 0.5,
+                                  '&:hover': {
+                                    backgroundColor: '#f0f0f0',
+                                    borderColor: '#bbb'
+                                  }
+                                }}
+                              >
+                                Remove this Service
+                              </Button>
+                            </Box>
+                          </Box>
+                        </Grid>
                       </Grid>
-                    </Grid>
-                  ))}
+                    ))}
+                  </Box>
 
                   <Grid container alignItems="center" justifyContent="space-between" sx={{ mt: 2, px: 2 }}>
                     <Grid item>
                       <Button
                         variant="outlined"
                         size="small"
-                        startIcon={<AddIcon />}
+                        endIcon={
+                          <AddIcon
+                            sx={{
+                              width: '18.33px',
+                              height: '18.33px',
+                              opacity: 1,
+                              backgroundColor: '#4C4E6442',
+                              borderRadius: '50%',
+                              padding: '2px'
+                            }}
+                          />
+                        }
+                        sx={{
+                          borderRadius: '999px',
+                          border: '1px solid #ccc',
+                          backgroundColor: '#f9f9f9',
+                          color: '#5c5f71',
+                          textTransform: 'none',
+                          fontWeight: 400,
+                          fontSize: '13px',
+                          px: 1.5,
+                          py: 0.5,
+                          '&:hover': {
+                            backgroundColor: '#f0f0f0',
+                            borderColor: '#bbb'
+                          }
+                        }}
                         onClick={() =>
                           append({
                             serviceName: '',

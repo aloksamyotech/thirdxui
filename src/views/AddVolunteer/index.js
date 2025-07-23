@@ -1339,8 +1339,8 @@ const AddCaseForm = ({ onCancel }) => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2 }}>
-                            <Typography variant="subtitle1" mb={2}>
+                          <Paper elevation={2} sx={{ p: 2 , height: '100%'  }}>
+                            <Typography variant="subtitle1" mb={4}>
                               Volunteer Tag
                             </Typography>
 

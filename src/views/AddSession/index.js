@@ -42,7 +42,6 @@ const AddCaseForm = ({ onCancel }) => {
 
   const location = useLocation();
   const session = location?.state?.session;
-
   const serviceId = session?.serviceId || location?.state?.serviceId;
 
   const {
@@ -77,13 +76,7 @@ const AddCaseForm = ({ onCancel }) => {
         description: session?.description || '',
         serviceId: serviceId || '',
         file: session?.file || '',
-        // serviceUserId: session?.serviceuser?._id || ''
-        serviceUserId: session?.serviceuser
-          ? {
-              label: session.serviceuser.name,
-              value: session.serviceuser._id
-            }
-          : ''
+        serviceUserId: session?.serviceuser?._id || ''
       };
 
       allCategory.forEach((category) => {
@@ -138,7 +131,7 @@ const AddCaseForm = ({ onCancel }) => {
         const response = await getApi(`${urls.login.getAllAdmin}`);
         const allUser = response?.data?.allAdmins || [];
         const formattedUsers = allUser.map((user) => ({
-          id: user._id,
+          _id: user._id,
           name: user.name
         }));
         setServiceUser(formattedUsers);
@@ -212,7 +205,6 @@ const AddCaseForm = ({ onCancel }) => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     let response;
-
     try {
       const formData = new FormData();
 
@@ -404,8 +396,8 @@ const AddCaseForm = ({ onCancel }) => {
 
             <Grid container spacing={2} sx={{ p: 2 }}>
               <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2 }}>
-                  <Typography variant="subtitle1" mb={2}>
+                <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                  <Typography variant="subtitle1" mb={4}>
                     Session Tag
                   </Typography>
                   <Grid container spacing={2}>

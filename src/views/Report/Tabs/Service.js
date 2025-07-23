@@ -3,7 +3,10 @@ import { Box, Tabs, Tab, Grid } from '@mui/material';
 import Chart from './Chart';
 import ServiceList from './ServiceList';
 import FilterPanel from 'components/FilterPanel';
-
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
+import PrintStyles from 'themes/print.js';
 const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter, FilterPanelProp }) => {
   const [value, setValue] = useState(0);
 
@@ -42,39 +45,69 @@ const Service = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpen
 
       <Box>
         {value === 0 && (
-          <Box
-            sx={{
-              px: 0,
-              display: 'flex',
-              gap: 4,
-              alignItems: 'flex-start',
-              width: '100%',
-              flexWrap: 'nowrap'
-            }}
-          >
+          <>
             <Box
               sx={{
-                mt: 1,
-                width: 300,
-                flexShrink: 0,
-                '& .MuiGrid-root': {
-                  width: '100% !important',
-                  minWidth: '300px !important'
-                }
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                px: 2,
+                mb: 2.5,
+                flexWrap: 'wrap',
+                gap: 1
               }}
             >
-              <FilterPanel {...FilterPanelProp} />
+              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2, ml: 'auto' }}>
+                <PrintOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => window.print()} />
+                <SaveAltOutlinedIcon
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = '/api/report/download-csv';
+                    link.download = 'report.csv';
+                    link.click();
+                  }}
+                />
+                <OpenInNewIcon sx={{ cursor: 'pointer' }} onClick={() => window.open(window.location.href, '_blank')} />
+              </Box>
             </Box>
+
             <Box
               sx={{
-                flexGrow: 2,
-                flexShrink: 1,
-                minWidth: 0
+                px: 0,
+                display: 'flex',
+                gap: 4,
+                alignItems: 'flex-start',
+                width: '100%',
+                flexWrap: 'nowrap'
               }}
             >
-              <Chart />
+              <Box
+                sx={{
+                  mt: 1,
+                  width: 300,
+                  flexShrink: 0,
+                  '& .MuiGrid-root': {
+                    width: '100% !important',
+                    minWidth: '300px !important'
+                  }
+                }}
+              >
+                <FilterPanel {...FilterPanelProp} />
+              </Box>
+               <PrintStyles targetId="print-chart" />
+              <Box
+               id="print-chart"
+                sx={{
+                  flexGrow: 2,
+                  flexShrink: 1,
+                  minWidth: 0
+                }}
+              >
+                <Chart />
+              </Box>
             </Box>
-          </Box>
+          </>
         )}
         {value === 1 && (
           <Box

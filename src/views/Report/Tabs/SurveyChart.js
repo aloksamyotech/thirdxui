@@ -54,7 +54,6 @@ const Chart = () => {
 
   return (
     <Grid item xs={12}>
-      <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 1 }}>Cases by Risk Factors</Typography>
       <Box
         sx={{
           backgroundColor: '#fff',

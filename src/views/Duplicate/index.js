@@ -23,7 +23,6 @@ const Duplicate = () => {
       try {
         setLoading(true);
         const response = await getApi(urls.duplicate.getallDuplicateUsers);
-
         const formatted = [];
 
         response?.data?.forEach((group, groupIndex) => {
@@ -35,7 +34,7 @@ const Duplicate = () => {
           const added = [];
           group.users.forEach((user) => {
             ids.push(user._id);
-            names.push(`${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`.trim());
+            names.push(`${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || '-'}`.trim());
             emails.push(user.contactInfo?.email || '-');
             phones.push(user.contactInfo?.homePhone || '-');
             dobs.push(user.personalInfo?.dateOfBirth ? new Date(user.personalInfo.dateOfBirth).toLocaleDateString() : '-');

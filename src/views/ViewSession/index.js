@@ -24,7 +24,6 @@ const ServiceDetails = () => {
   const [sessionData, setSessionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [groupedTags, setGroupedTags] = useState([]);
   const session = location.state?.session;
   const handleClose = () => {
     setAnchorEl(null);
@@ -34,10 +33,10 @@ const ServiceDetails = () => {
   };
   const open = Boolean(anchorEl);
   const formatDate = (date) => {
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-    return new Date(date).toLocaleDateString(undefined, options);
+    if (!date) return 'N/A';
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(date).toLocaleDateString('en-IN', options);
   };
-
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
@@ -77,80 +76,26 @@ const ServiceDetails = () => {
       fetchServiceTypeName();
     }
   }, [sessionData?.serviceType]);
+  const groupedTags = (sessionData?.[0]?.tags || []).reduce((acc, tag) => {
+    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
 
-  useEffect(() => {
-    const fetchAndGroupTags = async () => {
-      try {
-
-        const session = sessionData?.[0]; // Only using the first item
-        if (!session) {
-          console.warn('No session data found');
-          return;
-        }
-
-
-        const allTagsResponse = await getApi(urls.tag.getAllTags);
-
-        const allTags = allTagsResponse?.data?.allTags || [];
-
-        const allIds = [
-          ...session.benificiary,
-          ...session.campaigns,
-          ...session.eventAttanded,
-          ...session.engagement,
-          ...session.fundingInterest,
-          ...session.fundraisingActivities
-        ].map((id) => {
-          const normalizedId = typeof id === 'object' ? id.$oid : id;
-          return normalizedId;
-        });
-
-
-        const relatedTags = allTags.filter((tag) => {
-          const tagId = tag._id;
-          const isRelated = allIds.includes(tagId);
-          return isRelated;
-        });
-
-
-        const grouped = {};
-        relatedTags.forEach((tag) => {
-          const category = tag.tagCategoryName || 'Uncategorized';
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(tag.name);
-        });
-
-
-        const formatted = Object.entries(grouped).map(([category, tags]) => ({
-          category,
-          tags
-        }));
-
-
-        setGroupedTags(formatted);
-      } catch (err) {
-        console.error('Error fetching tags:', err);
-      }
-    };
-
-    if (sessionData?.length > 0) {
-      fetchAndGroupTags();
-    } else {
-      console.warn('No sessionData available to trigger fetch');
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
     }
-  }, [sessionData]);
 
+    acc[categoryName].push(tag.name);
+
+    return acc;
+  }, {});
+
+  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+    category,
+    tags
+  }));
   return (
     <Box sx={{ p: 2 }}>
       <Grid item xs={12} mb={2}>
-
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          spacing={1}
-          sx={{ width: '100%' }}
-        >
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ width: '100%' }}>
           <Stack direction="row" alignItems="center" spacing={1}>
             <IconButton onClick={() => navigate(-1)}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
@@ -182,7 +127,6 @@ const ServiceDetails = () => {
             View Attendees List
           </Button>
         </Stack>
-
       </Grid>
 
       <Grid container spacing={2} sx={{ height: 560 }}>
@@ -196,7 +140,6 @@ const ServiceDetails = () => {
               flexDirection: 'column'
             }}
           >
-
             <Box display="flex" alignItems="center" mb={2}>
               <Diversity2OutlinedIcon fontSize="small" sx={{ mr: 1 }} />
               <Typography variant="subtitle1">ABOUT SESSION</Typography>
@@ -205,16 +148,13 @@ const ServiceDetails = () => {
 
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
               <Grid container spacing={2}>
-
                 <Grid item xs={6}>
                   <Stack spacing={2}>
                     {[
                       { label: 'Location:', value: sessionData?.[0]?.country?.name || '-' },
                       {
                         label: 'Session Lead:',
-                        value: [sessionData?.[0]?.serviceuser?.personalInfo?.firstName, sessionData?.[0]?.serviceuser?.personalInfo?.lastName]
-                          .filter(Boolean)
-                          .join(' ')
+                        value: [sessionData?.[0]?.serviceuser?.name].filter(Boolean).join(' ')
                       },
                       { label: 'Service Type:', value: sessionData?.[0]?.serviceId?.name || '-' }
                     ].map(({ label, value }, idx) => (
@@ -229,13 +169,13 @@ const ServiceDetails = () => {
                             fontWeight: 600,
                             flexShrink: 0,
                             fontSize: '12px',
-                            lineHeight: '24px',
+                            lineHeight: '24px'
                           },
                           '& > *:last-of-type': {
                             flexGrow: 1,
                             fontWeight: 400,
                             fontSize: '12px',
-                            lineHeight: '24px',
+                            lineHeight: '24px'
                           }
                         }}
                       >
@@ -249,8 +189,8 @@ const ServiceDetails = () => {
                 <Grid item xs={6}>
                   <Stack spacing={2}>
                     {[
-                      { label: 'Date:', value: formatDate(sessionData?.[0]?.timestamp) || '-' },
-                      { label: 'Time:', value: sessionData?.[0]?.serviceId?.name || '-' },
+                      { label: 'Date:', value: formatDate(sessionData?.[0]?.createdAt) || '-' },
+                      { label: 'Time:', value: sessionData?.[0]?.time || '-' },
                       { label: 'Attachment:', value: (sessionData?.[0]?.file ? 1 : 0) + ' File' }
                     ].map(({ label, value }, idx) => (
                       <Box
@@ -264,13 +204,13 @@ const ServiceDetails = () => {
                             fontWeight: 600,
                             flexShrink: 0,
                             fontSize: '12px',
-                            lineHeight: '24px',
+                            lineHeight: '24px'
                           },
                           '& > *:last-of-type': {
                             flexGrow: 1,
                             fontWeight: 400,
                             fontSize: '12px',
-                            lineHeight: '24px',
+                            lineHeight: '24px'
                           }
                         }}
                       >
@@ -282,7 +222,6 @@ const ServiceDetails = () => {
                 </Grid>
               </Grid>
             </Box>
-
           </Paper>
         </Grid>
 
@@ -304,12 +243,12 @@ const ServiceDetails = () => {
 
             {/* Scrollable content */}
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              {groupedTags.length === 0 ? (
+              {groupedTagsArray.length === 0 ? (
                 <Typography variant="body2" color="textSecondary">
                   No tags found.
                 </Typography>
               ) : (
-                groupedTags.map((group, idx) => (
+                groupedTagsArray.map((group, idx) => (
                   <Box
                     key={idx}
                     mb={2}
@@ -330,7 +269,7 @@ const ServiceDetails = () => {
                           key={i}
                           label={tag}
                           size="small"
-                          onDelete={() => { }}
+                          onDelete={() => {}}
                           deleteIcon={
                             <CancelIcon
                               sx={{
@@ -361,8 +300,7 @@ const ServiceDetails = () => {
           </Paper>
         </Grid>
       </Grid>
-
-    </Box >
+    </Box>
   );
 };
 

@@ -4,7 +4,10 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
-
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useGridApiContext } from '@mui/x-data-grid';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
 const KeyIndicatorsList = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,12 +18,27 @@ const KeyIndicatorsList = () => {
     { field: 'count', headerName: 'Count of People', width: 160 }
   ];
 
-  const CustomToolbar = () => (
-    <GridToolbarContainer sx={{ justifyContent: 'space-between', p: 1 }}>
+  const CustomToolbar = () =>{
+ const apiRef = useGridApiContext();
+
+    const handleExportCSV = () => {
+      apiRef.current.exportDataAsCsv();
+    };
+
+    const handlePrint = () => {
+      apiRef.current.exportDataAsPrint();
+    };
+   return(
+      <GridToolbarContainer sx={{ justifyContent: 'space-between', p: 1 }}>
       <Typography sx={{ fontWeight: 600, fontSize: '16px' }}>Key Indicators List</Typography>
-      <GridToolbarExport />
+       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <PrintOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handlePrint} />
+            <SaveAltOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handleExportCSV} />
+            <OpenInNewIcon sx={{ cursor: 'pointer' }} onClick={() => window.open(window.location.href, '_blank')} />
+          </Box>
     </GridToolbarContainer>
   );
+} 
 
   useEffect(() => {
     const fetchData = async () => {

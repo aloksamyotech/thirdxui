@@ -42,7 +42,7 @@ const AddCaseForm = ({ onCancel }) => {
 
   const location = useLocation();
   const session = location?.state?.session;
-  const serviceId = session?.serviceId || location?.state?.serviceId;
+  const serviceId = session?.serviceId || location?.state?.serviceId || location?.state?.serivce || location?.state?.serviceData;
 
   const {
     control,
@@ -74,14 +74,14 @@ const AddCaseForm = ({ onCancel }) => {
         date: session?.date ? dayjs(session.date) : dayjs(),
         time: session?.time || dayjs().format('HH:mm'),
         description: session?.description || '',
-        serviceId: serviceId || '',
+        serviceId: serviceId || serviceId?._id || '',
         file: session?.file || '',
         serviceUserId: session?.serviceuser?._id || ''
       };
 
       allCategory.forEach((category) => {
         category.tags.forEach((tag) => {
-          if (session.tags?.includes(tag._id)) {
+          if (serviceId.tags || session.tags?.includes(tag._id)) {
             beneficiaryTags.push({
               categoryId: category._id,
               tagId: tag._id
@@ -216,7 +216,7 @@ const AddCaseForm = ({ onCancel }) => {
       (data.beneficiaryTags || []).forEach((tagId) => {
         formData.append('tags[]', tagId.tagId);
       });
-      if (session?._id) {
+      if (session?._id || session?.id) {
         const sessionServiceId = session.serviceId?._id || session.serviceId;
         if (!sessionServiceId) {
           throw new Error('Service ID is required for updating session');
@@ -236,11 +236,11 @@ const AddCaseForm = ({ onCancel }) => {
         formData.append('file', data.file);
       }
 
-      if (session?._id) {
-        if (!session._id) {
+      if (session?._id || session?.id) {
+        if (!session._id || session?.id) {
           throw new Error('Session ID is required for update');
         }
-        response = await updateApi(urls.session.update.replace(':id', session._id), formData, {
+        response = await updateApi(urls.session.update.replace(':id', session._id || session?.id), formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         toast.success('Session updated successfully');
@@ -396,7 +396,7 @@ const AddCaseForm = ({ onCancel }) => {
 
             <Grid container spacing={2} sx={{ p: 2 }}>
               <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                   <Typography variant="subtitle1" mb={4}>
                     Session Tag
                   </Typography>
@@ -440,7 +440,7 @@ const AddCaseForm = ({ onCancel }) => {
                       <Controller
                         name="file"
                         control={control}
-                         rules={{
+                        rules={{
                           validate: (file) => validateFile(file)
                         }}
                         render={({ field }) => (
@@ -497,7 +497,7 @@ const AddCaseForm = ({ onCancel }) => {
                       <TextField
                         label="Session Notes"
                         multiline
-                        minRows={11}
+                        minRows={13}
                         fullWidth
                         variant="outlined"
                         error={!!errors.description}

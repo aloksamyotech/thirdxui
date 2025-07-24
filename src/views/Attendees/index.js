@@ -1,6 +1,21 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, IconButton, Card, Button, Select, MenuItem, FormControl, InputLabel, Tooltip, Stack, Autocomplete, TextField } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Typography,
+  IconButton,
+  Card,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Tooltip,
+  Stack,
+  Autocomplete,
+  TextField
+} from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -28,7 +43,7 @@ export default function SessionRegisterPage() {
   const [totalRows, setTotalRows] = useState(0);
   const session = location?.state?.session || {};
 
-  const sessionId = session?._id || location?.state?.sessionId;
+  const sessionId = session?._id || location?.state?.sessionId || session?.sessionId;
 
   const columns = [
     {
@@ -240,19 +255,14 @@ export default function SessionRegisterPage() {
                 <Grid item xs={12} sm={8}>
                   <FormControl fullWidth>
                     <Autocomplete
-                      size='small'
+                      size="small"
                       options={rows}
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         setSelectedUserId(value ? value.id : '');
                       }}
                       onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Select Attendee"
-                        />
-                      )}
+                      renderInput={(params) => <TextField {...params} label="Select Attendee" />}
                       defaultValue={null}
                     />
                   </FormControl>

@@ -71,7 +71,7 @@ const AddCaseForm = ({ onCancel }) => {
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [allCategory, setAllCategory] = useState([]);
-  
+
   const location = useLocation();
   const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
     acc[curr._id] = 0;
@@ -149,10 +149,10 @@ const AddCaseForm = ({ onCancel }) => {
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
       letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
       beneficiaryTags:
-      editdata?.otherInfo?.tags?.map((tag) => ({
-        categoryId: tag.tagCategoryId._id,
-        tagId: tag._id
-      })) || [],
+        editdata?.otherInfo?.tags?.map((tag) => ({
+          categoryId: tag.tagCategoryId._id,
+          tagId: tag._id
+        })) || []
     }
   });
 
@@ -307,65 +307,65 @@ const AddCaseForm = ({ onCancel }) => {
     }
   }, [editdata, allCategory, setValue]);
   const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => {
-          const prefilledTags = (watch('beneficiaryTags') || [])
-            .filter((tag) => tag.categoryId === categoryId)
-            .map((tag) => options.find((opt) => opt._id === tag.tagId))
-            .filter(Boolean);
-  
-          return (
-            <Autocomplete
-              multiple
-              options={options || []}
-              getOptionLabel={(option) => option?.name || 'Unknown'}
-              groupBy={(option) => option.categoryName ?? label}
-              isOptionEqualToValue={(option, value) => option._id === value._id}
-              value={prefilledTags}
-              onChange={(_, selectedOptions) => {
-                const updatedTags = selectedOptions.map((opt) => ({
-                  categoryId: categoryId,
-                  tagId: opt._id
-                }));
-  
-                setValue('beneficiaryTags', [
-                  ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
-                  ...updatedTags
-                ]);
-                field.onChange(selectedOptions);
-              }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    label={option.name}
-                    {...getTagProps({ index })}
-                    key={option._id}
-                    deleteIcon={
-                      <span
-                        style={{
-                          backgroundColor: '#4C4E6442',
-                          borderRadius: '50%',
-                          width: 20,
-                          height: 20,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                      </span>
-                    }
-                  />
-                ))
-              }
-              renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-            />
-          );
-        }}
-      />
-    );
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
+    />
+  );
   const handleToggle = () => setRestrictAccess(!restrictAccess);
   const onSubmit = async (formData) => {
     const isValid = await trigger();
@@ -437,7 +437,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     fd.append('role', 'volunteer');
     fd.append('isActive', true);
-    
+
     (formData.beneficiaryTags || []).forEach((tag, index) => {
       fd.append(`otherInfo[tags][${index}]`, tag.tagId);
     });
@@ -1339,7 +1339,7 @@ const AddCaseForm = ({ onCancel }) => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2 , height: '100%'  }}>
+                          <Paper elevation={2} sx={{ p: 2, height: '400px' , overflow : 'auto'}}>
                             <Typography variant="subtitle1" mb={4}>
                               Volunteer Tag
                             </Typography>

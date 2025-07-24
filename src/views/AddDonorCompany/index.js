@@ -751,13 +751,13 @@ const AddCaseForm = ({ onCancel }) => {
                             <Box>
                               <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                  <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                                    <Typography variant="subtitle1" mb={4}>
+                                  <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                                    <Typography variant="subtitle1" mb={2}>
                                       Donor Tag
                                     </Typography>
                                     <Grid container spacing={2}>
                                       {allCategory?.map((category, index) => (
-                                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                                        <Grid item xs={12} key={category._id}>
                                           {renderAutocomplete(
                                             `Beneficiary.${index}`,
                                             category.name,
@@ -801,7 +801,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <TextField
                                   label="Notes"
                                   multiline
-                                  minRows={14}
+                                  minRows={15}
                                   fullWidth
                                   variant="outlined"
                                   error={!!errors.riskNotes}

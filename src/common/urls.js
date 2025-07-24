@@ -38,7 +38,7 @@ export const urls = Object.freeze({
     filterType: `${baseUrl}/services/search`,
     editServices: `${baseUrl}/services/editServices/`,
     toggleArchive: `${baseUrl}/services/toggleArchive/`,
-     bulkUpload: `${baseUrl}/services/bulkUpload`
+    bulkUpload: `${baseUrl}/services/bulkUpload`
   },
   case: {
     create: `${baseUrl}/cases/addCase`,

@@ -389,7 +389,7 @@ const AddCaseForm = () => {
 
             <Grid container spacing={2} sx={{ p: 2 }}>
               <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                   <Typography variant="subtitle1" mb={4}>
                     Service Tag
                   </Typography>
@@ -522,7 +522,7 @@ const AddCaseForm = () => {
                             {...field}
                             label="Notes"
                             multiline
-                            minRows={11}
+                            minRows={13}
                             fullWidth
                             variant="outlined"
                             error={!!errors.notes}

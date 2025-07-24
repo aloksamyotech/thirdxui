@@ -8,16 +8,34 @@ import { getApi } from 'common/apiClient';
 import { useNavigate } from 'react-router-dom';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
-const SessionItem = ({ id, date, time, title, description, summary, presenter }) => {
+const SessionItem = ({ sessionId, sessionData, id, date, time, title, description, summary, presenter, props }) => {
   const navigate = useNavigate();
 
   const handleEditClick = () => {
-    navigate();
+    navigate('/add-session', {
+      state: {
+        session: sessionData,
+        serviceData: id
+      }
+    });
   };
 
   const handleAddAttendeesClick = () => {
-    navigate();
+    navigate('/attendees', {
+      state: {
+        session: { sessionId }
+      }
+    });
   };
+
+  const handleViewSession = () => {
+    navigate('/view-session', {
+      state: {
+        session: { _id: sessionId }
+      }
+    });
+  };
+
   return (
     <Box sx={{ py: 1, px: 1 }}>
       <Grid container spacing={1} alignItems="center" wrap="wrap">
@@ -87,8 +105,8 @@ const SessionItem = ({ id, date, time, title, description, summary, presenter })
               Add Attendees
             </Button>
 
-            <IconButton size="small">
-              <InfoIcon fontSize="small" sx={{ color: '#49494c' }} onPointerDown={(e) => e.stopPropagation()} />
+            <IconButton size="small" onClick={handleViewSession} onPointerDown={(e) => e.stopPropagation()}>
+              <InfoIcon fontSize="small" sx={{ color: '#49494c' }} />
             </IconButton>
           </Stack>
         </Grid>
@@ -140,7 +158,8 @@ const Sessions = () => {
         serviceId: item?.serviceId || '',
         time: item?.time || '',
         description: item?.description || '',
-        presenter: item?.serviceuser?.name || ''
+        presenter: item?.serviceuser?.name || '',
+        sessionData: item
       }));
 
       setAllSession(formattedSessions);
@@ -223,7 +242,11 @@ const Sessions = () => {
         {loading ? (
           <SingleRowLoader />
         ) : allSession.length > 0 ? (
-          allSession.map((session, index) => <SessionItem key={index} {...session} id={session.serviceId} />)
+          allSession.map((session, index) => {
+            return (
+              <SessionItem key={index} {...session} id={session.serviceId} sessionId={session?.id} sessionData={session?.sessionData} />
+            );
+          })
         ) : (
           <Box display="flex" alignItems="center" justifyContent="center" height="100%">
             <Typography variant="body2" color="text.secondary">

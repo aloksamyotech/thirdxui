@@ -196,7 +196,7 @@ const AddDonorForm = () => {
     };
     fetchTags();
   }, []);
-  
+
   const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
@@ -1003,7 +1003,7 @@ const AddDonorForm = () => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2 , height: '100%' }}>
+                          <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                             <Typography variant="subtitle1" mb={4}>
                               Donor Tag
                             </Typography>
@@ -1113,7 +1113,7 @@ const AddDonorForm = () => {
                                 <TextField
                                   label="Notes"
                                   multiline
-                                  minRows={11}
+                                  minRows={13}
                                   fullWidth
                                   variant="outlined"
                                   sx={{ mb: 2 }}

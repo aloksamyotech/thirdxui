@@ -13,7 +13,8 @@ import {
   DialogContent,
   DialogActions,
   Autocomplete,
-  TextField
+  TextField,
+  Divider
 } from '@mui/material';
 import { getApi, postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
@@ -73,10 +74,11 @@ const RegisterAttendance = ({ open, handleClose, userId }) => {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 2 } }}>
-      <DialogTitle>Register Attendance</DialogTitle>
+      <DialogTitle sx={{ fontSize: '16px', fontWeight: 500 }}>Register Attendance</DialogTitle>
+      <Divider />
 
       <DialogContent dividers>
-        <Grid container spacing={2} mt={1}>
+        <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <Autocomplete
@@ -100,7 +102,20 @@ const RegisterAttendance = ({ open, handleClose, userId }) => {
                 }}
                 getOptionLabel={(option) => option.name || ''}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={(params) => <TextField {...params} label="Service Name" variant="outlined" />}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Service Name"
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '12px'
+                      }
+                    }}
+                  />
+                )}
               />
             </FormControl>
           </Grid>
@@ -126,18 +141,62 @@ const RegisterAttendance = ({ open, handleClose, userId }) => {
                     : ''
                 }
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderInput={(params) => <TextField {...params} label="Service User Name" variant="outlined" />}
+                // renderInput={(params) => <TextField {...params} label="Service User Name" variant="outlined" />}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Session Name"
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                    sx={{
+                      '& .MuiInputLabel-root': {
+                        fontSize: '12px'
+                      }
+                    }}
+                  />
+                )}
               />
             </FormControl>
           </Grid>
         </Grid>
       </DialogContent>
-
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button variant="outlined" color="error" onClick={handleClose}>
+      <DialogActions>
+        <Button
+          onClick={handleClose}
+          variant="outlined"
+          color="error"
+          sx={{
+            width: '104px',
+            height: '32px',
+            borderRadius: '8px',
+            borderWidth: '1px',
+            fontWeight: 600,
+            fontSize: '12px',
+            textTransform: 'uppercase'
+          }}
+        >
           CANCEL
         </Button>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          sx={{
+            width: '104px',
+            height: '32px',
+            borderRadius: '8px',
+            borderWidth: '1px',
+            fontWeight: 600,
+            fontSize: '12px',
+            textTransform: 'uppercase',
+            backgroundColor: '#002b3f',
+            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+            '&:hover': {
+              backgroundColor: '#001e2c'
+            }
+          }}
+        >
           SAVE
         </Button>
       </DialogActions>

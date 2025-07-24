@@ -82,7 +82,7 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" px={2} pt={2}>
-        <DialogTitle sx={{ fontSize: '1rem', fontWeight: 'bold', p: 0 }}>Add Item</DialogTitle>
+        <DialogTitle sx={{ fontSize: '16px', fontWeight: '600', p: 0 }}>Add Item</DialogTitle>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -96,12 +96,21 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
             onClick={() => handleClick('giftAidDeclarations')}
             sx={{
               justifyContent: 'space-between',
-              color: '#808191',
-              borderColor: '#808191',
+              color: '#4B5563',
+              backgroundColor: '#F9FAFC',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              py: 1,
+              px: 1,
               mb: 2,
-              fontSize: '0.85rem',
+              fontSize: '12px',
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               '&:hover': {
-                borderColor: '#808191'
+                borderColor: '#808191',
+                backgroundColor: '#f0f1f5'
               }
             }}
             endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
@@ -117,12 +126,21 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
             onClick={() => handleClick('task')}
             sx={{
               justifyContent: 'space-between',
-              color: '#808191',
-              borderColor: '#808191',
+              color: '#4B5563',
+              backgroundColor: '#F9FAFC',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              py: 1,
+              px: 1,
               mb: 2,
-              fontSize: '0.85rem',
+              fontSize: '12px',
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               '&:hover': {
-                borderColor: '#808191'
+                borderColor: '#808191',
+                backgroundColor: '#f0f1f5'
               }
             }}
             endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
@@ -133,7 +151,7 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
         <Grid container spacing={2}>
           {filteredItems.map((item) => (
             <Grid item xs={6} key={item.value}>
-              <Button
+              {/* <Button
                 variant="outlined"
                 fullWidth
                 size="small"
@@ -154,6 +172,40 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
                   }
                 }}
                 endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
+              >
+                {item.label}
+              </Button> */}
+              <Button
+                variant="outlined"
+                fullWidth
+                size="medium"
+                onClick={() => handleClick(item.value)}
+                sx={{
+                  justifyContent: 'space-between',
+                  color: '#4B5563', // soft dark gray for text
+                  backgroundColor: '#F9FAFC', // light background
+                  border: '1px solid #E5E7EB', // subtle gray border
+                  borderRadius: '12px',
+                  py: 1,
+                  px: 1,
+                  fontSize: '12px',
+                  textTransform: 'none',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  '&:hover': {
+                    borderColor: '#808191',
+                    backgroundColor: '#f0f1f5'
+                  }
+                }}
+                endIcon={
+                  <AddIcon
+                    sx={{
+                      color: '#0F172A', // darker icon color for contrast
+                      fontSize: '1.1rem'
+                    }}
+                  />
+                }
               >
                 {item.label}
               </Button>

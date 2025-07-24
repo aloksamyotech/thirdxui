@@ -141,7 +141,6 @@ const RegisterAttendance = ({ open, handleClose, userId }) => {
                     : ''
                 }
                 isOptionEqualToValue={(option, value) => option._id === value._id}
-                // renderInput={(params) => <TextField {...params} label="Service User Name" variant="outlined" />}
                 renderInput={(params) => (
                   <TextField
                     {...params}

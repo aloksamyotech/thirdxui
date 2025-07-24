@@ -151,30 +151,6 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
         <Grid container spacing={2}>
           {filteredItems.map((item) => (
             <Grid item xs={6} key={item.value}>
-              {/* <Button
-                variant="outlined"
-                fullWidth
-                size="small"
-                onClick={() => handleClick(item.value)}
-                sx={{
-                  justifyContent: 'space-between',
-                  color: '#808191',
-                  borderColor: '#808191',
-                  py: 1,
-                  px: 1.5,
-                  fontSize: item.value === 'fundraisingPack' ? '0.65rem' : '0.75rem',
-                  textTransform: 'none',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  '&:hover': {
-                    borderColor: '#808191'
-                  }
-                }}
-                endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
-              >
-                {item.label}
-              </Button> */}
               <Button
                 variant="outlined"
                 fullWidth
@@ -182,9 +158,9 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
                 onClick={() => handleClick(item.value)}
                 sx={{
                   justifyContent: 'space-between',
-                  color: '#4B5563', // soft dark gray for text
-                  backgroundColor: '#F9FAFC', // light background
-                  border: '1px solid #E5E7EB', // subtle gray border
+                  color: '#4B5563',
+                  backgroundColor: '#F9FAFC',
+                  border: '1px solid #E5E7EB',
                   borderRadius: '12px',
                   py: 1,
                   px: 1,
@@ -201,7 +177,7 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
                 endIcon={
                   <AddIcon
                     sx={{
-                      color: '#0F172A', // darker icon color for contrast
+                      color: '#0F172A',
                       fontSize: '1.1rem'
                     }}
                   />

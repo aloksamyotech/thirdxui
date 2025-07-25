@@ -51,6 +51,8 @@ const ListView = Loadable(lazy(() => import('views/List/Listview')));
 const List = Loadable(lazy(() => import('views/List')));
 const AddConfigUser = Loadable(lazy(() => import('views/AddConfigUser')));
 const DuplicatesView = Loadable(lazy(() => import('views/Duplicate/view')));
+const ViewMailingListData = Loadable(lazy(() => import('views/ViewMailingListData')));
+
 const MainRoutes = {
   path: '/',
   element: <MainLayout />,
@@ -259,6 +261,10 @@ const MainRoutes = {
         {
           path: 'view-duplicates',
           element: <DuplicatesView />
+        },
+        {
+          path: 'view-mailing-data',
+          element: <ViewMailingListData />
         }
       ]
     }

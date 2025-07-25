@@ -107,3 +107,43 @@ export const permissionsList = [
   { label: 'Donor management', key: 'donorManagement' },
   { label: 'Mailing List', key: 'mailingList' }
 ];
+
+export const channelOptions = ['telephone', 'email', 'letter', 'sms', 'whatsapp', 'donorTag'];
+
+export const fieldOptions = [
+  // Personal Info
+  'personalInfo.firstName',
+  'personalInfo.lastName',
+  'personalInfo.title',
+  'personalInfo.gender',
+  'personalInfo.dateOfBirth',
+  'personalInfo.nickName',
+  'personalInfo.ethnicity',
+
+  // Contact Info
+  'contactInfo.homePhone',
+  'contactInfo.phone',
+  'contactInfo.email',
+  'contactInfo.addressLine1',
+  'contactInfo.addressLine2',
+  'contactInfo.town',
+  'contactInfo.district',
+  'contactInfo.postcode',
+  'contactInfo.country',
+  'contactInfo.firstLanguage',
+
+  // Emergency Contact
+  'emergencyContact.firstName',
+  'emergencyContact.lastName',
+  'emergencyContact.title',
+  'emergencyContact.gender',
+  'emergencyContact.relationshipToUser',
+  'emergencyContact.homePhone',
+  'emergencyContact.phone',
+  'emergencyContact.email',
+  'emergencyContact.addressLine1',
+  'emergencyContact.addressLine2',
+  'emergencyContact.country',
+  'emergencyContact.town',
+  'emergencyContact.postcode',
+];

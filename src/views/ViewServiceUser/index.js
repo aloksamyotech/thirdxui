@@ -912,10 +912,8 @@ const UserProfileCard = () => {
                         size="small"
                         onClick={() => setAddItemOpen(true)}
                         sx={{
-                          backgroundColor: '#009fc7',
-                          '&:hover': {
-                            backgroundColor: '#009fc7'
-                          }
+                          backgroundColor: '#009FC7',
+                          padding: '6px 10px'
                         }}
                         endIcon={<AddIcon />}
                       >

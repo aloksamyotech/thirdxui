@@ -82,7 +82,7 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" px={2} pt={2}>
-        <DialogTitle sx={{ fontSize: '1rem', fontWeight: 'bold', p: 0 }}>Add Item</DialogTitle>
+        <DialogTitle sx={{ fontSize: '16px', fontWeight: '600', p: 0 }}>Add Item</DialogTitle>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -96,12 +96,21 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
             onClick={() => handleClick('giftAidDeclarations')}
             sx={{
               justifyContent: 'space-between',
-              color: '#808191',
-              borderColor: '#808191',
+              color: '#4B5563',
+              backgroundColor: '#F9FAFC',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              py: 1,
+              px: 1,
               mb: 2,
-              fontSize: '0.85rem',
+              fontSize: '12px',
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               '&:hover': {
-                borderColor: '#808191'
+                borderColor: '#808191',
+                backgroundColor: '#f0f1f5'
               }
             }}
             endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
@@ -117,12 +126,21 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
             onClick={() => handleClick('task')}
             sx={{
               justifyContent: 'space-between',
-              color: '#808191',
-              borderColor: '#808191',
+              color: '#4B5563',
+              backgroundColor: '#F9FAFC',
+              border: '1px solid #E5E7EB',
+              borderRadius: '12px',
+              py: 1,
+              px: 1,
               mb: 2,
-              fontSize: '0.85rem',
+              fontSize: '12px',
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               '&:hover': {
-                borderColor: '#808191'
+                borderColor: '#808191',
+                backgroundColor: '#f0f1f5'
               }
             }}
             endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
@@ -136,24 +154,34 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
               <Button
                 variant="outlined"
                 fullWidth
-                size="small"
+                size="medium"
                 onClick={() => handleClick(item.value)}
                 sx={{
                   justifyContent: 'space-between',
-                  color: '#808191',
-                  borderColor: '#808191',
+                  color: '#4B5563',
+                  backgroundColor: '#F9FAFC',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '12px',
                   py: 1,
-                  px: 1.5,
-                  fontSize: item.value === 'fundraisingPack' ? '0.65rem' : '0.75rem',
+                  px: 1,
+                  fontSize: '12px',
                   textTransform: 'none',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   '&:hover': {
-                    borderColor: '#808191'
+                    borderColor: '#808191',
+                    backgroundColor: '#f0f1f5'
                   }
                 }}
-                endIcon={<AddIcon sx={{ color: 'black', fontSize: '1rem' }} />}
+                endIcon={
+                  <AddIcon
+                    sx={{
+                      color: '#0F172A',
+                      fontSize: '1.1rem'
+                    }}
+                  />
+                }
               >
                 {item.label}
               </Button>

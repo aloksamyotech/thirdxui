@@ -51,7 +51,8 @@ export const urls = Object.freeze({
     create: `${baseUrl}/mail/addmail`,
     fetch: `${baseUrl}/mail/getallmail`,
     filterType: `${baseUrl}/mail/filter`,
-    fetchWithPagination: `${baseUrl}/mail/allwithpagination`
+    fetchWithPagination: `${baseUrl}/mail/allwithpagination`,
+    fetchMailingListData: `${baseUrl}/mail/getMail`
   },
   transaction: {
     create: `${baseUrl}/transaction/addtransaction`,

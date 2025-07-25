@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { urls, imageUrl } from 'common/urls';
 import { getApi } from 'common/apiClient';
 import { useNavigate } from 'react-router-dom';
+
 const Card = () => {
   const [mediaList, setMediaList] = useState([]);
   const [search, setSearch] = useState('');
@@ -93,16 +94,19 @@ const Card = () => {
                       justifyContent: 'center'
                     }}
                   >
-                    {item?.file && !imgError ? (
-                      <Box
-                        component="img"
-                        src={
-                          item.file?.startsWith('https://') ? item.file : `${imageUrl.replace(/\/$/, '')}/${item.file?.replace(/^\//, '')}`
-                        }
-                        alt="Media"
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={() => setImgError(true)}
-                      />
+                    {item?.file ? (
+                      (() => {
+                        const finalImageUrl = `${imageUrl}${item.file}`;
+                        return (
+                          <Box
+                            component="img"
+                            src={finalImageUrl}
+                            alt="Media"
+                            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={() => setImgError(true)}
+                          />
+                        );
+                      })()
                     ) : (
                       <IconSeeding fontSize="medium" />
                     )}

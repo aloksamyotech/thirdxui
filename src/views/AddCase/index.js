@@ -48,6 +48,7 @@ const AddCaseForm = () => {
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [allCategory, setAllCategory] = useState([]);
 
   const [searchQueryService, setSearchQueryService] = useState('');
   const [searchQueryCaseOwner, setSearchQueryCaseOwner] = useState('');
@@ -67,12 +68,7 @@ const AddCaseForm = () => {
       caseOwner: '',
       caseOpened: dayjs(),
       caseClosed: null,
-      benificiary: [],
-      campaigns: [],
-      engagement: [],
-      eventAttanded: [],
-      fundingInterest: [],
-      fundraisingActivities: [],
+      tags: [],
       description: '',
       files: null
     },
@@ -93,20 +89,10 @@ const AddCaseForm = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaigns(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Cases'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
@@ -114,22 +100,18 @@ const AddCaseForm = () => {
     fetchTags();
   }, []);
   useEffect(() => {
-    if (sessionData) {
-      console.log('sessionData', {
-        serviceUserId: sessionData?.serviceUserId || '',
-        serviceId: sessionData?.serviceId || '',
-        caseOwner: sessionData?.caseOwner || '',
-        caseOpened: dayjs(sessionData?.caseOpened) || dayjs(),
-        caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
-        Beneficiary: sessionData?.benificiary || [],
-        Campaigns: sessionData?.campaigns || [],
-        engagement: sessionData?.engagement || [],
-        eventsAttended: sessionData?.eventAttanded || [],
-        fundingInterests: sessionData?.fundingInterest || [],
-        fundraisingActivities: sessionData?.fundraisingActivities || [],
-        description: sessionData?.description || '',
-        serviceStatus: sessionData?.status || 'pending',
-        file: null // Do not pre-fill file inputs
+    if (sessionData && allCategory.length > 0) {
+      const beneficiaryTags = [];
+
+      allCategory.forEach((category) => {
+        category.tags.forEach((tag) => {
+          if (sessionData.tags?.includes(tag._id)) {
+            beneficiaryTags.push({
+              categoryId: category._id,
+              tagId: tag._id
+            });
+          }
+        });
       });
 
       reset({
@@ -138,18 +120,14 @@ const AddCaseForm = () => {
         caseOwner: sessionData?.caseOwner || '',
         caseOpened: dayjs(sessionData?.caseOpened) || dayjs(),
         caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
-        Beneficiary: sessionData?.benificiary || [],
-        Campaigns: sessionData?.campaigns || [],
-        engagement: sessionData?.engagement || [],
-        eventsAttended: sessionData?.eventAttanded || [],
-        fundingInterests: sessionData?.fundingInterest || [],
-        fundraisingActivities: sessionData?.fundraisingActivities || [],
         description: sessionData?.description || '',
         serviceStatus: sessionData?.status || 'pending',
-        file: null // Do not pre-fill file inputs
+        file: null,
+        beneficiaryTags
       });
     }
-  }, [sessionData, reset]);
+  }, [sessionData, allCategory, reset]);
+
   useEffect(() => {
     if (sessionData?.serviceUserId && rows.length > 0) {
       const match = rows.find((user) => user.id === sessionData.serviceUserId);
@@ -164,45 +142,64 @@ const AddCaseForm = () => {
     }
   }, [sessionData, caseOwner, setValue]);
 
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                label={option.name}
-                {...getTagProps({ index })}
-                key={option._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
   const onSubmit = async (data) => {
@@ -216,31 +213,9 @@ const AddCaseForm = () => {
       formData.append('caseOwner', data.caseOwner || '');
       formData.append('caseOpened', data.caseOpened || '');
       formData.append('caseClosed', data.caseClosed || '');
-
-      (data.Beneficiary || []).forEach((id) => {
-        formData.append('benificiary[]', id);
+      (data.beneficiaryTags || []).forEach((tagId) => {
+        formData.append('tags[]', tagId.tagId);
       });
-
-      (data.Campaigns || []).forEach((id) => {
-        formData.append('campaigns[]', id);
-      });
-
-      (data.engagement || []).forEach((id) => {
-        formData.append('engagement[]', id);
-      });
-
-      (data.eventsAttended || []).forEach((id) => {
-        formData.append('eventAttanded[]', id);
-      });
-
-      (data.fundingInterests || []).forEach((id) => {
-        formData.append('fundingInterest[]', id);
-      });
-
-      (data.fundraisingActivities || []).forEach((id) => {
-        formData.append('fundraisingActivities[]', id);
-      });
-
       formData.append('description', data.description || '');
       formData.append('status', data.serviceStatus);
 
@@ -276,7 +251,6 @@ const AddCaseForm = () => {
       const formattedUsers = allUser.map((user) => ({
         id: user._id,
         name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
-        // name: user?.personalInfo?.firstName
       }));
       setRows(formattedUsers);
     };
@@ -284,18 +258,11 @@ const AddCaseForm = () => {
   }, [searchQuery]);
   useEffect(() => {
     const fetchpeople = async () => {
-      const queryParams = new URLSearchParams();
-      if (searchQueryCaseOwner && searchQueryCaseOwner !== '') {
-        queryParams.append('search', searchQueryCaseOwner);
-      }
-      queryParams.append('role', 'user');
-
-      const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
-      const allUser = response?.data?.data || [];
+      const response = await getApi(`${urls.login.getAllAdmin}`);
+      const allUser = response?.data?.allAdmins || [];
       const formattedUsers = allUser.map((user) => ({
         id: user._id,
-        name: `${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || ''}`
-        // name: user?.personalInfo?.firstName
+        name: user.name
       }));
       setCaseOwner(formattedUsers);
     };
@@ -549,142 +516,24 @@ const AddCaseForm = () => {
                       )}
                     />
                   </Box>
-
-                  {/* <Controller
-                    name="serviceStatus"
-                    control={control}
-                    defaultValue="pending"
-                    render={({ field }) => (
-                      <FormControl fullWidth size="small" error={!!errors.serviceStatus}>
-                        <InputLabel id="status-label">Case Status</InputLabel>
-                        <Select
-                          {...field}
-                          labelId="status-label"
-                          label="Case Status"
-                          value={field.value || 'pending'}
-                          MenuProps={{
-                            PaperProps: {
-                              style: {
-                                maxHeight: 200
-                              }
-                            }
-                          }}
-                          sx={{
-                            '.MuiSelect-select': {
-                              padding: '1px 1px',
-                              fontSize: '0.750rem'
-                            }
-                          }}
-                        >
-                          <MenuItem value="open">
-                            <Chip
-                              label="Open"
-                              sx={{
-                                color: '#4caf50',
-                                backgroundColor: '#e8f5e9',
-                                fontWeight: 500,
-                                padding: '1px 1px',
-                                fontSize: '0.750rem'
-                              }}
-                            />
-                          </MenuItem>
-                          <MenuItem value="close">
-                            <Chip
-                              label="Close"
-                              sx={{
-                                color: '#ff9800',
-                                backgroundColor: '#fff3e0',
-                                fontWeight: 500,
-                                padding: '1px 1px',
-                                fontSize: '0.750rem'
-                              }}
-                            />
-                          </MenuItem>
-                          <MenuItem value="pending">
-                            <Chip
-                              label="Pending"
-                              sx={{
-                                color: '#2196f3',
-                                backgroundColor: '#e3f2fd',
-                                fontWeight: 500,
-                                padding: '1px 1px',
-                                fontSize: '0.750rem'
-                              }}
-                            />
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
-                    )}
-                  /> */}
                 </Grid>
               </Grid>
             </Grid>
 
             <Grid container spacing={2} sx={{ p: 2 }}>
               <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2 }}>
-                  <Typography variant="subtitle1" mb={2}>
+                <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                  <Typography variant="subtitle1" mb={4}>
                     Case Tag
                   </Typography>
 
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'Beneficiary',
-                        'Beneficiary Information',
-                        benificiary,
-                        errors.benificiary,
-                        errors.benificiary?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'Campaigns',
-                        'Campaigns Supported',
-                        Campaigns,
-                        errors.Campaigns,
-                        errors.Campaigns?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete('engagement', 'Engagement', engagement, errors.engagement, errors.engagement?.message, control)}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'eventsAttended',
-                        'Events Attended',
-                        eventsAttended,
-                        errors.eventsAttended,
-                        errors.eventsAttended?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'fundingInterests',
-                        'Funding Interests',
-                        fundingInterests,
-                        errors.fundingInterests,
-                        errors.fundingInterests?.message,
-                        control
-                      )}
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      {renderAutocomplete(
-                        'fundraisingActivities',
-                        'Fundraising Activities',
-                        fundraisingActivities,
-                        errors.fundraisingActivities,
-                        errors.fundraisingActivities?.message,
-                        control
-                      )}
+                    <Grid container spacing={2}>
+                      {allCategory?.map((category, index) => (
+                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                          {renderAutocomplete(`Beneficiary.${index}`, category.name, category.tags, null, null, control, category._id)}
+                        </Grid>
+                      ))}
                     </Grid>
                   </Grid>
                 </Paper>
@@ -709,17 +558,6 @@ const AddCaseForm = () => {
                       />
                     )}
                   />
-                  {/* <Controller
-                    name="isActive"
-                    control={control}
-                    defaultValue={true}
-                    render={({ field }) => (
-                      <Box display="flex" alignItems="center" gap={1} mb={2}>
-                        <Typography variant="subtitle1">Restrict Access</Typography>
-                        <AntSwitch {...field} checked={field.value} onChange={(e) => field.onChange(e.target.checked)} color="primary" />
-                      </Box>
-                    )}
-                  /> */}
                 </Paper>
               </Grid>
             </Grid>

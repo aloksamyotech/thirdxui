@@ -81,13 +81,13 @@ const UserProfileCard = () => {
   const [activityType, setActivityType] = useState('');
   const [sessionName, setSessionName] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [groupedTags, setGroupedTags] = useState([]);
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [caseNoteOpen, setCaseNoteOpen] = useState(false);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     const fetchUserById = async () => {
@@ -97,6 +97,7 @@ const UserProfileCard = () => {
 
         if (user) {
           setUserData(user);
+          setRole(user?.role);
         }
       } catch (error) {
         console.error('Error fetching user by ID:', error);
@@ -109,55 +110,6 @@ const UserProfileCard = () => {
     }
   }, [id]);
 
-  useEffect(() => {
-    const fetchAndGroupTags = async () => {
-      try {
-        const response = await getApi(urls.tag.getAllTags);
-        const allTags = response?.data?.allTags || [];
-
-        const combinedData = [
-          ...(userData?.otherInfo?.benificiary ?? []),
-          ...(userData?.otherInfo?.campaigns ?? []),
-          ...(userData?.otherInfo?.eventAttanded ?? []),
-          ...(userData?.otherInfo?.engagement ?? []),
-          ...(userData?.otherInfo?.fundingInterest ?? []),
-          ...(userData?.otherInfo?.fundraisingActivities ?? [])
-        ];
-
-        const allIds = combinedData.map((item) => {
-          const id = typeof item === 'object' && item !== null ? item._id : item;
-          if (!id) {
-            console.warn('⚠️ Invalid ID in item:', item);
-          }
-          return id;
-        });
-
-        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
-
-        const grouped = {};
-        relatedTags.forEach((tag) => {
-          const category = tag.tagCategoryName || 'Uncategorized';
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(tag.name);
-        });
-
-        const formatted = Object.entries(grouped).map(([category, tags]) => ({
-          category,
-          tags
-        }));
-
-        setGroupedTags(formatted);
-      } catch (err) {
-        console.error('❌ Error fetching tags:', err);
-      }
-    };
-
-    if (userData?.otherInfo) {
-      fetchAndGroupTags();
-    } else {
-      console.warn('⛔ userData.otherInfo not found, skipping tag fetch.');
-    }
-  }, [userData]);
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
@@ -227,6 +179,22 @@ const UserProfileCard = () => {
       navigate('/donor');
     }
   };
+  const groupedTags = (userData?.otherInfo?.tags || []).reduce((acc, tag) => {
+    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+
+    acc[categoryName].push(tag.name);
+
+    return acc;
+  }, {});
+
+  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+    category,
+    tags
+  }));
 
   return (
     <>
@@ -676,12 +644,12 @@ const UserProfileCard = () => {
                         </Typography>
 
                         <Grid>
-                          {groupedTags.length === 0 ? (
+                          {groupedTagsArray.length === 0 ? (
                             <Typography variant="body2" color="textSecondary">
                               No tags found.
                             </Typography>
                           ) : (
-                            groupedTags.map((group, idx) => (
+                            groupedTagsArray.map((group, idx) => (
                               <Box
                                 key={idx}
                                 mb={2}
@@ -749,14 +717,12 @@ const UserProfileCard = () => {
                         size="small"
                         onClick={() => setAddItemOpen(true)}
                         sx={{
-                          backgroundColor: '#009fc7',
-                          '&:hover': {
-                            backgroundColor: '#009fc7'
-                          }
+                          backgroundColor: '#009FC7',
+                          padding: '6px 10px'
                         }}
                         endIcon={<AddIcon />}
                       >
-                        Add Case Note
+                        Add Item
                       </Button>
                     </Box>
                   </Box>
@@ -779,7 +745,13 @@ const UserProfileCard = () => {
                   <TimelineActivity timelineData={timelineData} />
                 </Grid>
 
-                <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />
+                <AddItemDialog
+                  open={addItemOpen}
+                  onClose={() => setAddItemOpen(false)}
+                  onSelect={handleSelectItem}
+                  userId={id}
+                  role={role}
+                />
 
                 <CaseNoteDialog
                   open={caseNoteOpen}

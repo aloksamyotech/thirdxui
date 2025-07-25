@@ -1,113 +1,180 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Grid, Stack, Box, Typography, InputBase, IconButton, Checkbox } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import { Visibility } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-
-import { IconTrash } from '@tabler/icons';
+import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const Duplicate = () => {
-  const [showFilter, setShowFilter] = useState(true);
-  const [status, setStatus] = useState('');
   const navigate = useNavigate();
-
-  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [name, setNameFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
-
+  const [user, setUser] = useState('');
+  const [loading, setLoading] = useState(true);
   const handleCheckboxChange = (id) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
-  const rows = [
-    {
-      id: 1,
-      userid: 'D-123',
-      name: 'Snow',
-      email: 'bob@gmail.com',
-      dob: '27-03-04',
-      age: '20',
-      country: 'India',
-      gender: 'Male',
-      ethicity: 'Black',
-      no: '1234561234'
-    },
-    {
-      id: 1,
-      userid: 'D-123',
-      name: 'Snow',
-      email: 'bob@gmail.com',
-      dob: '27-03-04',
-      age: '20',
-      country: 'India',
-      gender: 'Male',
-      ethicity: 'Black',
-      no: '1234561234'
-    },
-    {
-      id: 1,
-      userid: 'D-123',
-      name: 'Snow',
-      email: 'bob@gmail.com',
-      dob: '27-03-04',
-      age: '20',
-      country: 'India',
-      gender: 'Male',
-      ethicity: 'Black',
-      no: '1234561234'
-    },
-    {
-      id: 1,
-      userid: 'D-123',
-      name: 'Snow',
-      email: 'bob@gmail.com',
-      dob: '27-03-04',
-      age: '20',
-      country: 'India',
-      gender: 'Male',
-      ethicity: 'Black',
-      no: '1234561234'
-    }
-  ];
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const response = await getApi(urls.duplicate.getallDuplicateUsers);
+        const formatted = [];
+
+        response?.data?.forEach((group, groupIndex) => {
+          const names = [];
+          const emails = [];
+          const phones = [];
+          const dobs = [];
+          const ids = [];
+          const added = [];
+          group.users.forEach((user) => {
+            ids.push(user._id);
+            names.push(`${user.personalInfo?.firstName || ''} ${user.personalInfo?.lastName || '-'}`.trim());
+            emails.push(user.contactInfo?.email || '-');
+            phones.push(user.contactInfo?.homePhone || '-');
+            dobs.push(user.personalInfo?.dateOfBirth ? new Date(user.personalInfo.dateOfBirth).toLocaleDateString() : '-');
+            added.push(user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-');
+          });
+
+          formatted.push({
+            id: groupIndex + 1,
+            ids,
+            names,
+            emails,
+            phones,
+            dobs,
+            groupIndex,
+            added
+          });
+        });
+        setUser(formatted);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
   const columns = [
     {
-      field: 'name',
+      field: 'names',
       headerName: 'Name',
       flex: 1,
-      renderCell: (params) => <Typography>{params?.row?.name || '-'}</Typography>
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'no',
-      headerName: 'Phone',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'dob',
-      headerName: 'Date Added',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'select',
-      headerName: 'View',
-      flex: 1,
-      renderCell: () => (
-        <IconButton
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate('/view-duplicates');
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: '20px',
+            height: '100%',
+            py: 3.5
           }}
         >
-          <Visibility />
+          {params.row.names.map((name, idx) => (
+            <Typography key={idx} sx={{ fontSize: '12px' }}>
+              {name}
+            </Typography>
+          ))}
+        </Box>
+      )
+    },
+
+    {
+      field: 'emails',
+      headerName: 'Email',
+      flex: 1,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: '15px',
+            height: '100%'
+          }}
+        >
+          {params.row.emails.map((email, idx) => (
+            <Typography key={idx} sx={{ fontSize: '12px' }}>
+              {email}
+            </Typography>
+          ))}
+        </Box>
+      )
+    },
+    {
+      field: 'phones',
+      headerName: 'Phone',
+      flex: 1,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: '25px',
+            height: '100%'
+          }}
+        >
+          {params.row.phones.map((phone, idx) => (
+            <Typography key={idx} sx={{ fontSize: '12px' }}>
+              {phone}
+            </Typography>
+          ))}
+        </Box>
+      )
+    },
+    {
+      field: 'dobs',
+      headerName: 'Date of Birth',
+      flex: 1,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: '15px',
+            height: '100%'
+          }}
+        >
+          {params.row.dobs.map((dob, idx) => (
+            <Typography key={idx} sx={{ fontSize: '12px' }}>
+              {dob}
+            </Typography>
+          ))}
+        </Box>
+      )
+    },
+    {
+      field: 'view',
+      headerName: 'View',
+      flex: 0.5,
+      sortable: false,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() =>
+            navigate('/view-duplicates', {
+              state: {
+                ids: params.row.ids,
+                names: params.row.names,
+                emails: params.row.emails,
+                phones: params.row.phones,
+                dobs: params.row.dobs,
+                added: params.row.added
+              }
+            })
+          }
+          sx={{ backgroundColor: '#e6f7ff' }}
+        >
+          <Visibility sx={{ fontSize: '16px' }} />
         </IconButton>
       )
     }
@@ -130,7 +197,7 @@ const Duplicate = () => {
           <Typography
             variant="h6"
             sx={{
-              fontWeight: '450',
+              fontWeight: '500',
               color: '#333',
               fontSize: '14px',
               lineHeight: '36px'
@@ -150,7 +217,7 @@ const Duplicate = () => {
     <>
       <Box>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+          <Typography fontWeight="600" fontSize="14px" display="flex" alignItems="center">
             Duplicates
           </Typography>
           <Box
@@ -167,13 +234,6 @@ const Duplicate = () => {
           >
             <InputBase
               placeholder="Search..."
-              // value={searchQuery}
-              // onChange={handleSearchChange}
-              // onKeyPress={(e) => {
-              //   if (e.key === 'Enter') {
-              //     handleFilter();
-              //   }
-              // }}
               sx={{
                 '& .MuiInputBase-input::placeholder': {
                   fontSize: '12 px',
@@ -193,7 +253,6 @@ const Duplicate = () => {
               }}
             />
             <IconButton
-              // onClick={handleFilter}
               sx={{
                 marginRight: '8px',
                 width: 18,
@@ -208,16 +267,32 @@ const Duplicate = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff' }}>
+            <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff', height: '500px' }}>
               <DataGrid
-                rows={rows}
+                rows={loading ? [] : user}
                 columns={columns}
+                loading={loading}
                 getRowId={(row) => row.id}
                 pagination={false}
+                getRowHeight={() => 'auto'}
                 hideFooterPagination
                 hideFooter
-                components={{
-                  Toolbar: () => <CustomHeader />
+                slots={{
+                  toolbar: () => <CustomHeader />,
+                  loadingOverlay: () => (
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                      }}
+                    >
+                      <SingleRowLoader />
+                    </Box>
+                  ),
+                  noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
                 }}
                 sx={{
                   '& .MuiDataGrid-row': {

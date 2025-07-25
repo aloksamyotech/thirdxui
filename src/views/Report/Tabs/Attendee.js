@@ -3,7 +3,10 @@ import { Box, Tabs, Tab, Grid } from '@mui/material';
 import Chart from './AttendeeChart.js';
 import DonorList from './AttendeeList.js';
 import FilterPanel from 'components/FilterPanel.js';
-
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
+import PrintStyles from 'themes/print.js';
 const Service = ({ selectedName, status, caseId, dateOpenedFilter, FilterPanelProp }) => {
   const [value, setValue] = useState(0);
 
@@ -41,7 +44,33 @@ const Service = ({ selectedName, status, caseId, dateOpenedFilter, FilterPanelPr
       </Tabs>
 
       <Box>
-        {value === 0 && (
+        {value === 0 && (<>
+         <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              px: 2,
+              mb: 1,
+              flexWrap: 'wrap',
+              gap: 1
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, ml: 'auto' }}>
+              <PrintOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => window.print()} />
+              <SaveAltOutlinedIcon
+                sx={{ cursor: 'pointer' }}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/api/report/download-csv';
+                  link.download = 'report.csv';
+                  link.click();
+                }}
+              />
+              <OpenInNewIcon sx={{ cursor: 'pointer' }} onClick={() => window.open(window.location.href, '_blank')} />
+            </Box>
+          </Box>
+
           <Box
             sx={{
               px: 0,
@@ -65,7 +94,9 @@ const Service = ({ selectedName, status, caseId, dateOpenedFilter, FilterPanelPr
             >
               <FilterPanel {...FilterPanelProp} />
             </Box>
+             <PrintStyles targetId="print-chart" />
             <Box
+             id="print-chart"
               sx={{
                 flexGrow: 2,
                 flexShrink: 1,
@@ -75,6 +106,7 @@ const Service = ({ selectedName, status, caseId, dateOpenedFilter, FilterPanelPr
               <Chart />
             </Box>
           </Box>
+              </>
         )}
         {value === 1 && (
           <Box

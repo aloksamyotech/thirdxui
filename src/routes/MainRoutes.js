@@ -46,6 +46,8 @@ const ViewDonor = Loadable(lazy(() => import('views/ViewDonor')));
 const ViewSubmission = Loadable(lazy(() => import('views/ViewSubmission')));
 const AboutCase = Loadable(lazy(() => import('views/AboutCase')));
 const AboutCaseNote = Loadable(lazy(() => import('views/AboutCaseNote')));
+const AddListForm = Loadable(lazy(() => import('views/List/AddList')));
+const ListView = Loadable(lazy(() => import('views/List/Listview')));
 const List = Loadable(lazy(() => import('views/List')));
 const AddConfigUser = Loadable(lazy(() => import('views/AddConfigUser')));
 const DuplicatesView = Loadable(lazy(() => import('views/Duplicate/view')));
@@ -183,6 +185,14 @@ const MainRoutes = {
         {
           path: 'list',
           element: <List />
+        },
+        {
+          path: 'add-list',
+          element: <AddListForm />
+        },
+        {
+          path: 'list-view',
+          element: <ListView />
         },
         {
           path: 'configuration',

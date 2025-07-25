@@ -224,15 +224,15 @@ const dashboard = {
           type: 'item',
           url: '/list',
           breadcrumbs: false
-        },
-        {
-          id: '21',
-          parentId: '17',
-          title: 'Archives List',
-          type: 'item',
-          url: '/archives',
-          breadcrumbs: false
         }
+        // {
+        //   id: '21',
+        //   parentId: '17',
+        //   title: 'Archives List',
+        //   type: 'item',
+        //   url: '/archives',
+        //   breadcrumbs: false
+        // }
       ]
     },
     {

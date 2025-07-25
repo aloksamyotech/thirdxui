@@ -20,27 +20,27 @@ import { urls } from 'common/urls';
 import { postApi } from 'common/apiClient';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import toast from 'react-hot-toast';
-const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, onClose, getAllForms, setPreset }) => {
-    
+const TemplateOne = ({ formData, setFormData, setPreview, setSelectedTemplate, onClose, getAllForms, setPreset, formValues }) => {
+
     //temporary solution
     const formDataUpdated = formData.map(field => {
         let updatedField = { ...field };
 
-        if (updatedField.label === "Phone" || updatedField.label === "Phone Number"|| updatedField.label === "Contact Number") {
+        if (updatedField.label === "Phone" || updatedField.label === "Phone Number" || updatedField.label === "Contact Number") {
             updatedField.validation = "isNumber";
         } else if (updatedField.label === "Email" || updatedField.label === "Email Address") {
             updatedField.validation = "isEmail";
         }
         return updatedField;
     });
-    
+
     const initialValues = {}
     const validationSchema = {}
     const formik = useFormik({
         initialValues,
         onSubmit: async () => {
             const apiUrl = urls?.forms?.add
-            await postApi(apiUrl, formDataUpdated)
+            await postApi(apiUrl, { formDataUpdated, formValues })
             formik.resetForm();
             onClose()
             setPreview(false)

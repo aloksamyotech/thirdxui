@@ -23,7 +23,6 @@ const ServiceDetails = () => {
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [groupedTags, setGroupedTags] = useState([]);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -75,46 +74,21 @@ const ServiceDetails = () => {
     }
   }, [serviceData?.serviceType]);
 
-  useEffect(() => {
-    const fetchAndGroupTags = async () => {
-      try {
-        const response = await getApi(urls.tag.getAllTags);
-        const allTags = response?.data?.allTags || [];
+  const groupedTags = (serviceData?.tags || []).reduce((acc, tag) => {
+    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
 
-        const allIds = [
-          ...serviceData.benificiary,
-          ...serviceData.campaigns,
-          ...serviceData.eventAttanded,
-          ...serviceData.engagement,
-          ...serviceData.fundingInterest,
-          ...serviceData.fundraisingActivities
-        ].map((id) => (typeof id === 'object' ? id.$oid : id));
-
-        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id.$oid || tag._id));
-
-        const grouped = {};
-        relatedTags.forEach((tag) => {
-          const category = tag.tagCategoryName || 'Uncategorized';
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(tag.name);
-        });
-
-        const formatted = Object.entries(grouped).map(([category, tags]) => ({
-          category,
-          tags
-        }));
-
-        setGroupedTags(formatted);
-      } catch (err) {
-        console.error('Error fetching tags:', err);
-      }
-    };
-
-    if (serviceData?.benificiary) {
-      fetchAndGroupTags();
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
     }
-  }, [serviceData]);
 
+    acc[categoryName].push(tag.name);
+
+    return acc;
+  }, {});
+  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+    category,
+    tags
+  }));
   return (
     <Box sx={{ p: 2 }}>
       <Grid item xs={12} mb={2}>
@@ -122,7 +96,9 @@ const ServiceDetails = () => {
           <IconButton onClick={() => navigate(-1)}>
             <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">View Service Details</Typography>
+          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
+            View Service Details
+          </Typography>
         </Stack>
       </Grid>
 
@@ -242,9 +218,7 @@ const ServiceDetails = () => {
                 </Grid>
 
                 <Grid item xs={12} mt={1}>
-                  <Typography sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginBottom: 1 }}>
-                    Image:
-                  </Typography>
+                  <Typography sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginBottom: 1 }}>Image:</Typography>
                   <Box mt={1}>
                     {serviceData?.file ? (
                       <img
@@ -263,7 +237,6 @@ const ServiceDetails = () => {
                 </Grid>
               </Grid>
             </Box>
-
           </Paper>
         </Grid>
 
@@ -284,12 +257,12 @@ const ServiceDetails = () => {
 
             {/* Scrollable content */}
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              {groupedTags.length === 0 ? (
+              {groupedTagsArray.length === 0 ? (
                 <Typography variant="body2" color="textSecondary">
                   No tags found.
                 </Typography>
               ) : (
-                groupedTags.map((group, idx) => (
+                groupedTagsArray.map((group, idx) => (
                   <Box
                     key={idx}
                     mb={2}
@@ -309,7 +282,7 @@ const ServiceDetails = () => {
                         <Chip
                           key={i}
                           label={tag}
-                          onDelete={() => { }}
+                          onDelete={() => {}}
                           deleteIcon={
                             <CancelIcon
                               sx={{

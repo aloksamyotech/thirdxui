@@ -272,12 +272,33 @@ const Chart = () => {
             borderRadius: '12px'
           }}
         >
-          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>
-            Cases By Gender{' '}
-            <Box component="span" sx={{ fontWeight: 400, fontSize: 14 }}>
-              {genderBarData.reduce((a, b) => a + b, 0)} Total
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, pt: 2 }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 16 }}>Cases By Gender</Typography>
+
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5
+              }}
+            >
+              <Box
+                sx={{
+                  backgroundColor: '#333',
+                  color: '#fff',
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 1,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  gap: 0.5
+                }}
+              >
+                {genderBarData.reduce((a, b) => a + b, 0)}
+              </Box>
+              Total
             </Box>
-          </Typography>
+          </Box>
 
           <BarChart
             layout="horizontal"

@@ -24,7 +24,10 @@ const Lead = () => {
   const [campaign, setCampaignFilter] = useState('');
   const [rows, setRows] = useState([]);
   const [formType, setFormType] = useState('');
+  const [formTitle, setFormTitle] = useState('');
   const [formTypes, setFormTypes] = useState([]);
+  const [formTitles, setFormTitles] = useState([]);
+  const [dateCreated, setDateCreated] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -61,7 +64,13 @@ const Lead = () => {
       queryParams.append('search', searchQuery);
     }
     if (formType) {
-      queryParams.append('search', formType);
+      queryParams.append('type', formType);
+    }
+    if (formTitle) {
+      queryParams.append('title', formTitle);
+    }
+    if (dateCreated) {
+      queryParams.append('createdAt', dateCreated);
     }
     const fromUrl = `${urls?.forms?.getAll}?${queryParams.toString()}`;
     const response = await getApi(fromUrl);
@@ -83,7 +92,7 @@ const Lead = () => {
   };
   useEffect(() => {
     getAllForms();
-  }, [searchQuery, formType, paginationModel]);
+  }, [searchQuery, formType, paginationModel, formTitle, dateCreated]);
 
   const getFormTypes = async () => {
     const url = `${urls?.forms?.getAll}?limit=1000`;
@@ -92,7 +101,12 @@ const Lead = () => {
       value: item?.title,
       label: item?.title
     }));
-    setFormTypes(options);
+    const optionsType = response?.data?.data?.map((item) => ({
+      value: item?.type,
+      label: item?.type
+    }));
+    setFormTypes(optionsType);
+    setFormTitles(options)
   };
   useEffect(() => {
     getFormTypes();
@@ -137,7 +151,7 @@ const Lead = () => {
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1 }}>
           <OpenInNewIcon color="primary" fontSize="small" sx={{ cursor: 'pointer' }} onClick={() => handleNavigate(params.row.link)} />
-          <EditOutlinedIcon sx={{ color: ' #EBEBE4' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+          {/* <EditOutlinedIcon sx={{ color: ' #EBEBE4' }} fontSize="small" onClick={() => handleEdit(params.row)} /> */}
         </Box>
       )
     }
@@ -233,9 +247,12 @@ const Lead = () => {
               formTypes={formTypes}
               formType={formType}
               setFormType={setFormType}
-              campaigns={campaignFilter}
-              setCampaignFilter={setCampaignFilter}
-              selectedFilters={['formType', 'campaignFilter']}
+              formTitles={formTitles}
+              formTitle={formTitle}
+              setFormTitle={setFormTitle}
+              dateCreated={dateCreated}
+              setDateCreated={setDateCreated}
+              selectedFilters={['formType', 'formDisplayTitle', 'dateCreated']}
             />
 
             <Grid item xs={9}>

@@ -96,6 +96,7 @@ export default function TabbedDataGrid() {
     const fromUrl = `${urls?.responses?.submit}?${queryParams.toString()}`;
     const response = await getApi(fromUrl);
     const pagination = response?.data?.meta || { total: 0 };
+    
     const formattedData = response?.data?.data
       ?.map((item, index) => {
         const submissionDate = moment(item?.submittedAt).format('L');
@@ -104,16 +105,12 @@ export default function TabbedDataGrid() {
           title: item?.formId?.title,
           status: item?.status,
           date: submissionDate,
-          age: '-'
+          age: item?.data?.Age || '-'
         };
         return data;
       })
       ?.filter((item) => item?.status === 'APPROVED' || item?.status === 'REJECTED');
-    setTotalRows(
-      tabValue === 0
-        ? formattedData?.filter((item) => item?.status === 'APPROVED')?.length
-        : formattedData?.filter((item) => item?.status === 'REJECTED')?.length
-    );
+    setTotalRows(pagination?.total);
     setRows(formattedData);
     setLoading(false);
   };
@@ -242,15 +239,15 @@ export default function TabbedDataGrid() {
                   loading
                     ? []
                     : filteredRows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                      ...row,
+                      sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                    }))
                 }
                 loading={loading}
                 columns={columns}
                 rowHeight={65}
                 getRowId={(row) => row.id}
-                checkboxSelection
+                // checkboxSelection
                 slots={{
                   toolbar: () => <CustomHeader tabValue={tabValue} setTabValue={setTabValue} />,
                   loadingOverlay: () => (

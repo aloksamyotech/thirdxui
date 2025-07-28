@@ -143,11 +143,11 @@ const AddCaseForm = ({ onCancel }) => {
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? false,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
       beneficiaryTags:
         editdata?.otherInfo?.tags?.map((tag) => ({
           categoryId: tag.tagCategoryId._id,
@@ -176,16 +176,22 @@ const AddCaseForm = ({ onCancel }) => {
         }
 
         if (editdata.contactPreferences.contactMethods) {
-          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? true);
-          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
-          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
-          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
-          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? true);
+          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? false);
+          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? false);
+          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? false);
+          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? false);
+          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? false);
         }
       }
     }
   }, [editdata, setValue]);
 
+  useEffect(() => {
+    Object.entries(contactMethodStates).forEach(([label, state]) => {
+      const isSelected = state === 1;
+      setValue(label.toLowerCase(), isSelected);
+    });
+  }, [contactMethodStates, setValue]);
   useEffect(() => {
     if (editdata?.contactPreferences?.contactMethods) {
       const methods = editdata.contactPreferences.contactMethods;
@@ -199,14 +205,8 @@ const AddCaseForm = ({ onCancel }) => {
       };
 
       setContactMethodStates(updatedStates);
-
-      setValue('telephone', methods.telephone);
-      setValue('emailConsent', methods.email);
-      setValue('sms', methods.sms);
-      setValue('whatsapp', methods.whatsapp);
-      setValue('letter', methods.letter);
     }
-  }, [editdata, setValue]);
+  }, [editdata]);
   useEffect(() => {
     ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
       register(field);
@@ -430,7 +430,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 
     fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', formData.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', formData.letter ? 'true' : 'false');
@@ -444,8 +444,8 @@ const AddCaseForm = ({ onCancel }) => {
     if (formData.file) {
       fd.append('file', formData.file || '');
     }
-    if (formData.profileImage) {
-      fd.append('profileImage', formData.profileImage || '');
+    if (formData.personalInfo?.profileImage instanceof File) {
+      fd.append('profileImage', formData.personalInfo.profileImage);
     }
 
     try {
@@ -478,52 +478,6 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLetterNumberSpace = /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
 
-  const tabFieldMap = {
-    0: [
-      'personalInfo.firstName',
-      'personalInfo.lastName',
-      'personalInfo.dateOfBirth',
-      'personalInfo.title',
-      'personalInfo.gender',
-      'personalInfo.ethnicity',
-      'personalInfo.nickName',
-      'homePhone',
-      'phone',
-      'email',
-      'addressLine1',
-      'town',
-      'district',
-      'postcode',
-      'country',
-      'firstLanguage',
-      'otherId',
-
-      'Beneficiary',
-      'Campaigns',
-      'riskNotes',
-      'engagement',
-      'eventsAttended',
-      'fundingInterests',
-      'fundraisingActivities',
-      'restrictAccess'
-    ],
-    1: [
-      'firstName',
-      'lastName',
-      'phone',
-      'title',
-      'gender',
-      'preferred',
-      'emergencyhomePhone',
-      'emergencyphone',
-      'emergencyemail',
-      'emergencyaddress',
-      'emergencycountry',
-      'emergencytown',
-      'emergencypinCode'
-    ],
-    2: ['preferredContact', 'reason', 'contactPurpose', 'confirmDate', 'telephone', 'emailConsent', 'sms', 'letter', 'whatsapp']
-  };
 
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
@@ -796,7 +750,7 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="profileImage"
+                                name="personalInfo.profileImage"
                                 control={control}
                                 rules={{
                                   validate: (file) => validateFile(file)
@@ -806,7 +760,15 @@ const AddCaseForm = ({ onCancel }) => {
                                     fullWidth
                                     variant="outlined"
                                     size="small"
-                                    value={field.value ? (typeof field.value === 'object' && field.value.name ? field.value.name : '') : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object'
+                                          ? field.value.name || ''
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop()
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Profile image"
                                     inputProps={{
                                       readOnly: true,
@@ -819,9 +781,13 @@ const AddCaseForm = ({ onCancel }) => {
                                           color: '#7a7b7c',
                                           opacity: 1,
                                           whiteSpace: 'nowrap',
-
+                                          overflow: 'hidden',
                                           textOverflow: 'ellipsis',
-                                          overflow: 'hidden'
+                                          '&::placeholder': {
+                                            fontSize: '12px',
+                                            color: '#7a7b7c',
+                                            opacity: 1
+                                          }
                                         }
                                       }
                                     }}
@@ -843,13 +809,12 @@ const AddCaseForm = ({ onCancel }) => {
                                         </InputAdornment>
                                       )
                                     }}
-                                    error={!!errors.profileImage}
-                                    helperText={errors.profileImage?.message}
+                                    error={!!errors?.personalInfo?.profileImage}
+                                    helperText={errors.personalInfo?.profileImage?.message}
                                   />
                                 )}
                               />
                             </Grid>
-
                             <Grid item xs={12}>
                               <Controller
                                 name="personalInfo.dateOfBirth"
@@ -1339,7 +1304,7 @@ const AddCaseForm = ({ onCancel }) => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2, height: '400px' , overflow : 'auto'}}>
+                          <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                             <Typography variant="subtitle1" mb={4}>
                               Volunteer Tag
                             </Typography>

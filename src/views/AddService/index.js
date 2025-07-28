@@ -124,23 +124,18 @@ const AddCaseForm = () => {
   });
 
   useEffect(() => {
-    if (serviceToEdit && serviceData) {
+    if (serviceToEdit && serviceData && allCategory.length > 0) {
       setValue('name', serviceData?.name || '');
       setValue('code', serviceData?.code || '');
       setValue('serviceType', serviceData?.serviceType || '');
 
-      // setValue('benificiary', serviceData?.benificiary || []);
-      // setValue('Campaigns', serviceData?.campaigns || []);
-      // setValue('engagement', serviceData?.engagement || []);
-      // setValue('eventsAttended', serviceData?.eventAttanded || []);
-      // setValue('fundingInterests', serviceData?.fundingInterest || []);
-      // setValue('fundraisingActivities', serviceData?.fundraisingActivities || []);
-      if (Array.isArray(serviceData.tags) && allCategory.length > 0) {
+      if (Array.isArray(serviceData.tags)) {
+        const selectedTagIds = serviceData.tags.map((t) => t._id); // 👈 Extract IDs
         const beneficiaryTags = [];
 
         allCategory.forEach((category) => {
           category.tags.forEach((tag) => {
-            if (serviceData.tags.includes(tag._id)) {
+            if (selectedTagIds.includes(tag._id)) {
               beneficiaryTags.push({
                 categoryId: category._id,
                 tagId: tag._id
@@ -151,12 +146,13 @@ const AddCaseForm = () => {
 
         setValue('beneficiaryTags', beneficiaryTags);
       }
+
       setValue('notes', serviceData?.description || '');
       setValue('attachment', serviceData?.attachment || null);
       setValue('file', serviceData?.file || null);
       setRestrictAccess(serviceData?.isActive || false);
     }
-  }, [serviceData, serviceToEdit, setValue]);
+  }, [serviceData, serviceToEdit, allCategory, setValue]);
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -171,67 +167,57 @@ const AddCaseForm = () => {
     };
     fetchTags();
   }, []);
+  const renderAutocomplete = (label, options, categoryId) => {
+    const selectedOptions = (watch('beneficiaryTags') || [])
+      .filter((tag) => tag.categoryId === categoryId)
+      .map((tag) => options.find((opt) => opt._id === tag.tagId))
+      .filter(Boolean);
 
-  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => {
-        const prefilledTags = (watch('beneficiaryTags') || [])
-          .filter((tag) => tag.categoryId === categoryId)
-          .map((tag) => options.find((opt) => opt._id === tag.tagId))
-          .filter(Boolean);
+    return (
+      <Autocomplete
+        multiple
+        options={options || []}
+        getOptionLabel={(option) => option?.name || 'Unknown'}
+        groupBy={(option) => option.categoryName ?? label}
+        isOptionEqualToValue={(option, value) => option._id === value._id}
+        value={selectedOptions}
+        onChange={(_, selectedOptions) => {
+          const updatedTags = selectedOptions.map((opt) => ({
+            categoryId: categoryId,
+            tagId: opt._id
+          }));
 
-        return (
-          <Autocomplete
-            multiple
-            options={options || []}
-            getOptionLabel={(option) => option?.name || 'Unknown'}
-            groupBy={(option) => option.categoryName ?? label}
-            isOptionEqualToValue={(option, value) => option._id === value._id}
-            value={prefilledTags}
-            onChange={(_, selectedOptions) => {
-              const updatedTags = selectedOptions.map((opt) => ({
-                categoryId: categoryId,
-                tagId: opt._id
-              }));
+          setValue('beneficiaryTags', [...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId), ...updatedTags]);
+        }}
+        renderTags={(value, getTagProps) =>
+          value.map((option, index) => (
+            <Chip
+              label={option.name}
+              {...getTagProps({ index })}
+              key={option._id}
+              deleteIcon={
+                <span
+                  style={{
+                    backgroundColor: '#4C4E6442',
+                    borderRadius: '50%',
+                    width: 20,
+                    height: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                </span>
+              }
+            />
+          ))
+        }
+        renderInput={(params) => <TextField {...params} label={label} size="small" fullWidth />}
+      />
+    );
+  };
 
-              setValue('beneficiaryTags', [
-                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
-                ...updatedTags
-              ]);
-              field.onChange(selectedOptions);
-            }}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip
-                  label={option.name}
-                  {...getTagProps({ index })}
-                  key={option._id}
-                  deleteIcon={
-                    <span
-                      style={{
-                        backgroundColor: '#4C4E6442',
-                        borderRadius: '50%',
-                        width: 20,
-                        height: 20,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                    </span>
-                  }
-                />
-              ))
-            }
-            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-          />
-        );
-      }}
-    />
-  );
   const onSubmit = async (data) => {
     setIsloading(true);
 
@@ -396,9 +382,9 @@ const AddCaseForm = () => {
 
                   <Grid container spacing={2}>
                     <Grid container spacing={2}>
-                      {allCategory?.map((category, index) => (
+                      {allCategory?.map((category) => (
                         <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
-                          {renderAutocomplete(`Beneficiary.${index}`, category.name, category.tags, null, null, control, category._id)}
+                          {renderAutocomplete(category.name, category.tags, category._id)}
                         </Grid>
                       ))}
                     </Grid>

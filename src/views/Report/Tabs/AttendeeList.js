@@ -182,7 +182,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
         const lastName = user?.attendee?.personalInfo?.lastName || '';
         const countryName = user?.attendee?.contactInfo?.country || '-';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
-        const dob = user?.attendee?.personalInfo?.dob;
+        const dob = user?.attendee?.personalInfo?.dateOfBirth;
         const age = dob ? calculateAge(dob) : '-';
         return {
           id: user?._id,

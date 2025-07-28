@@ -22,7 +22,7 @@ import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { getApi, postApi } from 'common/apiClient';
+import { getApi, postApi, updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import AntSwitch from 'components/AntSwitch';
 import toast from 'react-hot-toast';
@@ -40,12 +40,6 @@ const AddCaseForm = () => {
   const [rows, setRows] = useState([]);
   const [services, setServices] = useState([]);
   const [caseOwner, setCaseOwner] = useState([]);
-  const [benificiary, setBenificiary] = useState([]);
-  const [Campaigns, setCampaigns] = useState([]);
-  const [engagement, setengagement] = useState([]);
-  const [eventsAttended, seteventsAttended] = useState([]);
-  const [fundingInterests, setfundingInterests] = useState([]);
-  const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [allCategory, setAllCategory] = useState([]);
@@ -70,7 +64,7 @@ const AddCaseForm = () => {
       caseClosed: null,
       tags: [],
       description: '',
-      files: null
+      file: null
     },
     mode: 'all'
   });
@@ -83,7 +77,7 @@ const AddCaseForm = () => {
     const file = event.target.files[0];
     if (file) {
       setSelectedFile(file);
-      setValue('attachments', file);
+      setValue('file', file);
     }
   };
   useEffect(() => {
@@ -103,9 +97,11 @@ const AddCaseForm = () => {
     if (sessionData && allCategory.length > 0) {
       const beneficiaryTags = [];
 
+      const selectedTagIds = sessionData.tags?.map((t) => t._id) || [];
+
       allCategory.forEach((category) => {
         category.tags.forEach((tag) => {
-          if (sessionData.tags?.includes(tag._id)) {
+          if (selectedTagIds.includes(tag._id)) {
             beneficiaryTags.push({
               categoryId: category._id,
               tagId: tag._id
@@ -122,7 +118,7 @@ const AddCaseForm = () => {
         caseClosed: sessionData?.caseClosed ? dayjs(sessionData.caseClosed) : null,
         description: sessionData?.description || '',
         serviceStatus: sessionData?.status || 'pending',
-        file: null,
+        file: sessionData?.file,
         beneficiaryTags
       });
     }
@@ -217,19 +213,23 @@ const AddCaseForm = () => {
         formData.append('tags[]', tagId.tagId);
       });
       formData.append('description', data.description || '');
-      formData.append('status', data.serviceStatus);
-
+      formData.append('status', sessionData?.serviceStatus || data.serviceStatus);
       if (data.file) {
         formData.append('file', data.file);
       }
+      if (sessionData) {
+        await updateApi(`${urls.case.update.replace(':id', sessionData?._id)}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
 
-      const response = await postApi(urls.case.create, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+        toast.success('Case updated successfully');
+      } else {
+        await postApi(urls.case.create, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
 
-      toast.success('Cases added successfully');
+        toast.success('Case added successfully');
+      }
       navigate('/case');
       setIsloading(false);
     } catch (error) {
@@ -474,7 +474,7 @@ const AddCaseForm = () => {
                 <Grid item xs={12} sm={4}>
                   <Box mb={2} display="flex" justifyContent="space-between">
                     <Controller
-                      name="files"
+                      name="file"
                       control={control}
                       rules={{
                         validate: (file) => validateFile(file)
@@ -484,7 +484,7 @@ const AddCaseForm = () => {
                           variant="outlined"
                           size="small"
                           fullWidth
-                          value={field.value ? field.value.name : ''}
+                          value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
                           placeholder="Attachments"
                           InputProps={{
                             readOnly: true,
@@ -496,7 +496,7 @@ const AddCaseForm = () => {
                             endAdornment: (
                               <InputAdornment position="end">
                                 <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                  <Link component="span">Upload a file</Link>
+                                  <Link component="span">Upload</Link>
                                   <input
                                     type="file"
                                     hidden
@@ -510,8 +510,8 @@ const AddCaseForm = () => {
                               </InputAdornment>
                             )
                           }}
-                          error={!!errors.files}
-                          helperText={errors.files?.message}
+                          error={!!errors.file}
+                          helperText={errors.file?.message}
                         />
                       )}
                     />

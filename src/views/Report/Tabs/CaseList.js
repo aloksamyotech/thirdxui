@@ -194,7 +194,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
+          owner: user?.serviceId?.name || '',
           status: user?.isActive === true ? 'Open' : 'Closed',
           ethicity: user?.serviceUserId?.personalInfo?.ethnicity || '-',
           country: countryName,

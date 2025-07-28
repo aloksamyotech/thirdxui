@@ -75,6 +75,7 @@ const AddCaseForm = ({ onCancel }) => {
       return { ...prev, [label]: nextState };
     });
   };
+
   const defaultFormValues = {
     personalInfo: {
       title: editdata?.personalInfo?.title || '',
@@ -117,11 +118,11 @@ const AddCaseForm = ({ onCancel }) => {
     reason: editdata?.contactPreferences?.reason?._id || '',
     contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
     confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-    telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
-    emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-    sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-    whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-    letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
+    telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? false,
+    emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+    sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+    whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
+    letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
     riskAssessmentNotes: editdata?.riskAssessment?.riskAssessmentNotes || '',
     keyIndicators: editdata?.riskAssessment?.keyIndicators?.map((val) => (typeof val === 'object' ? val._id || val.id : val)) || [],
 
@@ -198,11 +199,11 @@ const AddCaseForm = ({ onCancel }) => {
         }
 
         if (editdata.contactPreferences.contactMethods) {
-          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? true);
-          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
-          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
-          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
-          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? true);
+          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? false);
+          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? false);
+          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? false);
+          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? false);
+          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? false);
         }
       }
     }
@@ -384,26 +385,27 @@ const AddCaseForm = ({ onCancel }) => {
   );
 
   useEffect(() => {
+    Object.entries(contactMethodStates).forEach(([label, state]) => {
+      const isSelected = state === 1;
+      setValue(label.toLowerCase(), isSelected);
+    });
+  }, [contactMethodStates, setValue]);
+  useEffect(() => {
     if (editdata?.contactPreferences?.contactMethods) {
       const methods = editdata.contactPreferences.contactMethods;
 
       const updatedStates = {
         Telephone: methods.telephone ? 1 : 0,
         Email: methods.email ? 1 : 0,
+        Letter: methods.letter ? 1 : 0,
         SMS: methods.sms ? 1 : 0,
-        Whatsapp: methods.whatsapp ? 1 : 0,
-        Letter: methods.letter ? 1 : 0
+        Whatsapp: methods.whatsapp ? 1 : 0
       };
 
       setContactMethodStates(updatedStates);
-
-      setValue('telephone', methods.telephone);
-      setValue('emailConsent', methods.email);
-      setValue('sms', methods.sms);
-      setValue('whatsapp', methods.whatsapp);
-      setValue('letter', methods.letter);
     }
-  }, [editdata, setValue]);
+  }, [editdata]);
+
   useEffect(() => {
     ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
       register(field);
@@ -477,7 +479,7 @@ const AddCaseForm = ({ onCancel }) => {
     });
 
     fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', formData.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', formData.letter ? 'true' : 'false');

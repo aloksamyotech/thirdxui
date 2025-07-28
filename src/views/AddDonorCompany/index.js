@@ -113,11 +113,11 @@ const AddCaseForm = ({ onCancel }) => {
       referrerEmail: editdata?.referrer?.email || '',
       referrerPhone: editdata?.referrer?.phone || '',
       referralType: editdata?.referrer?.referralType || '',
-      donor: editdata?.contactPreferences?.contactMethods?.donor ?? true,
-      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
       preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
@@ -127,12 +127,6 @@ const AddCaseForm = ({ onCancel }) => {
       otherId: editdata?.companyInformation?.otherId || '',
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
-      // Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-      // Campaignstag: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-      // engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-      // eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-      // fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-      // fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
       restrictAccess: editdata?.otherInfo?.restrictAccess || false,
       beneficiaryTags:
         editdata?.otherInfo?.tags?.map((tag) => ({
@@ -157,6 +151,7 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -304,10 +299,9 @@ const AddCaseForm = ({ onCancel }) => {
     }
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
 
-    // fd.append('contactPreferences[contactMethods][donortag]', data.donortag ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', data.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donor]', data.donor ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
     fd.append('companyInformation[companyName]', data.companyname || '');
@@ -383,13 +377,11 @@ const AddCaseForm = ({ onCancel }) => {
       return updated;
     });
   };
-
   const booleanToState = (value) => {
     if (value === true) return 1;
-    if (value === false) return 2;
-    return 0;
+    if (value === false) return 0;
+    return 2;
   };
-
   useEffect(() => {
     if (editdata) {
       const contactMethods = editdata?.contactPreferences?.contactMethods || {};

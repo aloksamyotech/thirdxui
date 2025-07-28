@@ -57,12 +57,6 @@ const AddDonorForm = () => {
   const [contactpurpose, setContactpurpose] = useState([]);
   const [reason, setReason] = useState([]);
   const [contactmethod, setContactmethod] = useState([]);
-  const [benificiary, setBenificiary] = useState([]);
-  const [Campaignstag, setCampaignstag] = useState([]);
-  const [engagement, setengagement] = useState([]);
-  const [eventsAttended, seteventsAttended] = useState([]);
-  const [fundingInterests, setfundingInterests] = useState([]);
-  const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
     acc[curr._id] = 0;
     return acc;
@@ -109,11 +103,11 @@ const AddDonorForm = () => {
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactemail: editdata?.contactPreferences?.email || '',
       contactNo: editdata?.contactPreferences?.phone || '',
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? true,
-      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
+      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
       role: 'donor',
@@ -300,11 +294,11 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', data.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donor]', data.donerTag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
     if (data.Recruitmentcampaign) {
@@ -356,10 +350,9 @@ const AddDonorForm = () => {
   };
   const booleanToState = (value) => {
     if (value === true) return 1;
-    if (value === false) return 2;
-    return 0;
+    if (value === false) return 0;
+    return 2;
   };
-
   useEffect(() => {
     if (editdata) {
       const contactMethods = editdata?.contactPreferences?.contactMethods || {};

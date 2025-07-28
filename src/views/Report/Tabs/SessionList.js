@@ -74,12 +74,11 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
         const response = await getApi(`${urls.session.fetchWithPagination}?${queryParams.toString()}`);
 
         const data = response?.data?.data || [];
-
         const pagination = response?.data?.meta || { total: 0 };
 
         const transformedRows = data.map((item, index) => {
           const personalInfo = item?.serviceuser?.personalInfo || {};
-          const fullName = `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim();
+          const fullName = personalInfo.name || '';
           const caseid = item?.serviceuser?.uniqueId;
           const countryName = item?.country || '-';
           const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
@@ -92,8 +91,8 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
             status: item.isActive ? 'Open' : 'Closed',
             country: item.country || '-',
             countryFlag: matchedCountry?.flag || '',
-            ethicity: item.ethnicity || '-',
-            owner: item.owner || '-'
+            ethicity: item.serviceuser?.personalInfo?.ethnicity || '-',
+            owner: item.serviceId?.name || '-'
           };
         });
 
@@ -145,17 +144,17 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
       };
 
       const formattedUsers = filteredCases.map((user, index) => {
-        const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
-        const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
+        const personalInfo = user?.serviceuser?.personalInfo || {};
+        const fullName = personalInfo.name || '';
 
         return {
           id: user?._id,
           serialNumber: `RD-${(index + 1).toString().padStart(3, '0')}`,
           dateOpened: formatDate(user?.caseOpened),
           dateClosed: formatDate(user?.caseClosed),
-          serviceUser: `${firstName} ${lastName}`.trim() || 'Unknown User',
+          serviceUser: fullName,
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
+          owner: user?.serviceId?.name || '',
           status: user?.isActive === true ? 'Open' : 'Closed'
         };
       });

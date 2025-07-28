@@ -43,6 +43,7 @@ export const urls = Object.freeze({
   case: {
     create: `${baseUrl}/cases/addCase`,
     fetch: `${baseUrl}/cases/getAllCases`,
+    update: `${baseUrl}/cases/editCase/:id`,
     delete: `${baseUrl}/cases/deleteCase/`,
     filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,

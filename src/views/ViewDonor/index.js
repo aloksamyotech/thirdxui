@@ -126,7 +126,12 @@ const UserProfileCard = () => {
   const contactPreferences = userData?.contactPreferences || {};
   const otherInfo = userData?.otherInfo || {};
   const companyInformation = userData?.companyInformation || {};
-  const imagePath = userData?.otherInfo?.file;
+  let imagePath = userData?.otherInfo?.file || '';
+
+  if (imagePath.startsWith('/thirdexDev/thirdxBE/')) {
+    imagePath = imagePath.replace('/thirdexDev/thirdxBE/', '/');
+  }
+
   const fullImageUrl = imagePath ? (imagePath.startsWith('https://') ? imagePath : `${imageUrl}${imagePath}`) : '';
 
   const handleClick = (event) => {

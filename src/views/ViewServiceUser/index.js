@@ -235,7 +235,12 @@ const UserProfileCard = () => {
     setCaseNoteOpen(false);
   };
 
-  const imagePath = userData?.otherInfo?.file;
+  let imagePath = userData?.otherInfo?.file || '';
+
+  if (imagePath.startsWith('/thirdexDev/thirdxBE/')) {
+    imagePath = imagePath.replace('/thirdexDev/thirdxBE/', '');
+  }
+
   const fullImageUrl = imagePath
     ? imagePath.startsWith('https://')
       ? imagePath

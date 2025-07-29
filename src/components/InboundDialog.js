@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 
-const EmailDialog = ({ open, handleClose, userId, type, dialogTitle, dateLabel }) => {
+const EmailDialog = ({ open, handleClose, onClose, fetchTimeLineData, userId, type, dialogTitle, dateLabel }) => {
   const [dateReceived, setDateReceived] = useState(null);
 
   const handleSubmit = async () => {
@@ -35,7 +35,9 @@ const EmailDialog = ({ open, handleClose, userId, type, dialogTitle, dateLabel }
       }
 
       const response = await postApi(endpoint, formData);
+      fetchTimeLineData();
       handleClose();
+      onClose();
     } catch (error) {
       console.error(`Error creating ${type}:`, error);
     }

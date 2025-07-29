@@ -18,7 +18,8 @@ const CustomHeader = ({
   enableBulkActions = false,
   extraActions = null,
   refetchData,
-  isCompletlyDelete = false
+  isCompletlyDelete = false,
+  isShowArchive = true
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -152,9 +153,11 @@ const CustomHeader = ({
                 <MenuItem onClick={handleBulkDelete}>
                   Bulk Delete <IconTrash size={18} style={{ marginLeft: 8 }} />
                 </MenuItem>
-                <MenuItem onClick={handleBulkArchive}>
-                  Bulk Archive <ArchiveIcon fontSize="small" style={{ marginLeft: 8 }} />
-                </MenuItem>
+                {isShowArchive && (
+                  <MenuItem onClick={handleBulkArchive}>
+                    Bulk Archive <ArchiveIcon fontSize="small" style={{ marginLeft: 8 }} />
+                  </MenuItem>
+                )}
               </Menu>
             </div>
           )}

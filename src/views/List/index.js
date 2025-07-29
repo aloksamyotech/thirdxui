@@ -325,7 +325,7 @@ const List = () => {
                 slots={{
                   toolbar: () => (
                     <CustomHeader
-                      entityType={entityTypeMap[listType] || 'service_user'}
+                      entityType={'list'}
                       title={`All List`}
                       selectedIds={selectedIds}
                       enableBulkActions={true}
@@ -333,6 +333,7 @@ const List = () => {
                       extraActions={null}
                       isCompletlyDelete={true}
                       refetchData={fetchLists}
+                      isShowArchive={false} 
                     />
                   ),
                   loadingOverlay: () => (

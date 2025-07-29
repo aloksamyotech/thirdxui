@@ -43,40 +43,7 @@ import './index.css';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import TimelineActivity from 'components/TimelineActivity';
 import moment from 'moment';
-// const timelineData = [
-//   {
-//     date: '27 Nov 2024',
-//     type: 'Survey completed',
-//     color: 'error',
-//     description: 'Mentee satisfaction form',
-//     file: 'Invoices.pdf'
-//   },
-//   {
-//     date: '27 Nov 2024',
-//     type: 'Attended a session',
-//     color: 'secondary',
-//     description: 'Group work – Ether – Sammy Odoi - Soapbox',
-//     avatars: ['/avatars/user1.png'],
-//     sessionTitle: 'Create a new session',
-//     members: '50 members in a sessions'
-//   },
-//   {
-//     date: '27 Nov 2024',
-//     type: 'Attended a session',
-//     color: 'warning',
-//     description: 'Group work – Ether – Sammy Odoi - Soapbox',
-//     avatars: ['/avatars/user1.png', '/avatars/user2.png', '/avatars/user3.png'],
-//     extraCount: 3,
-//     sessionTitle: 'Create a new session',
-//     members: '50 members in a sessions'
-//   },
-//   {
-//     date: '27 Nov 2024',
-//     type: 'Volunteering Activity',
-//     color: 'primary',
-//     description: 'Mentee satisfaction form'
-//   }
-// ];
+import { colors } from 'common/constants';
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -127,17 +94,6 @@ const UserProfileCard = () => {
       .join(' ');
   }
 
-  const colors = [
-    '#FF5733', // red-ish
-    '#33FF57', // green-ish
-    '#3357FF', // blue-ish
-    '#F39C12', // orange
-    '#9B59B6', // purple
-    '#1ABC9C', // teal
-    '#E74C3C', // bright red
-    '#2ECC71' // bright green
-  ];
-
   const getRandomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -149,7 +105,7 @@ const UserProfileCard = () => {
         return {
           ...item,
           label: formatKeyToLabel(item.type),
-          dateField: moment(item.dateField).format('DD MMM YYYY'),
+          dateField: moment(item.date).format('DD MMM YYYY'),
           color: getRandomColor()
         };
       });
@@ -249,13 +205,6 @@ const UserProfileCard = () => {
 
   const handleBackClick = () => {
     navigate(-1);
-    // if (location.state?.isArchive) {
-    //   navigate('/archives');
-    // } else if (userData?.role === 'volunteer') {
-    //   navigate('/volunteer');
-    // } else {
-    //   navigate('/people');
-    // }
   };
   return (
     <>

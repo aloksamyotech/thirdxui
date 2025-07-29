@@ -38,37 +38,9 @@ import OptionsPopoverDonor from 'components/PopoverDoner';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { imageUrl } from 'common/urls';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
-import { SUBROLES } from 'common/constants';
+import { colors, SUBROLES } from 'common/constants';
 import TimelineActivity from 'components/TimelineActivity';
-
-const timelineData = [
-  {
-    date: '27 Nov 2024',
-    type: 'Donated $500',
-    color: 'error',
-    description: 'Monthly recurring donation',
-    file: 'Invoices.pdf'
-  },
-  {
-    date: '28 Nov 2024',
-    type: 'Email sent (Thank You)',
-    color: 'secondary',
-    description: 'Acknowledgement email sent'
-  },
-  {
-    date: '13 Jan 2025',
-    type: 'Donated $1,500',
-    color: 'warning',
-    description: 'Special fundraising campaign',
-    file: 'Invoices.pdf'
-  },
-  {
-    date: '21 Feb 2025',
-    type: 'Attended Volunteer Event',
-    color: 'primary',
-    description: 'Charity marathon participation'
-  }
-];
+import moment from 'moment';
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -87,6 +59,7 @@ const UserProfileCard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [timeLineData, setTimeLineData] = useState();
   const [role, setRole] = useState('');
 
   useEffect(() => {
@@ -107,6 +80,40 @@ const UserProfileCard = () => {
     };
     if (id) {
       fetchUserById();
+    }
+  }, [id]);
+
+  function formatKeyToLabel(key) {
+    return key
+
+      .replace(/([A-Z])/g, ' $1')
+
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  const getRandomColor = () => {
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+  useEffect(() => {
+    const fetchTimeLineData = async () => {
+      const response = await getApi(`${urls.timeline.getTimeLineById}${id}`);
+
+      const formattedTimeline = response?.data?.timeline?.map((item) => {
+        return {
+          ...item,
+          label: formatKeyToLabel(item.type),
+          dateField: moment(item.date).format('DD MMM YYYY'),
+          color: getRandomColor()
+        };
+      });
+
+      setTimeLineData(formattedTimeline);
+    };
+
+    if (id) {
+      fetchTimeLineData();
     }
   }, [id]);
 
@@ -747,7 +754,7 @@ const UserProfileCard = () => {
                 />
 
                 <Grid item xs={9}>
-                  <TimelineActivity timelineData={timelineData} />
+                  <TimelineActivity timelineData={timeLineData} />
                 </Grid>
 
                 <AddItemDialog

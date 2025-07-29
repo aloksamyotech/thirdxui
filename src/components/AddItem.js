@@ -5,15 +5,28 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import GiftAidDialog from './GiftAiddialog';
 import Attendee from './AttendeeDialog';
+import { useNavigate } from 'react-router';
 import EmailInboundDialog from './InboundDialog';
 import { ROLES } from 'common/constants';
+import { getApi } from 'common/apiClient';
+import { urls } from 'common/urls';
 
 const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
+  const navigate = useNavigate();
   const [selectedForm, setSelectedForm] = useState(null);
 
-  const handleClick = (type) => {
+  const handleClick = async (type) => {
+    if (type === 'caseNote') {
+      const res = await getApi(`${urls.case.getCaseServiceUser}${userId}`);
+      if (res?.data) {
+        navigate('/view-case', { state: { id: res?.data?._id } });
+      }
+    } else if (type === 'donation') {
+      navigate('/financial');
+    }
     setSelectedForm(type);
   };
+
   const allItems = [
     { label: 'Case Note', value: 'caseNote' },
     { label: 'Register Attendance', value: 'registerAttendance' },

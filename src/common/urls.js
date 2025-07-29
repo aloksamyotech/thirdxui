@@ -47,6 +47,7 @@ export const urls = Object.freeze({
     delete: `${baseUrl}/cases/deleteCase/`,
     filterType: `${baseUrl}/cases/search`,
     getById: `${baseUrl}/cases/getCaseById/:id`,
+    getCaseServiceUser: `${baseUrl}/cases/getCaseServiceUser/`,
     fetchWithPagination: `${baseUrl}/cases/allwithpagination`,
     toggleArchive: `${baseUrl}/cases/toggleArchive/:id`,
     bulkUpload: `${baseUrl}/cases/bulkUpload`
@@ -153,7 +154,8 @@ export const urls = Object.freeze({
     phoneinboundCreate: `${baseUrl}/userTimeline/phone-inbound/:id`,
     phoneoutboundCreate: `${baseUrl}/userTimeline/phone-outbound/:id`,
     letterRecivedCreate: `${baseUrl}/userTimeline/letter-received/:id`,
-    lettersendCreate: `${baseUrl}/userTimeline/letter-sent/:id`
+    lettersendCreate: `${baseUrl}/userTimeline/letter-sent/:id`,
+    getTimeLineById: `${baseUrl}/userTimeline/`
   },
   duplicate: {
     getallDuplicateUsers: `${baseUrl}/duplicate/getallduplicate`

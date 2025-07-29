@@ -38,7 +38,7 @@ const AddCaseForm = ({ onCancel }) => {
       try {
         const queryParams = new URLSearchParams();
         if (searchQuery) queryParams.append('search', searchQuery);
-        queryParams.append('role', 'donor');
+        // queryParams.append('role', 'donor');
 
         const response = await getApi(`${urls.serviceuser.fetchWithPagination}?${queryParams.toString()}`);
         const allDonors = response.data.data || [];

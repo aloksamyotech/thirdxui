@@ -25,6 +25,8 @@ const ServiceDetails = () => {
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const session = location.state?.session;
+  console.log(`sessionsession`, session);
+
   const handleClose = () => {
     setAnchorEl(null);
   };

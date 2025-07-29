@@ -356,7 +356,7 @@ const Mail = () => {
             <Grid item xs={9}>
               {value === '1' && (
                 <TabPanel value="1">
-                  <Card>
+                  <Card style={{ height: '100vh' }}>
                     <DataGrid
                       rows={
                         loading
@@ -429,7 +429,7 @@ const Mail = () => {
 
               {value === '2' && (
                 <TabPanel value="2">
-                  <Card>
+                  <Card style={{ height: '100vh' }}>
                     <DataGrid
                       rows={
                         loading
@@ -502,7 +502,7 @@ const Mail = () => {
 
               {value === '3' && (
                 <TabPanel value="3">
-                  <Card>
+                  <Card style={{ height: '100vh' }}>
                     <DataGrid
                       rows={
                         loading

@@ -3,13 +3,17 @@ import { Box, Grid, Typography } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+
 const Chart = () => {
   const [riskLabels, setRiskLabels] = useState([]);
   const [riskBarData, setRiskBarData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchChartData = async () => {
       try {
+        setLoading(true);
         const [userRes, configRes] = await Promise.all([getApi(urls.serviceuser.getAllServicesUser), getApi(urls.configuration.fetch)]);
 
         const attendees = userRes?.data?.allUser || [];
@@ -46,6 +50,8 @@ const Chart = () => {
         setRiskBarData(counts);
       } catch (err) {
         console.error('Error fetching risk factor chart data:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,21 +68,25 @@ const Chart = () => {
           padding: '16px'
         }}
       >
-        <BarChart
-          layout="horizontal"
-          series={[
-            {
-              id: 'risk-series',
-              data: riskBarData,
-              color: '#0C3149',
-              barCategoryGapRatio: 0.5
-            }
-          ]}
-          xAxis={[{ id: 'x-axis', scaleType: 'linear', min: 0 }]}
-          yAxis={[{ id: 'y-axis', scaleType: 'band', data: riskLabels }]}
-          height={riskLabels.length * 50}
-          margin={{ top: 10, bottom: 40, left: 150, right: 20 }}
-        />
+        {loading ? (
+          <SectionSkeleton lines={1} variant="rectangular" height={200} spacing={1} />
+        ) : (
+          <BarChart
+            layout="horizontal"
+            series={[
+              {
+                id: 'risk-series',
+                data: riskBarData,
+                color: '#0C3149',
+                barCategoryGapRatio: 0.5
+              }
+            ]}
+            xAxis={[{ id: 'x-axis', scaleType: 'linear', min: 0 }]}
+            yAxis={[{ id: 'y-axis', scaleType: 'band', data: riskLabels }]}
+            height={riskLabels.length * 50}
+            margin={{ top: 10, bottom: 40, left: 150, right: 20 }}
+          />
+        )}
       </Box>
     </Grid>
   );

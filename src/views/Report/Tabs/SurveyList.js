@@ -86,7 +86,6 @@ const KeyIndicatorsList = () => {
       <DataGrid
         rows={rows}
         columns={columns}
-        checkboxSelection
         disablePagination
         hideFooter
         autoHeight

@@ -149,3 +149,50 @@ export const fieldOptions = [
   'emergencyContact.town',
   'emergencyContact.postcode'
 ];
+export const transactionFieldOptions = [
+  'amountPaid',
+  'processingCost',
+  'receiptNumber',
+  'transactionId',
+  'isArchive',
+  'isDelete',
+  'isCompletlyDelete',
+  'createdAt',
+  'updatedAt',
+];
+export const serviceFieldOptions = [
+  'name',
+  'code',
+  'isArchive',
+  'description',
+];
+export const caseFieldOptions = [
+  'uniqueId',
+  'caseOpened',
+  'caseClosed',
+  'description',
+  'status',
+];
+export const formFieldOptions = [
+  'title',
+  'type',
+  'description',
+  'records',
+  'publicId',
+  'createdAt',
+  'fields.id',
+  'fields.name',
+  'fields.label',
+  'fields.type',
+  'fields.values',         
+  'fields.values.label',
+  'fields.values.value',
+  'fields.validation',
+  'fields.required',
+];
+export const mailingListFieldOptions = [
+  'name',
+  'userType',
+];
+
+

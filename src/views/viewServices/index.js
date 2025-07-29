@@ -9,7 +9,7 @@ import { urls } from 'common/urls';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { getApi } from 'common/apiClient';
 import { useNavigate } from 'react-router-dom';
-
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairServiceOutlined';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import { imageUrl } from 'common/urls';
@@ -23,6 +23,7 @@ const ServiceDetails = () => {
   const [serviceData, setServiceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [groupedTagsArray, setGroupedTagsArray] = useState([]);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -39,6 +40,7 @@ const ServiceDetails = () => {
     const fetchServiceDetails = async () => {
       if (!serviceid) return;
       try {
+        setLoading(true);
         const res = await getApi(urls.service.getById.replace(':id', serviceid));
         setServiceData(res?.data?.userData || {});
       } catch (error) {
@@ -54,6 +56,7 @@ const ServiceDetails = () => {
   useEffect(() => {
     const fetchServiceTypeName = async () => {
       try {
+        setLoading(true);
         const response = await getApi(urls.configuration.fetch);
         const configList = response?.data?.allConfiguration || [];
         const serviceTypeConfigs = configList.filter((item) => item.configurationType === 'Service Types');
@@ -67,6 +70,8 @@ const ServiceDetails = () => {
       } catch (error) {
         console.error('Error fetching configuration:', error);
         setServiceTypeName('Unknown');
+      } finally {
+        setLoading(false);
       }
     };
     if (serviceData?.serviceType) {
@@ -74,21 +79,26 @@ const ServiceDetails = () => {
     }
   }, [serviceData?.serviceType]);
 
-  const groupedTags = (serviceData?.tags || []).reduce((acc, tag) => {
-    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+  useEffect(() => {
+    setLoading(true);
 
-    if (!acc[categoryName]) {
-      acc[categoryName] = [];
-    }
+    const grouped = (serviceData?.tags || []).reduce((acc, tag) => {
+      const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(tag.name);
+      return acc;
+    }, {});
 
-    acc[categoryName].push(tag.name);
+    const groupedArray = Object.entries(grouped).map(([category, tags]) => ({
+      category,
+      tags
+    }));
 
-    return acc;
-  }, {});
-  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
-    category,
-    tags
-  }));
+    setGroupedTagsArray(groupedArray);
+    setLoading(false);
+  }, [serviceData]);
   return (
     <Box sx={{ p: 2 }}>
       <Grid item xs={12} mb={2}>
@@ -129,113 +139,116 @@ const ServiceDetails = () => {
               </Typography>
             </Box>
             <Divider sx={{ mb: 2 }} />
-
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              <Grid
-                container
-                spacing={2}
-                sx={{
-                  '& > *:not(:last-child)': {
-                    marginBottom: '10px'
-                  }
-                }}
-              >
-                <Grid item xs={6}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Service Name:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {serviceData?.name}
-                    </Box>
-                  </Typography>
-                </Grid>
+              {loading ? (
+                <SectionSkeleton lines={1} variant="rectangular" height={200} spacing={1} />
+              ) : (
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{
+                    '& > *:not(:last-child)': {
+                      marginBottom: '10px'
+                    }
+                  }}
+                >
+                  <Grid item xs={6}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Service Name:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {serviceData?.name}
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Service Status:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {serviceData?.isActive ? 'Active' : 'Inactive'}
-                    </Box>
-                  </Typography>
-                </Grid>
+                  <Grid item xs={6}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Service Status:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {serviceData?.isActive ? 'Active' : 'Inactive'}
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Service Code:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {serviceData?.code}
-                    </Box>
-                  </Typography>
-                </Grid>
+                  <Grid item xs={6}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Service Code:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {serviceData?.code}
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Start Date:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {formatDate(serviceData?.createdAt)}
-                    </Box>
-                  </Typography>
-                </Grid>
+                  <Grid item xs={6}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Start Date:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {formatDate(serviceData?.createdAt)}
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Service Type:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {serviceTypeName}
-                    </Box>
-                  </Typography>
-                </Grid>
+                  <Grid item xs={6}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Service Type:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {serviceTypeName}
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Attachment:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {serviceData?.file ? 1 : 0} File
-                    </Box>
-                  </Typography>
-                </Grid>
+                  <Grid item xs={6}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Attachment:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {serviceData?.file ? 1 : 0} File
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={12}>
-                  <Typography>
-                    <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
-                      Description:
-                    </Box>
-                    <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                      {serviceData?.description}
-                    </Box>
-                  </Typography>
-                </Grid>
+                  <Grid item xs={12}>
+                    <Typography>
+                      <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
+                        Description:
+                      </Box>
+                      <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
+                        {serviceData?.description}
+                      </Box>
+                    </Typography>
+                  </Grid>
 
-                <Grid item xs={12} mt={1}>
-                  <Typography sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginBottom: 1 }}>Image:</Typography>
-                  <Box mt={1}>
-                    {serviceData?.file ? (
-                      <img
-                        src={
-                          serviceData.file.startsWith('https://')
-                            ? serviceData.file
-                            : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
-                        }
-                        alt="Service"
-                        style={{ width: 200, height: 'auto', borderRadius: 8 }}
-                      />
-                    ) : (
-                      <Typography color="textSecondary">No image available</Typography>
-                    )}
-                  </Box>
+                  <Grid item xs={12} mt={1}>
+                    <Typography sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginBottom: 1 }}>Image:</Typography>
+                    <Box mt={1}>
+                      {serviceData?.file ? (
+                        <img
+                          src={
+                            serviceData.file.startsWith('https://')
+                              ? serviceData.file
+                              : `${imageUrl.replace(/\/$/, '')}/${serviceData.file.replace(/^\//, '')}`
+                          }
+                          alt="Service"
+                          style={{ width: 200, height: 'auto', borderRadius: 8 }}
+                        />
+                      ) : (
+                        <Typography color="textSecondary">No image available</Typography>
+                      )}
+                    </Box>
+                  </Grid>
                 </Grid>
-              </Grid>
+              )}
             </Box>
           </Paper>
         </Grid>
@@ -255,9 +268,10 @@ const ServiceDetails = () => {
               <Typography variant="subtitle1">Service Tags</Typography>
             </Box>
 
-            {/* Scrollable content */}
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              {groupedTagsArray.length === 0 ? (
+              {loading ? (
+                <SectionSkeleton lines={4} height={100} spacing={1} />
+              ) : groupedTagsArray.length === 0 ? (
                 <Typography variant="body2" color="textSecondary">
                   No tags found.
                 </Typography>

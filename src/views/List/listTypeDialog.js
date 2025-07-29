@@ -18,13 +18,13 @@ import { useNavigate } from 'react-router-dom';
 import { DescriptionOutlined } from '@mui/icons-material';
 
 const listOptions = [
-  { label: 'Service User', icon: <PersonOutlineOutlinedIcon />, route: '/add-list',state: { type: 'Service User' }  },
-  { label: 'Volunteer', icon: <VolunteerActivismOutlinedIcon />, route: '/add-list',state: { type: 'Volunteer' }  },
-  { label: 'Services', icon: <SettingsIcon />, route: '/add-list',state: { type: 'Services' }  },
-  { label: 'Case', icon: <ContentPasteOutlinedIcon />, route: '/add-list',state: { type: 'Case' }  },
+  { label: 'Service User', icon: <PersonOutlineOutlinedIcon />, route: '/add-list',state: { type: 'service_user' }  },
+  { label: 'Volunteer', icon: <VolunteerActivismOutlinedIcon />, route: '/add-list',state: { type: 'volunteer' }  },
+  { label: 'Services', icon: <SettingsIcon />, route: '/add-list',state: { type: 'services' }  },
+  { label: 'Case', icon: <ContentPasteOutlinedIcon />, route: '/add-list',state: { type: 'case' }  },
   { label: 'Mailing List', icon: <MailOutlineIcon />, route: '/add-list',state: { type: 'Mailing List' }  },
-  { label: 'Donations', icon: <FavoriteBorderOutlinedIcon />, route: '/add-list',state: { type: 'Donations' }  },
-  { label: 'Donors', icon: <NaturePeopleOutlinedIcon />, route: '/add-list',state: { type: 'Donors' }  },
+  { label: 'Donations', icon: <FavoriteBorderOutlinedIcon />, route: '/add-list',state: { type: 'donations' }  },
+  { label: 'Donors', icon: <NaturePeopleOutlinedIcon />, route: '/add-list',state: { type: 'donor' }  },
   { label: 'Forms', icon: <DescriptionOutlined />, route: '/add-list',state: { type: 'Forms' }  }
 ];
 

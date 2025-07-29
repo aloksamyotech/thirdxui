@@ -20,14 +20,11 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import { dateAddedFilters, entityTypeMap, listTypeFilter, ROLES, sessionNames } from 'common/constants';
 import CustomHeader from 'components/CustomHeader';
 import ListTypeDialog from './listTypeDialog';
-const staticListData = [
-  { id: 1, name: 'List Name', createdAt: '24/02/24', archived: false, listType: 'Service user' },
-  { id: 2, name: 'Archived List', createdAt: '24/02/24', archived: true, listType: 'Service user' },
-  { id: 3, name: 'List Name', createdAt: '24/02/24', archived: false, listType: 'Service user' }
-];
 const List = () => {
   const navigate = useNavigate();
   const [showFilter, setShowFilter] = useState(true);
+  const [listFilters, setListFilters] = useState([]);
+  const [listName, setListName] = useState('');
   const [sessionName, setSessionNameFilter] = useState('');
   const [listType, setListType] = useState('Service user');
   const [totalRows, setTotalRows] = useState(0);
@@ -41,40 +38,141 @@ const List = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [includeArchives, setIncludeArchives] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10
   });
+  const [tag, setTag] = useState('');
+  const [tagOptions, setTagOptions] = useState([]);
 
-  const activityTypes = [
-    { value: 'outreach', label: 'Outreach' },
-    { value: 'training', label: 'Training' }
-  ];
+  const handleFilter = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams();
+
+      if (listName && listName !== '') {
+        queryParams.append('name', listName);
+      }
+
+      if (tag && tag !== '') {
+        queryParams.append('tag', tag);
+      }
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.append('search', searchQuery.trim());
+      }
+
+      queryParams.append('page', paginationModel.page + 1);
+      queryParams.append('limit', paginationModel.pageSize);
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
+
+      const url = `${urls.list.fetchWithPagination}?${queryParams.toString()}`;
+
+      const response = await getApi(url);
+
+      const allList = response?.data?.data || [];
+      const pagination = response?.data?.meta || { total: 0 };
+
+      const formattedUsers = allList?.map((user, index) => {
+        return {
+          id: user._id,
+          serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+          name: user.name || '',
+          createdAt: user?.createdAt,
+          listType: user?.listType
+        };
+      });
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+      setIsFiltered(true);
+    } catch (error) {
+      console.error('Failed to fetch filtered lists:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLists = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: paginationModel.page + 1,
+        limit: paginationModel.pageSize
+      });
+
+      if (!includeArchives) {
+        queryParams.append('archive', 'false');
+      }
+
+      const response = await getApi(`${urls.list.fetchWithPagination}?${queryParams.toString()}`);
+      const allLists = response?.data?.data || [];
+      const pagination = response?.data?.meta || {};
+
+      const formattedUsers = allLists.map((user, index) => ({
+        id: user?._id,
+        serialNumber: `#C-${(index + 1).toString().padStart(3, '0')}`,
+        name: user?.name || '',
+        createdAt: user?.createdAt,
+        listType: user?.listType
+      }));
+
+      setRows(formattedUsers);
+      setTotalRows(pagination?.total);
+
+      const uniqueList = [...new Set(allLists.map((item) => item.name).filter(Boolean))].map((value) => ({
+        value,
+        label: value
+      }));
+
+      setListFilters(uniqueList);
+    } catch (error) {
+      console.error('Failed to fetch lists:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleFilter();
+  }, [includeArchives]);
+
+  useEffect(() => {
+    if (listName || searchQuery || isFiltered || tag) {
+      handleFilter();
+    }
+  }, [listName || searchQuery || tag]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    if (!event.target.value.trim()) {
-      fetchpeople();
-    }
-  };
-  const handleFilter = () => {
-    setPaginationModel({
-      page: 0,
-      pageSize: paginationModel.pageSize
-    });
-    fetchpeople();
   };
   const handleReset = () => {
-    setDateOpenedFilter('');
-    setSearchQuery('');
+    setListName('');
     setIsFiltered(false);
-    setPaginationModel({
-      page: 0,
-      pageSize: 10
-    });
-    setListType('Service user');
+    setIncludeArchives(false);
+    fetchLists();
+  };
+  const fetchtTagData = async () => {
+    try {
+      const response = await getApi(urls.tag.getAllTags);
+
+      const options = response?.data?.allTags?.map((item) => ({
+        value: item._id,
+        label: item.name
+      }));
+      setTagOptions(options);
+    } catch (error) {
+      console.error('Error fetching config:', error);
+    }
   };
 
+  useEffect(() => {
+    fetchLists();
+    fetchtTagData();
+  }, [paginationModel]);
   const columns = [
     {
       field: 'name',
@@ -193,25 +291,29 @@ const List = () => {
       <Grid container spacing={2}>
         <FilterPanel
           showFilter={showFilter}
-          listType={listTypeFilter}
-          setListType={setListType}
-          sessionNames={sessionNames}
-          setSessionNameFilter={setSessionNameFilter}
-          dateAddedFilters={dateAddedFilters}
-          dateOpenedFilter={dateOpenedFilter}
-          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-          includeServiceuser={includeServiceuser}
-          setIncludeServiceuser={setIncludeServiceuser}
-          selectedFilters={['listTypeFilter', 'dateOpenedFilter']}
-          customDateLabel="By Date"
+          listNames={listFilters}
+          listNameFilter={listName}
+          setListNameFilter={(value) => setListName(value)}
+          tags={tagOptions}
+          tagFilter={tag}
+          setTagFilter={(value) => setTag(value)}
+          selectedFilters={['listNameFilter', 'tagFilter']}
           onReset={handleReset}
         />
         <Grid item xs={9}>
           <Box width="100%">
             <Card style={{ height: '100vh' }}>
               <DataGrid
-                rows={staticListData}
+                rows={
+                  loading
+                    ? []
+                    : rows.map((row, index) => ({
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
+                }
                 columns={columns}
+                loading={loading}
                 checkboxSelection
                 onRowSelectionModelChange={(newSelection) => {
                   setSelectedIds(newSelection);
@@ -223,13 +325,15 @@ const List = () => {
                 slots={{
                   toolbar: () => (
                     <CustomHeader
-                      entityType={entityTypeMap[listType] || 'service_user'}
+                      entityType={'list'}
                       title={`All List`}
                       selectedIds={selectedIds}
                       enableBulkActions={true}
                       exportEnabled={true}
                       extraActions={null}
                       isCompletlyDelete={true}
+                      refetchData={fetchLists}
+                      isShowArchive={false} 
                     />
                   ),
                   loadingOverlay: () => (

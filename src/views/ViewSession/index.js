@@ -14,6 +14,7 @@ import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import { imageUrl } from 'common/urls';
 import OptionsPopover from 'components/AddFilter';
 import Diversity2OutlinedIcon from '@mui/icons-material/Diversity2Outlined';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 
 const ServiceDetails = () => {
   const location = useLocation();
@@ -24,8 +25,9 @@ const ServiceDetails = () => {
   const [sessionData, setSessionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [groupedTagsArray, setGroupedTagsArray] = useState([]);
+
   const session = location.state?.session;
-  console.log(`sessionsession`, session);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -72,28 +74,38 @@ const ServiceDetails = () => {
       } catch (error) {
         console.error('Error fetching configuration:', error);
         setServiceTypeName('Unknown');
+      } finally {
+        setLoading(false);
       }
     };
     if (sessionData?.serviceType) {
       fetchServiceTypeName();
     }
   }, [sessionData?.serviceType]);
-  const groupedTags = (sessionData?.[0]?.tags || []).reduce((acc, tag) => {
-    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
 
-    if (!acc[categoryName]) {
-      acc[categoryName] = [];
-    }
+  useEffect(() => {
+    setLoading(true);
 
-    acc[categoryName].push(tag.name);
+    const groupedTags = (sessionData?.[0]?.tags || []).reduce((acc, tag) => {
+      const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
 
-    return acc;
-  }, {});
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
 
-  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
-    category,
-    tags
-  }));
+      acc[categoryName].push(tag.name);
+
+      return acc;
+    }, {});
+
+    const groupedArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+      category,
+      tags
+    }));
+
+    setGroupedTagsArray(groupedArray);
+    setLoading(false);
+  }, [sessionData]);
   return (
     <Box sx={{ p: 2 }}>
       <Grid item xs={12} mb={2}>
@@ -149,80 +161,84 @@ const ServiceDetails = () => {
             <Divider sx={{ mb: 2 }} />
 
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Stack spacing={2}>
-                    {[
-                      { label: 'Location:', value: sessionData?.[0]?.country?.name || '-' },
-                      {
-                        label: 'Session Lead:',
-                        value: [sessionData?.[0]?.serviceuser?.name].filter(Boolean).join(' ')
-                      },
-                      { label: 'Service Type:', value: sessionData?.[0]?.serviceId?.name || '-' }
-                    ].map(({ label, value }, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          display: 'flex',
-                          gap: 1,
-                          alignItems: 'center',
-                          '& > *:first-of-type': {
-                            width: 110,
-                            fontWeight: 600,
-                            flexShrink: 0,
-                            fontSize: '12px',
-                            lineHeight: '24px'
-                          },
-                          '& > *:last-of-type': {
-                            flexGrow: 1,
-                            fontWeight: 400,
-                            fontSize: '12px',
-                            lineHeight: '24px'
-                          }
-                        }}
-                      >
-                        <Typography component="span">{label}</Typography>
-                        <Typography component="span">{value}</Typography>
-                      </Box>
-                    ))}
-                  </Stack>
-                </Grid>
+              {loading ? (
+                <SectionSkeleton lines={1} variant="rectangular" height={150} spacing={1} />
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Stack spacing={2}>
+                      {[
+                        { label: 'Location:', value: sessionData?.[0]?.country?.name || '-' },
+                        {
+                          label: 'Session Lead:',
+                          value: [sessionData?.[0]?.serviceuser?.name].filter(Boolean).join(' ')
+                        },
+                        { label: 'Service Type:', value: sessionData?.[0]?.serviceId?.name || '-' }
+                      ].map(({ label, value }, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                            '& > *:first-of-type': {
+                              width: 110,
+                              fontWeight: 600,
+                              flexShrink: 0,
+                              fontSize: '12px',
+                              lineHeight: '24px'
+                            },
+                            '& > *:last-of-type': {
+                              flexGrow: 1,
+                              fontWeight: 400,
+                              fontSize: '12px',
+                              lineHeight: '24px'
+                            }
+                          }}
+                        >
+                          <Typography component="span">{label}</Typography>
+                          <Typography component="span">{value}</Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <Stack spacing={2}>
-                    {[
-                      { label: 'Date:', value: formatDate(sessionData?.[0]?.createdAt) || '-' },
-                      { label: 'Time:', value: sessionData?.[0]?.time || '-' },
-                      { label: 'Attachment:', value: (sessionData?.[0]?.file ? 1 : 0) + ' File' }
-                    ].map(({ label, value }, idx) => (
-                      <Box
-                        key={idx}
-                        sx={{
-                          display: 'flex',
-                          gap: 1,
-                          alignItems: 'center',
-                          '& > *:first-of-type': {
-                            width: 110,
-                            fontWeight: 600,
-                            flexShrink: 0,
-                            fontSize: '12px',
-                            lineHeight: '24px'
-                          },
-                          '& > *:last-of-type': {
-                            flexGrow: 1,
-                            fontWeight: 400,
-                            fontSize: '12px',
-                            lineHeight: '24px'
-                          }
-                        }}
-                      >
-                        <Typography component="span">{label}</Typography>
-                        <Typography component="span">{value}</Typography>
-                      </Box>
-                    ))}
-                  </Stack>
+                  <Grid item xs={6}>
+                    <Stack spacing={2}>
+                      {[
+                        { label: 'Date:', value: formatDate(sessionData?.[0]?.createdAt) || '-' },
+                        { label: 'Time:', value: sessionData?.[0]?.time || '-' },
+                        { label: 'Attachment:', value: (sessionData?.[0]?.file ? 1 : 0) + ' File' }
+                      ].map(({ label, value }, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                            '& > *:first-of-type': {
+                              width: 110,
+                              fontWeight: 600,
+                              flexShrink: 0,
+                              fontSize: '12px',
+                              lineHeight: '24px'
+                            },
+                            '& > *:last-of-type': {
+                              flexGrow: 1,
+                              fontWeight: 400,
+                              fontSize: '12px',
+                              lineHeight: '24px'
+                            }
+                          }}
+                        >
+                          <Typography component="span">{label}</Typography>
+                          <Typography component="span">{value}</Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Grid>
                 </Grid>
-              </Grid>
+              )}
             </Box>
           </Paper>
         </Grid>
@@ -243,9 +259,10 @@ const ServiceDetails = () => {
               <Typography variant="subtitle1">Session Tags</Typography>
             </Box>
 
-            {/* Scrollable content */}
             <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-              {groupedTagsArray.length === 0 ? (
+              {loading ? (
+                <SectionSkeleton lines={4} height={100} spacing={1} />
+              ) : groupedTagsArray.length === 0 ? (
                 <Typography variant="body2" color="textSecondary">
                   No tags found.
                 </Typography>

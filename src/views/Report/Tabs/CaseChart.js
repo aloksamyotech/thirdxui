@@ -4,16 +4,23 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+
 const Chart = () => {
   const [ethnicityData, setEthnicityData] = useState([]);
   const [ageRangePieData, setAgeRangePieData] = useState([]);
   const [ageBarData, setAgeBarData] = useState([0, 0, 0, 0, 0]);
   const [genderData, setGenderData] = useState([0, 0, 0, 0]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getApi(urls.case.fetch)
-      .then((response) => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        const response = await getApi(urls.case.fetch);
         const cases = response.data;
+
         const ethnicityCount = {
           'Black / Black British - Caribbean / African': 0,
           'Asian / Asian British': 0,
@@ -44,12 +51,6 @@ const Chart = () => {
           }
         });
 
-        // const finalEthnicityData = staticEthnicityConfig.map((item) => ({
-        //   id: item.id,
-        //   value: ethnicityCount[item.label],
-        //   label: `${item.label} ${ethnicityCount[item.label]}%`,
-        //   color: item.color
-        // }));
         const finalEthnicityData = staticEthnicityConfig.map((item) => ({
           id: item.id,
           value: ethnicityCount[item.label],
@@ -89,10 +90,8 @@ const Chart = () => {
           label: `${item.label}\n${ageRangeCount[item.label]}%`,
           color: item.color
         }));
-
         setAgeRangePieData(finalAgeRangeData);
 
-        // ===== 3. Age Group Bar Chart Data (with Static Labels) =====
         const barAgeGroupCount = {
           Adults: 0,
           Infants: 0,
@@ -118,7 +117,6 @@ const Chart = () => {
         const finalBarData = barLabels.map((label) => barAgeGroupCount[label] ?? 0);
         setAgeBarData(finalBarData);
 
-        // ===== 4. Gender Count =====
         const genderCount = {
           Male: 0,
           Female: 0,
@@ -136,12 +134,15 @@ const Chart = () => {
         });
 
         const finalGenderBarData = [genderCount.Male, genderCount.Female, genderCount.Binary, genderCount['Not prefer to say']];
-
         setGenderData(finalGenderBarData);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('API Error:', error);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
   const staticEthnicityConfig = [
     { id: 1, label: 'Black / Black British - Caribbean / African', color: '#133144', labelColor: '#fff' },
@@ -179,30 +180,34 @@ const Chart = () => {
           }}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Ethnicity</Typography>
-          <Box sx={{ paddingLeft: '50px' }}>
-            <PieChart
-              series={[
-                {
-                  arcLabel: (item) => item.label,
-                  arcLabelMinAngle: 15,
-                  paddingAngle: 1,
-                  data: ethnicityData,
-                  arcLabelStyle: (item) => ({
-                    fill: item.labelColor,
-                    fontSize: 14
-                  })
-                }
-              ]}
-              width={360}
-              height={340}
-              slotProps={{ legend: { hidden: true } }}
-              sx={{
-                [`& .MuiPieArcLabel-root`]: {
-                  fill: '#fff',
-                  fontSize: '10px'
-                }
-              }}
-            />
+          <Box>
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={300} spacing={1} />
+            ) : (
+              <PieChart
+                series={[
+                  {
+                    arcLabel: (item) => item.label,
+                    arcLabelMinAngle: 15,
+                    paddingAngle: 1,
+                    data: ethnicityData,
+                    arcLabelStyle: (item) => ({
+                      fill: item.labelColor,
+                      fontSize: 14
+                    })
+                  }
+                ]}
+                width={360}
+                height={340}
+                slotProps={{ legend: { hidden: true } }}
+                sx={{
+                  [`& .MuiPieArcLabel-root`]: {
+                    fill: '#fff',
+                    fontSize: '10px'
+                  }
+                }}
+              />
+            )}
           </Box>
         </Box>
       </Grid>
@@ -217,26 +222,30 @@ const Chart = () => {
           }}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Age Range</Typography>
-          <Box sx={{ paddingLeft: '50px' }}>
-            <PieChart
-              series={[
-                {
-                  data: ageRangePieData,
-                  arcLabel: (item) => item.label,
-                  arcLabelMinAngle: 10,
-                  paddingAngle: 1
-                }
-              ]}
-              width={360}
-              height={340}
-              slotProps={{ legend: { hidden: true } }}
-              sx={{
-                [`& .MuiPieArcLabel-root`]: {
-                  fill: '#fff',
-                  fontSize: '14px'
-                }
-              }}
-            />
+          <Box>
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={300} spacing={1} />
+            ) : (
+              <PieChart
+                series={[
+                  {
+                    data: ageRangePieData,
+                    arcLabel: (item) => item.label,
+                    arcLabelMinAngle: 10,
+                    paddingAngle: 1
+                  }
+                ]}
+                width={360}
+                height={340}
+                slotProps={{ legend: { hidden: true } }}
+                sx={{
+                  [`& .MuiPieArcLabel-root`]: {
+                    fill: '#fff',
+                    fontSize: '14px'
+                  }
+                }}
+              />
+            )}
           </Box>
         </Box>
       </Grid>
@@ -250,33 +259,38 @@ const Chart = () => {
           }}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Age Range</Typography>
-
-          <BarChart
-            layout="horizontal"
-            series={[
-              {
-                id: 'bar-series-1',
-                data: ageBarData,
-                color: '#009FC7'
-              }
-            ]}
-            xAxis={[
-              {
-                id: 'x-axis',
-                scaleType: 'linear',
-                label: 'Units of measure'
-              }
-            ]}
-            yAxis={[
-              {
-                id: 'y-axis',
-                scaleType: 'band',
-                data: ['Adults', 'Infants', 'Seniors', 'Kids', 'Anyone']
-              }
-            ]}
-            height={300}
-            margin={{ top: 10, bottom: 30, left: 60, right: 20 }}
-          />
+          <Box>
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={300} spacing={1} />
+            ) : (
+              <BarChart
+                layout="horizontal"
+                series={[
+                  {
+                    id: 'bar-series-1',
+                    data: ageBarData,
+                    color: '#009FC7'
+                  }
+                ]}
+                xAxis={[
+                  {
+                    id: 'x-axis',
+                    scaleType: 'linear',
+                    label: 'Units of measure'
+                  }
+                ]}
+                yAxis={[
+                  {
+                    id: 'y-axis',
+                    scaleType: 'band',
+                    data: ['Adults', 'Infants', 'Seniors', 'Kids', 'Anyone']
+                  }
+                ]}
+                height={300}
+                margin={{ top: 10, bottom: 30, left: 60, right: 20 }}
+              />
+            )}
+          </Box>
         </Box>
       </Grid>
 
@@ -315,32 +329,37 @@ const Chart = () => {
               Total
             </Box>
           </Box>
-
-          <BarChart
-            layout="horizontal"
-            series={[
-              {
-                id: 'bar-series-2',
-                data: genderData,
-                color: '#1B4B66'
-              }
-            ]}
-            xAxis={[
-              {
-                id: 'x-axis',
-                scaleType: 'linear'
-              }
-            ]}
-            yAxis={[
-              {
-                id: 'y-axis',
-                scaleType: 'band',
-                data: ['Male', 'Female', 'Binary', 'Not prefer to say']
-              }
-            ]}
-            height={300}
-            margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
-          />
+          <Box>
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={300} spacing={1} />
+            ) : (
+              <BarChart
+                layout="horizontal"
+                series={[
+                  {
+                    id: 'bar-series-2',
+                    data: genderData,
+                    color: '#1B4B66'
+                  }
+                ]}
+                xAxis={[
+                  {
+                    id: 'x-axis',
+                    scaleType: 'linear'
+                  }
+                ]}
+                yAxis={[
+                  {
+                    id: 'y-axis',
+                    scaleType: 'band',
+                    data: ['Male', 'Female', 'Binary', 'Not prefer to say']
+                  }
+                ]}
+                height={300}
+                margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
+              />
+            )}
+          </Box>
         </Box>
       </Grid>
     </Grid>

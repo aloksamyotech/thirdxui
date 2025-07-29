@@ -7,6 +7,7 @@ import leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 
 const getCoordinates = async (placeName) => {
   const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`);
@@ -15,7 +16,7 @@ const getCoordinates = async (placeName) => {
     return {
       name: placeName,
       lat: parseFloat(data[0].lat),
-      lon: parseFloat(data[0].lon),
+      lon: parseFloat(data[0].lon)
     };
   }
   return null;
@@ -43,16 +44,18 @@ const createCustomIcon = (text) => {
     `,
     className: '',
     iconSize: [40, 45],
-    iconAnchor: [20, 45],
+    iconAnchor: [20, 45]
   });
 };
 
 const Map = () => {
   const [locations, setLocations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLocations = async () => {
       try {
+        setLoading(true);
         const res = await getApi(urls.session.fetch);
         const sessions = res?.data?.allSession || [];
 
@@ -72,7 +75,7 @@ const Map = () => {
                 name,
                 count,
                 lat: geo.lat,
-                lon: geo.lon,
+                lon: geo.lon
               };
             }
             return null;
@@ -83,20 +86,20 @@ const Map = () => {
         setLocations(validCoords);
       } catch (error) {
         console.error('Error fetching session locations:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchLocations();
   }, []);
 
-  const mapCenter = [20.5937, 78.9629]; // Centered at India
+  const mapCenter = [20.5937, 78.9629];
 
   return (
     <Box sx={{ bgcolor: '#fff', borderRadius: '10px', overflow: 'hidden', height: 'auto' }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', p: '20px' }}>
-        <Typography sx={{ fontSize: '16px', lineHeight: '22px' }}>
-          Where We Have Deliver Session?
-        </Typography>
+        <Typography sx={{ fontSize: '16px', lineHeight: '22px' }}>Where We Have Deliver Session?</Typography>
         <Stack direction="row" spacing={1}>
           <Select value="This Week" size="small">
             <MenuItem value="This Week">This Week</MenuItem>
@@ -113,23 +116,27 @@ const Map = () => {
                 <InputAdornment position="end">
                   <SearchIcon />
                 </InputAdornment>
-              ),
+              )
             }}
           />
         </Stack>
       </Stack>
       <Stack>
-        <MapContainer center={mapCenter} zoom={2} style={{ width: '100%', height: '350px' }}>
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-          />
-          {locations.map((loc, index) => (
-            <Marker key={index} position={[loc.lat, loc.lon]} icon={createCustomIcon(loc.count)}>
-              <Popup>{`${loc.name} - ${loc.count} sessions`}</Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        {loading ? (
+          <SectionSkeleton lines={1} variant="rectangular" height={340} spacing={1} />
+        ) : (
+          <MapContainer center={mapCenter} zoom={2} style={{ width: '100%', height: '350px' }}>
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+            />
+            {locations.map((loc, index) => (
+              <Marker key={index} position={[loc.lat, loc.lon]} icon={createCustomIcon(loc.count)}>
+                <Popup>{`${loc.name} - ${loc.count} sessions`}</Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        )}
       </Stack>
     </Box>
   );

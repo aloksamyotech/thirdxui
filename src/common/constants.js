@@ -87,6 +87,8 @@ export const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
+export const colors = ['#FF5733', '#33FF57', '#3357FF', '#F39C12', '#9B59B6', '#1ABC9C', '#E74C3C', '#2ECC71'];
+
 export const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
@@ -145,5 +147,5 @@ export const fieldOptions = [
   'emergencyContact.addressLine2',
   'emergencyContact.country',
   'emergencyContact.town',
-  'emergencyContact.postcode',
+  'emergencyContact.postcode'
 ];

@@ -331,7 +331,7 @@ const CaseDetailsPage = () => {
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Stack direction="row" alignItems="center">
                 <Typography fontWeight="bold" display="flex" alignItems="center">
-                  <IconButton onClick={() => navigate('/case')}>
+                  <IconButton onClick={() => navigate(-1)}>
                     <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
                   </IconButton>
                   {serviceDetails?.name} Case

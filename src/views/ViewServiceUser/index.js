@@ -42,40 +42,41 @@ import { imageUrl } from 'common/urls';
 import './index.css';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import TimelineActivity from 'components/TimelineActivity';
-const timelineData = [
-  {
-    date: '27 Nov 2024',
-    type: 'Survey completed',
-    color: 'error',
-    description: 'Mentee satisfaction form',
-    file: 'Invoices.pdf'
-  },
-  {
-    date: '27 Nov 2024',
-    type: 'Attended a session',
-    color: 'secondary',
-    description: 'Group work – Ether – Sammy Odoi - Soapbox',
-    avatars: ['/avatars/user1.png'],
-    sessionTitle: 'Create a new session',
-    members: '50 members in a sessions'
-  },
-  {
-    date: '27 Nov 2024',
-    type: 'Attended a session',
-    color: 'warning',
-    description: 'Group work – Ether – Sammy Odoi - Soapbox',
-    avatars: ['/avatars/user1.png', '/avatars/user2.png', '/avatars/user3.png'],
-    extraCount: 3,
-    sessionTitle: 'Create a new session',
-    members: '50 members in a sessions'
-  },
-  {
-    date: '27 Nov 2024',
-    type: 'Volunteering Activity',
-    color: 'primary',
-    description: 'Mentee satisfaction form'
-  }
-];
+import moment from 'moment';
+// const timelineData = [
+//   {
+//     date: '27 Nov 2024',
+//     type: 'Survey completed',
+//     color: 'error',
+//     description: 'Mentee satisfaction form',
+//     file: 'Invoices.pdf'
+//   },
+//   {
+//     date: '27 Nov 2024',
+//     type: 'Attended a session',
+//     color: 'secondary',
+//     description: 'Group work – Ether – Sammy Odoi - Soapbox',
+//     avatars: ['/avatars/user1.png'],
+//     sessionTitle: 'Create a new session',
+//     members: '50 members in a sessions'
+//   },
+//   {
+//     date: '27 Nov 2024',
+//     type: 'Attended a session',
+//     color: 'warning',
+//     description: 'Group work – Ether – Sammy Odoi - Soapbox',
+//     avatars: ['/avatars/user1.png', '/avatars/user2.png', '/avatars/user3.png'],
+//     extraCount: 3,
+//     sessionTitle: 'Create a new session',
+//     members: '50 members in a sessions'
+//   },
+//   {
+//     date: '27 Nov 2024',
+//     type: 'Volunteering Activity',
+//     color: 'primary',
+//     description: 'Mentee satisfaction form'
+//   }
+// ];
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -92,7 +93,7 @@ const UserProfileCard = () => {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState('');
   const location = useLocation();
-
+  const [timeLineData, setTimeLineData] = useState();
   const id = location?.state?.id;
   const uniqueid = location?.state?.serialNumber;
 
@@ -113,6 +114,51 @@ const UserProfileCard = () => {
     };
     if (id) {
       fetchUserById();
+    }
+  }, [id]);
+
+  function formatKeyToLabel(key) {
+    return key
+
+      .replace(/([A-Z])/g, ' $1')
+
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  const colors = [
+    '#FF5733', // red-ish
+    '#33FF57', // green-ish
+    '#3357FF', // blue-ish
+    '#F39C12', // orange
+    '#9B59B6', // purple
+    '#1ABC9C', // teal
+    '#E74C3C', // bright red
+    '#2ECC71' // bright green
+  ];
+
+  const getRandomColor = () => {
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  useEffect(() => {
+    const fetchTimeLineData = async () => {
+      const response = await getApi(`${urls.timeline.getTimeLineById}${id}`);
+      const formattedTimeline = response?.data?.timeline?.map((item) => {
+        return {
+          ...item,
+          label: formatKeyToLabel(item.type),
+          dateField: moment(item.dateField).format('DD MMM YYYY'),
+          color: getRandomColor()
+        };
+      });
+
+      setTimeLineData(formattedTimeline);
+    };
+
+    if (id) {
+      fetchTimeLineData();
     }
   }, [id]);
 
@@ -937,7 +983,7 @@ const UserProfileCard = () => {
                 />
 
                 <Grid item xs={9}>
-                  <TimelineActivity timelineData={timelineData} />
+                  <TimelineActivity timelineData={timeLineData} />
                 </Grid>
 
                 <AddItemDialog

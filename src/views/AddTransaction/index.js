@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import { postApi, getApi } from 'common/apiClient';
 
-const AddCaseForm = ({ onCancel }) => {
+const AddCaseForm = ({ onCancel, fetchTransections }) => {
   const navigate = useNavigate();
   const [tabIndex, setTabIndex] = useState(0);
   const [paymentTabComplete, setPaymentTabComplete] = useState(false);
@@ -137,7 +137,7 @@ const AddCaseForm = ({ onCancel }) => {
     } catch (error) {
       toast.error('Submission failed!');
     } finally {
-      fetchData();
+      fetchTransections();
     }
   };
 
@@ -400,11 +400,7 @@ const AddCaseForm = ({ onCancel }) => {
                           size="small"
                           label="Amount Due"
                           {...register('reason', {
-                            required: 'Amount Due is required',
-                            pattern: {
-                              value: /^[0-9]+$/,
-                              message: 'Only numbers allowed'
-                            }
+                            required: 'Amount Due is required'
                           })}
                           error={!!errors.reason}
                           helperText={errors.reason?.message}

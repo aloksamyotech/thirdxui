@@ -192,13 +192,13 @@ const Financial = () => {
       const response = await getApi(
         `${urls.transaction.fetchWithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`
       );
+
       const allTransaction = response?.data?.data || [];
       const pagination = response?.data?.meta || { total: 0 };
       const formattedTransactions = allTransaction?.map((item, index) => {
         const donorName =
-          item?.donorId?.subRole === 'donar_individual'
-            ? `${item?.donorId?.personalInfo?.firstName || ''} ${item?.donorId?.personalInfo?.lastName || ''}`.trim()
-            : item?.donorId?.companyInformation?.companyName;
+          `${item?.donorId?.personalInfo?.firstName || ''} ${item?.donorId?.personalInfo?.lastName || ''}`.trim() ||
+          item?.donorId?.companyInformation?.companyName;
 
         return {
           id: item._id || index,
@@ -238,7 +238,7 @@ const Financial = () => {
   };
   useEffect(() => {
     fetchData();
-  }, [paginationModel]);
+  }, []);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -307,7 +307,7 @@ const Financial = () => {
             </IconButton>
           </Tooltip>
           <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-            <AddCaseForm onCancel={handleClose} />
+            <AddCaseForm onCancel={handleClose} fetchTransections={fetchData} />
           </Dialog>
 
           <Box

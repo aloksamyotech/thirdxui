@@ -10,6 +10,7 @@ import EmailInboundDialog from './InboundDialog';
 import { ROLES } from 'common/constants';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import { toast } from 'react-toastify';
 
 const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
       const res = await getApi(`${urls.case.getCaseServiceUser}${userId}`);
       if (res?.data) {
         navigate('/view-case', { state: { id: res?.data?._id } });
+      } else {
+        toast.error('No case found for user');
       }
     } else if (type === 'donation') {
       navigate('/financial');

@@ -200,9 +200,7 @@ const Mail = () => {
   return (
     <Card sx={{ backgroundColor: '#eef2f6' }}>
       <TabContext value={value}>
-
         <Grid>
-
           <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
             <Tooltip title="Add" arrow>
               <IconButton
@@ -288,7 +286,6 @@ const Mail = () => {
                     }
                   }}
                 />
-
               </TabList>
             </Box>
 
@@ -357,244 +354,229 @@ const Mail = () => {
               onReset={handleReset}
             />
             <Grid item xs={9}>
-              {value === '1' && (<TabPanel
-                value="1"
-              >
-
-                <Card >
-                  <DataGrid
-                    rows={
-                      loading
-                        ? []
-                        : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
-                    }
-                    columns={columns}
-                    rowCount={totalRows}
-                    loading={loading}
-                    pagination
-                    paginationMode="server"
-                    paginationModel={paginationModel}
-                    onPaginationModelChange={setPaginationModel}
-                    onRowSelectionModelChange={(newSelection) => {
-                      setSelectedIds(newSelection);
-                    }}
-                    onRowClick={(row) => {
-                      navigate('/view-mailing-data', { state: { id: row?.id } });
-                    }}
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    rowHeight={65}
-                    getRowId={(row) => row.id}
-                    slots={{
-                      toolbar: () => (
-                        <CustomHeader
-                          entityType="mailingList"
-                          title="Service Users Mailing List"
-                          selectedIds={selectedIds}
-                          enableBulkActions={false}
-                          exportEnabled={true}
-                          extraActions={null}
-                          refetchData={fetchMails}
-                        />
-                      ),
-                      loadingOverlay: () => (
-                        <Box
-                          sx={{
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'self-start',
-                            justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                          }}
-                        >
-                          <SingleRowLoader />
-                        </Box>
-                      ),
-                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
-                    }}
-                    sx={{
-                      '& .MuiDataGrid-columnHeaders': {
-                        display: 'none'
-                      },
-                      '& .MuiDataGrid-cell': {
-                        textAlign: 'left',
-                        fontSize: '14px'
-                      },
-                      '& .MuiDataGrid-row:hover': {
-                        cursor: 'pointer'
+              {value === '1' && (
+                <TabPanel value="1">
+                  <Card>
+                    <DataGrid
+                      rows={
+                        loading
+                          ? []
+                          : rows.map((row, index) => ({
+                              ...row,
+                              sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                            }))
                       }
-                    }}
-                    disableSelectionOnClick
-                  />
-                </Card>
-
-              </TabPanel>
+                      columns={columns}
+                      rowCount={totalRows}
+                      loading={loading}
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      onPaginationModelChange={setPaginationModel}
+                      onRowSelectionModelChange={(newSelection) => {
+                        setSelectedIds(newSelection);
+                      }}
+                      onRowClick={(row) => {
+                        navigate('/view-mailing-data', { state: { id: row?.id } });
+                      }}
+                      pageSizeOptions={[5, 10, 25, 50]}
+                      rowHeight={65}
+                      getRowId={(row) => row.id}
+                      slots={{
+                        toolbar: () => (
+                          <CustomHeader
+                            entityType="mailingList"
+                            title="Service Users Mailing List"
+                            selectedIds={selectedIds}
+                            enableBulkActions={false}
+                            exportEnabled={true}
+                            extraActions={null}
+                            refetchData={fetchMails}
+                          />
+                        ),
+                        loadingOverlay: () => (
+                          <Box
+                            sx={{
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'self-start',
+                              justifyContent: 'center',
+                              backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                            }}
+                          >
+                            <SingleRowLoader />
+                          </Box>
+                        ),
+                        noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
+                      }}
+                      sx={{
+                        '& .MuiDataGrid-columnHeaders': {
+                          display: 'none'
+                        },
+                        '& .MuiDataGrid-cell': {
+                          textAlign: 'left',
+                          fontSize: '14px'
+                        },
+                        '& .MuiDataGrid-row:hover': {
+                          cursor: 'pointer'
+                        }
+                      }}
+                      disableSelectionOnClick
+                    />
+                  </Card>
+                </TabPanel>
               )}
 
-              {value === '2' && (<TabPanel
-                value="2"
-              >
-
-                <Card >
-                  <DataGrid
-                    rows={
-                      loading
-                        ? []
-                        : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
-                    }
-                    columns={columns}
-                    rowCount={totalRows}
-                    loading={loading}
-                    pagination
-                    paginationMode="server"
-                    paginationModel={paginationModel}
-                    onPaginationModelChange={setPaginationModel}
-                    onRowSelectionModelChange={(newSelection) => {
-                      setSelectedIds(newSelection);
-                    }}
-                    onRowClick={(row) => {
-                      navigate('/view-mailing-data', { state: { id: row?.id } });
-                    }}
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    rowHeight={65}
-                    getRowId={(row) => row.id}
-                    slots={{
-                      toolbar: () => (
-                        <CustomHeader
-                          entityType="mailingList"
-                          title="Volunteers Mailing List"
-                          selectedIds={selectedIds}
-                          enableBulkActions={false}
-                          exportEnabled={true}
-                          extraActions={null}
-                          refetchData={fetchMails}
-                        />
-                      ),
-                      loadingOverlay: () => (
-                        <Box
-                          sx={{
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'self-start',
-                            justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                          }}
-                        >
-                          <SingleRowLoader />
-                        </Box>
-                      ),
-                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
-                    }}
-                    sx={{
-                      '& .MuiDataGrid-columnHeaders': {
-                        display: 'none'
-                      },
-                      '& .MuiDataGrid-cell': {
-                        textAlign: 'left',
-                        fontSize: '14px'
-                      },
-                      '& .MuiDataGrid-row:hover': {
-                        cursor: 'pointer'
+              {value === '2' && (
+                <TabPanel value="2">
+                  <Card>
+                    <DataGrid
+                      rows={
+                        loading
+                          ? []
+                          : rows.map((row, index) => ({
+                              ...row,
+                              sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                            }))
                       }
-                    }}
-                    disableSelectionOnClick
-                  />
-                </Card>
-
-              </TabPanel>
+                      columns={columns}
+                      rowCount={totalRows}
+                      loading={loading}
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      onPaginationModelChange={setPaginationModel}
+                      onRowSelectionModelChange={(newSelection) => {
+                        setSelectedIds(newSelection);
+                      }}
+                      onRowClick={(row) => {
+                        navigate('/view-mailing-data', { state: { id: row?.id } });
+                      }}
+                      pageSizeOptions={[5, 10, 25, 50]}
+                      rowHeight={65}
+                      getRowId={(row) => row.id}
+                      slots={{
+                        toolbar: () => (
+                          <CustomHeader
+                            entityType="mailingList"
+                            title="Volunteers Mailing List"
+                            selectedIds={selectedIds}
+                            enableBulkActions={false}
+                            exportEnabled={true}
+                            extraActions={null}
+                            refetchData={fetchMails}
+                          />
+                        ),
+                        loadingOverlay: () => (
+                          <Box
+                            sx={{
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'self-start',
+                              justifyContent: 'center',
+                              backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                            }}
+                          >
+                            <SingleRowLoader />
+                          </Box>
+                        ),
+                        noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
+                      }}
+                      sx={{
+                        '& .MuiDataGrid-columnHeaders': {
+                          display: 'none'
+                        },
+                        '& .MuiDataGrid-cell': {
+                          textAlign: 'left',
+                          fontSize: '14px'
+                        },
+                        '& .MuiDataGrid-row:hover': {
+                          cursor: 'pointer'
+                        }
+                      }}
+                      disableSelectionOnClick
+                    />
+                  </Card>
+                </TabPanel>
               )}
 
-              {value === '3' && (<TabPanel
-                value="3"
-              >
-
-                <Card >
-                  <DataGrid
-                    rows={
-                      loading
-                        ? []
-                        : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
-                    }
-                    columns={columns}
-                    rowCount={totalRows}
-                    loading={loading}
-                    pagination
-                    paginationMode="server"
-                    paginationModel={paginationModel}
-                    onPaginationModelChange={setPaginationModel}
-                    onRowSelectionModelChange={(newSelection) => {
-                      setSelectedIds(newSelection);
-                    }}
-                    onRowClick={(row) => {
-                      navigate('/view-mailing-data', { state: { id: row?.id } });
-                    }}
-                    pageSizeOptions={[5, 10, 25, 50]}
-                    rowHeight={65}
-                    getRowId={(row) => row.id}
-                    slots={{
-                      toolbar: () => (
-                        <CustomHeader
-                          entityType="mailingList"
-                          title="Donors Mailing List"
-                          selectedIds={selectedIds}
-                          enableBulkActions={false}
-                          exportEnabled={true}
-                          extraActions={null}
-                          refetchData={fetchMails}
-                        />
-                      ),
-                      loadingOverlay: () => (
-                        <Box
-                          sx={{
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'self-start',
-                            justifyContent: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                          }}
-                        >
-                          <SingleRowLoader />
-                        </Box>
-                      ),
-                      noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
-                    }}
-                    sx={{
-                      '& .MuiDataGrid-columnHeaders': {
-                        display: 'none'
-                      },
-                      '& .MuiDataGrid-cell': {
-                        textAlign: 'left',
-                        fontSize: '14px'
-                      },
-                      '& .MuiDataGrid-row:hover': {
-                        cursor: 'pointer'
+              {value === '3' && (
+                <TabPanel value="3">
+                  <Card>
+                    <DataGrid
+                      rows={
+                        loading
+                          ? []
+                          : rows.map((row, index) => ({
+                              ...row,
+                              sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                            }))
                       }
-                    }}
-                    disableSelectionOnClick
-                  />
-                </Card>
-
-              </TabPanel>
+                      columns={columns}
+                      rowCount={totalRows}
+                      loading={loading}
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      onPaginationModelChange={setPaginationModel}
+                      onRowSelectionModelChange={(newSelection) => {
+                        setSelectedIds(newSelection);
+                      }}
+                      onRowClick={(row) => {
+                        navigate('/view-mailing-data', { state: { id: row?.id } });
+                      }}
+                      pageSizeOptions={[5, 10, 25, 50]}
+                      rowHeight={65}
+                      getRowId={(row) => row.id}
+                      slots={{
+                        toolbar: () => (
+                          <CustomHeader
+                            entityType="mailingList"
+                            title="Donors Mailing List"
+                            selectedIds={selectedIds}
+                            enableBulkActions={false}
+                            exportEnabled={true}
+                            extraActions={null}
+                            refetchData={fetchMails}
+                          />
+                        ),
+                        loadingOverlay: () => (
+                          <Box
+                            sx={{
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'self-start',
+                              justifyContent: 'center',
+                              backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                            }}
+                          >
+                            <SingleRowLoader />
+                          </Box>
+                        ),
+                        noRowsOverlay: () => (loading ? null : <Box sx={{ padding: 2, textAlign: 'center' }}>No data available.</Box>)
+                      }}
+                      sx={{
+                        '& .MuiDataGrid-columnHeaders': {
+                          display: 'none'
+                        },
+                        '& .MuiDataGrid-cell': {
+                          textAlign: 'left',
+                          fontSize: '14px'
+                        },
+                        '& .MuiDataGrid-row:hover': {
+                          cursor: 'pointer'
+                        }
+                      }}
+                      disableSelectionOnClick
+                    />
+                  </Card>
+                </TabPanel>
               )}
             </Grid>
-
           </Grid>
         </Grid>
-
       </TabContext>
-      <ChooseTypeDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-      />
-
+      <ChooseTypeDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </Card>
   );
 };

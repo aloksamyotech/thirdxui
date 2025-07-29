@@ -42,41 +42,8 @@ import { imageUrl } from 'common/urls';
 import './index.css';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import TimelineActivity from 'components/TimelineActivity';
-
-const timelineData = [
-  {
-    date: '27 Nov 2024',
-    type: 'Survey completed',
-    color: 'error',
-    description: 'Mentee satisfaction form',
-    file: 'Invoices.pdf'
-  },
-  {
-    date: '27 Nov 2024',
-    type: 'Attended a session',
-    color: 'secondary',
-    description: 'Group work – Ether – Sammy Odoi - Soapbox',
-    avatars: ['/avatars/user1.png'],
-    sessionTitle: 'Create a new session',
-    members: '50 members in a sessions'
-  },
-  {
-    date: '27 Nov 2024',
-    type: 'Attended a session',
-    color: 'warning',
-    description: 'Group work – Ether – Sammy Odoi - Soapbox',
-    avatars: ['/avatars/user1.png', '/avatars/user2.png', '/avatars/user3.png'],
-    extraCount: 3,
-    sessionTitle: 'Create a new session',
-    members: '50 members in a sessions'
-  },
-  {
-    date: '27 Nov 2024',
-    type: 'Volunteering Activity',
-    color: 'primary',
-    description: 'Mentee satisfaction form'
-  }
-];
+import moment from 'moment';
+import { colors } from 'common/constants';
 
 const UserProfileCard = () => {
   const navigate = useNavigate();
@@ -91,8 +58,9 @@ const UserProfileCard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState('');
   const location = useLocation();
-  const [groupedTags, setGroupedTags] = useState([]);
+  const [timeLineData, setTimeLineData] = useState();
   const id = location?.state?.id;
   const uniqueid = location?.state?.serialNumber;
 
@@ -101,9 +69,9 @@ const UserProfileCard = () => {
       try {
         const response = await getApi(urls.serviceuser.getById.replace(':userId', id));
         const user = response?.data;
-
         if (user) {
           setUserData(user);
+          setRole(user?.role);
         }
       } catch (error) {
         console.error('Error fetching user by ID:', error);
@@ -116,55 +84,40 @@ const UserProfileCard = () => {
     }
   }, [id]);
 
+  function formatKeyToLabel(key) {
+    return key
+
+      .replace(/([A-Z])/g, ' $1')
+
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  const getRandomColor = () => {
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
   useEffect(() => {
-    const fetchAndGroupTags = async () => {
-      try {
-        const response = await getApi(urls.tag.getAllTags);
-        const allTags = response?.data?.allTags || [];
+    const fetchTimeLineData = async () => {
+      const response = await getApi(`${urls.timeline.getTimeLineById}${id}`);
+      const formattedTimeline = response?.data?.timeline?.map((item) => {
+        return {
+          ...item,
+          label: formatKeyToLabel(item.type),
+          dateField: moment(item.date).format('DD MMM YYYY'),
+          color: getRandomColor()
+        };
+      });
 
-        const combinedData = [
-          ...(userData?.otherInfo?.benificiary ?? []),
-          ...(userData?.otherInfo?.campaigns ?? []),
-          ...(userData?.otherInfo?.eventAttanded ?? []),
-          ...(userData?.otherInfo?.engagement ?? []),
-          ...(userData?.otherInfo?.fundingInterest ?? []),
-          ...(userData?.otherInfo?.fundraisingActivities ?? [])
-        ];
-
-        const allIds = combinedData.map((item) => {
-          const id = typeof item === 'object' && item !== null ? item._id : item;
-          if (!id) {
-            console.warn('⚠️ Invalid ID in item:', item);
-          }
-          return id;
-        });
-
-        const relatedTags = allTags.filter((tag) => allIds.includes(tag._id?.$oid || tag._id));
-
-        const grouped = {};
-        relatedTags.forEach((tag) => {
-          const category = tag.tagCategoryName || 'Uncategorized';
-          if (!grouped[category]) grouped[category] = [];
-          grouped[category].push(tag.name);
-        });
-
-        const formatted = Object.entries(grouped).map(([category, tags]) => ({
-          category,
-          tags
-        }));
-
-        setGroupedTags(formatted);
-      } catch (err) {
-        console.error('❌ Error fetching tags:', err);
-      }
+      setTimeLineData(formattedTimeline);
     };
 
-    if (userData?.otherInfo) {
-      fetchAndGroupTags();
-    } else {
-      console.warn('⛔ userData.otherInfo not found, skipping tag fetch.');
+    if (id) {
+      fetchTimeLineData();
     }
-  }, [userData]);
+  }, [id]);
+
   const createdAt = userData?.createdAt;
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('en-GB', {
@@ -217,11 +170,33 @@ const UserProfileCard = () => {
     setTabValue(newValue);
   };
 
+  const groupedTags = (userData?.otherInfo?.tags || []).reduce((acc, tag) => {
+    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+
+    acc[categoryName].push(tag.name);
+
+    return acc;
+  }, {});
+
+  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+    category,
+    tags
+  }));
+
   const handleSave = (data) => {
     setCaseNoteOpen(false);
   };
 
-  const imagePath = userData?.otherInfo?.file;
+  let imagePath = userData?.otherInfo?.file || '';
+
+  if (imagePath.startsWith('/thirdexDev/thirdxBE/')) {
+    imagePath = imagePath.replace('/thirdexDev/thirdxBE/', '');
+  }
+
   const fullImageUrl = imagePath
     ? imagePath.startsWith('https://')
       ? imagePath
@@ -230,15 +205,7 @@ const UserProfileCard = () => {
 
   const handleBackClick = () => {
     navigate(-1);
-    // if (location.state?.isArchive) {
-    //   navigate('/archives');
-    // } else if (userData?.role === 'volunteer') {
-    //   navigate('/volunteer');
-    // } else {
-    //   navigate('/people');
-    // }
   };
-
   return (
     <>
       <Grid item xs={12}>
@@ -568,12 +535,12 @@ const UserProfileCard = () => {
                         </Box>
 
                         <Grid>
-                          {groupedTags.length === 0 ? (
+                          {groupedTagsArray.length === 0 ? (
                             <Typography variant="body2" color="textSecondary">
                               No tags found.
                             </Typography>
                           ) : (
-                            groupedTags.map((group, idx) => (
+                            groupedTagsArray.map((group, idx) => (
                               <Box
                                 key={idx}
                                 mb={2}
@@ -945,10 +912,8 @@ const UserProfileCard = () => {
                         size="small"
                         onClick={() => setAddItemOpen(true)}
                         sx={{
-                          backgroundColor: '#009fc7',
-                          '&:hover': {
-                            backgroundColor: '#009fc7'
-                          }
+                          backgroundColor: '#009FC7',
+                          padding: '6px 10px'
                         }}
                         endIcon={<AddIcon />}
                       >
@@ -972,10 +937,16 @@ const UserProfileCard = () => {
                 />
 
                 <Grid item xs={9}>
-                  <TimelineActivity timelineData={timelineData} />
+                  <TimelineActivity timelineData={timeLineData} />
                 </Grid>
 
-                <AddItemDialog open={addItemOpen} onClose={() => setAddItemOpen(false)} onSelect={handleSelectItem} />
+                <AddItemDialog
+                  open={addItemOpen}
+                  onClose={() => setAddItemOpen(false)}
+                  onSelect={handleSelectItem}
+                  userId={id}
+                  role={role}
+                />
 
                 <CaseNoteDialog
                   open={caseNoteOpen}

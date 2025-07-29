@@ -3,8 +3,23 @@ import { Grid, Paper, Box, Typography, Chip } from '@mui/material';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-const CaseTagCard = ({ groupedTags, sessionData, caseId }) => {
-  
+const CaseTagCard = ({ sessionData, caseId }) => {
+  const groupedTags = (sessionData?.tags || []).reduce((acc, tag) => {
+    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+
+    if (!acc[categoryName]) {
+      acc[categoryName] = [];
+    }
+
+    acc[categoryName].push(tag.name);
+
+    return acc;
+  }, {});
+
+  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
+    category,
+    tags
+  }));
   return (
     <Paper
       variant="outlined"
@@ -22,12 +37,12 @@ const CaseTagCard = ({ groupedTags, sessionData, caseId }) => {
       </Box>
 
       <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-        {groupedTags.length === 0 ? (
+        {groupedTagsArray.length === 0 ? (
           <Typography variant="body2" color="textSecondary">
             No tags found.
           </Typography>
         ) : (
-          groupedTags.map((group, idx) => (
+          groupedTagsArray.map((group, idx) => (
             <Box
               key={idx}
               mb={2}

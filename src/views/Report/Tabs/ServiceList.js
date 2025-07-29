@@ -1,6 +1,13 @@
-import { Button, Grid, TextField, Typography } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useGridApiContext } from '@mui/x-data-grid';
+import { Button, Grid, IconButton, TextField, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
+import {
+  DataGrid,
+  GridToolbarContainer,
+} from '@mui/x-data-grid';
 import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import flag from '../../../assets/images/Flag_of_India.svg';
@@ -117,6 +124,16 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
       .catch((error) => console.error('Error fetching countries:', error));
   }, []);
   const CustomHeader = () => {
+    const apiRef = useGridApiContext();
+
+    const handleExportCSV = () => {
+      apiRef.current.exportDataAsCsv();
+    };
+
+    const handlePrint = () => {
+      apiRef.current.exportDataAsPrint();
+    };
+
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
         <GridToolbarContainer
@@ -141,21 +158,17 @@ const ServiceList = ({ countryOfOriginFilter, selectedName, status, caseId, date
           >
             Service User Report List
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '200px' }}
-            />
-            <GridToolbarExport />
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <PrintOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handlePrint} />
+            <SaveAltOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handleExportCSV} />
+            <OpenInNewIcon sx={{ cursor: 'pointer' }} onClick={() => window.open(window.location.href, '_blank')} />
           </Box>
         </GridToolbarContainer>
       </Box>
     );
   };
+
   const getAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();

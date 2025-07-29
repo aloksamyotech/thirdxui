@@ -288,25 +288,33 @@ const Chart = () => {
             borderRadius: '12px'
           }}
         >
-          <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>
-            Cases By Gender{' '}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, pt: 2 }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 16 }}>Cases By Gender</Typography>
+
             <Box
-              component="span"
               sx={{
-                fontWeight: 400,
-                fontSize: 14,
-                ml: 2,
-                px: 1,
-                backgroundColor: 'black',
-                borderRadius: 1,
-                color: 'white',
-                marginLeft: '60px'
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5
               }}
             >
-              34
+              <Box
+                sx={{
+                  backgroundColor: '#333',
+                  color: '#fff',
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 1,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  gap: 0.5
+                }}
+              >
+                34
+              </Box>
+              Total
             </Box>
-            Total
-          </Typography>
+          </Box>
 
           <BarChart
             layout="horizontal"

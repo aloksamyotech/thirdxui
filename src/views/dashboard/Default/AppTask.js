@@ -27,6 +27,7 @@ import { urls } from 'common/urls';
 import { getApi, updateApi, updateApiPatch } from 'common/apiClient';
 import AddIcon from '@mui/icons-material/Add';
 import DialogActions from '@mui/material/DialogActions';
+import CloseIcon from '@mui/icons-material/Close';
 
 AppTasks.propTypes = {
   title: PropTypes.string,
@@ -52,6 +53,8 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteTask, setDeleteTask] = useState('');
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+
   const limit = 10;
   const initialTaskState = {
     details: '',
@@ -127,7 +130,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
             })
           : '',
         label: item?.details || '',
-        assignedTo: item?.assignedTo?.userName || 'N/A',
+        assignedTo: item?.assignedTo?.name || 'N/A',
         dueDate: item?.dueDate
           ? new Date(item.dueDate).toLocaleDateString('en-GB', {
               day: '2-digit',
@@ -170,17 +173,28 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
   const handleEditTask = (taskId) => {
     const taskToEdit = myTasks.find((t) => t.id === taskId);
 
+    const assignedToId =
+      typeof taskToEdit.assignedTo === 'object'
+        ? taskToEdit.assignedTo._id
+        : adminList.find((admin) => admin.name.trim().toLowerCase() === taskToEdit.assignedTo.trim().toLowerCase())?._id;
+
+    const matchedAdmin = adminList.find((admin) => admin._id === assignedToId);
+
     setTask({
       details: taskToEdit?.label || '',
-      assignedTo: taskToEdit?.assignedTo?._id || '',
+      assignedTo: assignedToId || '',
       dueDate: taskToEdit?.dueDate ? taskToEdit.dueDate.split('T')[0] : '',
       isCompleted: taskToEdit?.isCompleted || false,
       notification: taskToEdit?.notification || false
     });
 
+    setSelectedAdmin(matchedAdmin || null);
     setSelectedTaskId(taskId);
     setEditMode(true);
     setOpenAddForm(true);
+  };
+  const handleClose = () => {
+    setOpenAddForm(false);
   };
   return (
     <>
@@ -300,8 +314,21 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
           }
         }}
       >
-        <DialogTitle sx={{ px: 3, py: 2, borderBottom: '1px solid #eee' }}>
-          <Typography variant="h6">Edit Task </Typography>
+        <DialogTitle
+          sx={{
+            px: 3,
+            py: 2,
+            borderBottom: '1px solid #eee',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
+          <Typography variant="h6">Edit Task</Typography>
+
+          <IconButton onClick={handleClose} size="small" onPointerDown={(e) => e.stopPropagation()}>
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
 
         <DialogContent sx={{ p: 3, marginTop: '10px' }}>
@@ -326,7 +353,7 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
             >
               {adminList.map((admin) => (
                 <MenuItem key={admin._id} value={admin._id}>
-                  {admin.userName}
+                  {admin.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -334,12 +361,13 @@ export default function AppTasks({ title, subheader, list = [], ...other }) {
               fullWidth
               type="date"
               label="Due Date"
-              value={task.dueDate}
+              value={task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''}
               onChange={handleChange('dueDate')}
               size="small"
               InputLabelProps={{ shrink: true }}
               onPointerDown={(e) => e.stopPropagation()}
             />
+
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
                 <Stack direction="row" alignItems="center" spacing={1}>

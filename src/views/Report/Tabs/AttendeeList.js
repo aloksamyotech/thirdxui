@@ -11,7 +11,10 @@ import { useEffect } from 'react';
 import config from '../../../config';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import CheckIcon from '@mui/icons-material/Check';
-
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useGridApiContext } from '@mui/x-data-grid';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
 const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpenedFilter }) => {
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -73,6 +76,15 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
   ];
 
   const CustomHeader = () => {
+     const apiRef = useGridApiContext();
+
+    const handleExportCSV = () => {
+      apiRef.current.exportDataAsCsv();
+    };
+
+    const handlePrint = () => {
+      apiRef.current.exportDataAsPrint();
+    };
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
         <GridToolbarContainer
@@ -99,15 +111,11 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
             Case Report List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '200px' }}
-            />
-            <GridToolbarExport />
+             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <PrintOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handlePrint} />
+            <SaveAltOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handleExportCSV} />
+            <OpenInNewIcon sx={{ cursor: 'pointer' }} onClick={() => window.open(window.location.href, '_blank')} />
+          </Box>
           </Box>
         </GridToolbarContainer>
       </Box>
@@ -174,7 +182,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
         const lastName = user?.attendee?.personalInfo?.lastName || '';
         const countryName = user?.attendee?.contactInfo?.country || '-';
         const matchedCountry = countriesWithFlags.find((c) => c.label.toLowerCase() === countryName.toLowerCase());
-        const dob = user?.attendee?.personalInfo?.dob;
+        const dob = user?.attendee?.personalInfo?.dateOfBirth;
         const age = dob ? calculateAge(dob) : '-';
         return {
           id: user?._id,

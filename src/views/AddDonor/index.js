@@ -35,6 +35,7 @@ import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
 import { stateStyles } from 'common/constants';
+import { validateFile } from 'utils/filevalidator';
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
@@ -56,16 +57,11 @@ const AddDonorForm = () => {
   const [contactpurpose, setContactpurpose] = useState([]);
   const [reason, setReason] = useState([]);
   const [contactmethod, setContactmethod] = useState([]);
-  const [benificiary, setBenificiary] = useState([]);
-  const [Campaignstag, setCampaignstag] = useState([]);
-  const [engagement, setengagement] = useState([]);
-  const [eventsAttended, seteventsAttended] = useState([]);
-  const [fundingInterests, setfundingInterests] = useState([]);
-  const [fundraisingActivities, setfundraisingActivities] = useState([]);
   const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
     acc[curr._id] = 0;
     return acc;
   }, {});
+  const [allCategory, setAllCategory] = useState([]);
 
   const [purposeStates, setPurposeStates] = useState(initialPurposeStates || {});
 
@@ -91,7 +87,7 @@ const AddDonorForm = () => {
       lastname: editdata?.personalInfo?.lastName || '',
       phone: editdata?.contactInfo?.phone || '',
       mobilePhone: editdata?.contactInfo?.homePhone || '',
-      email: editdata?.contactInfo?.email || '',
+      Contact_email: editdata?.contactInfo?.email || '',
       gender: editdata?.personalInfo?.gender || '',
       dob: editdata?.personalInfo?.dateOfBirth ? dayjs(editdata.personalInfo.dateOfBirth) : null,
       address: editdata?.contactInfo?.addressLine1 || '',
@@ -101,26 +97,25 @@ const AddDonorForm = () => {
       country: editdata?.contactInfo?.country || '',
       riskNotes: editdata?.otherInfo?.description || '',
       file: editdata?.otherInfo?.file || '',
-      Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-      Campaignstag: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-      engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-      eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-      fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
       preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation ? dayjs(editdata.contactPreferences.dateOfConfirmation) : null,
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactemail: editdata?.contactPreferences?.email || '',
       contactNo: editdata?.contactPreferences?.phone || '',
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? true,
-      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
+      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
-      role: 'donor'
+      role: 'donor',
+      beneficiaryTags:
+        editdata?.otherInfo?.tags?.map((tag) => ({
+          categoryId: tag.tagCategoryId._id,
+          tagId: tag._id
+        })) || []
     }
   });
 
@@ -185,65 +180,75 @@ const AddDonorForm = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaignstag(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Donors'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
     };
     fetchTags();
   }, []);
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                label={option.name}
-                {...getTagProps({ index })}
-                key={option._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
   const onSubmit = async (data) => {
@@ -262,41 +267,20 @@ const AddDonorForm = () => {
     fd.append('personalInfo[dateOfBirth]', data.dob ? new Date(data.dob).toISOString() : '');
     fd.append('contactInfo[phone]', data.phone || '');
     fd.append('contactInfo[homePhone]', data.mobilePhone || '');
-    fd.append('contactInfo[email]', data.email || '');
+    fd.append('contactInfo[email]', data.Contact_email || '');
     fd.append('contactInfo[addressLine1]', data.address || '');
     fd.append('contactInfo[addressLine2]', data.address2 || '');
     fd.append('contactInfo[district]', data.district || '');
     fd.append('contactInfo[postcode]', data.pinCode || '');
     fd.append('contactInfo[country]', data.country || '');
     fd.append('otherInfo[description]', data.riskNotes || '');
-    (data.Beneficiary || []).forEach((id) => {
-      fd.append('otherInfo[benificiary][]', id);
-    });
-
-    (data.Campaignstag || []).forEach((id) => {
-      fd.append('otherInfo[campaigns][]', id);
-    });
-
-    (data.engagement || []).forEach((id) => {
-      fd.append('otherInfo[engagement][]', id);
-    });
-
-    (data.eventsAttended || []).forEach((id) => {
-      fd.append('otherInfo[eventAttanded][]', id);
-    });
-
-    (data.fundingInterests || []).forEach((id) => {
-      fd.append('otherInfo[fundingInterest][]', id);
-    });
-
-    (data.fundraisingActivities || []).forEach((id) => {
-      fd.append('otherInfo[fundraisingActivities][]', id);
-    });
     fd.append('otherInfo[restrictAccess]', data.restrictAccess ? 'true' : 'false');
     if (data.preferredContact) {
       fd.append('contactPreferences[preferredMethod]', data.preferredContact);
     }
-
+    (data.beneficiaryTags || []).forEach((tag, index) => {
+      fd.append(`otherInfo[tags][${index}]`, tag.tagId);
+    });
     if (data.contactPurpose && Array.isArray(data.contactPurpose)) {
       data.contactPurpose.forEach((id) => {
         fd.append('contactPreferences[contactPurposes][]', id);
@@ -310,10 +294,11 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
     fd.append('contactPreferences[email]', data.contactemail || '');
     fd.append('contactPreferences[phone]', data.contactNo || '');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', data.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donor]', data.donerTag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
     if (data.Recruitmentcampaign) {
@@ -365,10 +350,9 @@ const AddDonorForm = () => {
   };
   const booleanToState = (value) => {
     if (value === true) return 1;
-    if (value === false) return 2;
-    return 0;
+    if (value === false) return 0;
+    return 2;
   };
-
   useEffect(() => {
     if (editdata) {
       const contactMethods = editdata?.contactPreferences?.contactMethods || {};
@@ -757,7 +741,7 @@ const AddDonorForm = () => {
 
                             <Grid item xs={12} sm={4}>
                               <Controller
-                                name="email"
+                                name="Contact_email"
                                 control={control}
                                 rules={{
                                   required: 'Email is required',
@@ -1012,76 +996,26 @@ const AddDonorForm = () => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2 }}>
-                            <Typography variant="subtitle1" mb={2}>
+                          <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                            <Typography variant="subtitle1" mb={4}>
                               Donor Tag
                             </Typography>
 
                             <Grid container spacing={2}>
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Beneficiary',
-                                  'Beneficiary Information',
-                                  benificiary,
-                                  errors.Beneficiary,
-                                  errors.Beneficiary?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Campaignstag',
-                                  'Campaigns Supported',
-                                  Campaignstag,
-                                  errors.Campaignstag,
-                                  errors.Campaignstag?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'engagement',
-                                  'Engagement',
-                                  engagement,
-                                  errors.engagement,
-                                  errors.engagement?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'eventsAttended',
-                                  'Events Attended',
-                                  eventsAttended,
-                                  errors.eventsAttended,
-                                  errors.eventsAttended?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundingInterests',
-                                  'Funding Interests',
-                                  fundingInterests,
-                                  errors.fundingInterests,
-                                  errors.fundingInterests?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundraisingActivities',
-                                  'Fundraising Activities',
-                                  fundraisingActivities,
-                                  errors.fundraisingActivities,
-                                  errors.fundraisingActivities?.message,
-                                  control
-                                )}
+                              <Grid container spacing={2}>
+                                {allCategory?.map((category, index) => (
+                                  <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                                    {renderAutocomplete(
+                                      `Beneficiary.${index}`,
+                                      category.name,
+                                      category.tags,
+                                      errors?.Beneficiary?.[index],
+                                      errors?.Beneficiary?.[index]?.message,
+                                      control,
+                                      category._id
+                                    )}
+                                  </Grid>
+                                ))}
                               </Grid>
                             </Grid>
                           </Paper>
@@ -1100,6 +1034,9 @@ const AddDonorForm = () => {
                               <Controller
                                 name="file"
                                 control={control}
+                                rules={{
+                                  validate: (file) => validateFile(file)
+                                }}
                                 render={({ field }) => (
                                   <TextField
                                     variant="outlined"
@@ -1132,34 +1069,15 @@ const AddDonorForm = () => {
                                               accept="image/jpeg,image/png,image/jpg"
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0];
-                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                                if (file) {
-                                                  if (!allowedTypes.includes(file.type)) {
-                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  if (file.size > maxSizeInBytes) {
-                                                    toast.error('File size must be less than or equal to 25MB.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  field.onChange(file);
-                                                } else {
-                                                  field.onChange(null);
-                                                }
+                                                field.onChange(file);
                                               }}
                                             />
                                           </Button>
                                         </InputAdornment>
                                       )
                                     }}
+                                    error={!!errors.file}
+                                    helperText={errors.file?.message}
                                   />
                                 )}
                               />
@@ -1188,7 +1106,7 @@ const AddDonorForm = () => {
                                 <TextField
                                   label="Notes"
                                   multiline
-                                  minRows={11}
+                                  minRows={13}
                                   fullWidth
                                   variant="outlined"
                                   sx={{ mb: 2 }}

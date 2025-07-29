@@ -33,11 +33,10 @@ const CommonConfirmDialog = ({
           <IconTrash fontSize="small" />
         </IconButton>
       </Box>
-      <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>Are you sure?</DialogTitle>
+      <DialogTitle sx={{ textAlign: 'center', fontWeight: 600, fontSize: 20, color: '#053046' }}>{title}</DialogTitle>
       <DialogContent>
         <Typography align="center" sx={{ fontSize: 14, color: '#0a344a', mb: '-9px' }}>
-          You want to delete this profile {'"Name"'}. <br />
-          This action can not be undone.
+          {content}
         </Typography>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>

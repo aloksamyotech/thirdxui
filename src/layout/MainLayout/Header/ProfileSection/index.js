@@ -117,7 +117,7 @@ const ProfileSection = () => {
     fetchTask();
     fetchAdmin();
   }, []);
-  const filteredTasks = taskList.filter((task) => task?.assignedTo?.userName?.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredTasks = taskList.filter((task) => task?.assignedTo?.name?.toLowerCase().includes(searchTerm.toLowerCase()));
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
@@ -512,15 +512,17 @@ const ProfileSection = () => {
               <Typography fontWeight={600} mb={1}>
                 Assigned To
               </Typography>
+
               <Autocomplete
                 size="small"
                 options={adminList}
-                getOptionLabel={(option) => option?.userName}
+                getOptionLabel={(option) => option?.name || ''}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                value={adminList.find((admin) => admin._id === task.assignedTo) || null}
                 onChange={(event, value) => {
                   setTask((prev) => ({ ...prev, assignedTo: value ? value._id : '' }));
                 }}
                 renderInput={(params) => <TextField {...params} />}
-                defaultValue={null}
               />
             </div>
 

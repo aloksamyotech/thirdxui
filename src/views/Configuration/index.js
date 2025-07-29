@@ -26,6 +26,7 @@ import { IconTrash, IconPencil } from '@tabler/icons';
 import CommonConfirmDialog from '../../components/deleteDialog';
 
 const defaultTabTypes = [
+  'Form Types',
   'Contact Types',
   'Referral Types',
   'Contact Purpose',

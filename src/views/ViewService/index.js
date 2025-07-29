@@ -83,14 +83,14 @@ const ViewService = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await getApi(urls.serviceuser.getAllServicesUser);
-        const users = response.data.allUser || [];
+        const response = await getApi(urls.login.getAllAdmin);
+        const users = response.data.allAdmins || [];
 
         const activeUsers = users.filter((user) => user.isActive);
 
         const formattedLeads = activeUsers.map((user) => ({
           value: user._id,
-          label: `${user.personalInfo?.firstName?.trim()} ${user.personalInfo?.lastName?.trim() || ''}`.trim()
+          label: user.name
         }));
 
         setSessionLeads(formattedLeads);

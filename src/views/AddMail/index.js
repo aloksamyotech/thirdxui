@@ -11,13 +11,16 @@ import {
   MenuItem,
   IconButton,
   Box,
-  Paper
+  Paper,
+  FormControl,
+  InputLabel,
+  FormHelperText
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AntSwitch from 'components/AntSwitch.js';
 import { useForm, Controller } from 'react-hook-form';
 import { postApi, getApi } from 'common/apiClient';
@@ -25,11 +28,16 @@ import toast from 'react-hot-toast';
 import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import { Autocomplete } from '@mui/material';
+import { channelOptions, fieldOptions } from 'common/constants';
 
 const MailingListForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsloading] = useState(false);
   const [tagOptions, setTagOptions] = useState([]);
+  const [contactPurposeEntry, setContactPurposeEntry] = useState([]);
+
+  const location = useLocation();
+  const userType = location?.state?.subRole;
 
   const {
     handleSubmit,
@@ -40,8 +48,8 @@ const MailingListForm = () => {
   } = useForm({
     mode: 'all',
     defaultValues: {
-      listName: '',
-      tags: '',
+      userType,
+      tags: [],
       channelSettings: '',
       purposeSettings: '',
       includeArchived: false
@@ -51,7 +59,7 @@ const MailingListForm = () => {
   const [filters, setFilters] = useState([
     {
       id: 1,
-      logic: 'AND',
+      operator_to_next: 'AND',
       field: '',
       comparison: '',
       value: '',
@@ -68,20 +76,20 @@ const MailingListForm = () => {
       prev.map((f) =>
         f.id === id
           ? {
-              ...f,
-              [field]: value,
-              errors: {
-                ...f.errors,
-                [field]: false
-              }
+            ...f,
+            [field]: value,
+            errors: {
+              ...f.errors,
+              [field]: false
             }
+          }
           : f
       )
     );
   };
 
   const addFilter = () => {
-    setFilters([...filters, { id: Date.now(), logic: 'AND', field: '', comparison: '', value: '' }]);
+    setFilters([...filters, { id: Date.now(), operator_to_next: 'AND', field: '', comparison: '', value: '' }]);
   };
 
   const removeFilter = (id) => {
@@ -98,8 +106,19 @@ const MailingListForm = () => {
     }
   };
 
+  const fetchContactPurposes = async () => {
+    try {
+      const res = await getApi(urls.configuration.fetch);
+      const options = res?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+      setContactPurposeEntry(options || []);
+    } catch (err) {
+      console.error('Error fetching contact purposes:', err);
+    }
+  };
+
   useEffect(() => {
     fetchtTagData();
+    fetchContactPurposes();
   }, []);
 
   const onSubmit = async (data) => {
@@ -224,11 +243,14 @@ const MailingListForm = () => {
               rules={{ required: 'This field is required' }}
               render={({ field, fieldState }) => (
                 <Autocomplete
-                  {...field}
+                  multiple
                   options={tagOptions || []}
                   getOptionLabel={(option) => option?.name || ''}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
-                  onChange={(_, value) => field.onChange(value)}
+                  value={tagOptions.filter(opt => field.value?.includes(opt._id)) || []}
+                  onChange={(_, selectedOptions) =>
+                    field.onChange(selectedOptions.map(opt => opt._id))
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -247,7 +269,25 @@ const MailingListForm = () => {
             <Controller
               name="channelSettings"
               control={control}
-              render={({ field }) => <TextField {...field} fullWidth label="List People with any of these channel settings" size="small" />}
+              rules={{ required: 'Please select at least one channel' }}
+              render={({ field, fieldState }) => (
+                <Autocomplete
+                  multiple
+                  options={channelOptions}
+                  value={field.value || []}
+                  onChange={(_, value) => field.onChange(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="List People with any of these channel settings"
+                      size="small"
+                      fullWidth
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    />
+                  )}
+                />
+              )}
             />
           </Grid>
 
@@ -255,7 +295,29 @@ const MailingListForm = () => {
             <Controller
               name="purposeSettings"
               control={control}
-              render={({ field }) => <TextField {...field} fullWidth label="AND any of these purpose settings" size="small" />}
+              rules={{ required: 'Please select at least one purpose' }}
+              render={({ field, fieldState }) => (
+                <Autocomplete
+                  multiple
+                  options={contactPurposeEntry}
+                  getOptionLabel={(option) => option?.name}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  value={contactPurposeEntry.filter(opt => field.value?.includes(opt._id)) || []}
+                  onChange={(_, selectedOptions) =>
+                    field.onChange(selectedOptions.map(opt => opt._id))
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="AND any of these purpose settings"
+                      size="small"
+                      fullWidth
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    />
+                  )}
+                />
+              )}
             />
           </Grid>
 
@@ -288,23 +350,29 @@ const MailingListForm = () => {
                     <Select
                       fullWidth
                       size="small"
-                      value={filter.logic}
-                      onChange={(e) => handleFilterChange(filter.id, 'logic', e.target.value)}
+                      value={filter.operator_to_next}
+                      onChange={(e) => handleFilterChange(filter.id, 'operator_to_next', e.target.value)}
                     >
                       <MenuItem value="AND">AND</MenuItem>
                       <MenuItem value="OR">OR</MenuItem>
                     </Select>
                   </Grid>
                   <Grid item xs={3}>
-                    <TextField
-                      fullWidth
-                      label="Field"
-                      size="small"
-                      value={filter.field}
-                      onChange={(e) => handleFilterChange(filter.id, 'field', e.target.value)}
-                      error={filter.errors?.field}
-                      helperText={filter.errors?.field ? 'Field is required' : ''}
-                    />
+                    <FormControl fullWidth size="small" error={filter.errors?.field}>
+                      <InputLabel>Field</InputLabel>
+                      <Select
+                        value={filter.field}
+                        onChange={(e) => handleFilterChange(filter.id, 'field', e.target.value)}
+                        label="Field"
+                      >
+                        {fieldOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {filter.errors?.field && <FormHelperText>Field is required</FormHelperText>}
+                    </FormControl>
                   </Grid>
                   <Grid item xs={3}>
                     <Select

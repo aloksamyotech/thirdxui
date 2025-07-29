@@ -29,7 +29,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import { urls } from 'common/urls';
-import { getApi, updateApi } from 'common/apiClient';
+import { getApi, updateApiPatch } from 'common/apiClient';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import toast from 'react-hot-toast';
 import config from '../../config';
@@ -48,7 +48,7 @@ const User = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [nameFilterOptions, setNameFilterOptions] = useState([]);
   const [selectedName, setSelectedName] = useState('');
-
+  const [users, setusers] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -59,6 +59,31 @@ const User = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
 
+  const fetchData = async () => {
+    try {
+      const response = await getApi(`${urls.login.getUserswithPagination}?page=${paginationModel.page + 1}&limit=${paginationModel.pageSize}`);
+      const filteredAdmins = response?.data?.data?.map((admin) => ({
+        ...admin,
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.accountType,
+        lastLogin: new Date(admin.createdAt).toLocaleDateString()
+      }));
+
+      setusers(filteredAdmins);
+      setTotalRows(response?.data?.meta?.total); // For server-side pagination
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const columns = [
     {
       field: 'name',
@@ -66,70 +91,42 @@ const User = () => {
       flex: 2,
       renderCell: (params) => (
         <Box>
-          <Typography sx={{ fontWeight: '450' }} mb={1}>
-            {params.row.name || '-'}
-          </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'gray' }}>{params.row.email || '-'}</Typography>
+          <Typography sx={{ color: '#555', fontSize: '14px' }}>{params.row.name || '-'}</Typography>
         </Box>
       )
     },
     {
-      field: 'date',
-      headerName: 'Date',
-      flex: 1.2,
-      valueGetter: (params) => params.value || '-'
+      field: 'email',
+      headerName: 'Email',
+      flex: 2,
+      renderCell: (params) => <Typography sx={{ color: '#555', fontSize: '14px' }}>{params.row.email || '-'}</Typography>
     },
     {
-      field: 'status',
-      headerName: 'Status',
+      field: 'role',
+      headerName: 'Role',
       flex: 1.5,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          icon={params.value === 'Open' ? <CheckIcon sx={{ color: 'gray' }} /> : <LoopIcon sx={{ color: 'gray' }} />}
-          variant="outlined"
-          sx={{
-            borderColor: params.value === 'Open' ? '#808080' : '#808080',
-            backgroundColor: 'transparent',
-            color: params.value === 'Open' ? '#808080' : '#808080'
-          }}
-        />
-      )
+      renderCell: (params) => <Typography sx={{ color: '#555', fontSize: '14px' }}>{params.row.role || '-'}</Typography>
     },
     {
-      field: 'country',
-      headerName: 'Country',
+      field: 'lastLogin',
+      headerName: 'Last Log in',
       flex: 1.5,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {params.row.countryFlag && (
-            <img src={params.row.countryFlag} alt={params.row.country} width="24px" height="16px" style={{ border: '1px solid #ccc' }} />
-          )}
-          <Typography>{params.row.country || '-'}</Typography>
-        </Box>
-      )
-    },
-    {
-      field: 'age',
-      headerName: 'Age',
-      flex: 1,
-      valueGetter: (params) => (params.value != null ? params.value : '-')
+      renderCell: (params) => <Typography sx={{ color: '#666', fontSize: '14px' }}>{params.row.lastLogin || '-'}</Typography>
     },
     {
       field: 'actions',
       headerName: 'Manage',
       flex: 1,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', width: '100%', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <IconButton color="error" size="small" onClick={() => handleDelete(params.row.id)}>
             <IconTrash color="orangered" size={18} />
           </IconButton>
           <IconButton
-            color="error"
             size="small"
             onClick={() => {
-              const fullUser = allData.find((user) => user._id === params.row.id);
-              navigate('/add-user', { state: fullUser });
+              const User = users.find((user) => user._id === params.row.id);
+              navigate('/add-config-user', { state: User });
             }}
           >
             <IconPencil color="orangered" size={18} />
@@ -328,9 +325,9 @@ const User = () => {
   const handleConfirmDelete = async () => {
     if (userIdToDelete) {
       try {
-        await updateApi(urls.serviceuser.deleteUser.replace(':userId', userIdToDelete));
+        await updateApiPatch(urls.login.delete.replace(':adminId', userIdToDelete));
         toast.success('User deleted successfully!');
-        fetchUser();
+        fetchData();
       } catch (error) {
         console.error('Error deleting user:', error);
       } finally {
@@ -355,7 +352,7 @@ const User = () => {
           <Stack direction="row" alignItems="center" justifyContent="space-between" m={1} marginBlock={3}>
             <Tooltip title="Add" arrow>
               <IconButton
-                onClick={() => navigate('/add-user')}
+                onClick={() => navigate('/add-config-user')}
                 sx={{
                   backgroundColor: '#009fc7',
                   borderRadius: '4px',
@@ -424,26 +421,7 @@ const User = () => {
             </Box>
           </Stack>
           <Grid container spacing={2}>
-            <FilterPanel
-              showFilter={showFilter}
-              statuses={statusFilter}
-              statusFilter={status}
-              setStatusFilter={(value) => setStatus(value)}
-              dateAddedFilters={dateAddedFilters}
-              dateOpenedFilter={dateOpenedFilter}
-              setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-              names={nameFilterOptions}
-              nameFilter={selectedName}
-              setNameFilter={setSelectedName}
-              countriesWithFlags={countriesWithFlags}
-              countryOfOriginFilter={countryOfOriginFilter}
-              setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
-              selectedFilters={['nameFilter', 'countryOfOriginFilter', 'dateOpenedFilter', 'statusFilter']}
-              onReset={handleReset}
-              customDateLabel="By Date"
-              onApply={fetchUser}
-            />
-            <Grid item xs={9}>
+            <Grid item xs={12}>
               <TableStyle>
                 <Box width="100%">
                   <Card style={{ height: '100vh' }}>
@@ -451,7 +429,7 @@ const User = () => {
                       rows={
                         loading
                           ? []
-                          : rows.map((row, index) => ({
+                          : users.map((row, index) => ({
                               ...row,
                               sNo: paginationModel.page * paginationModel.pageSize + index + 1
                             }))

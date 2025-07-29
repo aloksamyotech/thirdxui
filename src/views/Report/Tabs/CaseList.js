@@ -1,6 +1,10 @@
 import { Button, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useGridApiContext } from '@mui/x-data-grid';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import SaveAltOutlinedIcon from '@mui/icons-material/SaveAltOutlined';
 import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import flag from '../../../assets/images/Flag_of_India.svg';
@@ -82,6 +86,15 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
   ];
 
   const CustomHeader = () => {
+     const apiRef = useGridApiContext();
+
+    const handleExportCSV = () => {
+      apiRef.current.exportDataAsCsv();
+    };
+
+    const handlePrint = () => {
+      apiRef.current.exportDataAsPrint();
+    };
     return (
       <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
         <GridToolbarContainer
@@ -107,17 +120,12 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
             {' '}
             Case Report List
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              InputProps={{
-                endAdornment: <SearchIcon />
-              }}
-              sx={{ width: '200px' }}
-            />
-            <GridToolbarExport />
+             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <PrintOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handlePrint} />
+            <SaveAltOutlinedIcon sx={{ cursor: 'pointer' }} onClick={handleExportCSV} />
+            <OpenInNewIcon sx={{ cursor: 'pointer' }} onClick={() => window.open(window.location.href, '_blank')} />
           </Box>
+        
         </GridToolbarContainer>
       </Box>
     );
@@ -186,7 +194,7 @@ const CaseList = ({ countryOfOriginFilter, selectedName, status, caseId, dateOpe
           dateClosed: formatDate(user?.caseClosed),
           serviceUser: `${firstName} ${lastName}`.trim() || '',
           service: user?.serviceId?.name || '',
-          owner: user?.serviceType || '',
+          owner: user?.serviceId?.name || '',
           status: user?.isActive === true ? 'Open' : 'Closed',
           ethicity: user?.serviceUserId?.personalInfo?.ethnicity || '-',
           country: countryName,

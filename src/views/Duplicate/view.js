@@ -1,171 +1,120 @@
-import React, { useState } from 'react';
-import { Button, Grid, Stack, Box, Typography, InputBase, IconButton, Checkbox } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-import CallMergeIcon from '@mui/icons-material/CallMerge';
-import { Visibility } from '@mui/icons-material';
-import { IconTrash } from '@tabler/icons';
+import React from 'react';
+import { Box, Typography, Grid, Button, Divider, IconButton } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import CustomHeader from 'components/CustomHeader';
+import { useNavigate, useLocation } from 'react-router-dom';
+import WestIcon from '@mui/icons-material/West';
+import EastIcon from '@mui/icons-material/East';
+import { urls } from 'common/urls';
+import { updateApi } from 'common/apiClient';
+const DuplicateDetails = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { ids, names, emails, phones, dobs, added } = location.state || {};
 
-const Duplicate = () => {
-  const [showFilter, setShowFilter] = useState(true);
-  const [status, setStatus] = useState('');
-  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
-  const [name, setNameFilter] = useState('');
-  const [selectedIds, setSelectedIds] = useState([]);
+  const rowLabelStyle = { fontWeight: 'bold', color: '#555', fontSize: '12px' };
+  const rowDataStyle = { color: '#333', fontSize: '12px' };
 
-  const handleCheckboxChange = (id) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+  const rowLabels = ['Added', 'Name', 'Email', 'Phone', 'Date of Birth'];
+  const rowValues = [added, names, emails, phones, dobs];
+  const handleMerge = async (selectedId) => {
+    const toDeleteIds = ids.filter((id) => id !== selectedId);
+
+    try {
+      for (const id of toDeleteIds) {
+        const res = await updateApi(urls.serviceuser.deleteUser.replace(':userId', id));
+      }
+
+      navigate(-1);
+    } catch (error) {
+      console.error('Error while deleting users:', error);
+    }
   };
 
-  const rows = [
-    {
-      id: 1,
-      userid: 'D-123',
-      name: 'Snow',
-      email: 'bob@gmail.com',
-      dob: '27-03-04',
-      age: '20',
-      country: 'India',
-      gender: 'Male',
-      ethicity: 'Black',
-      no: '1234561234'
-    }
-  ];
-  const columns = [
-    {
-      field: 'name',
-      headerName: 'Name',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.row?.name || '-'}</Typography>
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'no',
-      headerName: 'Phone',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'dob',
-      headerName: 'Date',
-      flex: 1,
-      renderCell: (params) => <Typography>{params?.value || '-'}</Typography>
-    },
-    {
-      field: 'select',
-      headerName: 'View',
-      flex: 1,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <IconButton>
-          <Visibility />
-        </IconButton>
-      )
-    }
-  ];
-
   return (
-    <>
-      <Box>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography fontWeight="600" fontSize="16px" display="flex" alignItems="center">
-            <IconButton onClick={() => navigate('/services')}>
-              <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
-            </IconButton>
-            Duplicates
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#f8f9fa',
-              borderRadius: '30px',
-              paddingLeft: '16px',
-              border: '1px solid #e0e0e0',
-              width: '489px',
-              height: '40px'
-            }}
-          >
-            <InputBase
-              placeholder="Search..."
-              sx={{
-                '& .MuiInputBase-input::placeholder': {
-                  fontSize: '12 px',
-                  opacity: 1
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '14px'
-                },
-                '& .MuiInputLabel-root': {
-                  fontSize: '13px'
-                },
-                '& .MuiInputBase-root.Mui-focused': {
-                  backgroundColor: '#e0e0e0'
-                },
-                flex: 1,
-                color: 'text.primary'
-              }}
-            />
-            <IconButton
-              // onClick={handleFilter}
-              sx={{
-                marginRight: '8px',
-                width: 18,
-                height: 18,
-                cursor: 'pointer'
-              }}
-            >
-              <SearchIcon />
-            </IconButton>
-          </Box>
-        </Stack>
+    <Box sx={{ p: 1 }}>
+      <Typography fontWeight="600" fontSize="12px" display="flex" alignItems="center" mb={2}>
+        <IconButton onClick={() => navigate(-1)}>
+          <KeyboardBackspaceIcon sx={{ fontSize: 16, color: 'black' }} />
+        </IconButton>
+        Duplicates
+      </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Box sx={{ boxShadow: 1, borderRadius: 2, overflow: 'hidden', bgcolor: '#fff' }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                getRowId={(row) => row.id}
-                pagination={false}
-                hideFooterPagination
-                hideFooter
-                components={{
-                  toolbar: () => (
-                    <CustomHeader
-                      entityType="duplicates"
-                      title="Duplicates"
-                      selectedIds={selectedIds}
-                      enableBulkActions={false}
-                      exportEnabled={true}
-                      extraActions={null}
-                    />
-                  )
-                }}
-                sx={{
-                  '& .MuiDataGrid-row': {
-                    borderBottom: '1px solid #ccc'
-                  },
-                  '& .MuiDataGrid-columnHeader': {
-                    backgroundColor: '#f5f5f5'
-                  }
-                }}
-              />
-            </Box>
-          </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={10}>
+          <Box sx={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+            <Grid container sx={{ bgcolor: '#f9f9f9', p: 2 }}>
+              <Grid item xs={3}>
+                <Typography sx={{ fontWeight: 500, fontSize: '12px' }}>
+                  Matched on <strong>Email, Name, DOB</strong>
+                </Typography>
+              </Grid>
+
+              {names.map((_, idx) => (
+                <Grid item xs key={idx}>
+                  <Typography sx={{ fontWeight: 600, fontSize: '12px' }}>Test {String.fromCharCode(65 + idx)}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+            <Divider />
+
+            {rowLabels.map((label, idx) => (
+              <React.Fragment key={idx}>
+                <Grid container sx={{ p: 2 }}>
+                  <Grid item xs={3}>
+                    <Typography sx={rowLabelStyle}>{label}</Typography>
+                  </Grid>
+                  {rowValues[idx].map((value, valueIdx) => (
+                    <Grid item xs key={valueIdx}>
+                      <Typography sx={rowDataStyle}>{value}</Typography>
+                    </Grid>
+                  ))}
+                </Grid>
+                <Divider />
+              </React.Fragment>
+            ))}
+          </Box>
         </Grid>
-      </Box>
-    </>
+
+        <Grid item xs={2}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', marginTop: '40px' }}>
+            <Button variant="outlined" color="inherit" sx={{ fontSize: '0.65rem', width: '120px' }} onClick={() => navigate(-1)}>
+              NO ACTION
+            </Button>
+
+            {ids?.map((id, idx) => (
+              <Button
+                key={id}
+                variant="contained"
+                sx={{
+                  width: '120px',
+                  backgroundColor: '#009FC7',
+                  fontSize: '0.65rem',
+                  mt: 1,
+                  '&:hover': { backgroundColor: '#007FA3' }
+                }}
+                onClick={() => handleMerge(id)}
+              >
+                <EastIcon sx={{ mr: 1 }} fontSize="small" /> MERGE {String.fromCharCode(65 + idx)}
+              </Button>
+            ))}
+
+            <Button
+              variant="contained"
+              sx={{
+                width: '120px',
+                backgroundColor: '#053146',
+                fontSize: '0.65rem',
+                '&:hover': { backgroundColor: '#041F2C' }
+              }}
+              onClick={() => navigate(-1)}
+            >
+              NOT DUPLICATES
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
-export default Duplicate;
+export default DuplicateDetails;

@@ -14,11 +14,7 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import SubmissionDialog from './SubmissionDialog';
 import toast from 'react-hot-toast';
 import { IconTrash } from '@tabler/icons';
-
-const campaignFilter = [
-  { value: 'campaign1', label: 'Campaign 1' },
-  { value: 'campaign2', label: 'Campaign 2' }
-];
+import CommonConfirmDialog from 'components/deleteDialog';
 
 const CustomHeader = () => {
   return (
@@ -54,9 +50,11 @@ const CustomHeader = () => {
 };
 
 const Lead = () => {
-  const [campaign, setCampaignFilter] = useState('');
   const [formType, setFormType] = useState('');
+  const [formTitle, setFormTitle] = useState('');
   const [formTypes, setFormTypes] = useState([]);
+  const [formTitles, setFormTitles] = useState([]);
+  const [dateCreated, setDateCreated] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [rows, setRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,6 +66,7 @@ const Lead = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleOpenDialog = (params) => {
     setSelectedRowId(params.row.id);
@@ -92,6 +91,7 @@ const Lead = () => {
     getAllResponse();
     toast.success('Submission Rejected');
     setDialogOpen(false);
+    setConfirmOpen(false)
   };
 
   const navigate = useNavigate();
@@ -110,7 +110,13 @@ const Lead = () => {
       queryParams.append('search', searchQuery);
     }
     if (formType) {
-      queryParams.append('search', formType);
+      queryParams.append('type', formType);
+    }
+    if (formTitle) {
+      queryParams.append('title', formTitle);
+    }
+    if (dateCreated) {
+      queryParams.append('createdAt', dateCreated);
     }
     const fromUrl = `${urls?.responses?.submit}?${queryParams.toString()}`;
     const response = await getApi(fromUrl);
@@ -120,9 +126,9 @@ const Lead = () => {
       let data = {
         id: item?._id,
         index: index + 1,
-        type: item?.formId?.title,
+        type: item?.formId?.type,
         campaign: item?.template,
-        title: 'help',
+        title: item?.formId?.title,
         submissionDate,
         status: item?.status
       };
@@ -134,7 +140,7 @@ const Lead = () => {
   };
   useEffect(() => {
     getAllResponse();
-  }, [searchQuery, formType, paginationModel]);
+  }, [searchQuery, formType, paginationModel, formTitle, dateCreated]);
 
   const getFormTypes = async () => {
     const url = `${urls?.responses?.submit}?limit=10000`;
@@ -143,7 +149,12 @@ const Lead = () => {
       value: item?.formId?.title,
       label: item?.formId?.title
     }));
-    setFormTypes(options);
+    const optionsType = response?.data?.data?.map((item) => ({
+      value: item?.formId?.type,
+      label: item?.formId?.type
+    }));
+    setFormTypes(optionsType);
+    setFormTitles(options);
   };
   useEffect(() => {
     getFormTypes();
@@ -164,11 +175,7 @@ const Lead = () => {
       field: 'title',
       headerName: 'Form Display Title',
       flex: 0.8,
-      renderCell: (params) => (
-        <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {/* {params.value} */} Volunteer Form
-        </Typography>
-      )
+      renderCell: (params) => <Chip label={params.value} sx={{ bgcolor: '#e5f8fe', color: '#79dbfb' }} />
     },
     {
       field: 'submissionDate',
@@ -180,43 +187,6 @@ const Lead = () => {
         </Typography>
       )
     },
-    // {
-    //   field: 'campaign',
-    //   headerName: 'Form Campaign',
-    //   flex: 1,
-    //   renderCell: (params) => (
-    //     <Typography variant="body2" sx={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-    //       {/* {params.value} */} Beach cleaning - Corporate volunteer project 2019
-    //     </Typography>
-    //   )
-    // },
-
-    // {
-    //   field: 'status',
-    //   headerName: 'Status',
-    //   flex: 0.8,
-    //   renderCell: (params) => (
-    //     <Button
-    //       size="small"
-    //       variant="contained"
-    //       sx={{
-    //         color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
-    //         backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
-    //         boxShadow: 'none',
-    //         borderRadius: '10px',
-    //         padding: '0px',
-    //         fontWeight: '400',
-    //         '&:hover': {
-    //           color: params?.value === 'PENDING' ? '#ffc107' : params?.value === 'APPROVED' ? '#00c853' : '#d84315',
-    //           backgroundColor: params?.value === 'PENDING' ? '#fff8e1' : params?.value === 'APPROVED' ? '#b9f6ca' : '#fbe9e7',
-    //           boxShadow: 'none'
-    //         }
-    //       }}
-    //     >
-    //       {params?.value || '-'}
-    //     </Button>
-    //   )
-    // },
     {
       field: 'edit',
       headerName: 'Edit',
@@ -226,10 +196,14 @@ const Lead = () => {
       sortable: false,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} />
+          {/* <EditOutlinedIcon sx={{ color: 'red', cursor: 'pointer' }} fontSize="small" onClick={() => handleEdit(params.row)} /> */}
 
           <IconTrash
-            onClick={() => handleTrustAction(params.row)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedRowId(params.row.id);
+              setConfirmOpen(true)
+            }}
             size={18}
             style={{ color: 'red', cursor: 'pointer', verticalAlign: 'middle' }}
           />
@@ -241,9 +215,16 @@ const Lead = () => {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-
   return (
     <>
+      <CommonConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleDecline}
+        content="Are you sure you want to delete ?"
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Grid>
         <Card sx={{ backgroundColor: '#eef2f6' }}>
           <Grid>
@@ -307,9 +288,12 @@ const Lead = () => {
               formTypes={formTypes}
               formType={formType}
               setFormType={setFormType}
-              campaigns={campaignFilter}
-              setCampaignFilter={setCampaignFilter}
-              selectedFilters={['formType', 'campaignFilter']}
+              formTitles={formTitles}
+              formTitle={formTitle}
+              setFormTitle={setFormTitle}
+              dateCreated={dateCreated}
+              setDateCreated={setDateCreated}
+              selectedFilters={['formType', 'formDisplayTitle', 'dateSubmitted']}
             />
 
             <Grid item xs={9}>
@@ -319,9 +303,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                          ...row,
-                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                        }))
+                        ...row,
+                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                      }))
                   }
                   columns={columns}
                   loading={loading}

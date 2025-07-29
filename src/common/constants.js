@@ -12,29 +12,29 @@ export const ROLES = {
 };
 
 export const entityTypeMap = {
-    'Service user': 'service_user',
-    Volunteer: 'volunteer',
-    Service: 'services',
-    Case: 'cases',
-    Donor: 'donor',
-    'Mailing List': 'mailing_list',
-    Donation: 'donation',
-    Form: 'form'
-  };
+  'Service user': 'service_user',
+  Volunteer: 'volunteer',
+  Service: 'services',
+  Case: 'cases',
+  Donor: 'donor',
+  'Mailing List': 'mailing_list',
+  Donation: 'donation',
+  Form: 'form'
+};
 export const sessionNames = [
-    { value: 'sessionA', label: 'Session A' },
-    { value: 'sessionB', label: 'Session B' }
-  ];
+  { value: 'sessionA', label: 'Session A' },
+  { value: 'sessionB', label: 'Session B' }
+];
 export const listTypeFilter = [
-    { value: 'Service user', label: 'Service user' },
-    { value: 'Volunteer', label: 'Volunteer ' },
-    { value: 'Service', label: 'Service ' },
-    { value: 'Case', label: 'Case' },
-    { value: 'Donor', label: 'Donor' },
-    { value: 'Mailing List', label: 'Mailing List' },
-    { value: 'Donation', label: 'Donation' },
-    { value: 'Form', label: 'Form' }
-  ];
+  { value: 'Service user', label: 'Service user' },
+  { value: 'Volunteer', label: 'Volunteer ' },
+  { value: 'Service', label: 'Service ' },
+  { value: 'Case', label: 'Case' },
+  { value: 'Donor', label: 'Donor' },
+  { value: 'Mailing List', label: 'Mailing List' },
+  { value: 'Donation', label: 'Donation' },
+  { value: 'Form', label: 'Form' }
+];
 export const ethnicityOptions = [
   'Arabic or North African',
   'Asian or Asian British – Indian',
@@ -87,9 +87,65 @@ export const dateAddedFilters = [
   { value: 'year', label: 'Last 1 Year' }
 ];
 
+export const colors = ['#FF5733', '#33FF57', '#3357FF', '#F39C12', '#9B59B6', '#1ABC9C', '#E74C3C', '#2ECC71'];
+
 export const statusFilter = [
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' }
 ];
 
-export const TagCategoryAppliedToOptions = ['Service Users', 'Staff', 'Volunteers', 'Donors'];
+export const TagCategoryAppliedToOptions = ['Service Users', 'Volunteers', 'Services', 'Cases', 'Donors', 'Session'];
+
+export const accountTypes = [
+  { label: 'Admin', value: 'admin' },
+  { label: 'User', value: 'user' }
+];
+
+export const permissionsList = [
+  { label: 'People', key: 'people' },
+  { label: 'Cases', key: 'cases' },
+  { label: 'Services', key: 'services' },
+  { label: 'Forms', key: 'forms' },
+  { label: 'Donor management', key: 'donorManagement' },
+  { label: 'Mailing List', key: 'mailingList' }
+];
+
+export const channelOptions = ['telephone', 'email', 'letter', 'sms', 'whatsapp', 'donorTag'];
+
+export const fieldOptions = [
+  // Personal Info
+  'personalInfo.firstName',
+  'personalInfo.lastName',
+  'personalInfo.title',
+  'personalInfo.gender',
+  'personalInfo.dateOfBirth',
+  'personalInfo.nickName',
+  'personalInfo.ethnicity',
+
+  // Contact Info
+  'contactInfo.homePhone',
+  'contactInfo.phone',
+  'contactInfo.email',
+  'contactInfo.addressLine1',
+  'contactInfo.addressLine2',
+  'contactInfo.town',
+  'contactInfo.district',
+  'contactInfo.postcode',
+  'contactInfo.country',
+  'contactInfo.firstLanguage',
+
+  // Emergency Contact
+  'emergencyContact.firstName',
+  'emergencyContact.lastName',
+  'emergencyContact.title',
+  'emergencyContact.gender',
+  'emergencyContact.relationshipToUser',
+  'emergencyContact.homePhone',
+  'emergencyContact.phone',
+  'emergencyContact.email',
+  'emergencyContact.addressLine1',
+  'emergencyContact.addressLine2',
+  'emergencyContact.country',
+  'emergencyContact.town',
+  'emergencyContact.postcode'
+];

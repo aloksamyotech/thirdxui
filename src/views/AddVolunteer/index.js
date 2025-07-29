@@ -38,6 +38,7 @@ import dayjs from 'dayjs';
 import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
+import { validateFile } from 'utils/filevalidator';
 
 const stateStyles = [
   { color: '#E9B867', icon: '?' },
@@ -69,6 +70,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [allCategory, setAllCategory] = useState([]);
+
   const location = useLocation();
   const initialPurposeStates = contactpurpose?.reduce((acc, curr) => {
     acc[curr._id] = 0;
@@ -122,12 +125,6 @@ const AddCaseForm = ({ onCancel }) => {
       otherId: editdata?.contactInfo?.otherId || '',
       riskNotes: editdata?.otherInfo?.description || '',
       file: editdata?.otherInfo?.file || '',
-      Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-      Campaigns: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-      engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-      eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-      fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
       restrictAccess: editdata?.otherInfo?.restrictAccess || false,
       title: editdata?.emergencyContact?.title || '',
       gender: editdata?.emergencyContact?.gender || '',
@@ -146,11 +143,16 @@ const AddCaseForm = ({ onCancel }) => {
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
       confirmationDate: editdata?.contactPreferences?.dateOfConfirmation || null,
-      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
-      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true
+      telephone: editdata?.contactPreferences?.contactMethods?.telephone ?? false,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
+      beneficiaryTags:
+        editdata?.otherInfo?.tags?.map((tag) => ({
+          categoryId: tag.tagCategoryId._id,
+          tagId: tag._id
+        })) || []
     }
   });
 
@@ -174,20 +176,42 @@ const AddCaseForm = ({ onCancel }) => {
         }
 
         if (editdata.contactPreferences.contactMethods) {
-          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? true);
-          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? true);
-          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? true);
-          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? true);
+          setValue('telephone', editdata.contactPreferences.contactMethods.telephone ?? false);
+          setValue('emailConsent', editdata.contactPreferences.contactMethods.email ?? false);
+          setValue('sms', editdata.contactPreferences.contactMethods.sms ?? false);
+          setValue('whatsapp', editdata.contactPreferences.contactMethods.whatsapp ?? false);
+          setValue('letter', editdata.contactPreferences.contactMethods.letter ?? false);
         }
       }
     }
   }, [editdata, setValue]);
 
-  const restrictAccessValue = watch('restrictAccess');
-  const telephoneValue = watch('telephone');
-  const emailConsentValue = watch('emailConsent');
-  const smsValue = watch('sms');
-  const whatsappValue = watch('whatsapp');
+  useEffect(() => {
+    Object.entries(contactMethodStates).forEach(([label, state]) => {
+      const isSelected = state === 1;
+      setValue(label.toLowerCase(), isSelected);
+    });
+  }, [contactMethodStates, setValue]);
+  useEffect(() => {
+    if (editdata?.contactPreferences?.contactMethods) {
+      const methods = editdata.contactPreferences.contactMethods;
+
+      const updatedStates = {
+        Telephone: methods.telephone ? 1 : 0,
+        Email: methods.email ? 1 : 0,
+        SMS: methods.sms ? 1 : 0,
+        Whatsapp: methods.whatsapp ? 1 : 0,
+        Letter: methods.letter ? 1 : 0
+      };
+
+      setContactMethodStates(updatedStates);
+    }
+  }, [editdata]);
+  useEffect(() => {
+    ['telephone', 'emailConsent', 'sms', 'whatsapp', 'letter'].forEach((field) => {
+      register(field);
+    });
+  }, [register]);
 
   const ethnicityOptions = [
     'Arabic or North African',
@@ -261,65 +285,85 @@ const AddCaseForm = ({ onCancel }) => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaigns(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Volunteers'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
     };
     fetchTags();
   }, []);
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+  useEffect(() => {
+    if (editdata?.otherInfo?.tags && allCategory?.length) {
+      allCategory.forEach((category) => {
+        const categoryTags = editdata.otherInfo.tags
+          .filter((tag) => tag.tagCategoryId?._id === category._id || tag.tagCategoryId === category._id)
+          .map((tag) => category.tags.find((t) => t._id === tag._id))
+          .filter(Boolean);
+        setValue(`Beneficiary.${category._id}`, categoryTags);
+      });
+    }
+  }, [editdata, allCategory, setValue]);
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                label={option.name}
-                {...getTagProps({ index })}
-                key={option._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
   const handleToggle = () => setRestrictAccess(!restrictAccess);
@@ -354,29 +398,6 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactInfo[otherId]', formData.otherId || '');
 
     fd.append('otherInfo[description]', formData.riskNotes || '');
-    (formData.Beneficiary || []).forEach((id) => {
-      fd.append('otherInfo[benificiary][]', id);
-    });
-
-    (formData.Campaigns || []).forEach((id) => {
-      fd.append('otherInfo[campaigns][]', id);
-    });
-
-    (formData.engagement || []).forEach((id) => {
-      fd.append('otherInfo[engagement][]', id);
-    });
-
-    (formData.eventsAttended || []).forEach((id) => {
-      fd.append('otherInfo[eventAttanded][]', id);
-    });
-
-    (formData.fundingInterests || []).forEach((id) => {
-      fd.append('otherInfo[fundingInterest][]', id);
-    });
-
-    (formData.fundraisingActivities || []).forEach((id) => {
-      fd.append('otherInfo[fundraisingActivities][]', id);
-    });
     fd.append('otherInfo[restrictAccess]', formData.restrictAccess ? 'true' : 'false');
 
     fd.append('emergencyContact[firstName]', formData.firstname || '');
@@ -409,7 +430,7 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactPreferences[dateOfConfirmation]', confirmDate ? new Date(confirmDate).toISOString() : '');
 
     fd.append('contactPreferences[contactMethods][telephone]', formData.telephone ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][email]', formData.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', formData.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', formData.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', formData.whatsapp ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', formData.letter ? 'true' : 'false');
@@ -417,11 +438,14 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('role', 'volunteer');
     fd.append('isActive', true);
 
+    (formData.beneficiaryTags || []).forEach((tag, index) => {
+      fd.append(`otherInfo[tags][${index}]`, tag.tagId);
+    });
     if (formData.file) {
       fd.append('file', formData.file || '');
     }
-    if (formData.profileImage) {
-      fd.append('profileImage', formData.profileImage || '');
+    if (formData.personalInfo?.profileImage instanceof File) {
+      fd.append('profileImage', formData.personalInfo.profileImage);
     }
 
     try {
@@ -454,52 +478,6 @@ const AddCaseForm = ({ onCancel }) => {
   const onlyLetterNumberSpace = /^[a-zA-Z0-9 ]+$/;
   const onlyLettersAndNumbers = /^[A-Za-z0-9\s]*$/;
 
-  const tabFieldMap = {
-    0: [
-      'personalInfo.firstName',
-      'personalInfo.lastName',
-      'personalInfo.dateOfBirth',
-      'personalInfo.title',
-      'personalInfo.gender',
-      'personalInfo.ethnicity',
-      'personalInfo.nickName',
-      'homePhone',
-      'phone',
-      'email',
-      'addressLine1',
-      'town',
-      'district',
-      'postcode',
-      'country',
-      'firstLanguage',
-      'otherId',
-
-      'Beneficiary',
-      'Campaigns',
-      'riskNotes',
-      'engagement',
-      'eventsAttended',
-      'fundingInterests',
-      'fundraisingActivities',
-      'restrictAccess'
-    ],
-    1: [
-      'firstName',
-      'lastName',
-      'phone',
-      'title',
-      'gender',
-      'preferred',
-      'emergencyhomePhone',
-      'emergencyphone',
-      'emergencyemail',
-      'emergencyaddress',
-      'emergencycountry',
-      'emergencytown',
-      'emergencypinCode'
-    ],
-    2: ['preferredContact', 'reason', 'contactPurpose', 'confirmDate', 'telephone', 'emailConsent', 'sms', 'letter', 'whatsapp']
-  };
 
   const handleTabChange = (newIndex) => {
     setTabIndex(newIndex);
@@ -533,29 +511,19 @@ const AddCaseForm = ({ onCancel }) => {
   };
 
   useEffect(() => {
-    if (editdata) {
-      const contactMethods = editdata?.contactPreferences?.contactMethods || {};
+    if (contactpurpose?.length && editdata?.contactPreferences?.contactPurposes) {
+      const selectedIds = editdata.contactPreferences.contactPurposes.map((item) => item._id);
 
-      setContactMethodStates({
-        donerTag: booleanToState(contactMethods?.donor),
-        Email: booleanToState(contactMethods?.email),
-        SMS: booleanToState(contactMethods?.sms),
-        Whatsapp: booleanToState(contactMethods?.whatsapp),
-        letter: booleanToState(contactMethods?.letter)
-      });
-    }
-  }, [editdata, reset]);
-
-  useEffect(() => {
-    if (contactpurpose?.length) {
       const initStates = contactpurpose.reduce((acc, item) => {
-        acc[item._id] = 0;
+        acc[item._id] = selectedIds.includes(item._id) ? 1 : 0;
         return acc;
       }, {});
-      setPurposeStates(initStates);
-    }
-  }, [contactpurpose]);
 
+      setPurposeStates(initStates);
+      setValue('contactPurposeStates', initStates);
+      setValue('contactPurpose', selectedIds);
+    }
+  }, [contactpurpose, editdata]);
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -782,14 +750,25 @@ const AddCaseForm = ({ onCancel }) => {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Controller
-                                name="profileImage"
+                                name="personalInfo.profileImage"
                                 control={control}
+                                rules={{
+                                  validate: (file) => validateFile(file)
+                                }}
                                 render={({ field }) => (
                                   <TextField
                                     fullWidth
                                     variant="outlined"
                                     size="small"
-                                    value={field.value ? (typeof field.value === 'object' && field.value.name ? field.value.name : '') : ''}
+                                    value={
+                                      field.value
+                                        ? typeof field.value === 'object'
+                                          ? field.value.name || ''
+                                          : typeof field.value === 'string'
+                                          ? field.value.split('/').pop()
+                                          : ''
+                                        : ''
+                                    }
                                     placeholder="Profile image"
                                     inputProps={{
                                       readOnly: true,
@@ -802,9 +781,13 @@ const AddCaseForm = ({ onCancel }) => {
                                           color: '#7a7b7c',
                                           opacity: 1,
                                           whiteSpace: 'nowrap',
-
+                                          overflow: 'hidden',
                                           textOverflow: 'ellipsis',
-                                          overflow: 'hidden'
+                                          '&::placeholder': {
+                                            fontSize: '12px',
+                                            color: '#7a7b7c',
+                                            opacity: 1
+                                          }
                                         }
                                       }
                                     }}
@@ -819,39 +802,19 @@ const AddCaseForm = ({ onCancel }) => {
                                               accept="image/jpeg,image/png,image/jpg"
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0];
-                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                                if (file) {
-                                                  if (!allowedTypes.includes(file.type)) {
-                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  if (file.size > maxSizeInBytes) {
-                                                    toast.error('File size must be ≤ 25MB.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
-
-                                                  field.onChange(file);
-                                                } else {
-                                                  field.onChange(null);
-                                                }
+                                                field.onChange(file);
                                               }}
                                             />
                                           </IconButton>
                                         </InputAdornment>
                                       )
                                     }}
+                                    error={!!errors?.personalInfo?.profileImage}
+                                    helperText={errors.personalInfo?.profileImage?.message}
                                   />
                                 )}
                               />
                             </Grid>
-
                             <Grid item xs={12}>
                               <Controller
                                 name="personalInfo.dateOfBirth"
@@ -1341,76 +1304,26 @@ const AddCaseForm = ({ onCancel }) => {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                          <Paper elevation={2} sx={{ p: 2 }}>
-                            <Typography variant="subtitle1" mb={2}>
+                          <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                            <Typography variant="subtitle1" mb={4}>
                               Volunteer Tag
                             </Typography>
 
                             <Grid container spacing={2}>
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Beneficiary',
-                                  'Beneficiary Information',
-                                  benificiary,
-                                  errors.Beneficiary,
-                                  errors.Beneficiary?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'Campaigns',
-                                  'Campaigns Supported',
-                                  Campaigns,
-                                  errors.Campaigns,
-                                  errors.Campaigns?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'engagement',
-                                  'Engagement',
-                                  engagement,
-                                  errors.engagement,
-                                  errors.engagement?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'eventsAttended',
-                                  'Events Attended',
-                                  eventsAttended,
-                                  errors.eventsAttended,
-                                  errors.eventsAttended?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundingInterests',
-                                  'Funding Interests',
-                                  fundingInterests,
-                                  errors.fundingInterests,
-                                  errors.fundingInterests?.message,
-                                  control
-                                )}
-                              </Grid>
-
-                              <Grid item xs={12}>
-                                {renderAutocomplete(
-                                  'fundraisingActivities',
-                                  'Fundraising Activities',
-                                  fundraisingActivities,
-                                  errors.fundraisingActivities,
-                                  errors.fundraisingActivities?.message,
-                                  control
-                                )}
+                              <Grid container spacing={2}>
+                                {allCategory?.map((category, index) => (
+                                  <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                                    {renderAutocomplete(
+                                      `Beneficiary.${index}`,
+                                      category.name,
+                                      category.tags,
+                                      errors?.Beneficiary?.[index],
+                                      errors?.Beneficiary?.[index]?.message,
+                                      control,
+                                      category._id
+                                    )}
+                                  </Grid>
+                                ))}
                               </Grid>
                             </Grid>
                           </Paper>
@@ -1429,6 +1342,9 @@ const AddCaseForm = ({ onCancel }) => {
                               <Controller
                                 name="file"
                                 control={control}
+                                rules={{
+                                  validate: (file) => validateFile(file)
+                                }}
                                 render={({ field }) => (
                                   <TextField
                                     variant="outlined"
@@ -1461,34 +1377,36 @@ const AddCaseForm = ({ onCancel }) => {
                                               accept="image/jpeg,image/png,image/jpg"
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0];
-                                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                const maxSizeInBytes = 25 * 1024 * 1024;
+                                                // const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                                // const maxSizeInBytes = 25 * 1024 * 1024;
 
-                                                if (file) {
-                                                  if (!allowedTypes.includes(file.type)) {
-                                                    toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
+                                                // if (file) {
+                                                //   if (!allowedTypes.includes(file.type)) {
+                                                //     toast.error('Only JPG, JPEG, or PNG image files are allowed.');
+                                                //     e.target.value = null;
+                                                //     field.onChange(null);
+                                                //     return;
+                                                //   }
 
-                                                  if (file.size > maxSizeInBytes) {
-                                                    toast.error('File size must be less than or equal to 25MB.');
-                                                    e.target.value = null;
-                                                    field.onChange(null);
-                                                    return;
-                                                  }
+                                                //   if (file.size > maxSizeInBytes) {
+                                                //     toast.error('File size must be less than or equal to 25MB.');
+                                                //     e.target.value = null;
+                                                //     field.onChange(null);
+                                                //     return;
+                                                //   }
 
-                                                  field.onChange(file);
-                                                } else {
-                                                  field.onChange(null);
-                                                }
+                                                field.onChange(file);
+                                                // } else {
+                                                //   field.onChange(null);
+                                                // }
                                               }}
                                             />
                                           </Button>
                                         </InputAdornment>
                                       )
                                     }}
+                                    error={!!errors.file}
+                                    helperText={errors.file?.message}
                                   />
                                 )}
                               />
@@ -2090,7 +2008,6 @@ const AddCaseForm = ({ onCancel }) => {
                           );
                         })}
                       </Box>
-
                       <Grid item xs={12} mb={2}>
                         <Box>
                           <Typography variant="subtitle2" mb={1}>

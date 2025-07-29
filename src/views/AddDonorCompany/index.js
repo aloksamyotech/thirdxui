@@ -35,6 +35,7 @@ import { postApi, updateApiPatch, getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import config from '../../config';
 import { stateStyles } from 'common/constants';
+
 const contactMethodInitial = {
   donerTag: 0,
   Email: 0,
@@ -62,6 +63,8 @@ const AddCaseForm = ({ onCancel }) => {
   const [eventsAttended, seteventsAttended] = useState([]);
   const [fundingInterests, setfundingInterests] = useState([]);
   const [fundraisingActivities, setfundraisingActivities] = useState([]);
+  const [allCategory, setAllCategory] = useState([]);
+
   const location = useLocation();
 
   const subRole = location?.state?.subRole;
@@ -110,12 +113,11 @@ const AddCaseForm = ({ onCancel }) => {
       referrerEmail: editdata?.referrer?.email || '',
       referrerPhone: editdata?.referrer?.phone || '',
       referralType: editdata?.referrer?.referralType || '',
-      donerTag: editdata?.contactPreferences?.contactMethods?.donerTag ?? true,
-      letter: editdata?.contactPreferences?.contactMethods?.letter ?? true,
-      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? true,
-      sms: editdata?.contactPreferences?.contactMethods?.sms ?? true,
-      donortag: editdata?.contactPreferences?.contactMethods?.donortag ?? true,
-      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? true,
+      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
+      letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
+      emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
+      sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
+      whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
       preferredContact: editdata?.contactPreferences?.preferredMethod?._id || '',
       reason: editdata?.contactPreferences?.reason?._id || '',
       contactPurpose: editdata?.contactPreferences?.contactPurposes?._id || '',
@@ -125,13 +127,12 @@ const AddCaseForm = ({ onCancel }) => {
       otherId: editdata?.companyInformation?.otherId || '',
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
-      Beneficiary: editdata?.otherInfo?.benificiary?.map((item) => item._id) || [],
-      Campaignstag: editdata?.otherInfo?.campaigns?.map((item) => item._id) || [],
-      engagement: editdata?.otherInfo?.engagement?.map((item) => item._id) || [],
-      eventsAttended: editdata?.otherInfo?.eventAttanded?.map((item) => item._id) || [],
-      fundingInterests: editdata?.otherInfo?.fundingInterest?.map((item) => item._id) || [],
-      fundraisingActivities: editdata?.otherInfo?.fundraisingActivities?.map((item) => item._id) || [],
-      restrictAccess: editdata?.otherInfo?.restrictAccess || false
+      restrictAccess: editdata?.otherInfo?.restrictAccess || false,
+      beneficiaryTags:
+        editdata?.otherInfo?.tags?.map((tag) => ({
+          categoryId: tag.tagCategoryId._id,
+          tagId: tag._id
+        })) || []
     }
   });
 
@@ -150,6 +151,7 @@ const AddCaseForm = ({ onCancel }) => {
         setCountryList(countries);
       });
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -171,20 +173,10 @@ const AddCaseForm = ({ onCancel }) => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getApi(urls.tag.getAllTags);
-
-        const benificiarydata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Beneficiary Information');
-        setBenificiary(benificiarydata);
-        const Campaignsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Campaigns Supported');
-        setCampaignstag(Campaignsdata);
-        const engagementdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Engagement');
-        setengagement(engagementdata);
-        const eventsAttendeddata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Event Attended');
-        seteventsAttended(eventsAttendeddata);
-        const fundingInterestsdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Funding Interests');
-        setfundingInterests(fundingInterestsdata);
-        const fundraisingActivitiesdata = response?.data?.allTags?.filter((item) => item.tagCategoryName === 'Fundraising Activities');
-        setfundraisingActivities(fundraisingActivitiesdata);
+        const allCategory = await getApi(`${urls.comman.getAllTagData}`, {
+          appliedTo: 'Donors'
+        });
+        setAllCategory(allCategory?.data);
       } catch (error) {
         console.error('Error fetching tags:', error);
       }
@@ -199,45 +191,65 @@ const AddCaseForm = ({ onCancel }) => {
       return { ...prev, [label]: nextState };
     });
   };
-  const renderAutocomplete = (name, label, options, error, helperText, control) => (
+
+  const renderAutocomplete = (name, label, options, error, helperText, control, categoryId) => (
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
-        <Autocomplete
-          multiple
-          options={options}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option._id === value._id}
-          value={options.filter((opt) => field.value?.includes(opt._id)) || []}
-          onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                label={option.name}
-                {...getTagProps({ index })}
-                key={option._id}
-                deleteIcon={
-                  <span
-                    style={{
-                      backgroundColor: '#4C4E6442',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <CloseIcon style={{ color: 'white', fontSize: 16 }} />
-                  </span>
-                }
-              />
-            ))
-          }
-          renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
-        />
-      )}
+      render={({ field }) => {
+        const prefilledTags = (watch('beneficiaryTags') || [])
+          .filter((tag) => tag.categoryId === categoryId)
+          .map((tag) => options.find((opt) => opt._id === tag.tagId))
+          .filter(Boolean);
+
+        return (
+          <Autocomplete
+            multiple
+            options={options || []}
+            getOptionLabel={(option) => option?.name || 'Unknown'}
+            groupBy={(option) => option.categoryName ?? label}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            value={prefilledTags}
+            onChange={(_, selectedOptions) => {
+              const updatedTags = selectedOptions.map((opt) => ({
+                categoryId: categoryId,
+                tagId: opt._id
+              }));
+
+              setValue('beneficiaryTags', [
+                ...(watch('beneficiaryTags') || []).filter((tag) => tag.categoryId !== categoryId),
+                ...updatedTags
+              ]);
+              field.onChange(selectedOptions);
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                  key={option._id}
+                  deleteIcon={
+                    <span
+                      style={{
+                        backgroundColor: '#4C4E6442',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <CloseIcon style={{ color: 'white', fontSize: 16 }} />
+                    </span>
+                  }
+                />
+              ))
+            }
+            renderInput={(params) => <TextField {...params} label={label} size="small" error={!!error} helperText={helperText} fullWidth />}
+          />
+        );
+      }}
     />
   );
   const handleChange = (e) => {
@@ -268,28 +280,8 @@ const AddCaseForm = ({ onCancel }) => {
     fd.append('contactInfo[email]', data.email || '');
 
     fd.append('otherInfo[description]', data.riskNotes || '');
-    (data.Beneficiary || []).forEach((id) => {
-      fd.append('otherInfo[benificiary][]', id);
-    });
-
-    (data.Campaignstag || []).forEach((id) => {
-      fd.append('otherInfo[campaigns][]', id);
-    });
-
-    (data.engagement || []).forEach((id) => {
-      fd.append('otherInfo[engagement][]', id);
-    });
-
-    (data.eventsAttended || []).forEach((id) => {
-      fd.append('otherInfo[eventAttanded][]', id);
-    });
-
-    (data.fundingInterests || []).forEach((id) => {
-      fd.append('otherInfo[fundingInterest][]', id);
-    });
-
-    (data.fundraisingActivities || []).forEach((id) => {
-      fd.append('otherInfo[fundraisingActivities][]', id);
+    (data.beneficiaryTags || []).forEach((tag, index) => {
+      fd.append(`otherInfo[tags][${index}]`, tag.tagId);
     });
     fd.append('otherInfo[restrictAccess]', data.restrictAccess ? 'true' : 'false');
 
@@ -307,13 +299,11 @@ const AddCaseForm = ({ onCancel }) => {
     }
     fd.append('contactPreferences[dateOfConfirmation]', data.confirmationDate || '');
 
-    fd.append('contactPreferences[contactMethods][donortag]', data.donortag ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][email]', data.emailConsent ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][email]', data.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donerTag]', data.donerTag ? 'true' : 'false');
+    fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
-
     fd.append('companyInformation[companyName]', data.companyname || '');
     fd.append('companyInformation[mainContactName]', data.contactname || '');
     fd.append('companyInformation[otherId]', data.otherId || '');
@@ -387,13 +377,11 @@ const AddCaseForm = ({ onCancel }) => {
       return updated;
     });
   };
-
   const booleanToState = (value) => {
     if (value === true) return 1;
-    if (value === false) return 2;
-    return 0;
+    if (value === false) return 0;
+    return 2;
   };
-
   useEffect(() => {
     if (editdata) {
       const contactMethods = editdata?.contactPreferences?.contactMethods || {};
@@ -409,15 +397,21 @@ const AddCaseForm = ({ onCancel }) => {
   }, [editdata, reset]);
 
   useEffect(() => {
-    if (contactpurpose?.length) {
-      const initStates = contactpurpose.reduce((acc, item) => {
-        acc[item._id] = 0;
+    if (editdata?.contactPreferences?.contactPurposes && contactpurpose.length > 0) {
+      const selected = Array.isArray(editdata.contactPreferences.contactPurposes)
+        ? editdata.contactPreferences.contactPurposes.map((p) => p._id || p)
+        : [editdata.contactPreferences.contactPurposes._id || editdata.contactPreferences.contactPurposes];
+
+      const restoredStates = contactpurpose.reduce((acc, item) => {
+        acc[item._id] = selected.includes(item._id) ? 1 : 0;
         return acc;
       }, {});
-      setPurposeStates(initStates);
-    }
-  }, [contactpurpose]);
 
+      setPurposeStates(restoredStates);
+      setValue('contactPurposeStates', restoredStates);
+      setValue('contactPurpose', selected);
+    }
+  }, [editdata, contactpurpose]);
   return (
     <Grid>
       <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -685,6 +679,9 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Controller
                                   name="file"
                                   control={control}
+                                  rules={{
+                                    validate: (file) => validateFile(file)
+                                  }}
                                   render={({ field }) => (
                                     <TextField
                                       variant="outlined"
@@ -717,34 +714,15 @@ const AddCaseForm = ({ onCancel }) => {
                                                 accept="image/jpeg,image/png,image/jpg"
                                                 onChange={(e) => {
                                                   const file = e.target.files?.[0];
-                                                  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                                                  const maxSizeInBytes = 25 * 1024 * 1024;
-
-                                                  if (file) {
-                                                    if (!allowedTypes.includes(file.type)) {
-                                                      toast.error('Only JPG, JPEG, or PNG image files are allowed.');
-                                                      e.target.value = null;
-                                                      field.onChange(null);
-                                                      return;
-                                                    }
-
-                                                    if (file.size > maxSizeInBytes) {
-                                                      toast.error('File size must be less than or equal to 25MB.');
-                                                      e.target.value = null;
-                                                      field.onChange(null);
-                                                      return;
-                                                    }
-
-                                                    field.onChange(file);
-                                                  } else {
-                                                    field.onChange(null);
-                                                  }
+                                                  field.onChange(file);
                                                 }}
                                               />
                                             </Button>
                                           </InputAdornment>
                                         )
                                       }}
+                                      error={!!errors.file}
+                                      helperText={errors.file?.message}
                                     />
                                   )}
                                 />
@@ -765,77 +743,24 @@ const AddCaseForm = ({ onCancel }) => {
                             <Box>
                               <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                  <Paper elevation={2} sx={{ p: 2 }}>
+                                  <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                                     <Typography variant="subtitle1" mb={2}>
                                       Donor Tag
                                     </Typography>
-
                                     <Grid container spacing={2}>
-                                      <Grid item xs={12}>
-                                        {renderAutocomplete(
-                                          'Beneficiary',
-                                          'Beneficiary Information',
-                                          benificiary,
-                                          errors.Beneficiary,
-                                          errors.Beneficiary?.message,
-                                          control
-                                        )}
-                                      </Grid>
-
-                                      <Grid item xs={12}>
-                                        {renderAutocomplete(
-                                          'Campaignstag',
-                                          'Campaigns Supported',
-                                          Campaignstag,
-                                          errors.Campaignstag,
-                                          errors.Campaignstag?.message,
-                                          control
-                                        )}
-                                      </Grid>
-
-                                      <Grid item xs={12}>
-                                        {renderAutocomplete(
-                                          'engagement',
-                                          'Engagement',
-                                          engagement,
-                                          errors.engagement,
-                                          errors.engagement?.message,
-                                          control
-                                        )}
-                                      </Grid>
-
-                                      <Grid item xs={12}>
-                                        {renderAutocomplete(
-                                          'eventsAttended',
-                                          'Events Attended',
-                                          eventsAttended,
-                                          errors.eventsAttended,
-                                          errors.eventsAttended?.message,
-                                          control
-                                        )}
-                                      </Grid>
-
-                                      <Grid item xs={12}>
-                                        {renderAutocomplete(
-                                          'fundingInterests',
-                                          'Funding Interests',
-                                          fundingInterests,
-                                          errors.fundingInterests,
-                                          errors.fundingInterests?.message,
-                                          control
-                                        )}
-                                      </Grid>
-
-                                      <Grid item xs={12}>
-                                        {renderAutocomplete(
-                                          'fundraisingActivities',
-                                          'Fundraising Activities',
-                                          fundraisingActivities,
-                                          errors.fundraisingActivities,
-                                          errors.fundraisingActivities?.message,
-                                          control
-                                        )}
-                                      </Grid>
+                                      {allCategory?.map((category, index) => (
+                                        <Grid item xs={12} key={category._id}>
+                                          {renderAutocomplete(
+                                            `Beneficiary.${index}`,
+                                            category.name,
+                                            category.tags,
+                                            errors?.Beneficiary?.[index],
+                                            errors?.Beneficiary?.[index]?.message,
+                                            control,
+                                            category._id
+                                          )}
+                                        </Grid>
+                                      ))}
                                     </Grid>
                                   </Paper>
                                 </Grid>
@@ -868,7 +793,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <TextField
                                   label="Notes"
                                   multiline
-                                  minRows={14}
+                                  minRows={15}
                                   fullWidth
                                   variant="outlined"
                                   error={!!errors.riskNotes}

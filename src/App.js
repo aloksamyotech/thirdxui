@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Routes from 'routes';
 import themes from 'themes';
 import NavigationScroll from 'layout/NavigationScroll';
+import './themes/print.js';
 
 const App = () => {
   const customization = useSelector((state) => state.customization);

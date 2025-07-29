@@ -10,6 +10,8 @@ import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 
 const SessionItem = ({ sessionId, sessionData, id, date, time, title, description, summary, presenter, props }) => {
   const navigate = useNavigate();
+  console.log(`sessionId`, sessionId);
+  console.log(`serivce id `, id?._id);
 
   const handleEditClick = () => {
     navigate('/add-session', {

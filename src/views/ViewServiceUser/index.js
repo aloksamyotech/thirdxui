@@ -193,7 +193,7 @@ const UserProfileCard = () => {
 
   let imagePath = userData?.otherInfo?.file || '';
 
-  if (imagePath.startsWith('/thirdexDev/thirdxBE/')) {
+  if (imagePath.startsWith('/thirdexDev/thirdxBE/') || imagePath.startsWith('/thiredx/thirdxBE/')) {
     imagePath = imagePath.replace('/thirdexDev/thirdxBE/', '');
   }
 

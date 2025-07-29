@@ -12,7 +12,7 @@ import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { toast } from 'react-toastify';
 
-const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
+const AddItemDialog = ({ open, onClose, onSelect,fetchTimeLineData, userId, role }) => {
   const navigate = useNavigate();
   const [selectedForm, setSelectedForm] = useState(null);
 
@@ -206,7 +206,7 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
         </Grid>
       </Box>
       {selectedForm === 'giftAidDeclarations' && (
-        <GiftAidDialog open={true} handleClose={() => setSelectedForm(null)} userId={userId} dateLabel={'Gift Aid Declarations'} />
+        <GiftAidDialog open={true} onClose={onClose} fetchTimeLineData={fetchTimeLineData} handleClose={() => setSelectedForm(null)} userId={userId} dateLabel={'Gift Aid Declarations'} />
       )}
       {selectedForm === 'registerAttendance' && <Attendee open={true} handleClose={() => setSelectedForm(null)} userId={userId} />}
       {selectedForm === 'emailInbound' && (
@@ -214,6 +214,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
           open={true}
           handleClose={() => setSelectedForm(null)}
           userId={userId}
+          fetchTimeLineData={fetchTimeLineData}
+          onClose={onClose}
           type="inbound"
           dialogTitle="Email Inbound"
           dateLabel="Email Inbound"
@@ -224,6 +226,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
           open={true}
           handleClose={() => setSelectedForm(null)}
           userId={userId}
+          onClose={onClose}
+          fetchTimeLineData={fetchTimeLineData}
           type="outbound"
           dialogTitle="Email Outbound"
           dateLabel="Email Outbound"
@@ -234,6 +238,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
           open={true}
           handleClose={() => setSelectedForm(null)}
           userId={userId}
+          fetchTimeLineData={fetchTimeLineData}
+          onClose={onClose}
           type="phoneCallInbound"
           dialogTitle="Phone Call Inbound"
           dateLabel="Phone Call Inbound"
@@ -244,6 +250,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
           open={true}
           handleClose={() => setSelectedForm(null)}
           userId={userId}
+          fetchTimeLineData={fetchTimeLineData}
+          onClose={onClose}
           type="phoneCallOutbound"
           dialogTitle="Phone Call Outbound"
           dateLabel="Phone Call Outbound"
@@ -254,6 +262,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
           open={true}
           handleClose={() => setSelectedForm(null)}
           userId={userId}
+          onClose={onClose}
+          fetchTimeLineData={fetchTimeLineData}
           type="letterReceived"
           dialogTitle="Letter Received"
           dateLabel="Letter Received"
@@ -264,6 +274,8 @@ const AddItemDialog = ({ open, onClose, onSelect, userId, role }) => {
           open={true}
           handleClose={() => setSelectedForm(null)}
           userId={userId}
+          onClose={onClose}
+          fetchTimeLineData={fetchTimeLineData}
           type="letterSent"
           dialogTitle="Letter Sent"
           dateLabel="Letter Sent"

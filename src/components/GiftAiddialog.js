@@ -17,7 +17,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { postApi } from 'common/apiClient';
 import { urls } from 'common/urls';
-const GiftAidDialog = ({ open, handleClose, userId }) => {
+const GiftAidDialog = ({ open, handleClose, fetchTimeLineData, onClose, userId }) => {
   const [formData, setFormData] = useState({
     title: '',
     firstName: '',
@@ -38,7 +38,7 @@ const GiftAidDialog = ({ open, handleClose, userId }) => {
   const handleSubmit = async () => {
     try {
       const response = await postApi(`${urls.timeline.giftaidCreate.replace(':id', userId)}`, formData);
-      handleClose();
+      fetchTimeLineData(), onClose(), handleClose();
     } catch (error) {
       console.error('Error creating GiftAid:', error);
     }

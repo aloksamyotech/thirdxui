@@ -98,21 +98,20 @@ const UserProfileCard = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  const fetchTimeLineData = async () => {
+    const response = await getApi(`${urls.timeline.getTimeLineById}${id}`);
+    const formattedTimeline = response?.data?.timeline?.map((item) => {
+      return {
+        ...item,
+        label: formatKeyToLabel(item.type),
+        dateField: moment(item.date).format('DD MMM YYYY'),
+        color: getRandomColor()
+      };
+    });
+
+    setTimeLineData(formattedTimeline);
+  };
   useEffect(() => {
-    const fetchTimeLineData = async () => {
-      const response = await getApi(`${urls.timeline.getTimeLineById}${id}`);
-      const formattedTimeline = response?.data?.timeline?.map((item) => {
-        return {
-          ...item,
-          label: formatKeyToLabel(item.type),
-          dateField: moment(item.date).format('DD MMM YYYY'),
-          color: getRandomColor()
-        };
-      });
-
-      setTimeLineData(formattedTimeline);
-    };
-
     if (id) {
       fetchTimeLineData();
     }
@@ -944,6 +943,7 @@ const UserProfileCard = () => {
                   open={addItemOpen}
                   onClose={() => setAddItemOpen(false)}
                   onSelect={handleSelectItem}
+                  fetchTimeLineData={fetchTimeLineData}
                   userId={id}
                   role={role}
                 />

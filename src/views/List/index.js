@@ -48,6 +48,7 @@ const List = () => {
 
   const handleFilter = async () => {
     try {
+      setLoading(true);
       const queryParams = new URLSearchParams();
 
       if (listName && listName !== '') {
@@ -90,6 +91,8 @@ const List = () => {
       setIsFiltered(true);
     } catch (error) {
       console.error('Failed to fetch filtered lists:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -310,6 +313,7 @@ const List = () => {
                       }))
                 }
                 columns={columns}
+                loading={loading}
                 checkboxSelection
                 onRowSelectionModelChange={(newSelection) => {
                   setSelectedIds(newSelection);

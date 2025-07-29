@@ -89,7 +89,9 @@ const AddCaseForm = ({ onCancel }) => {
     },
     phone: editdata?.contactInfo?.homePhone || '',
     mobilePhone: editdata?.contactInfo?.phone || '',
-    email: editdata?.contactInfo?.email || '',
+    contactInfo: {
+      email: editdata?.contactInfo?.email || ''
+    },
     address: editdata?.contactInfo?.addressLine1 || '',
     address2: editdata?.contactInfo?.addressLine2 || '',
     town: editdata?.contactInfo?.town || '',
@@ -161,7 +163,7 @@ const AddCaseForm = ({ onCancel }) => {
           }
         ]
   };
-
+  console.log('defaultFormValues------------------', defaultFormValues);
   const {
     register,
     handleSubmit,
@@ -413,6 +415,7 @@ const AddCaseForm = ({ onCancel }) => {
   }, [register]);
 
   const onSubmit = async (formData) => {
+    console.log('formData00000000000000000', formData);
     const isValid = await trigger();
     if (!isValid) {
       toast.error('Please fill in all required fields.');
@@ -433,7 +436,7 @@ const AddCaseForm = ({ onCancel }) => {
     }
     fd.append('contactInfo[homePhone]', formData.phone || '');
     fd.append('contactInfo[phone]', formData.mobilePhone || '');
-    fd.append('contactInfo[email]', formData.email || '');
+    fd.append('contactInfo[email]', formData.contactInfo.email || '');
     fd.append('contactInfo[addressLine1]', formData.address || '');
     fd.append('contactInfo[addressLine2]', formData.address2 || '');
     fd.append('contactInfo[town]', formData.town || '');
@@ -1056,7 +1059,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                             <Grid item xs={12} sm={4}>
                               <Controller
-                                name="email"
+                                name="contactInfo.email"
                                 control={control}
                                 rules={{
                                   required: 'Email is required',

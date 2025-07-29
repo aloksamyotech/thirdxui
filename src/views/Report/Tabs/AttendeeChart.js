@@ -6,17 +6,24 @@ import female from '../../../assets/images/female.png';
 import male from '../../../assets/images/male.png';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+
 const Chart = () => {
   const [ethnicityData, setEthnicityData] = useState([]);
   const [ageRangePieData, setAgeRangePieData] = useState([]);
   const [genderBarData, setGenderBarData] = useState([0, 0, 0, 0]);
   const [malePercent, setMalePercent] = useState(0);
   const [femalePercent, setFemalePercent] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getApi(urls.attendees.fetch)
-      .then((response) => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        const response = await getApi(urls.attendees.fetch);
         const attendee = response.data.data;
+
         const ethnicityCount = {
           'Black / Black British - Caribbean / African': 0,
           'Asian / Asian British': 0,
@@ -113,12 +120,16 @@ const Chart = () => {
         setMalePercent(maleP);
         setFemalePercent(femaleP);
 
-        const femalePercent = totalGender ? Math.round((genderCount.Female / totalGender) * 100) : 0;
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching cases:', error);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
   const staticEthnicityConfig = [
     { id: 1, label: 'Black / Black British - Caribbean / African', color: '#133144', labelColor: '#fff' },
     { id: 2, label: 'Asian / Asian British', color: '#86E5FC', labelColor: '#000' },
@@ -140,30 +151,34 @@ const Chart = () => {
           }}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Ethnicity</Typography>
-          <Box sx={{ paddingLeft: '50px' }}>
-            <PieChart
-              series={[
-                {
-                  arcLabel: (item) => item.label,
-                  arcLabelMinAngle: 15,
-                  paddingAngle: 1,
-                  data: ethnicityData,
-                  arcLabelStyle: (item) => ({
-                    fill: item.labelColor,
-                    fontSize: 14
-                  })
-                }
-              ]}
-              width={360}
-              height={340}
-              slotProps={{ legend: { hidden: true } }}
-              sx={{
-                [`& .MuiPieArcLabel-root`]: {
-                  fill: '#fff',
-                  fontSize: '10px'
-                }
-              }}
-            />
+          <Box>
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={300} spacing={1} />
+            ) : (
+              <PieChart
+                series={[
+                  {
+                    arcLabel: (item) => item.label,
+                    arcLabelMinAngle: 15,
+                    paddingAngle: 1,
+                    data: ethnicityData,
+                    arcLabelStyle: (item) => ({
+                      fill: item.labelColor,
+                      fontSize: 14
+                    })
+                  }
+                ]}
+                width={360}
+                height={340}
+                slotProps={{ legend: { hidden: true } }}
+                sx={{
+                  [`& .MuiPieArcLabel-root`]: {
+                    fill: '#fff',
+                    fontSize: '10px'
+                  }
+                }}
+              />
+            )}
           </Box>
         </Box>
       </Grid>
@@ -178,30 +193,33 @@ const Chart = () => {
           }}
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, px: 2, pt: 2 }}>Cases By Age Range</Typography>
-          <Box sx={{ paddingLeft: '50px' }}>
-            <PieChart
-              series={[
-                {
-                  data: ageRangePieData,
-                  arcLabel: (item) => item.label,
-                  arcLabelMinAngle: 10,
-                  paddingAngle: 1
-                }
-              ]}
-              width={360}
-              height={340}
-              slotProps={{ legend: { hidden: true } }}
-              sx={{
-                [`& .MuiPieArcLabel-root`]: {
-                  fill: '#fff',
-                  fontSize: '14px'
-                }
-              }}
-            />
+          <Box>
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={300} spacing={1} />
+            ) : (
+              <PieChart
+                series={[
+                  {
+                    data: ageRangePieData,
+                    arcLabel: (item) => item.label,
+                    arcLabelMinAngle: 10,
+                    paddingAngle: 1
+                  }
+                ]}
+                width={360}
+                height={340}
+                slotProps={{ legend: { hidden: true } }}
+                sx={{
+                  [`& .MuiPieArcLabel-root`]: {
+                    fill: '#fff',
+                    fontSize: '14px'
+                  }
+                }}
+              />
+            )}
           </Box>
         </Box>
       </Grid>
-
       <Grid item xs={6}>
         <Box
           sx={{
@@ -214,53 +232,68 @@ const Chart = () => {
         >
           <Typography sx={{ fontWeight: 600, fontSize: 16, mb: 1 }}>Cases By Age Range</Typography>
 
-          <Box sx={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', mb: 2 }}>
-            <Box sx={{ width: '60%', backgroundColor: '#ff2f92' }} />
-            <Box sx={{ width: '80%', backgroundColor: '#00c7ff' }} />
-          </Box>
-
-          <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
-            <Box sx={{ textAlign: 'center' }}>
+          {loading ? (
+            <SectionSkeleton lines={1} variant="rectangular" height={290} spacing={1} />
+          ) : (
+            <>
               <Box
                 sx={{
-                  width: 150,
-                  height: 150,
-                  borderRadius: '50%',
-                  border: '2px solid #ddd',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  height: 10,
+                  borderRadius: 5,
                   overflow: 'hidden',
-                  mb: 1
+                  mb: 2
                 }}
               >
-                <img src={female} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Box sx={{ width: `${femalePercent}%`, backgroundColor: '#ff2f92' }} />
+                <Box sx={{ width: `${malePercent}%`, backgroundColor: '#00c7ff' }} />
               </Box>
 
-              <Typography sx={{ fontWeight: 600 }}>Female</Typography>
-              <Typography sx={{ color: '#ff2f92', fontWeight: 700 }}>{femalePercent}%</Typography>
-            </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
+                {/* Female Section */}
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      borderRadius: '50%',
+                      border: '2px solid #ddd',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      mb: 1
+                    }}
+                  >
+                    <img src={female} alt="Female Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </Box>
+                  <Typography sx={{ fontWeight: 600 }}>Female</Typography>
+                  <Typography sx={{ color: '#ff2f92', fontWeight: 700 }}>{femalePercent}%</Typography>
+                </Box>
 
-            <Box sx={{ textAlign: 'center' }}>
-              <Box
-                sx={{
-                  width: 150,
-                  height: 150,
-                  borderRadius: '50%',
-                  border: '2px solid #ddd',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  mb: 1
-                }}
-              >
-                <img src={male} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {/* Male Section */}
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      borderRadius: '50%',
+                      border: '2px solid #ddd',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      mb: 1
+                    }}
+                  >
+                    <img src={male} alt="Male Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </Box>
+                  <Typography sx={{ fontWeight: 600 }}>Male</Typography>
+                  <Typography sx={{ color: '#00c7ff', fontWeight: 700 }}>{malePercent}%</Typography>
+                </Box>
               </Box>
-              <Typography sx={{ fontWeight: 600 }}>Male</Typography>
-              <Typography sx={{ color: '#00c7ff', fontWeight: 700 }}>{malePercent}%</Typography>
-            </Box>
-          </Box>
+            </>
+          )}
         </Box>
       </Grid>
 
@@ -300,31 +333,37 @@ const Chart = () => {
             </Box>
           </Box>
 
-          <BarChart
-            layout="horizontal"
-            series={[
-              {
-                id: 'bar-series-gender',
-                data: genderBarData,
-                color: '#1B4B66'
-              }
-            ]}
-            xAxis={[
-              {
-                id: 'x-axis',
-                scaleType: 'linear'
-              }
-            ]}
-            yAxis={[
-              {
-                id: 'y-axis',
-                scaleType: 'band',
-                data: ['Male', 'Female', 'Non-Binary', 'Not prefer to say']
-              }
-            ]}
-            height={300}
-            margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
-          />
+          {loading ? (
+            <Box sx={{ p: 2 }}>
+              <SectionSkeleton lines={1} variant="rectangular" height={260} spacing={1} />
+            </Box>
+          ) : (
+            <BarChart
+              layout="horizontal"
+              series={[
+                {
+                  id: 'bar-series-gender',
+                  data: genderBarData,
+                  color: '#1B4B66'
+                }
+              ]}
+              xAxis={[
+                {
+                  id: 'x-axis',
+                  scaleType: 'linear'
+                }
+              ]}
+              yAxis={[
+                {
+                  id: 'y-axis',
+                  scaleType: 'band',
+                  data: ['Male', 'Female', 'Non-Binary', 'Not prefer to say']
+                }
+              ]}
+              height={300}
+              margin={{ top: 10, bottom: 30, left: 120, right: 20 }}
+            />
+          )}
         </Box>
       </Grid>
     </Grid>

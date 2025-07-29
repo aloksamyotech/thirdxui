@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { getApi } from 'common/apiClient';
 import moment from 'moment';
 import CasePopover from 'components/CasePopover';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 
 const AboutCaseNote = () => {
   const navigate = useNavigate();
@@ -89,61 +90,72 @@ const AboutCaseNote = () => {
             </Typography>
 
             <Box borderBottom={1} borderColor="grey.300" mb={2} mt={2} />
+            {loading ? (
+              <SectionSkeleton lines={1} variant="rectangular" height={150} spacing={1} />
+            ) : (
+              <Grid container spacing={2}>
+                <Grid item xs={6} sx={{ '& > *:not(:last-child)': { mb: '18px' }, maxWidth: '522px' }}>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
+                      Date:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
+                      {caseNoteData?.date ? moment(caseNoteData.caseOpened).format('DD/MM/YYYY') : '-'}
+                    </Box>
+                  </Typography>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
+                      Contact Type:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
+                      {caseNoteData?.configurationId?.name || '-'}
+                    </Box>
+                  </Typography>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
+                      Subject:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
+                      {caseNoteData?.subject || '-'}
+                    </Box>
+                  </Typography>
+                  <Box sx={{ display: 'flex', maxWidth: '500px', alignItems: 'flex-start' }}>
+                    <Box sx={{ fontWeight: 600, fontSize: '12px', minWidth: '80px' }}>Case Note:</Box>
+                    <Typography sx={{ fontWeight: 400, fontSize: '12px' }}>{caseNoteData?.note || '-'}</Typography>
+                  </Box>
+                </Grid>
 
-            <Grid container spacing={2}>
-              <Grid item xs={6} sx={{ '& > *:not(:last-child)': { mb: '18px' }, maxWidth: '522px' }}>
-                <Typography>
-                  <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
-                    Date:
-                  </Box>
-                  <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
-                    {caseNoteData?.date ? moment(caseNoteData.caseOpened).format('DD/MM/YYYY') : '-'}
-                  </Box>
-                </Typography>
-                <Typography>
-                  <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
-                    Contact Type:
-                  </Box>
-                  <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
-                    {caseNoteData?.configurationId?.name || '-'}
-                  </Box>
-                </Typography>
-                <Typography>
-                  <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
-                    Subject:
-                  </Box>
-                  <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
-                    {caseNoteData?.subject || '-'}
-                  </Box>
-                </Typography>
-                <Box sx={{ display: 'flex', maxWidth: '500px', alignItems: 'flex-start' }}>
-                  <Box sx={{ fontWeight: 600, fontSize: '12px', minWidth: '80px' }}>Case Note:</Box>
-                  <Typography sx={{ fontWeight: 400, fontSize: '12px' }}>{caseNoteData?.note || '-'}</Typography>
-                </Box>
+                <Grid item xs={6} sx={{ '& > *:not(:last-child)': { mb: '18px' } }}>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
+                      Total hours:
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{
+                        fontWeight: 400,
+                        fontSize: '12px',
+                        backgroundColor: '#E0F4FF',
+                        color: '#26C6F9',
+                        borderRadius: 3,
+                        p: 0.5,
+                        px: 1
+                      }}
+                    >
+                      {durationInHours.toFixed(2)} hr
+                    </Box>
+                  </Typography>
+                  <Typography>
+                    <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
+                      Attachments:
+                    </Box>
+                    <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
+                      {caseNoteData?.file ? `1 File` : 'No Attachments'}
+                    </Box>
+                  </Typography>
+                </Grid>
               </Grid>
-
-              <Grid item xs={6} sx={{ '& > *:not(:last-child)': { mb: '18px' } }}>
-                <Typography>
-                  <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
-                    Total hours:
-                  </Box>
-                  <Box
-                    component="span"
-                    sx={{ fontWeight: 400, fontSize: '12px', backgroundColor: '#E0F4FF', color: '#26C6F9', borderRadius: 3, p: 0.5, px: 1 }}
-                  >
-                    {durationInHours.toFixed(2)} hr
-                  </Box>
-                </Typography>
-                <Typography>
-                  <Box component="span" sx={{ fontWeight: 600, fontSize: '12px', mr: 1 }}>
-                    Attachments:
-                  </Box>
-                  <Box component="span" sx={{ fontWeight: 400, fontSize: '12px' }}>
-                    {caseNoteData?.file ? `1 File` : 'No Attachments'}
-                  </Box>
-                </Typography>
-              </Grid>
-            </Grid>
+            )}
           </Card>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, gap: 2 }}>

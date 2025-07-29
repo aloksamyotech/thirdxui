@@ -2,24 +2,36 @@ import React from 'react';
 import { Grid, Paper, Box, Typography, Chip } from '@mui/material';
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
+import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
+import { useEffect, useState } from 'react';
 
 const CaseTagCard = ({ sessionData, caseId }) => {
-  const groupedTags = (sessionData?.tags || []).reduce((acc, tag) => {
-    const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+  const [loading, setLoading] = useState(true);
+  const [groupedTagsArray, setGroupedTagsArray] = useState([]);
 
-    if (!acc[categoryName]) {
-      acc[categoryName] = [];
+  useEffect(() => {
+    if (sessionData?.tags?.length > 0) {
+      const grouped = (sessionData.tags || []).reduce((acc, tag) => {
+        const categoryName = tag?.tagCategoryId?.name || 'Uncategorized';
+        if (!acc[categoryName]) {
+          acc[categoryName] = [];
+        }
+        acc[categoryName].push(tag.name);
+        return acc;
+      }, {});
+
+      const groupedArray = Object.entries(grouped).map(([category, tags]) => ({
+        category,
+        tags
+      }));
+
+      setGroupedTagsArray(groupedArray);
+      setLoading(false);
+    } else {
+      setLoading(true);
     }
+  }, [sessionData]);
 
-    acc[categoryName].push(tag.name);
-
-    return acc;
-  }, {});
-
-  const groupedTagsArray = Object.entries(groupedTags ?? {}).map(([category, tags]) => ({
-    category,
-    tags
-  }));
   return (
     <Paper
       variant="outlined"
@@ -37,7 +49,9 @@ const CaseTagCard = ({ sessionData, caseId }) => {
       </Box>
 
       <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
-        {groupedTagsArray.length === 0 ? (
+        {loading ? (
+          <SectionSkeleton lines={4} height={100} spacing={1} />
+        ) : groupedTagsArray.length === 0 ? (
           <Typography variant="body2" color="textSecondary">
             No tags found.
           </Typography>

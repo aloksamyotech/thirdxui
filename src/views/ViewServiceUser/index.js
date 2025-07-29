@@ -194,6 +194,8 @@ const UserProfileCard = () => {
 
   if (imagePath.startsWith('/thirdexDev/thirdxBE/') || imagePath.startsWith('/thiredx/thirdxBE/')) {
     imagePath = imagePath.replace('/thirdexDev/thirdxBE/', '');
+      imagePath = imagePath.replace('/thiredx/thirdxBE/', '/');
+
   }
 
   const fullImageUrl = imagePath

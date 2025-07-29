@@ -159,5 +159,11 @@ export const urls = Object.freeze({
   },
   duplicate: {
     getallDuplicateUsers: `${baseUrl}/duplicate/getallduplicate`
+  },
+  list:{
+    create: `${baseUrl}/list/addList`,
+    fetch: `${baseUrl}/list/getallList`,
+    fetchWithPagination: `${baseUrl}/list/allwithpagination`,
+    fetchListData: `${baseUrl}/list/getList`
   }
 });

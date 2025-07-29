@@ -12,7 +12,10 @@ import {
   IconButton,
   Box,
   Paper,
-  Checkbox
+  Checkbox,
+  FormControl,
+  InputLabel,
+  FormHelperText
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Delete, ArrowUpward, ArrowDownward } from '@mui/icons-material';
@@ -27,15 +30,33 @@ import { urls } from 'common/urls';
 import { useEffect } from 'react';
 import { Autocomplete } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import { caseFieldOptions, channelOptions, fieldOptions, formFieldOptions, mailingListFieldOptions, serviceFieldOptions, transactionFieldOptions } from 'common/constants';
 
 const AddListForm = () => {
-  const channelOptions = ['Email', 'SMS', 'donerTag', 'letter', 'Whatsapp'];
   const location = useLocation();
   const state = location.state;
   const navigate = useNavigate();
   const [isLoading, setIsloading] = useState(false);
   const [tagOptions, setTagOptions] = useState([]);
-
+  const [contactPurposeEntry, setContactPurposeEntry] = useState([]);
+  const [filterFieldOptions, setFilterFieldOptions] = useState([]);
+  const setFieldOption = () => {
+    if (state?.type == 'service_user' || state?.type == 'donor' || state?.type == 'volunteer') {
+      setFilterFieldOptions(fieldOptions);
+    } else if (state?.type == 'donations') {
+      setFilterFieldOptions(transactionFieldOptions);
+    } else if (state?.type == 'Mailing List') {
+      setFilterFieldOptions(mailingListFieldOptions);
+    } else if (state?.type == 'Forms') {
+      setFilterFieldOptions(formFieldOptions);
+    } else if (state?.type == 'case') {
+      setFilterFieldOptions(caseFieldOptions);
+    } else if (state?.type == 'services') {
+      setFilterFieldOptions(serviceFieldOptions);
+    } else {
+      setFilterFieldOptions([]);
+    }
+  };
   const {
     handleSubmit,
     control,
@@ -100,9 +121,19 @@ const AddListForm = () => {
       console.error('Error fetching config:', error);
     }
   };
-
+  const fetchContactPurposes = async () => {
+    try {
+      const res = await getApi(urls.configuration.fetch);
+      const options = res?.data?.allConfiguration?.filter((item) => item.configurationType === 'Contact Purpose');
+      setContactPurposeEntry(options || []);
+    } catch (err) {
+      console.error('Error fetching contact purposes:', err);
+    }
+  };
   useEffect(() => {
     fetchtTagData();
+    fetchContactPurposes();
+    setFieldOption();
   }, []);
 
   const onSubmit = async (data) => {
@@ -146,8 +177,7 @@ const AddListForm = () => {
         listType: state?.type || '',
         filters: validatedFilters.map(({ errors, ...rest }) => rest)
       };
-
-      console.log(formData);
+      const response = await postApi(urls.list.create, formData);
       toast.success('List added successfully');
       navigate('/list');
     } catch (error) {
@@ -256,7 +286,7 @@ const AddListForm = () => {
                 <Autocomplete
                   multiple
                   disableCloseOnSelect
-                  disablePortal={true} 
+                  disablePortal={true}
                   options={channelOptions}
                   value={field.value || []}
                   onChange={(_, newValue) => field.onChange(newValue)}
@@ -326,74 +356,86 @@ const AddListForm = () => {
             <Controller
               name="purposeSettings"
               control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  multiple
-                  disablePortal={true} 
-                  disableCloseOnSelect
-                  options={channelOptions}
-                  value={field.value || []}
-                  onChange={(_, newValue) => field.onChange(newValue)}
-                  getOptionLabel={(option) => option}
-                  isOptionEqualToValue={(option, value) => option === value}
-                  renderInput={(params) => (
-                    <TextField {...params} label="AND any of these purpose settings" placeholder="Search" size="small" />
-                  )}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props} style={{ padding: 0, marginBottom: 8 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          width: '100%',
-                          cursor: 'pointer',
-                          gap: 1
-                        }}
-                      >
-                        <Checkbox
-                          checked={selected}
-                          sx={{
-                            color: selected ? '#009fc7' : 'rgba(0,0,0,0.26)',
-                            '&.Mui-checked': {
-                              color: '#009fc7'
-                            }
-                          }}
-                        />
+              rules={{ required: 'This field is required' }}
+              render={({ field, fieldState }) => {
+                const selectedValues = contactPurposeEntry.filter((item) => field.value?.includes(item._id));
+
+                return (
+                  <Autocomplete
+                    multiple
+                    disablePortal
+                    disableCloseOnSelect
+                    options={contactPurposeEntry}
+                    getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(option, value) => option._id === value._id}
+                    value={selectedValues}
+                    onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="AND any of these purpose settings"
+                        placeholder="Search"
+                        size="small"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props} style={{ padding: 0, marginBottom: 8 }}>
                         <Box
                           sx={{
-                            flexGrow: 1,
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
-                            backgroundColor: selected ? '#67ae5a' : '#c95a51',
-                            color: '#fff',
-                            borderRadius: '20px',
-                            px: 2,
-                            py: '6px',
-                            fontWeight: 500,
-                            fontSize: 14,
-                            userSelect: 'none'
+                            width: '100%',
+                            cursor: 'pointer',
+                            gap: 1
                           }}
                         >
-                          <Typography>{option}</Typography>
+                          <Checkbox
+                            checked={selected}
+                            sx={{
+                              color: selected ? '#009fc7' : 'rgba(0,0,0,0.26)',
+                              '&.Mui-checked': {
+                                color: '#009fc7'
+                              }
+                            }}
+                          />
                           <Box
                             sx={{
-                              ml: 1,
-                              fontWeight: 'bold',
-                              fontSize: 18,
-                              userSelect: 'none',
-                              lineHeight: 1
+                              flexGrow: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              backgroundColor: selected ? '#67ae5a' : '#c95a51',
+                              color: '#fff',
+                              borderRadius: '20px',
+                              px: 2,
+                              py: '6px',
+                              fontWeight: 500,
+                              fontSize: 14,
+                              userSelect: 'none'
                             }}
                           >
-                            {selected ? '✓' : '×'}
+                            <Typography>{option.name}</Typography>
+                            <Box
+                              sx={{
+                                ml: 1,
+                                fontWeight: 'bold',
+                                fontSize: 18,
+                                userSelect: 'none',
+                                lineHeight: 1
+                              }}
+                            >
+                              {selected ? '✓' : '×'}
+                            </Box>
                           </Box>
                         </Box>
-                      </Box>
-                    </li>
-                  )}
-                  renderTags={(selected) => selected.join(', ')}
-                />
-              )}
+                      </li>
+                    )}
+                    renderTags={(selected) => selected.map((opt) => opt.name).join(', ')}
+                  />
+                );
+              }}
             />
           </Grid>
 
@@ -427,15 +469,17 @@ const AddListForm = () => {
                     </Select>
                   </Grid>
                   <Grid item xs={3}>
-                    <TextField
-                      fullWidth
-                      label="Field"
-                      size="small"
-                      value={filter.field}
-                      onChange={(e) => handleFilterChange(filter.id, 'field', e.target.value)}
-                      error={filter.errors?.field}
-                      helperText={filter.errors?.field ? 'Field is required' : ''}
-                    />
+                    <FormControl fullWidth size="small" error={filter.errors?.field}>
+                      <InputLabel>Field</InputLabel>
+                      <Select value={filter.field} onChange={(e) => handleFilterChange(filter.id, 'field', e.target.value)} label="Field">
+                        {filterFieldOptions?.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {filter.errors?.field && <FormHelperText>Field is required</FormHelperText>}
+                    </FormControl>
                   </Grid>
                   <Grid item xs={3}>
                     <Select

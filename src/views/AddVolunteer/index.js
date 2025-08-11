@@ -114,7 +114,7 @@ const AddCaseForm = ({ onCancel }) => {
       },
       phone: editdata?.contactInfo?.homePhone || '',
       mobilePhone: editdata?.contactInfo?.phone || '',
-      email: editdata?.contactInfo?.email || '',
+      contactInfo_email: editdata?.contactInfo?.email || '',
       address: editdata?.contactInfo?.addressLine1 || '',
       address2: editdata?.contactInfo?.addressLine2 || '',
       town: editdata?.contactInfo?.town || '',
@@ -387,7 +387,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     fd.append('contactInfo[homePhone]', formData.phone || '');
     fd.append('contactInfo[phone]', formData.mobilePhone || '');
-    fd.append('contactInfo[email]', formData.email || '');
+    fd.append('contactInfo[email]', formData.contactInfo_email || '');
     fd.append('contactInfo[addressLine1]', formData.address || '');
     fd.append('contactInfo[addressLine2]', formData.address2 || '');
     fd.append('contactInfo[town]', formData.town || '');
@@ -973,7 +973,7 @@ const AddCaseForm = ({ onCancel }) => {
 
                             <Grid item xs={12} sm={4}>
                               <Controller
-                                name="email"
+                                name="contactInfo_email"
                                 control={control}
                                 rules={{
                                   required: 'Email is required',

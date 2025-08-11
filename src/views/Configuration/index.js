@@ -277,24 +277,22 @@ const TabbedDataGrid = () => {
           {section}
         </Typography>
       )}
-      {!loading && showAddIcon && (
-        <IconButton
-          onClick={(event) => {
-            event.stopPropagation();
-            handleOpenModal(section);
-          }}
-          sx={{
-            backgroundColor: '#41C048',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px',
-            color: 'white',
-            '&:hover': { backgroundColor: '#41C048' }
-          }}
-        >
-          <Add sx={{ fontSize: 16 }} />
-        </IconButton>
-      )}
+      <IconButton
+        onClick={(event) => {
+          event.stopPropagation();
+          handleOpenModal(section);
+        }}
+        sx={{
+          backgroundColor: '#41C048',
+          borderRadius: '50%',
+          width: '20px',
+          height: '20px',
+          color: 'white',
+          '&:hover': { backgroundColor: '#41C048' }
+        }}
+      >
+        <Add sx={{ fontSize: 16 }} />
+      </IconButton>
     </Box>
   );
 
@@ -313,22 +311,38 @@ const TabbedDataGrid = () => {
         {loading ? (
           <Skeleton variant="text" width="80%" height={20} />
         ) : (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="subtitle2" fontWeight="medium">
-              Name
-            </Typography>
-            <Typography variant="subtitle2" fontWeight="medium">
-              Status
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ flex: 2 }}>
+              <Typography variant="subtitle2" fontWeight="medium">
+                Name
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 2 }}>
+              <Typography variant="subtitle2" fontWeight="medium">
+                Status
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle2" fontWeight="medium">
+                Action
+              </Typography>
+            </Box>
           </Box>
         )}
       </Box>
       <Box sx={{ px: 2, py: 1, overflowY: 'auto', flexGrow: 1 }}>
         {loading ? (
           [...Array(3)].map((_, i) => (
-            <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Skeleton variant="text" width="60%" height={20} />
-              <Skeleton variant="circular" width={24} height={24} />
+            <Box key={i} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ flex: 2 }}>
+                <Skeleton variant="text" width="60%" height={20} />
+              </Box>
+              <Box sx={{ flex: 2 }}>
+                <Skeleton variant="circular" width={24} height={24} />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Skeleton variant="text" width="40%" height={20} />
+              </Box>
             </Box>
           ))
         ) : items.length > 0 ? (
@@ -337,7 +351,6 @@ const TabbedDataGrid = () => {
               key={item.id}
               sx={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
                 mb: 1,
                 pb: 1,
@@ -345,21 +358,21 @@ const TabbedDataGrid = () => {
                 flexWrap: 'wrap'
               }}
             >
-              <Typography
-                sx={{
-                  flex: 1,
-                  minWidth: 0,
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-line',
-                  pr: 2,
-                  maxWidth: '60%'
-                }}
-              >
-                {item.name}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.2 }}>
+              <Box sx={{ flex: 2, pr: 2 }}>
+                <Typography
+                  sx={{
+                    minWidth: 0,
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-line'
+                  }}
+                >
+                  {item.name}
+                </Typography>
+              </Box>
+              <Box sx={{ flex: 2 }}>
                 <AntSwitch checked={item.status} onChange={(e) => handleStatusUpdate(item.id, e.target.checked)} />
-                &nbsp;
+              </Box>
+              <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <IconButton onClick={() => handleEdit(item)}>
                   <IconPencil color="orangered" size={18} />
                 </IconButton>
@@ -472,7 +485,7 @@ const TabbedDataGrid = () => {
         <Grid item xs={9}>
           <Grid container spacing={2}>
             {Object.entries(tabData).map(([section, items], index) => (
-              <Grid item xs={12} sm={6} md={4} key={section}>
+              <Grid item xs={12} sm={12} md={6} key={section}>
                 <Accordion
                   expanded={!!expandedPanels[section]}
                   onChange={handleAccordionChange(section)}
@@ -486,8 +499,6 @@ const TabbedDataGrid = () => {
                     expandIcon={<ExpandMoreIcon />}
                     sx={{
                       px: 2,
-                      py: 1,
-                      borderBottom: '1px solid #e0e0e0',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center'

@@ -494,7 +494,7 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
     <Stack
       direction="row"
       alignItems="center"
-      justifyContent="space-between"
+      spacing={2}
       sx={{
         px: 2,
         py: 0.75,
@@ -504,16 +504,28 @@ function TaskItem({ task, checked, onChange, onEdit, onDelete }) {
         })
       }}
     >
-      <FormControlLabel
-        control={<Checkbox checked={checked} onChange={onChange} onPointerDown={(e) => e.stopPropagation()} />}
-        label={
-          <Typography variant="body2" sx={{ m: 0, color: '#26262680' }}>
-            Call due for {task?.assignedTo} on <strong>{formatDate(task?.dueDate)}</strong>
-          </Typography>
-        }
-      />
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>
+        <FormControlLabel
+          sx={{ m: 0, flex: 1 }}
+          control={<Checkbox checked={checked} onChange={onChange} onPointerDown={(e) => e.stopPropagation()} />}
+          label={
+            <Typography
+              variant="body2"
+              sx={{
+                m: 0,
+                color: '#26262680',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Call due for {task?.assignedTo} on <strong>{formatDate(task?.dueDate)}</strong>
+            </Typography>
+          }
+        />
+      </Box>
 
-      <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         <IconButton size="large" color="inherit" sx={{ opacity: 0.5 }} onClick={onEdit} onPointerDown={(e) => e.stopPropagation()}>
           <Iconify icon={'material-symbols:edit-outline'} />
         </IconButton>

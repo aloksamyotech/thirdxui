@@ -326,31 +326,6 @@ const FormBuilder = ({ setFormData, formData, setPreview, onClose, templateData,
         >
           <span>Fields</span>
         </div>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '8px 4px',
-            flexWrap: 'wrap',
-            gap: '10px'
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor: '#fff',
-              border: '1px solid #ccc',
-              borderRadius: '8px',
-              padding: '4px 8px',
-              maxWidth: '208px',
-              flex: 1
-            }}
-          >
-            <SearchIcon sx={{ color: 'gray', marginRight: '8px' }} />
-            <InputBase placeholder="Search for fields..." sx={{ flex: 1, fontSize: '14px' }} />
-          </Box>
-        </Box>
         {loading ? (
           <Box sx={{ textAlign: 'center', py: 10 }}>
             <CircularProgress />

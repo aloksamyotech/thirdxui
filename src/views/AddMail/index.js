@@ -76,13 +76,13 @@ const MailingListForm = () => {
       prev.map((f) =>
         f.id === id
           ? {
-            ...f,
-            [field]: value,
-            errors: {
-              ...f.errors,
-              [field]: false
+              ...f,
+              [field]: value,
+              errors: {
+                ...f.errors,
+                [field]: false
+              }
             }
-          }
           : f
       )
     );
@@ -247,10 +247,8 @@ const MailingListForm = () => {
                   options={tagOptions || []}
                   getOptionLabel={(option) => option?.name || ''}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
-                  value={tagOptions.filter(opt => field.value?.includes(opt._id)) || []}
-                  onChange={(_, selectedOptions) =>
-                    field.onChange(selectedOptions.map(opt => opt._id))
-                  }
+                  value={tagOptions.filter((opt) => field.value?.includes(opt._id)) || []}
+                  onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -302,10 +300,8 @@ const MailingListForm = () => {
                   options={contactPurposeEntry}
                   getOptionLabel={(option) => option?.name}
                   isOptionEqualToValue={(option, value) => option._id === value._id}
-                  value={contactPurposeEntry.filter(opt => field.value?.includes(opt._id)) || []}
-                  onChange={(_, selectedOptions) =>
-                    field.onChange(selectedOptions.map(opt => opt._id))
-                  }
+                  value={contactPurposeEntry.filter((opt) => field.value?.includes(opt._id)) || []}
+                  onChange={(_, selectedOptions) => field.onChange(selectedOptions.map((opt) => opt._id))}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -344,35 +340,39 @@ const MailingListForm = () => {
 
           <Grid item xs={12}>
             <Paper variant="outlined" sx={{ p: 2 }}>
-              {filters.map((filter) => (
+              {filters.map((filter, index) => (
                 <Grid container spacing={1} alignItems="center" key={filter.id} sx={{ mb: 1 }}>
-                  <Grid item xs={2}>
-                    <Select
-                      fullWidth
-                      size="small"
-                      value={filter.operator_to_next}
-                      onChange={(e) => handleFilterChange(filter.id, 'operator_to_next', e.target.value)}
-                    >
-                      <MenuItem value="AND">AND</MenuItem>
-                      <MenuItem value="OR">OR</MenuItem>
-                    </Select>
-                  </Grid>
-                  <Grid item xs={3}>
-                    <FormControl fullWidth size="small" error={filter.errors?.field}>
-                      <InputLabel>Field</InputLabel>
+                  {index !== 0 && (
+                    <Grid item xs={2}>
                       <Select
-                        value={filter.field}
-                        onChange={(e) => handleFilterChange(filter.id, 'field', e.target.value)}
-                        label="Field"
+                        fullWidth
+                        size="small"
+                        value={filter.operator_to_next}
+                        onChange={(e) => handleFilterChange(filter.id, 'operator_to_next', e.target.value)}
                       >
-                        {fieldOptions.map((option) => (
-                          <MenuItem key={option} value={option}>
-                            {option}
-                          </MenuItem>
-                        ))}
+                        <MenuItem value="AND">AND</MenuItem>
+                        <MenuItem value="OR">OR</MenuItem>
                       </Select>
-                      {filter.errors?.field && <FormHelperText>Field is required</FormHelperText>}
-                    </FormControl>
+                    </Grid>
+                  )}
+
+                  <Grid item xs={index !== 0 ? 3 : 5}>
+                    {' '}
+                    <Autocomplete
+                      size="small"
+                      options={fieldOptions}
+                      value={filter.field || null}
+                      onChange={(event, newValue) => handleFilterChange(filter.id, 'field', newValue)}
+                      disableClearable
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Field"
+                          error={filter.errors?.field}
+                          helperText={filter.errors?.field ? 'Field is required' : ''}
+                        />
+                      )}
+                    />
                   </Grid>
                   <Grid item xs={3}>
                     <Select
@@ -382,7 +382,6 @@ const MailingListForm = () => {
                       onChange={(e) => handleFilterChange(filter.id, 'comparison', e.target.value)}
                       displayEmpty
                       error={filter.errors?.value}
-                      helperText={filter.errors?.value ? 'Value is required' : ''}
                     >
                       <MenuItem value="" disabled>
                         Select Comparison

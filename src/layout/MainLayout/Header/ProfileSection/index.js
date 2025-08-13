@@ -38,7 +38,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import UpgradePlanCard from './UpgradePlanCard';
-import User1 from 'assets/images/UserProfile.png';
+import User1 from 'assets/images/femaleicon.png';
 import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';

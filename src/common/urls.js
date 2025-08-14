@@ -164,6 +164,7 @@ export const urls = Object.freeze({
     create: `${baseUrl}/list/addList`,
     fetch: `${baseUrl}/list/getallList`,
     fetchWithPagination: `${baseUrl}/list/allwithpagination`,
-    fetchListData: `${baseUrl}/list/getList`
+    fetchListData: `${baseUrl}/list/getList`,
+    assignTagToEntities:`${baseUrl}/list/addBulkTags`,
   }
 });

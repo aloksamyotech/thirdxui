@@ -333,7 +333,8 @@ const List = () => {
                       extraActions={null}
                       isCompletlyDelete={true}
                       refetchData={fetchLists}
-                      isShowArchive={false} 
+                      //isShowArchive={false} 
+                      isShowTags={true} 
                     />
                   ),
                   loadingOverlay: () => (

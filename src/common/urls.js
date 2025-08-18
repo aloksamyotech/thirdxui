@@ -149,6 +149,7 @@ export const urls = Object.freeze({
   timeline: {
     giftaidCreate: `${baseUrl}/giftAid/:id`,
     attendeesCreate: `${baseUrl}/userTimeline/register-attendance/:id`,
+    taskCreate: `${baseUrl}/userTimeline/register-task/:id`,
     emailinboundCreate: `${baseUrl}/userTimeline/email-inbound/:id`,
     emailOutboundCreate: `${baseUrl}/userTimeline/email-outbound/:id`,
     phoneinboundCreate: `${baseUrl}/userTimeline/phone-inbound/:id`,

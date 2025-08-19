@@ -168,7 +168,7 @@ const CustomHeader = ({
                   )}
                    {isShowTags && (
                   <MenuItem onClick={handleOpen}>
-                    Tag Cases <LocalOfferIcon fontSize="small" style={{ marginLeft: 8 }} />
+                    Tags Cases <LocalOfferIcon fontSize="small" style={{ marginLeft: 8 }} />
                   </MenuItem>
                   )}
                 </Menu>

@@ -88,6 +88,12 @@ const Case = () => {
       headerName: 'Date Opened',
       width: 105,
       valueGetter: (params) => params.value || '-'
+    },
+    {
+      field: 'dateClosed',
+      headerName: 'Date Closed',
+      width: 105,
+      valueGetter: (params) => params.value || '-'
     }
   ];
 
@@ -252,7 +258,11 @@ const Case = () => {
               onClick={() => navigate('/add-case')}
               sx={{
                 backgroundColor: '#009fc7',
-                borderRadius: '4px',
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px',
                 width: '220px',
                 height: '35px',
                 display: 'flex',

@@ -111,7 +111,7 @@ const dashboard = {
         {
           id: '09',
           parentId: '08',
-          title: 'Donor',
+          title: 'Donors',
           type: 'item',
           url: '/donor',
           breadcrumbs: false,

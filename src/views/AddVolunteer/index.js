@@ -1306,7 +1306,7 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                             <Typography variant="subtitle1" mb={4}>
-                              Volunteer Tag
+                              Volunteer Tags
                             </Typography>
 
                             <Grid container spacing={2}>
@@ -1977,7 +1977,7 @@ const AddCaseForm = ({ onCancel }) => {
                       }}
                     >
                       <Typography variant="subtitle2" mb={1}>
-                        Purpose
+                       Channels
                       </Typography>
                       <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
                         {Object.keys(contactMethodStates).map((label) => {

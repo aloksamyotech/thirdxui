@@ -14,55 +14,55 @@ const StatusChip = ({ status }) => {
   switch (normalizedStatus) {
     case 'Open':
     case 'open':
-      icon = (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: iconSize,
-            color: '#2e7d32'
-          }}
-        >
-          <CheckIcon fontSize="inherit" />
-        </Box>
-      );
+      // icon = (
+      //   <Box
+      //     sx={{
+      //       display: 'flex',
+      //       alignItems: 'center',
+      //       justifyContent: 'center',
+      //       fontSize: iconSize,
+      //       color: '#2e7d32'
+      //     }}
+      //   >
+      //     <CheckIcon fontSize="inherit" />
+      //   </Box>
+      // );
       //   color = '#2e7d32';
       bgColor = '#91FD91';
       break;
     case 'Close':
     case 'close':
-      icon = (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: iconSize,
-            color: '#c62828'
-          }}
-        >
-          <CloseIcon fontSize="inherit" />
-        </Box>
-      );
+      // icon = (
+      //   <Box
+      //     sx={{
+      //       display: 'flex',
+      //       alignItems: 'center',
+      //       justifyContent: 'center',
+      //       fontSize: iconSize,
+      //       color: '#c62828'
+      //     }}
+      //   >
+      //     <CloseIcon fontSize="inherit" />
+      //   </Box>
+      // );
       //   color = '#c62828';
       bgColor = '#FDA191';
       break;
     case 'Pending':
     case 'pending':
-      icon = (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: iconSize,
-            color: '#f9a825'
-          }}
-        >
-          <LoopIcon fontSize="inherit" />
-        </Box>
-      );
+      // icon = (
+      //   <Box
+      //     sx={{
+      //       display: 'flex',
+      //       alignItems: 'center',
+      //       justifyContent: 'center',
+      //       fontSize: iconSize,
+      //       color: '#f9a825'
+      //     }}
+      //   >
+      //     <LoopIcon fontSize="inherit" />
+      //   </Box>
+      // );
       //   color = '#f9a825';
       bgColor = '#FFF68D';
       break;

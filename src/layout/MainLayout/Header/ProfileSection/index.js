@@ -248,9 +248,6 @@ const ProfileSection = () => {
                       <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
                         Profile
                       </Typography>
-                      <Typography variant="body2" color="primary" sx={{ cursor: 'pointer' }}>
-                        Mark all as read
-                      </Typography>
                     </Stack>
                   </Box>
 

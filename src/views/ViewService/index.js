@@ -276,29 +276,7 @@ const ViewService = () => {
       )}
 
       <Grid container spacing={2}>
-        <FilterPanel
-          showFilter={showFilter}
-          dateAddedFilters={dateAddedFilters}
-          dateOpenedFilter={dateOpenedFilter}
-          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
-          countriesWithFlags={countriesWithFlags}
-          countryOfOriginFilter={countryOfOriginFilter}
-          setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
-          timeFilter={timeFilter}
-          setTimeFilter={(value) => setTimeFilter(value)}
-          timeOptions={timeOptions}
-          locations={locationOptions}
-          locationFilter={locationFilter}
-          setLocationFilter={setLocationFilter}
-          sessionLeads={sessionLeads}
-          sessionLeadFilter={sessionLeadFilter}
-          setSessionLeadFilter={setSessionLeadFilter}
-          selectedFilters={['locationFilter', 'dateOpenedFilter', 'timeFilter', 'sessionLeadFilter']}
-          customDateLabel="By Date"
-          onReset={handleReset}
-        />
-
-        <Grid item xs={12} md={9}>
+        <Grid item xs={12} md={12}>
           <Card
             sx={{ borderRadius: 3, mb: 2, cursor: 'pointer' }}
             onClick={() =>
@@ -383,7 +361,8 @@ const ViewService = () => {
                         </Stack>
                       </Box>
 
-                      <EditOutlinedIcon sx={{ marginRight: '20px' }} />
+                      {/* <EditOutlinedIcon sx={{ marginRight: '20px' }} /> */}
+                      
                     </Box>
 
                     <Typography variant="body2" color="textSecondary" mb={1}>
@@ -401,7 +380,29 @@ const ViewService = () => {
               </Grid>
             )}
           </Card>
-
+          </Grid>
+   <FilterPanel
+          showFilter={showFilter}
+          dateAddedFilters={dateAddedFilters}
+          dateOpenedFilter={dateOpenedFilter}
+          setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+          countriesWithFlags={countriesWithFlags}
+          countryOfOriginFilter={countryOfOriginFilter}
+          setCountryOfOriginFilter={(value) => setCountryOfOriginFilter(value)}
+          timeFilter={timeFilter}
+          setTimeFilter={(value) => setTimeFilter(value)}
+          timeOptions={timeOptions}
+          locations={locationOptions}
+          locationFilter={locationFilter}
+          setLocationFilter={setLocationFilter}
+          sessionLeads={sessionLeads}
+          sessionLeadFilter={sessionLeadFilter}
+          setSessionLeadFilter={setSessionLeadFilter}
+          selectedFilters={['locationFilter', 'dateOpenedFilter', 'sessionLeadFilter']}
+          customDateLabel="By Date"
+          onReset={handleReset}
+        />
+<Grid item xs={12} md={9}>
           <Card sx={{ borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400, overflowY: 'auto' }}>
             <Typography variant="h5" m={1} p={1} fontWeight="550">
               Session List

@@ -1392,7 +1392,7 @@ const AddCaseForm = ({ onCancel }) => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                             <Typography variant="subtitle1" mb={4}>
-                              Service User Tag
+                              Service User Tags
                             </Typography>
                             <Grid container spacing={2}>
                               <Grid container spacing={2}>
@@ -2131,7 +2131,6 @@ const AddCaseForm = ({ onCancel }) => {
                         spacing={2}
                         key={item.id}
                         sx={{
-                          backgroundColor: '#F7F7F7',
                           borderRadius: 2,
                           p: 2,
                           mb: 5

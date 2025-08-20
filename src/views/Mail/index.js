@@ -207,7 +207,11 @@ const Mail = () => {
                 onClick={() => setDialogOpen(true)}
                 sx={{
                   backgroundColor: '#009fc7',
-                  borderRadius: '4px',
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px',
                   width: '220px',
                   height: '35px',
                   display: 'flex',

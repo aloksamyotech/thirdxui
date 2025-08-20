@@ -928,12 +928,12 @@ const UserProfileCard = () => {
                   activityTypes={activityTypes}
                   setActivityTypeFilter={setActivityType}
                   sessionNames={sessionNames}
-                  setSessionNameFilter={setSessionName}
+                  // setSessionNameFilter={setSessionName}
                   dateOpenedFilter={dateOpenedFilter}
                   setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
                   includeArchives={includeArchives}
                   setIncludeArchives={setIncludeArchives}
-                  selectedFilters={['activityTypeFilter', 'dateOpenedFilter', 'sessionNameFilter', 'includeArchives']}
+                  selectedFilters={['activityTypeFilter', 'dateOpenedFilter',  'includeArchives']}
                   customDateLabel="By Date"
                 />
 

@@ -232,8 +232,12 @@ const Donor = () => {
               <IconButton
                 onClick={() => setOpenDialog(true)}
                 sx={{
-                  backgroundColor: '#009fc7',
-                  borderRadius: '4px',
+                backgroundColor: '#009fc7',
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px',
                   width: '220px',
                   height: '35px',
                   display: 'flex',

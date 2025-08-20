@@ -290,7 +290,7 @@ const AddCaseForm = () => {
           <IconButton onClick={() => navigate(-1)} size="small">
             <ArrowBackIcon />
           </IconButton>
-          Adding New Case
+          Add New Case
         </Typography>
 
         <Box
@@ -524,7 +524,7 @@ const AddCaseForm = () => {
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                   <Typography variant="subtitle1" mb={4}>
-                    Case Tag
+                    Case Tags
                   </Typography>
 
                   <Grid container spacing={2}>

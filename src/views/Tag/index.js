@@ -59,7 +59,7 @@ const Tag = () => {
               lineHeight: '36px'
             }}
           >
-            Tag Category List
+            Tags Category List
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <GridToolbarExport />
@@ -173,7 +173,7 @@ const Tag = () => {
       await updateApi(`${urls.tagCategory.updateStatus}/${tagId}`, {
         isActive: newStatus
       });
-      toast.success('Tag Category update successfully');
+      toast.success('Tags Category update successfully');
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -184,10 +184,10 @@ const Tag = () => {
       const res = await postApi(urls.tagCategory.create, data);
       if (res.success == true) {
         fetchTags();
-        toast.success("Tag Category Created");
+        toast.success("Tags Category Created");
       }
     } catch (error) {
-      console.error("Error while creating tag category => ", error);
+      console.error("Error while creating tags category => ", error);
       toast.error("Internal Server Error");
     }
   };
@@ -200,8 +200,12 @@ const Tag = () => {
             <IconButton
               onClick={() => setOpen(true)}
               sx={{
-                backgroundColor: '#009fc7',
-                borderRadius: '4px',
+                 backgroundColor: '#009fc7',
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px',
                 width: '220px',
                 height: '35px',
                 display: 'flex',
@@ -216,7 +220,7 @@ const Tag = () => {
                 }
               }}
             >
-              Add Tag Category
+              Add Tags Category
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>

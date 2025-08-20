@@ -78,7 +78,7 @@ const TagForm = () => {
     try {
       const res = await updateApi(`${urls.tagCategory.editTagCategory}/${id}`, categoryData);
       if (res.success == true) {
-        toast.success('Tag created successfully');
+        toast.success('Tags created successfully');
       } else {
         toast.error('Something went wrong');
       }
@@ -111,7 +111,7 @@ const TagForm = () => {
     setIsloading(true);
     try {
       const response = await postApi(urls.tag.create, data);
-      toast.success('Tag created successfully');
+      toast.success('Tags created successfully');
       setIsModalOpen(false);
       reset();
     } catch (error) {
@@ -181,14 +181,14 @@ const TagForm = () => {
       await updateApi(`${urls.tag.updateStatus}/${tagId}`, {
         isActive: newStatus
       });
-      toast.success('Tag update successfully');
+      toast.success('Tags update successfully');
     } catch (error) {
       console.error('Error updating status:', error);
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Tag Name', flex: 1 },
+    { field: 'name', headerName: 'Tags Name', flex: 1 },
     {
       field: 'isActive',
       headerName: 'Status',
@@ -229,7 +229,7 @@ const TagForm = () => {
               lineHeight: '36px'
             }}
           >
-            Tag List
+            Tags List
           </Typography>
           <Box
             sx={{
@@ -289,7 +289,7 @@ const TagForm = () => {
           <IconButton onClick={() => navigate(-1)}>
             <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
           </IconButton>
-          Edit Tag Category
+          Edit Tags Category
         </Typography>
       </Box>
 
@@ -509,7 +509,7 @@ const TagForm = () => {
                     <TextField
                       {...field}
                       fullWidth
-                      label="Tag Name"
+                      label="Tags Name"
                       size="small"
                       error={!!errors.name}
                       helperText={errors.name?.message}

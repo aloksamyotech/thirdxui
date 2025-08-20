@@ -113,7 +113,7 @@ const AddItemDialog = ({ open, onClose, entityType = '', selectedIds = [] }) => 
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" px={2} pt={2}>
         <DialogTitle sx={{ fontSize: '16px', fontWeight: '600', p: 0 }}>
-          Add Tag
+          Add Tags
         </DialogTitle>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
@@ -128,7 +128,7 @@ const AddItemDialog = ({ open, onClose, entityType = '', selectedIds = [] }) => 
               value={selectedCategory}
               onChange={(e, value) => setSelectedCategory(value)}
               renderInput={(params) => (
-                <TextField {...params} label="Tag Category" size="small" />
+                <TextField {...params} label="Tags Category" size="small" />
               )}
             />
           </Grid>
@@ -141,7 +141,7 @@ const AddItemDialog = ({ open, onClose, entityType = '', selectedIds = [] }) => 
               onChange={(e, value) => setSelectedTag(value)}
               disabled={!selectedCategory}
               renderInput={(params) => (
-                <TextField {...params} label="Tag" size="small" />
+                <TextField {...params} label="Tags" size="small" />
               )}
             />
           </Grid>

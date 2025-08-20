@@ -473,7 +473,7 @@ const ViewService = () => {
                     </Box>
 
                     <Box sx={{ flexGrow: 1, px: 2, minWidth: 0 }}>
-                      <Tooltip title={session?.serviceId?.name || serviceData?.name || ''} placement="top" arrow>
+                      <Tooltip title={session?.country?.name || serviceData?.country || ''} placement="top" arrow>
                         <Typography
                           variant="subtitle2"
                           fontWeight="550"
@@ -484,11 +484,11 @@ const ViewService = () => {
                             overflowWrap: 'break-word'
                           }}
                         >
-                          {session?.serviceId?.name || serviceData?.name || '-'}
+                          {session?.country?.name || serviceData?.country || '-'}
                         </Typography>
                       </Tooltip>
                       <Tooltip
-                        title={session?.description || session?.serviceId?.description || serviceData?.description || ''}
+                        title={session?.serviceuser?.name || session?.serviceId?.description || serviceData?.name || ''}
                         placement="top"
                         arrow
                       >
@@ -504,7 +504,7 @@ const ViewService = () => {
                             textOverflow: 'ellipsis'
                           }}
                         >
-                          {session?.description || session?.serviceId?.description || serviceData?.description || '-'}
+                          Session Lead : {session?.serviceuser?.name || session?.serviceId?.description || serviceData?.name || '-'}
                         </Typography>
                       </Tooltip>
                     </Box>

@@ -22,7 +22,8 @@ const Case = () => {
   const [ownerFilters, setOwnerFilters] = useState([]);
   const [showFilter, setShowFilter] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
-
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [serviceType, setServiceType] = useState('');
   const [status, setStatus] = useState('');
   const [caseOwner, setOwner] = useState('');
@@ -108,6 +109,12 @@ const Case = () => {
       if (caseOwner && caseOwner !== '') {
         queryParams.append('caseOwner', caseOwner);
       }
+      if (startDate) {
+        queryParams.append('startDate', new Date(startDate).toISOString());
+      }
+      if (endDate) {
+        queryParams.append('endDate', new Date(endDate).toISOString());
+      }
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
@@ -158,6 +165,8 @@ const Case = () => {
     setServiceType('');
     setStatus('');
     setOwner('');
+    setStartDate(null);
+    setEndDate(null);
     setDateOpenedFilter('');
     setSearchQuery('');
     setIsFiltered(false);
@@ -165,10 +174,10 @@ const Case = () => {
   };
 
   useEffect(() => {
-    if (serviceType || status || caseOwner || dateOpenedFilter || searchQuery || isFiltered) {
+    if (serviceType || status || caseOwner || dateOpenedFilter ||startDate||endDate|| searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [serviceType, status, caseOwner, dateOpenedFilter, searchQuery]);
+  }, [serviceType, status, caseOwner, dateOpenedFilter, searchQuery, startDate, endDate]);
 
   const fetchInitialData = async () => {
     setLoading(true);
@@ -186,7 +195,7 @@ const Case = () => {
       const formattedUsers = allCases?.map((user, index) => {
         const firstName = user?.serviceUserId?.personalInfo?.firstName || '';
         const lastName = user?.serviceUserId?.personalInfo?.lastName || '';
-        const caseOwnerFirstName = user?.caseOwner?.name|| '';
+        const caseOwnerFirstName = user?.caseOwner?.name || '';
         return {
           id: user?._id,
           serialNumber: user?.uniqueId,
@@ -342,12 +351,15 @@ const Case = () => {
             statusFilter={status}
             setStatusFilter={(value) => setStatus(value)}
             dateAddedFilters={dateAddedFilters}
-            dateOpenedFilter={dateOpenedFilter}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             owners={ownerFilters}
             ownerFilter={caseOwner}
             setOwnerFilter={(value) => setOwner(value)}
-            selectedFilters={['serviceFilter', 'statusFilter', 'dateOpenedFilter', 'ownerFilter']}
+            selectedFilters={['serviceFilter', 'statusFilter', 'startDate', 'endDate', 'ownerFilter']}
             customDateLabel="Date Opened"
             onReset={handleReset}
           />

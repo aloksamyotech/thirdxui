@@ -10,6 +10,10 @@ import dayjs from 'dayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const FilterPanel = ({
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
   showFilter,
   formTypes,
   formType,
@@ -113,7 +117,7 @@ const FilterPanel = ({
   dateCreated,
   setDateCreated,
   dateSubmitted,
-  setDateSubmitted,
+  setDateSubmitted
 }) => {
   useEffect(() => {
     if (!dateAddedFilter || !setDateAddedFilter) return;
@@ -121,6 +125,8 @@ const FilterPanel = ({
   }, [dateAddedFilter, setDateAddedFilter]);
 
   const handleReset = () => {
+    if (setStartDate) setStartDate('');
+    if (setEndDate) setEndDate('');
     if (setFormType) setFormType('');
     if (setDateFilter) setDateFilter('');
     if (setDistrictFilter) setDistrictFilter('');
@@ -156,12 +162,23 @@ const FilterPanel = ({
     if (formTitle) setFormTitle('');
     if (dateCreated) setDateCreated('');
     if (dateSubmitted) setDateSubmitted('');
-
   };
 
   if (!showFilter) return null;
 
   const filterMapping = {
+    startDate: {
+      label: 'Start Date',
+      onChange: setStartDate,
+      value: startDate,
+      type: 'date'
+    },
+    endDate: {
+      label: 'End Date',
+      onChange: setEndDate,
+      value: endDate,
+      type: 'date'
+    },
     formType: {
       data: formTypes,
       label: 'Form Type',
@@ -404,7 +421,7 @@ const FilterPanel = ({
       onChange: setDateCreated,
       value: dateCreated,
       type: 'date'
-    },
+    }
   };
 
   return (
@@ -512,26 +529,26 @@ const FilterPanel = ({
                                 selected?.toLowerCase() === 'active'
                                   ? '#79dbfb'
                                   : selected?.toLowerCase() === 'inactive'
-                                    ? '#ff6a67'
-                                    : selected?.toLowerCase() === 'open'
-                                      ? '#2e7d32'
-                                      : selected?.toLowerCase() === 'close'
-                                        ? '#c62828'
-                                        : selected?.toLowerCase() === 'pending'
-                                          ? '#f9a825'
-                                          : 'white',
+                                  ? '#ff6a67'
+                                  : selected?.toLowerCase() === 'open'
+                                  ? '#2e7d32'
+                                  : selected?.toLowerCase() === 'close'
+                                  ? '#c62828'
+                                  : selected?.toLowerCase() === 'pending'
+                                  ? '#f9a825'
+                                  : 'white',
                               backgroundColor:
                                 selected?.toLowerCase() === 'active'
                                   ? '#e5f8fe'
                                   : selected?.toLowerCase() === 'inactive'
-                                    ? '#ffeae9'
-                                    : selected?.toLowerCase() === 'open'
-                                      ? '#91FD91'
-                                      : selected?.toLowerCase() === 'close'
-                                        ? '#FDA191'
-                                        : selected?.toLowerCase() === 'pending'
-                                          ? '#FFF68D'
-                                          : '#e0e0e0',
+                                  ? '#ffeae9'
+                                  : selected?.toLowerCase() === 'open'
+                                  ? '#91FD91'
+                                  : selected?.toLowerCase() === 'close'
+                                  ? '#FDA191'
+                                  : selected?.toLowerCase() === 'pending'
+                                  ? '#FFF68D'
+                                  : '#e0e0e0',
 
                               fontWeight: 500,
                               px: 1
@@ -551,26 +568,26 @@ const FilterPanel = ({
                               option.value?.toLowerCase() === 'active'
                                 ? '#79dbfb'
                                 : option.value?.toLowerCase() === 'inactive'
-                                  ? '#ff6a67'
-                                  : option.value?.toLowerCase() === 'open'
-                                    ? '#2e7d32'
-                                    : option.value?.toLowerCase() === 'close'
-                                      ? '#c62828'
-                                      : option.value?.toLowerCase() === 'pending'
-                                        ? '#f9a825'
-                                        : 'white',
+                                ? '#ff6a67'
+                                : option.value?.toLowerCase() === 'open'
+                                ? '#2e7d32'
+                                : option.value?.toLowerCase() === 'close'
+                                ? '#c62828'
+                                : option.value?.toLowerCase() === 'pending'
+                                ? '#f9a825'
+                                : 'white',
                             backgroundColor:
                               option.value?.toLowerCase() === 'active'
                                 ? '#e5f8fe'
                                 : option.value?.toLowerCase() === 'inactive'
-                                  ? '#ffeae9'
-                                  : option.value?.toLowerCase() === 'open'
-                                    ? '#91FD91'
-                                    : option.value?.toLowerCase() === 'close'
-                                      ? '#FDA191'
-                                      : option.value?.toLowerCase() === 'pending'
-                                        ? '#FFF68D'
-                                        : '#e0e0e0',
+                                ? '#ffeae9'
+                                : option.value?.toLowerCase() === 'open'
+                                ? '#91FD91'
+                                : option.value?.toLowerCase() === 'close'
+                                ? '#FDA191'
+                                : option.value?.toLowerCase() === 'pending'
+                                ? '#FFF68D'
+                                : '#e0e0e0',
 
                             fontWeight: 500
                           }}

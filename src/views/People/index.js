@@ -48,7 +48,8 @@ const PeopleManagement = () => {
   const [genderFilter, setGenderFilter] = useState('');
   const [showFilter, setShowFilter] = useState(true);
   const [isFiltered, setIsFiltered] = useState(false);
-  const [dateOpenedFilter, setDateOpenedFilter] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
@@ -109,10 +110,15 @@ const PeopleManagement = () => {
 
       if (districtFilter) queryParams.append('district', districtFilter);
       if (genderFilter) queryParams.append('gender', genderFilter);
-      if (dateOpenedFilter && dateOpenedFilter !== '') {
-        const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
-        queryParams.append('createdAt', formattedDate);
+      if (startDate) {
+        const formattedStart = new Date(startDate).toISOString().split('T')[0];
+        queryParams.append('startDate', formattedStart);
       }
+      if (endDate) {
+        const formattedEnd = new Date(endDate).toISOString().split('T')[0];
+        queryParams.append('endDate', formattedEnd);
+      }
+
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());
       }
@@ -149,10 +155,10 @@ const PeopleManagement = () => {
   };
 
   useEffect(() => {
-    if (districtFilter || genderFilter || dateOpenedFilter || searchQuery || isFiltered) {
+    if (districtFilter || genderFilter || startDate || endDate || searchQuery || isFiltered) {
       handleFilter();
     }
-  }, [districtFilter, genderFilter, dateOpenedFilter, searchQuery]);
+  }, [districtFilter, genderFilter, startDate, endDate, searchQuery]);
 
   useEffect(() => {
     handleFilter();
@@ -161,7 +167,8 @@ const PeopleManagement = () => {
   const handleReset = () => {
     setDistrictFilter('');
     setGenderFilter('');
-    setDateOpenedFilter('');
+    setStartDate(null);
+    setEndDate(null);
     setSearchQuery('');
     setIncludeArchives(false);
     setIsFiltered(false);
@@ -226,7 +233,7 @@ const PeopleManagement = () => {
                 paddingInline: '15px',
                 paddingBlock: '7px',
                 borderRadius: '10px',
-               
+
                 // width: '220px',
                 height: '35px',
                 display: 'flex',
@@ -309,11 +316,13 @@ const PeopleManagement = () => {
             genders={gender}
             genderFilter={genderFilter}
             setGenderFilter={setGenderFilter}
-            dateOpenedFilter={dateOpenedFilter}
-            setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            selectedFilters={['districtFilter', 'startDate', 'endDate', 'genderFilter', 'includeArchives']}
             includeArchives={includeArchives}
             setIncludeArchives={setIncludeArchives}
-            selectedFilters={['districtFilter', 'dateOpenedFilter', 'genderFilter', 'includeArchives']}
             onReset={handleReset}
             customDateLabel="By Date Added"
           />

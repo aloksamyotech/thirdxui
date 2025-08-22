@@ -252,25 +252,6 @@ const ViewService = () => {
               Service Details
             </Typography>
 
-            <Button
-              variant="contained"
-              size="small"
-              sx={{
-                backgroundColor: '#009fc7',
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                '&:hover': { backgroundColor: '#009fc7' },
-                paddingInline: '15px',
-                paddingBlock: '7px',
-                borderRadius: '10px'
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate('/add-session', { state: { serviceId: serviceData._id } });
-              }}
-            >
-              Add New Session <AddIcon sx={{ ml: 1 }} />
-            </Button>
           </Stack>
         </Grid>
       )}
@@ -278,7 +259,7 @@ const ViewService = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} md={12}>
           <Card
-            sx={{ borderRadius: 3, mb: 2, cursor: 'pointer' }}
+            sx={{ borderRadius: 3, mb: 2, cursor: 'pointer', position: 'relative' }}
             onClick={() =>
               navigate('/view-serviceDetails', {
                 state: { serviceid: serviceData?._id }
@@ -291,7 +272,7 @@ const ViewService = () => {
               </Box>
             ) : (
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={3}>
                   <Box
                     component="img"
                     src={
@@ -308,7 +289,7 @@ const ViewService = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12} md={7}>
                   <Stack>
                     <Box display="flex" justifyContent="space-between" alignItems="center" pt={1}>
                       <Box sx={{ maxWidth: '60%' }}>
@@ -362,7 +343,6 @@ const ViewService = () => {
                       </Box>
 
                       {/* <EditOutlinedIcon sx={{ marginRight: '20px' }} /> */}
-                      
                     </Box>
 
                     <Typography variant="body2" color="textSecondary" mb={1}>
@@ -371,17 +351,51 @@ const ViewService = () => {
                     <Typography variant="body2" color="textSecondary" mb={1}>
                       Start Date - {formatDate(serviceData?.createdAt)}
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography variant="body2"mr={4}>
                       <span style={{ fontWeight: 500 }}>Service Description - </span>
                       <span style={{ color: 'rgba(0, 0, 0, 0.6)' }}>{serviceData?.description}</span>
                     </Typography>
                   </Stack>
                 </Grid>
+                <Grid item xs={12} md={2} sx={{ position: 'relative' }}>
+                  {!loading && (
+                    <Box
+                    ml={2}
+                      sx={{
+                        display: { xs: 'none', md: 'block' },
+                        position: 'absolute',
+                        bottom: 16,
+                        right: 16,
+                
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate('/add-session', { state: { serviceId: serviceData?._id } });
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: '#009fc7',
+                          textTransform: 'none',
+                          whiteSpace: 'nowrap',
+                          '&:hover': { backgroundColor: '#007da4' },
+                          paddingInline: '15px',
+                          paddingBlock: '7px',
+                          borderRadius: '10px'
+                        }}
+                      >
+                        Add New Session <AddIcon sx={{ ml: 1 }} />
+                      </Button>
+                    </Box>
+                  )}
+                </Grid>
               </Grid>
             )}
           </Card>
-          </Grid>
-   <FilterPanel
+        </Grid>
+        <FilterPanel
           showFilter={showFilter}
           dateAddedFilters={dateAddedFilters}
           dateOpenedFilter={dateOpenedFilter}
@@ -402,14 +416,14 @@ const ViewService = () => {
           customDateLabel="By Date"
           onReset={handleReset}
         />
-<Grid item xs={12} md={9}>
+        <Grid item xs={12} md={9}>
           <Card sx={{ borderRadius: 2, boxShadow: 0, backgroundColor: '#fff', height: 400, overflowY: 'auto' }}>
             <Typography variant="h5" m={1} p={1} fontWeight="550">
               Session List
             </Typography>
             <Divider />
 
-            <Stack spacing={1} mt={2}>
+            <Stack spacing={1} mt={1}>
               {loading2 ? (
                 <Box
                   sx={{
@@ -510,48 +524,6 @@ const ViewService = () => {
                     </Box>
 
                     <Box display="flex" alignItems="center" gap={1}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{
-                          backgroundColor: '#1B4B66',
-                          textTransform: 'none',
-                          fontSize: '10px',
-                          py: 0.6,
-                          px: 1.5,
-                          minWidth: 100,
-                          borderRadius: 1.5
-                        }}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          navigate('/add-session', { state: { session } });
-                        }}
-                      >
-                        Edit Session
-                      </Button>
-
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                          textTransform: 'none',
-                          color: '#1B4B66',
-                          fontSize: '10px',
-                          py: 0.6,
-                          px: 1.5,
-                          minWidth: 110,
-                          borderColor: '#1B4B66',
-                          borderRadius: 1.5,
-                          marginRight: '150px'
-                        }}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          navigate('/attendees', { state: { session } });
-                        }}
-                      >
-                        Add Attendee
-                      </Button>
-
                       <IconButton
                         size="small"
                         onClick={(event) => {

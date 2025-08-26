@@ -17,8 +17,6 @@ const ViewTransaction = () => {
     try {
       setLoading(true);
       const response = await getApi(`${urls.transaction.fetchTransactionById}/${id}`);
-      console.log(response);
-
       setTransactionData(response?.data?.data || null);
     } catch (error) {
       console.error('Failed to fetch transaction:', error);

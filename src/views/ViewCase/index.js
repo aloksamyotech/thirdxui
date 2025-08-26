@@ -172,11 +172,6 @@ const CaseDetailsPage = () => {
     setIsFiltered(false);
     fetchCaseNotes();
   };
-  useEffect(() => {
-    if (selectedCaseNote) {
-      setOpenNote(true);
-    }
-  }, [selectedCaseNote]);
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
@@ -676,6 +671,7 @@ const CaseDetailsPage = () => {
                 getRowId={(row) => row.id}
                 onRowClick={(row) => {
                   setSelectedCaseNote(row?.row);
+                  setOpenNote(true);
                 }}
                 // onRowClick={(row) => {
                 // navigate('/about-case-note', { state: { caseData: row?.row } });
@@ -723,7 +719,7 @@ const CaseDetailsPage = () => {
       />
       <AboutCaseNote
         open={openNote}
-        onClose={() => setOpenNote(false)}
+        onClose={() => setOpenNote(false) }
         caseData={selectedCaseNote}
         setSelectedCaseNote={setSelectedCaseNote}
       />

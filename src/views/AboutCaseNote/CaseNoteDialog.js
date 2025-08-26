@@ -34,6 +34,12 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
     setCaseNoteData(null);
     setSelectedCaseNote(null);
   };
+  const handleCloseTow = () => {
+    setAnchorEl(null);
+    setCaseNoteData(null);
+    setSelectedCaseNote(null);
+    onClose();
+  };
   const openDialog = Boolean(anchorEl);
   useEffect(() => {
     const fetchCaseNotes = async () => {
@@ -55,117 +61,113 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
 
   return (
     <>
-      {caseNoteData ? (
-        <Dialog
-          open={open}
-          onClose={onClose}
-          fullWidth
-          maxWidth="md"
-          PaperProps={{
-            sx: { borderRadius: 2, p: 1 }
-          }}
-        >
-          <DialogTitle sx={{ fontWeight: 600, fontSize: '18px' }}>Case Note</DialogTitle>
-          <DialogContent>
-            {loading ? (
-              <SectionSkeleton lines={1} variant="rectangular" height={150} spacing={1} />
-            ) : (
-              <>
-                <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px', mb: 2 }}>
-                  <TableContainer component={Paper} elevation={0}>
-                    <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
-                      <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                        <TableRow sx={{ height: 50 }}>
-                          {['Date', 'Subject', 'Contact Type', 'Created By', 'Hours'].map((header) => (
-                            <TableCell
-                              key={header}
-                              sx={{
-                                fontSize: '12px',
-                                whiteSpace: 'nowrap',
-                                padding: '10px',
-                                borderBottom: '1px solid lightgray',
-                                fontWeight: 600
-                              }}
-                            >
-                              {header}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow sx={{ borderBottom: '1px solid lightgray', height: 50 }}>
-                          <TableCell sx={{ fontSize: '12px', padding: '10px' }}>
-                            {caseNoteData?.date ? moment(caseNoteData?.date).format('MM/DD/YYYY') : '-'}
+      <Dialog
+        open={open}
+        onClose={handleCloseTow}
+        fullWidth
+        maxWidth="md"
+        PaperProps={{
+          sx: { borderRadius: 2, p: 1 }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 600, fontSize: '18px' }}>Case Note</DialogTitle>
+        <DialogContent>
+          {!caseNoteData ? (
+            <SectionSkeleton lines={1} variant="rectangular" height={150} spacing={1} />
+          ) : (
+            <>
+              <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px', mb: 2 }}>
+                <TableContainer component={Paper} elevation={0}>
+                  <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+                    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                      <TableRow sx={{ height: 50 }}>
+                        {['Date', 'Subject', 'Contact Type', 'Created By', 'Hours'].map((header) => (
+                          <TableCell
+                            key={header}
+                            sx={{
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap',
+                              padding: '10px',
+                              borderBottom: '1px solid lightgray',
+                              fontWeight: 600
+                            }}
+                          >
+                            {header}
                           </TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '10px' }}>{caseNoteData?.subject || '-'}</TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '10px' }}>{caseNoteData?.configurationId?.name || '-'}</TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '10px' }}>
-                            {caseNoteData?.createdBy?.accountType || caseNoteData?.createdBy?.firstName || '-'}
-                          </TableCell>
-                          <TableCell sx={{ fontSize: '12px', padding: '10px' }}>
-                            <Box
-                              sx={{
-                                display: 'inline-block',
-                                backgroundColor: '#E0F4FF',
-                                color: '#26C6F9',
-                                borderRadius: 3,
-                                px: 1,
-                                py: 0.3,
-                                fontSize: '12px',
-                                fontWeight: 500
-                              }}
-                            >
-                              {durationInHours.toFixed(2)} hr
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
-                <Typography fontSize="13px" mb={2} sx={{ whiteSpace: 'pre-line', padding: '10px' }}>
-                  {caseNoteData?.note || '-'}
-                </Typography>
-              </>
-            )}
-            <Stack direction="row" justifyContent="flex-end" spacing={2} mt={3}>
-              <Button
-                variant="contained"
-                onClick={handleClick}
-                sx={{
-                  borderRadius: '6px',
-                  width: '100px',
-                  height: '36px',
-                  fontSize: '12px',
-                  backgroundColor: '#009fc7',
-                  '&:hover': {
-                    backgroundColor: '#009fc7'
-                  }
-                }}
-              >
-                Manage
-              </Button>
-              <Button
-                variant="contained"
-                color="inherit"
-                onClick={onClose}
-                sx={{
-                  borderRadius: '6px',
-                  width: '100px',
-                  fontSize: '12px',
-                  backgroundColor: '#0A2C40',
-                  color: '#fff',
-                  '&:hover': { backgroundColor: '#0A2C40' }
-                }}
-              >
-                CLOSE
-              </Button>
-            </Stack>
-          </DialogContent>
-        </Dialog>
-      ) : (
-        'loading'
-      )}
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow sx={{ borderBottom: '1px solid lightgray', height: 50 }}>
+                        <TableCell sx={{ fontSize: '12px', padding: '10px' }}>
+                          {caseNoteData?.date ? moment(caseNoteData?.date).format('MM/DD/YYYY') : '-'}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '10px' }}>{caseNoteData?.subject || '-'}</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '10px' }}>{caseNoteData?.configurationId?.name || '-'}</TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '10px' }}>
+                          {caseNoteData?.createdBy?.accountType || caseNoteData?.createdBy?.firstName || '-'}
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '12px', padding: '10px' }}>
+                          <Box
+                            sx={{
+                              display: 'inline-block',
+                              backgroundColor: '#E0F4FF',
+                              color: '#26C6F9',
+                              borderRadius: 3,
+                              px: 1,
+                              py: 0.3,
+                              fontSize: '12px',
+                              fontWeight: 500
+                            }}
+                          >
+                            {durationInHours.toFixed(2)} hr
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+              <Typography fontSize="13px" mb={2} sx={{ whiteSpace: 'pre-line', padding: '10px' }}>
+                {caseNoteData?.note || '-'}
+              </Typography>
+            </>
+          )}
+          <Stack direction="row" justifyContent="flex-end" spacing={2} mt={3}>
+            <Button
+              variant="contained"
+              onClick={handleClick}
+              sx={{
+                borderRadius: '6px',
+                width: '100px',
+                height: '36px',
+                fontSize: '12px',
+                backgroundColor: '#009fc7',
+                '&:hover': {
+                  backgroundColor: '#009fc7'
+                }
+              }}
+            >
+              Manage
+            </Button>
+            <Button
+              variant="contained"
+              color="inherit"
+              onClick={handleCloseTow}
+              sx={{
+                borderRadius: '6px',
+                width: '100px',
+                fontSize: '12px',
+                backgroundColor: '#0A2C40',
+                color: '#fff',
+                '&:hover': { backgroundColor: '#0A2C40' }
+              }}
+            >
+              CLOSE
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
       <CasePopover open={openDialog} anchorEl={anchorEl} onClose={handleClose} data={caseData} />
     </>
   );

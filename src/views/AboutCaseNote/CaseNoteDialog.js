@@ -31,8 +31,14 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
   };
   const handleClose = () => {
     setAnchorEl(null);
-    setCaseNoteData(null)
-    setSelectedCaseNote(null)
+    setCaseNoteData(null);
+    setSelectedCaseNote(null);
+  };
+  const handleCloseTow = () => {
+    setAnchorEl(null);
+    setCaseNoteData(null);
+    setSelectedCaseNote(null);
+    onClose();
   };
   const openDialog = Boolean(anchorEl);
   useEffect(() => {
@@ -55,9 +61,9 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
 
   return (
     <>
-      {caseData ? <Dialog
+      <Dialog
         open={open}
-        onClose={onClose}
+        onClose={handleCloseTow}
         fullWidth
         maxWidth="md"
         PaperProps={{
@@ -66,7 +72,7 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
       >
         <DialogTitle sx={{ fontWeight: 600, fontSize: '18px' }}>Case Note</DialogTitle>
         <DialogContent>
-          {loading ? (
+          {!caseNoteData ? (
             <SectionSkeleton lines={1} variant="rectangular" height={150} spacing={1} />
           ) : (
             <>
@@ -147,7 +153,7 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
             <Button
               variant="contained"
               color="inherit"
-              onClick={onClose}
+              onClick={handleCloseTow}
               sx={{
                 borderRadius: '6px',
                 width: '100px',
@@ -161,7 +167,7 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
             </Button>
           </Stack>
         </DialogContent>
-      </Dialog> : "loading"}
+      </Dialog>
       <CasePopover open={openDialog} anchorEl={anchorEl} onClose={handleClose} data={caseData} />
     </>
   );

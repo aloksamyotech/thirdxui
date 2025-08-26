@@ -55,7 +55,7 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
 
   return (
     <>
-      <Dialog
+      {caseData ? <Dialog
         open={open}
         onClose={onClose}
         fullWidth
@@ -161,7 +161,7 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
             </Button>
           </Stack>
         </DialogContent>
-      </Dialog>
+      </Dialog> : "loading"}
       <CasePopover open={openDialog} anchorEl={anchorEl} onClose={handleClose} data={caseData} />
     </>
   );

@@ -414,6 +414,9 @@ const Financial = () => {
                     rowHeight={65}
                     loading={loading}
                     getRowId={(row) => row.id}
+                     onRowClick={(params) => {
+                        navigate('/view-transaction', { state: { id : params?.row?.id } });
+                      }}
                     pagination
                     paginationMode="server"
                     paginationModel={paginationModel}

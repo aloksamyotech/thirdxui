@@ -251,7 +251,6 @@ const ViewService = () => {
               </IconButton>
               Service Details
             </Typography>
-
           </Stack>
         </Grid>
       )}
@@ -341,8 +340,6 @@ const ViewService = () => {
                           </Typography>
                         </Stack>
                       </Box>
-
-                      {/* <EditOutlinedIcon sx={{ marginRight: '20px' }} /> */}
                     </Box>
 
                     <Typography variant="body2" color="textSecondary" mb={1}>
@@ -351,7 +348,7 @@ const ViewService = () => {
                     <Typography variant="body2" color="textSecondary" mb={1}>
                       Start Date - {formatDate(serviceData?.createdAt)}
                     </Typography>
-                    <Typography variant="body2"mr={4}>
+                    <Typography variant="body2" mr={4}>
                       <span style={{ fontWeight: 500 }}>Service Description - </span>
                       <span style={{ color: 'rgba(0, 0, 0, 0.6)' }}>{serviceData?.description}</span>
                     </Typography>
@@ -359,36 +356,47 @@ const ViewService = () => {
                 </Grid>
                 <Grid item xs={12} md={2} sx={{ position: 'relative' }}>
                   {!loading && (
-                    <Box
-                    ml={2}
-                      sx={{
-                        display: { xs: 'none', md: 'block' },
-                        position: 'absolute',
-                        bottom: 16,
-                        right: 16,
-                
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate('/add-session', { state: { serviceId: serviceData?._id } });
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        size="small"
+                    <>
+                      <IconButton
                         sx={{
-                          backgroundColor: '#009fc7',
-                          textTransform: 'none',
-                          whiteSpace: 'nowrap',
-                          '&:hover': { backgroundColor: '#007da4' },
-                          paddingInline: '15px',
-                          paddingBlock: '7px',
-                          borderRadius: '10px'
+                          position: 'absolute',
+                          top: 5,
+                          right: 8,
+                          zIndex: 2,
+                          marginTop:2
                         }}
                       >
-                        Add New Session <AddIcon sx={{ ml: 1 }} />
-                      </Button>
-                    </Box>
+                        <EditOutlinedIcon />
+                      </IconButton>
+                      <Box
+                        sx={{
+                          display: { xs: 'none', md: 'block' },
+                          position: 'absolute',
+                          bottom: 16,
+                          right: 16
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/add-session', { state: { serviceId: serviceData?._id } });
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          size="small"
+                          sx={{
+                            backgroundColor: '#009fc7',
+                            textTransform: 'none',
+                            whiteSpace: 'nowrap',
+                            '&:hover': { backgroundColor: '#007da4' },
+                            paddingInline: '15px',
+                            paddingBlock: '7px',
+                            borderRadius: '10px'
+                          }}
+                        >
+                          Add New Session <AddIcon sx={{ ml: 1 }} />
+                        </Button>
+                      </Box>
+                    </>
                   )}
                 </Grid>
               </Grid>

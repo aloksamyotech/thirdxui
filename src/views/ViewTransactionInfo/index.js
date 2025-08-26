@@ -110,11 +110,11 @@ const ViewTransaction = () => {
                   </Grid>
                   <Grid item xs={12} sm={6} md={4}>
                     <Typography fontWeight={500}>Quantity</Typography>
-                    <Typography color="text.secondary">{transactionData?.allocation?.quantity || '-'}</Typography>
+                    <Typography color="text.secondary">{transactionData?.quantity || '-'}</Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={4}>
                     <Typography fontWeight={500}>Amount Due</Typography>
-                    <Typography color="text.secondary">{transactionData?.allocation?.amountDue || '-'}</Typography>
+                    <Typography color="text.secondary">{transactionData?.amountDue || '-'}</Typography>
                   </Grid>
                 </Grid>
               </>

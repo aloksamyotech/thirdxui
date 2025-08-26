@@ -172,7 +172,11 @@ const CaseDetailsPage = () => {
     setIsFiltered(false);
     fetchCaseNotes();
   };
-
+  useEffect(() => {
+    if (selectedCaseNote) {
+      setOpenNote(true);
+    }
+  }, [selectedCaseNote]);
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
@@ -420,26 +424,30 @@ const CaseDetailsPage = () => {
                       }}
                     />
                   </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }} mt={1}>
+                    <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                       <span style={{ fontWeight: 600 }}>Name:</span> {serviceuserDetails?.personalInfo?.firstName || '-'}
                       {serviceuserDetails?.personalInfo?.lastName || ''}
                     </Typography>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>User ID:</span> {serviceuserDetails?.uniqueId || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>Gender:</span> {serviceuserDetails?.personalInfo?.gender || '-'}
                       </Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>Contact:</span> {serviceuserDetails?.contactInfo?.phone || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>DOB:</span>
                         {serviceuserDetails?.personalInfo?.dateOfBirth
                           ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
@@ -574,7 +582,7 @@ const CaseDetailsPage = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography fontWeight={500}>Case Id</Typography>
-                    <Typography color="text.secondary">{serviceuserDetails?.uniqueId || '-'}</Typography>
+                    <Typography color="text.secondary">{caseData?.uniqueId || '-'}</Typography>
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={3}>
@@ -586,10 +594,7 @@ const CaseDetailsPage = () => {
 
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography fontWeight={500}>Owner</Typography>
-                    <Typography color="text.secondary">
-                      {caseData?.caseOwnerDetails?.[0]?.personalInfo?.firstName || ''}{' '}
-                      {caseData?.caseOwnerDetails?.[0]?.personalInfo?.lastName || ''}
-                    </Typography>
+                    <Typography color="text.secondary">{caseData?.caseOwnerDetails?.[0]?.name || ''} </Typography>
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={3}>
@@ -670,8 +675,7 @@ const CaseDetailsPage = () => {
                 rowHeight={70}
                 getRowId={(row) => row.id}
                 onRowClick={(row) => {
-                  setSelectedCaseNote(row?.row); 
-                  setOpenNote(true); 
+                  setSelectedCaseNote(row?.row);
                 }}
                 // onRowClick={(row) => {
                 // navigate('/about-case-note', { state: { caseData: row?.row } });
@@ -717,7 +721,12 @@ const CaseDetailsPage = () => {
         title="Add Case Note"
         caseid={id}
       />
-      <AboutCaseNote open={openNote} onClose={() => setOpenNote(false)} caseData={selectedCaseNote} />
+      <AboutCaseNote
+        open={openNote}
+        onClose={() => setOpenNote(false)}
+        caseData={selectedCaseNote}
+        setSelectedCaseNote={setSelectedCaseNote}
+      />
       <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>
   );

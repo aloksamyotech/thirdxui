@@ -278,9 +278,9 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
           value={formData.notes}
           onChange={handleChange}
           sx={{ mb: 2 }}
-          inputProps={{ maxLength: 100 }}
-          error={Boolean(errors.notes) || formData.notes.length > 100}
-          helperText={errors.notes || (formData.notes.length > 100 ? 'Max 100 characters allowed' : '')}
+          inputProps={{ maxLength: 1000 }}
+          error={Boolean(errors.notes) || formData.notes.length > 1000}
+          helperText={errors.notes || (formData.notes.length > 1000 ? 'Max 1000 characters allowed' : '')}
         />
 
         <Box mt={1} display="flex" justifyContent="space-between" alignItems="center">

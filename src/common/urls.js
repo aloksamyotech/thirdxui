@@ -63,7 +63,8 @@ export const urls = Object.freeze({
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
     filterType: `${baseUrl}/transaction/filter`,
-    fetchWithPagination: `${baseUrl}/transaction/allwithpagination`
+    fetchWithPagination: `${baseUrl}/transaction/allwithpagination`,
+    fetchTransactionById: `${baseUrl}/transaction/transactionbyid`
   },
   comman: {
     getAllTagData: `${baseUrl}/CommanFuntions`

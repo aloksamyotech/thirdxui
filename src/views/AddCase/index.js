@@ -282,6 +282,18 @@ const AddCaseForm = () => {
   }, [searchQueryService]);
 
   const onlyLetters = /^[A-Za-z\s]*$/;
+  const openedDate = watch('caseOpened');
+  const closedDate = watch('caseClosed');
+
+  useEffect(() => {
+    if (closedDate && dayjs(closedDate).isBefore(dayjs(), 'day')) {
+      setValue('serviceStatus', 'closed');
+    } else if (openedDate && dayjs(openedDate).isAfter(dayjs(), 'day')) {
+      setValue('serviceStatus', 'pending');
+    } else {
+      setValue('serviceStatus', 'open');
+    }
+  }, [openedDate, closedDate, setValue]);
 
   return (
     <Card sx={{ position: 'relative', backgroundColor: '#eef2f6' }}>
@@ -313,9 +325,9 @@ const AddCaseForm = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card sx={{ padding: 2, marginTop: 2 }}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <Controller
                     name="serviceUserId"
                     control={control}
@@ -347,7 +359,7 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <Controller
                     name="serviceId"
                     control={control}
@@ -379,7 +391,7 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <Controller
                     name="caseOwner"
                     control={control}
@@ -410,8 +422,73 @@ const AddCaseForm = () => {
                     }}
                   />
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Controller
+                    name="serviceStatus"
+                    control={control}
+                    defaultValue="pending"
+                    render={({ field }) => (
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                          {...field}
+                          label="Status"
+                          value={field.value || 'pending'}
+                          disabled // 🔹 ye line add karo
+                          renderValue={(selected) => {
+                            if (selected === 'open') return 'Open';
+                            if (selected === 'closed') return 'Closed';
+                            return 'Pending';
+                          }}
+                        >
+                          <MenuItem value="open">
+                            <Chip
+                              label="Open"
+                              sx={{
+                                backgroundColor: '#E0F4FF',
+                                color: '#26C6F9',
+                                borderRadius: '16px',
+                                fontWeight: 500,
+                                px: 1.5,
+                                fontSize: '12px'
+                              }}
+                            />
+                          </MenuItem>
 
-                <Grid item xs={12} sm={4}>
+                          <MenuItem value="closed">
+                            <Chip
+                              label="Closed"
+                              sx={{
+                                backgroundColor: '#FFE0E0',
+                                color: '#F44336',
+                                borderRadius: '16px',
+                                fontWeight: 500,
+                                px: 1.5,
+                                fontSize: '12px'
+                              }}
+                            />
+                          </MenuItem>
+
+                          <MenuItem value="pending">
+                            <Chip
+                              label="Pending"
+                              sx={{
+                                backgroundColor: '#FFF4E0',
+                                color: '#FF9800',
+                                borderRadius: '16px',
+                                fontWeight: 500,
+                                px: 1.5,
+                                fontSize: '12px'
+                              }}
+                            />
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
                   <Controller
                     name="caseOpened"
                     control={control}
@@ -437,7 +514,7 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={6}>
                   <Controller
                     name="caseClosed"
                     control={control}
@@ -471,7 +548,7 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={12}>
                   <Box mb={2} display="flex" justifyContent="space-between">
                     <Controller
                       name="file"
@@ -520,26 +597,26 @@ const AddCaseForm = () => {
               </Grid>
             </Grid>
 
-            <Grid container spacing={2} sx={{ p: 2 }}>
-              <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
-                  <Typography variant="subtitle1" mb={4}>
-                    Case Tags
-                  </Typography>
+            {/* <Grid container spacing={2} sx={{ p: 2 }}> */}
+            <Grid item xs={12} md={6}>
+              <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                <Typography variant="subtitle1" mb={4}>
+                  Case Tags
+                </Typography>
 
+                <Grid container spacing={2}>
                   <Grid container spacing={2}>
-                    <Grid container spacing={2}>
-                      {allCategory?.map((category, index) => (
-                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
-                          {renderAutocomplete(`Beneficiary.${index}`, category.name, category.tags, null, null, control, category._id)}
-                        </Grid>
-                      ))}
-                    </Grid>
+                    {allCategory?.map((category, index) => (
+                      <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                        {renderAutocomplete(`Beneficiary.${index}`, category.name, category.tags, null, null, control, category._id)}
+                      </Grid>
+                    ))}
                   </Grid>
-                </Paper>
-              </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
 
-              <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                   <Controller
                     name="description"
@@ -559,8 +636,8 @@ const AddCaseForm = () => {
                     )}
                   />
                 </Paper>
-              </Grid>
-            </Grid>
+              </Grid> */}
+            {/* </Grid> */}
           </Grid>
         </Card>
 

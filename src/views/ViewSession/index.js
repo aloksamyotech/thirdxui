@@ -61,6 +61,7 @@ const ServiceDetails = () => {
 
   const fetchpeopleAttendee = async () => {
     if (!sessionId) return;
+    setLoading(true)
     try {
       const queryParams = new URLSearchParams({
         page: paginationModel.page + 1,
@@ -87,6 +88,8 @@ const ServiceDetails = () => {
       setTotalRows(response?.data?.meta?.total || 0);
     } catch (error) {
       toast.error('Failed to load attendees');
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -232,9 +235,9 @@ const ServiceDetails = () => {
                   }}
                   sx={{
                     borderRadius: '6px',
-                    width: '10%',
+                    width: '12%',
                     height: 'auto',
-                    fontSize: '10px',
+                    fontSize: '12px',
                     backgroundColor: '#009fc7',
                     '&:hover': {
                       backgroundColor: '#009fc7'
@@ -384,31 +387,36 @@ const ServiceDetails = () => {
                   width: '100%'
                 }}
               >
-                <Chip
-                  label={[sessionData?.[0]?.file].filter(Boolean).join(' ') || '-'}
-                  size="small"
-                  onDelete={() => {}}
-                  deleteIcon={
-                    <CancelIcon
-                      sx={{
-                        fontSize: 16,
-                        color: '#009FC7'
-                      }}
-                    />
-                  }
-                  sx={{
-                    backgroundColor: '#009FC7',
-                    color: '#FFFFFF',
-                    height: 24,
-                    fontSize: '0.75rem',
-                    padding: '0 4px',
-
-                    '& .MuiChip-deleteIcon': {
-                      marginLeft: '4px',
-                      color: '#009FC7'
+                {sessionData?.[0]?.file ? (
+                  <Chip
+                    label={sessionData[0].file}
+                    size="small"
+                    onDelete={() => {}}
+                    deleteIcon={
+                      <CancelIcon
+                        sx={{
+                          fontSize: 16,
+                          color: '#009FC7'
+                        }}
+                      />
                     }
-                  }}
-                />
+                    sx={{
+                      backgroundColor: '#009FC7',
+                      color: '#FFFFFF',
+                      height: 24,
+                      fontSize: '0.75rem',
+                      padding: '0 4px',
+                      '& .MuiChip-deleteIcon': {
+                        marginLeft: '4px',
+                        color: '#009FC7'
+                      }
+                    }}
+                  />
+                ) : (
+                  <Typography variant="body2" color="textSecondary">
+                    No attachment available
+                  </Typography>
+                )}
               </Box>
               <Box display="flex" alignItems="center" mb={2}>
                 <Typography variant="subtitle1">Session Tags</Typography>

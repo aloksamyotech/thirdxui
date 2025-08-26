@@ -70,7 +70,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     if (session && Object.keys(session).length > 0) {
       const formData = {
-        countryOfOrigin: session?.country || '',
+        countryOfOrigin: session?.country._id || session?.country ||'',
         date: session?.date ? dayjs(session.date) : dayjs(),
         time: session?.time || dayjs().format('HH:mm'),
         description: session?.description || '',

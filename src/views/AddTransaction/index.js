@@ -109,7 +109,7 @@ const AddCaseForm = ({ onCancel, fetchTransections }) => {
       return;
     }
 
-    const valid = await trigger(['product', 'contactPurpose', 'reason']);
+    const valid = await trigger(['product', 'quantity', 'amountDue']);
     if (!valid) return;
 
     try {
@@ -118,6 +118,8 @@ const AddCaseForm = ({ onCancel, fetchTransections }) => {
         campaign: data.campaign || '',
         amountPaid: data.amountPaid || '',
         paymentMethod: data.paymentMethod || '',
+        quantity: data.quantity || '',
+        amountDue: data.amountDue || '',
         processingCost: data.processingCost || '',
         currency: data.currency || '',
         receiptNumber: data.receiptNumber || '',
@@ -382,7 +384,7 @@ const AddCaseForm = ({ onCancel, fetchTransections }) => {
                           fullWidth
                           size="small"
                           label="Quantity"
-                          {...register('contactPurpose', {
+                          {...register('quantity', {
                             required: 'Quantity is required',
                             pattern: {
                               value: /^[0-9]+$/,
@@ -399,7 +401,7 @@ const AddCaseForm = ({ onCancel, fetchTransections }) => {
                           fullWidth
                           size="small"
                           label="Amount Due"
-                          {...register('reason', {
+                          {...register('amountDue', {
                             required: 'Amount Due is required'
                           })}
                           error={!!errors.reason}

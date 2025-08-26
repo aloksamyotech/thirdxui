@@ -22,7 +22,7 @@ import moment from 'moment';
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton';
 import CasePopover from 'components/CasePopover';
 
-const AboutCaseNote = ({ open, onClose, caseData }) => {
+const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
   const [caseNoteData, setCaseNoteData] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +31,8 @@ const AboutCaseNote = ({ open, onClose, caseData }) => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+    setCaseNoteData(null)
+    setSelectedCaseNote(null)
   };
   const openDialog = Boolean(anchorEl);
   useEffect(() => {

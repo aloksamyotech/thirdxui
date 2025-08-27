@@ -14,6 +14,11 @@ import { urls } from 'common/urls';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader.js';
 import CustomHeader from 'components/CustomHeader.js';
 import { dateAddedFilters, statusFilter } from 'common/constants.js';
+const donorTypes = [
+  { value: 'donar_individual', label: 'Individual' },
+  { value: 'donar_company', label: 'Company' },
+  { value: 'donar_group', label: 'Group' }
+];
 
 const Donor = () => {
   const navigate = useNavigate();
@@ -22,7 +27,7 @@ const Donor = () => {
   const [status, setStatus] = useState('');
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
-
+  const [donorType, setDonorType] = useState('');
   const [name, setNameFilter] = useState('');
   const [campaign, setCampaignFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,6 +37,8 @@ const Donor = () => {
   const [rows, setRows] = useState([]);
   const [includeArchives, setIncludeArchives] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [totalRows, setTotalRows] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -87,7 +94,13 @@ const Donor = () => {
 
       if (status) queryParams.append('status', status === 'active');
       if (name) queryParams.append('name', name);
-
+      if (donorType) queryParams.append('subRole', donorType);
+      if (startDate) {
+        queryParams.append('startDate', new Date(startDate).toISOString());
+      }
+      if (endDate) {
+        queryParams.append('endDate', new Date(endDate).toISOString());
+      }
       if (campaign) queryParams.append('campaigns', campaign);
 
       if (dateOpenedFilter) {
@@ -138,6 +151,9 @@ const Donor = () => {
     setNameFilter('');
     setDateOpenedFilter('');
     setSearchQuery('');
+    setStartDate(null);
+    setDonorType('');
+    setEndDate(null);
     setIsFiltered(false);
     setIncludeArchives(false);
     setPaginationModel({
@@ -147,12 +163,12 @@ const Donor = () => {
   };
 
   useEffect(() => {
-    if (status || dateOpenedFilter || name || campaign || searchQuery) {
+    if (status || dateOpenedFilter || name || campaign || searchQuery || startDate || endDate||donorType) {
       handleFilter();
     } else {
       fetchDonor();
     }
-  }, [status, dateOpenedFilter, name, campaign, searchQuery, paginationModel, isFiltered]);
+  }, [status, dateOpenedFilter, name, campaign, searchQuery, paginationModel, isFiltered, startDate, endDate,donorType]);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -233,7 +249,11 @@ const Donor = () => {
                 onClick={() => setOpenDialog(true)}
                 sx={{
                   backgroundColor: '#009fc7',
-                  borderRadius: '4px',
+                  textTransform: 'none',
+                  whiteSpace: 'nowrap',
+                  paddingInline: '15px',
+                  paddingBlock: '7px',
+                  borderRadius: '10px',
                   width: '220px',
                   height: '35px',
                   display: 'flex',
@@ -314,13 +334,19 @@ const Donor = () => {
               setDateOpenedFilter={setDateOpenedFilter}
               names={nameFilterOptions}
               nameFilter={name}
+              donorTypes={donorTypes}
+              setDonorTypeFilter={setDonorType}
+              startDate={startDate}
+              setStartDate={setStartDate}
+              endDate={endDate}
+              setEndDate={setEndDate}
               setNameFilter={setNameFilter}
               campaigns={campaignTypeOptions}
               campaignFilter={campaign}
               setCampaignFilter={setCampaignFilter}
               includeArchives={includeArchives}
               setIncludeArchives={setIncludeArchives}
-              selectedFilters={['statusFilter', 'dateOpenedFilter']}
+              selectedFilters={['donorTypeFilter', 'startDate', 'endDate', 'campaignFilter']}
               customDateLabel="By Date"
               onReset={handleReset}
             />

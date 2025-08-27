@@ -298,7 +298,7 @@ const AddCaseForm = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                   <Controller
                     name="name"
                     control={control}
@@ -321,7 +321,7 @@ const AddCaseForm = () => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                   <Controller
                     name="code"
                     control={control}
@@ -345,7 +345,7 @@ const AddCaseForm = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                   <Controller
                     name="serviceType"
                     control={control}
@@ -370,33 +370,59 @@ const AddCaseForm = () => {
                     }}
                   />
                 </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Controller
+                    name="file"
+                    control={control}
+                    rules={{
+                      validate: (file) => validateFile(file)
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
+                        placeholder="Upload Image"
+                        InputProps={{
+                          readOnly: true,
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <InsertPhotoOutlinedIcon fontSize="small" />
+                            </InputAdornment>
+                          ),
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                <Link component="span">Upload</Link>
+                                <input
+                                  type="file"
+                                  hidden
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    field.onChange(file);
+                                  }}
+                                />
+                              </Button>
+                            </InputAdornment>
+                          )
+                        }}
+                        error={!!errors.file}
+                        helperText={errors.file?.message}
+                      />
+                    )}
+                  />
+                </Grid>
               </Grid>
             </Grid>
 
             <Grid container spacing={2} sx={{ p: 2 }}>
               <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
-                  <Typography variant="subtitle1" mb={4}>
-                    Service Tag
-                  </Typography>
-
-                  <Grid container spacing={2}>
-                    <Grid container spacing={2}>
-                      {allCategory?.map((category) => (
-                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
-                          {renderAutocomplete(category.name, category.tags, category._id)}
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Grid>
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                   <Grid container spacing={2}>
                     {/* Attachments Field */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={12}>
                       <Controller
                         name="attachment"
                         control={control}
@@ -436,50 +462,6 @@ const AddCaseForm = () => {
                             }}
                             error={!!errors.attachment}
                             helperText={errors.attachment?.message}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Controller
-                        name="file"
-                        control={control}
-                        rules={{
-                          validate: (file) => validateFile(file)
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
-                            placeholder="Upload Image"
-                            InputProps={{
-                              readOnly: true,
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <InsertPhotoOutlinedIcon fontSize="small" />
-                                </InputAdornment>
-                              ),
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                    <Link component="span">Upload</Link>
-                                    <input
-                                      type="file"
-                                      hidden
-                                      accept="image/*"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        field.onChange(file);
-                                      }}
-                                    />
-                                  </Button>
-                                </InputAdornment>
-                              )
-                            }}
-                            error={!!errors.file}
-                            helperText={errors.file?.message}
                           />
                         )}
                       />
@@ -527,6 +509,23 @@ const AddCaseForm = () => {
                         sx={{ gap: 1 }}
                       />
                     </Grid> */}
+                  </Grid>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                  <Typography variant="subtitle1" mb={4}>
+                    Service Tags
+                  </Typography>
+
+                  <Grid container spacing={2}>
+                    <Grid container spacing={2}>
+                      {allCategory?.map((category) => (
+                        <Grid item xs={12} key={category._id} sx={{ ml: 2 }}>
+                          {renderAutocomplete(category.name, category.tags, category._id)}
+                        </Grid>
+                      ))}
+                    </Grid>
                   </Grid>
                 </Paper>
               </Grid>

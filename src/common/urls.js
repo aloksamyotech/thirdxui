@@ -63,7 +63,8 @@ export const urls = Object.freeze({
     create: `${baseUrl}/transaction/addtransaction`,
     fetch: `${baseUrl}/transaction/getalltransaction`,
     filterType: `${baseUrl}/transaction/filter`,
-    fetchWithPagination: `${baseUrl}/transaction/allwithpagination`
+    fetchWithPagination: `${baseUrl}/transaction/allwithpagination`,
+    fetchTransactionById: `${baseUrl}/transaction/transactionbyid`
   },
   comman: {
     getAllTagData: `${baseUrl}/CommanFuntions`
@@ -149,6 +150,7 @@ export const urls = Object.freeze({
   timeline: {
     giftaidCreate: `${baseUrl}/giftAid/:id`,
     attendeesCreate: `${baseUrl}/userTimeline/register-attendance/:id`,
+    taskCreate: `${baseUrl}/userTimeline/register-task/:id`,
     emailinboundCreate: `${baseUrl}/userTimeline/email-inbound/:id`,
     emailOutboundCreate: `${baseUrl}/userTimeline/email-outbound/:id`,
     phoneinboundCreate: `${baseUrl}/userTimeline/phone-inbound/:id`,
@@ -164,6 +166,7 @@ export const urls = Object.freeze({
     create: `${baseUrl}/list/addList`,
     fetch: `${baseUrl}/list/getallList`,
     fetchWithPagination: `${baseUrl}/list/allwithpagination`,
-    fetchListData: `${baseUrl}/list/getList`
+    fetchListData: `${baseUrl}/list/getList`,
+    assignTagToEntities:`${baseUrl}/list/addBulkTags`,
   }
 });

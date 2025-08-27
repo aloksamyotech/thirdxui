@@ -745,7 +745,7 @@ const AddCaseForm = ({ onCancel }) => {
                                 <Grid item xs={12}>
                                   <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                                     <Typography variant="subtitle1" mb={2}>
-                                      Donor Tag
+                                      Donor Tags
                                     </Typography>
                                     <Grid container spacing={2}>
                                       {allCategory?.map((category, index) => (

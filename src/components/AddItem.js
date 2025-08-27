@@ -11,6 +11,7 @@ import { ROLES } from 'common/constants';
 import { getApi } from 'common/apiClient';
 import { urls } from 'common/urls';
 import { toast } from 'react-toastify';
+import AddTaskDialog from './AddTaskDialog';
 
 const AddItemDialog = ({ open, onClose, onSelect,fetchTimeLineData, userId, role }) => {
   const navigate = useNavigate();
@@ -279,6 +280,15 @@ const AddItemDialog = ({ open, onClose, onSelect,fetchTimeLineData, userId, role
           type="letterSent"
           dialogTitle="Letter Sent"
           dateLabel="Letter Sent"
+        />
+      )}
+      {selectedForm === 'task' && (
+        <AddTaskDialog
+          open={true}
+          handleClose={() => setSelectedForm(null)}
+          userId={userId}
+          onClose={onClose}
+          fetchTimeLineData={fetchTimeLineData}
         />
       )}
     </Dialog>

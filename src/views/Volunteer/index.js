@@ -219,8 +219,12 @@ const Volunteer = () => {
             <IconButton
               onClick={() => navigate('/add-volunteer')}
               sx={{
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px',
                 backgroundColor: '#009fc7',
-                borderRadius: '4px',
                 width: '220px',
                 height: '35px',
                 display: 'flex',

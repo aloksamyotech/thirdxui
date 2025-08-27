@@ -83,9 +83,8 @@ const AboutCaseCard = ({ sessionData, caseId }) => {
                 Case Owner :
               </Box>{' '}
               <Box component="span" sx={{ fontWeight: '400', fontSize: '12px', lineHeight: '24px' }}>
-                {sessionData?.caseOwnerDetails?.[0]?.personalInfo?.firstName +
-                  ' ' +
-                  sessionData?.caseOwnerDetails?.[0]?.personalInfo?.lastName || '-'}
+                {sessionData?.caseOwnerDetails?.[0]?.name }
+                
               </Box>
             </Typography>
 

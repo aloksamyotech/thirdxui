@@ -26,7 +26,8 @@ const Financial = () => {
   const [name, setNameFilter] = useState('');
   const [nameFilters, setNameFilters] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [campaign, setCampaignFilter] = useState('');
   const [user, setUser] = useState([]);
   const [assignedTo, setAssignedTo] = useState('');
@@ -125,7 +126,12 @@ const Financial = () => {
 
       if (assignedTo) queryParams.append('donorId', assignedTo);
       if (campaignName) queryParams.append('campaign', campaignName);
-
+       if (startDate) {
+        queryParams.append('startDate', new Date(startDate).toISOString());
+      }
+      if (endDate) {
+        queryParams.append('endDate', new Date(endDate).toISOString());
+      }
       if (dateOpenedFilter && dateOpenedFilter !== '') {
         const formattedDate = new Date(dateOpenedFilter).toISOString().split('T')[0];
         queryParams.append('createdAt', formattedDate);
@@ -172,6 +178,8 @@ const Financial = () => {
   };
 
   const handleReset = () => {
+    setStartDate(null);
+    setEndDate(null);
     setCampaignName('');
     setCampaignFilter('');
     setNameFilter('');
@@ -181,10 +189,10 @@ const Financial = () => {
   };
 
   useEffect(() => {
-    if (assignedTo || dateOpenedFilter || isFiltered || searchQuery || campaignName) {
+    if (assignedTo || dateOpenedFilter || isFiltered || searchQuery || startDate || endDate || campaignName) {
       handleFilter();
     }
-  }, [assignedTo, dateOpenedFilter, searchQuery, campaignName]);
+  }, [assignedTo, dateOpenedFilter, startDate, endDate,searchQuery, campaignName]);
 
   const fetchData = async () => {
     try {
@@ -286,8 +294,12 @@ const Financial = () => {
             <IconButton
               onClick={handleOpen}
               sx={{
-                backgroundColor: '#009fc7',
-                borderRadius: '4px',
+                 backgroundColor: '#009fc7',
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                paddingInline: '15px',
+                paddingBlock: '7px',
+                borderRadius: '10px',
                 width: '220px',
                 height: '35px',
                 display: 'flex',
@@ -368,6 +380,10 @@ const Financial = () => {
             showFilter={showFilter}
             dateAddedFilters={dateAddedFilters}
             dateOpenedFilter={dateOpenedFilter}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
             setDateOpenedFilter={(value) => setDateOpenedFilter(value)}
             names={donorOptions}
             nameFilter={assignedTo}
@@ -375,7 +391,7 @@ const Financial = () => {
             campaigns={campaignTypeOptions}
             campaignFilter={campaignName}
             setCampaignFilter={(value) => setCampaignName(value)}
-            selectedFilters={['dateOpenedFilter']}
+            selectedFilters={['startDate','endDate',"campaignFilter",]}
             onReset={handleReset}
             customDateLabel="By Date"
           />
@@ -398,6 +414,9 @@ const Financial = () => {
                     rowHeight={65}
                     loading={loading}
                     getRowId={(row) => row.id}
+                     onRowClick={(params) => {
+                        navigate('/view-transaction', { state: { id : params?.row?.id } });
+                      }}
                     pagination
                     paginationMode="server"
                     paginationModel={paginationModel}

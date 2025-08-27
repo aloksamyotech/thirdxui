@@ -70,7 +70,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     if (session && Object.keys(session).length > 0) {
       const formData = {
-        countryOfOrigin: session?.country || '',
+        countryOfOrigin: session?.country._id || session?.country ||'',
         date: session?.date ? dayjs(session.date) : dayjs(),
         time: session?.time || dayjs().format('HH:mm'),
         description: session?.description || '',
@@ -312,7 +312,7 @@ const AddCaseForm = ({ onCancel }) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                   <Controller
                     name="date"
                     control={control}
@@ -332,8 +332,28 @@ const AddCaseForm = ({ onCancel }) => {
                     )}
                   />
                 </Grid>
-
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
+                  <Controller
+                    name="time"
+                    control={control}
+                    rules={{ required: 'Time is required' }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Time"
+                        type="time"
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        inputProps={{ step: 300 }}
+                        error={!!errors.time}
+                        helperText={errors.time?.message}
+                        {...field}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={3}>
                   <Controller
                     name="countryOfOrigin"
                     control={control}
@@ -358,7 +378,7 @@ const AddCaseForm = ({ onCancel }) => {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={3}>
                   <Controller
                     name="serviceUserId"
                     control={control}
@@ -393,12 +413,87 @@ const AddCaseForm = ({ onCancel }) => {
                 </Grid>
               </Grid>
             </Grid>
+             <Grid container spacing={2} sx={{ p: 2 }}>
+            <Grid item xs={12} md={6}>
+              <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                <Grid container spacing={2} mb={2}>
+                  <Grid item xs={12} sm={12}>
+                    <Controller
+                      name="file"
+                      control={control}
+                      rules={{
+                        validate: (file) => validateFile(file)
+                      }}
+                      render={({ field }) => (
+                        <Box mb={2} display="flex" justifyContent="space-between">
+                          <TextField
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={typeof field.value === 'string' ? field.value : field.value?.name || ''}
+                            placeholder="Attachments"
+                            InputProps={{
+                              readOnly: true,
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <AttachFileIcon fontSize="small" />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                    <Link component="span">Upload a file</Link>
+                                    <input
+                                      type="file"
+                                      hidden
+                                      accept=".pdf,.doc,.docx"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        field.onChange(file);
+                                      }}
+                                    />
+                                  </Button>
+                                </InputAdornment>
+                              )
+                            }}
+                            error={!!errors.file}
+                            helperText={errors.file?.message}
+                          />
+                        </Box>
+                      )}
+                    />
+                  </Grid>
+                </Grid>
 
-            <Grid container spacing={2} sx={{ p: 2 }}>
+                <Controller
+                  name="description"
+                  control={control}
+                  rules={{
+                    required: 'This field is required',
+                    minLength: { value: 2, message: 'Minimum 2 characters' },
+                    maxLength: { value: 500, message: 'Maximum 500 characters allowed' },
+                    //pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      label="Session Notes"
+                      multiline
+                      minRows={13}
+                      fullWidth
+                      variant="outlined"
+                      error={!!errors.description}
+                      helperText={errors.description?.message}
+                      {...field}
+                    />
+                  )}
+                />
+              </Paper>
+            </Grid>
+           
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                   <Typography variant="subtitle1" mb={4}>
-                    Session Tag
+                    Session Tags
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid container spacing={2}>
@@ -409,103 +504,6 @@ const AddCaseForm = ({ onCancel }) => {
                       ))}
                     </Grid>
                   </Grid>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
-                  <Grid container spacing={2} mb={2}>
-                    <Grid item xs={12} sm={6}>
-                      <Controller
-                        name="time"
-                        control={control}
-                        rules={{ required: 'Time is required' }}
-                        render={({ field }) => (
-                          <TextField
-                            label="Time"
-                            type="time"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{ step: 300 }}
-                            error={!!errors.time}
-                            helperText={errors.time?.message}
-                            {...field}
-                          />
-                        )}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <Controller
-                        name="file"
-                        control={control}
-                        rules={{
-                          validate: (file) => validateFile(file)
-                        }}
-                        render={({ field }) => (
-                          <Box mb={2} display="flex" justifyContent="space-between">
-                            <TextField
-                              variant="outlined"
-                              size="small"
-                              fullWidth
-                              value={typeof field.value === 'string' ? field.value : field.value?.name || ''}
-                              placeholder="Attachments"
-                              InputProps={{
-                                readOnly: true,
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <AttachFileIcon fontSize="small" />
-                                  </InputAdornment>
-                                ),
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                      <Link component="span">Upload a file</Link>
-                                      <input
-                                        type="file"
-                                        hidden
-                                        accept=".pdf,.doc,.docx"
-                                        onChange={(e) => {
-                                          const file = e.target.files?.[0];
-                                          field.onChange(file);
-                                        }}
-                                      />
-                                    </Button>
-                                  </InputAdornment>
-                                )
-                              }}
-                              error={!!errors.file}
-                              helperText={errors.file?.message}
-                            />
-                          </Box>
-                        )}
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Controller
-                    name="description"
-                    control={control}
-                    rules={{
-                      required: 'This field is required',
-                      minLength: { value: 2, message: 'Minimum 2 characters' },
-                      maxLength: { value: 500, message: 'Maximum 500 characters allowed' },
-                      pattern: { value: textOnlyRegex, message: 'Only letters allowed' }
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        label="Session Notes"
-                        multiline
-                        minRows={13}
-                        fullWidth
-                        variant="outlined"
-                        error={!!errors.description}
-                        helperText={errors.description?.message}
-                        {...field}
-                      />
-                    )}
-                  />
                 </Paper>
               </Grid>
             </Grid>

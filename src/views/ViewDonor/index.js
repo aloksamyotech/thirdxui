@@ -365,7 +365,7 @@ const UserProfileCard = () => {
               }}
             >
               <Tab
-                label="People"
+                label="Profile"
                 value={0}
                 sx={(theme) => ({
                   marginRight: 2

@@ -4,9 +4,11 @@ import { useState } from 'react';
 import LibraryAddCheckOutlinedIcon from '@mui/icons-material/LibraryAddCheckOutlined';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { IconTrash } from '@tabler/icons';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import toast from 'react-hot-toast';
 import { updateApi } from 'common/apiClient';
 import { urls } from 'common/urls';
+import AddItemDialog from './addBulkTagDialog';
 
 const CustomHeader = ({
   entityType = '',
@@ -19,9 +21,11 @@ const CustomHeader = ({
   extraActions = null,
   refetchData,
   isCompletlyDelete = false,
-  isShowArchive = true
+  isShowArchive = true,
+  isShowTags = false
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [opendialog, setOpen] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -31,6 +35,8 @@ const CustomHeader = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleOpen = () => setOpen(true);
+  const handleClosedialog = () => setOpen(false);
 
   const handleBulkDelete = async () => {
     try {
@@ -94,80 +100,88 @@ const CustomHeader = ({
   };
 
   return (
-    <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
-      <GridToolbarContainer
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          backgroundColor: '#f5f5f5',
-          borderBottom: '1px solid #ddd',
-          width: '100%',
-          height: '100%',
-          padding: '0 12px'
-        }}
-      >
-        <Typography
-          variant="h6"
+    <>
+    <AddItemDialog open={opendialog} onClose={handleClosedialog} entityType ={entityType} selectedIds = {selectedIds}></AddItemDialog>
+      <Box sx={{ height: '50px', display: 'flex', alignItems: 'center' }}>
+        <GridToolbarContainer
           sx={{
-            fontWeight: '400',
-            color: '#101010',
-            fontSize: '14px',
-            lineHeight: '36px'
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#f5f5f5',
+            borderBottom: '1px solid #ddd',
+            width: '100%',
+            height: '100%',
+            padding: '0 12px'
           }}
         >
-          {title}
-        </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: '400',
+              color: '#101010',
+              fontSize: '14px',
+              lineHeight: '36px'
+            }}
+          >
+            {title}
+          </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {enableBulkActions && (
-            <div>
-              <Tooltip
-                title={selectedIds?.length === 0 ? 'Please select any row' : ''}
-                disableHoverListener={selectedIds?.length !== 0}
-                arrow
-              >
-                <span>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleClick}
-                    disabled={selectedIds?.length === 0}
-                    sx={{
-                      backgroundColor: '#FAFAFA',
-                      borderRadius: '10px',
-                      textTransform: 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      pointerEvents: selectedIds?.length === 0 ? 'auto' : 'initial' // Required for tooltip to work on disabled button
-                    }}
-                  >
-                    Bulk Select
-                    <LibraryAddCheckOutlinedIcon fontSize="small" />
-                  </Button>
-                </span>
-              </Tooltip>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {enableBulkActions && (
+              <div>
+                <Tooltip
+                  title={selectedIds?.length === 0 ? 'Please select any row' : ''}
+                  disableHoverListener={selectedIds?.length !== 0}
+                  arrow
+                >
+                  <span>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleClick}
+                      disabled={selectedIds?.length === 0}
+                      sx={{
+                        backgroundColor: '#FAFAFA',
+                        borderRadius: '10px',
+                        textTransform: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        pointerEvents: selectedIds?.length === 0 ? 'auto' : 'initial' // Required for tooltip to work on disabled button
+                      }}
+                    >
+                      Bulk Select
+                      <LibraryAddCheckOutlinedIcon fontSize="small" />
+                    </Button>
+                  </span>
+                </Tooltip>
 
-              <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                <MenuItem onClick={handleBulkDelete}>
-                  Bulk Delete <IconTrash size={18} style={{ marginLeft: 8 }} />
-                </MenuItem>
-                {isShowArchive && (
-                  <MenuItem onClick={handleBulkArchive}>
-                    Bulk Archive <ArchiveIcon fontSize="small" style={{ marginLeft: 8 }} />
+                <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+                  <MenuItem onClick={handleBulkDelete}>
+                    Bulk Delete <IconTrash size={18} style={{ marginLeft: 8 }} />
                   </MenuItem>
-                )}
-              </Menu>
-            </div>
-          )}
+                  {isShowArchive && (
+                    <MenuItem onClick={handleBulkArchive}>
+                      Bulk Archive <ArchiveIcon fontSize="small" style={{ marginLeft: 8 }} />
+                    </MenuItem>
+                  )}
+                   {isShowTags && (
+                  <MenuItem onClick={handleOpen}>
+                    Tags Cases <LocalOfferIcon fontSize="small" style={{ marginLeft: 8 }} />
+                  </MenuItem>
+                  )}
+                </Menu>
+              </div>
+            )}
 
-          {extraActions}
+            {extraActions}
 
-          {exportEnabled && <GridToolbarExport />}
-        </Box>
-      </GridToolbarContainer>
-    </Box>
+            {exportEnabled && <GridToolbarExport />}
+          </Box>
+        </GridToolbarContainer>
+      </Box>
+    </>
   );
 };
 

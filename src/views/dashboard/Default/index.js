@@ -139,8 +139,8 @@ const Dashboard = () => {
             <Grid item>
               <DashboardCard title="Active Service Users" num1={`${totalActiveUser}`} num2="62" loading={isLoading} />
             </Grid>
-            <Grid item marginInline={5}>
-              <Shortcut2 icon={1} title="Add Person" path="/add-serviceuser" />
+            <Grid item marginInline={3}>
+              <Shortcut2 icon={1} title="Add Service User" path="/add-serviceuser" />
             </Grid>
           </Grid>
         </Grid>

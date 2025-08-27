@@ -175,7 +175,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
   const existingFileName = caseNoteData?.file ? caseNoteData.file.split('\\').pop() : '';
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="case-note-dialog">
-      <Box sx={{ width: 600, bgcolor: 'background.paper', p: 3, mx: 'auto', mt: '10%', borderRadius: 2, boxShadow: 24 }}>
+      <Box sx={{  bgcolor: 'background.paper', p: 3, mx: 'auto', mt: '10%', borderRadius: 2, boxShadow: 24, width:"60%"}}>
         <Typography variant="h5" gutterBottom>
           {title}
         </Typography>
@@ -227,7 +227,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
           </Grid>
         </Grid>
 
-        <Box mb={2} display="flex" justifyContent="space-between">
+        {/* <Box mb={2} display="flex" justifyContent="space-between">
           <TextField
             placeholder="Attachments"
             variant="outlined"
@@ -251,22 +251,8 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
             }}
           />
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
-        </Box>
+        </Box> */}
 
-        <TextField
-          fullWidth
-          multiline
-          size="small"
-          rows={3}
-          label="Case Notes"
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-          inputProps={{ maxLength: 100 }}
-          error={Boolean(errors.notes) || formData.notes.length > 100}
-          helperText={errors.notes || (formData.notes.length > 100 ? 'Max 100 characters allowed' : '')}
-        />
 
         <TextField
           fullWidth
@@ -281,6 +267,20 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
           inputProps={{ maxLength: 50 }}
           error={Boolean(errors.subject) || formData.subject.length > 50}
           helperText={errors.subject || (formData.subject.length > 50 ? 'Max 50 characters allowed' : '')}
+        />
+        <TextField
+          fullWidth
+          multiline
+          size="small"
+          rows={3}
+          label="Case Notes"
+          name="notes"
+          value={formData.notes}
+          onChange={handleChange}
+          sx={{ mb: 2 }}
+          inputProps={{ maxLength: 1000 }}
+          error={Boolean(errors.notes) || formData.notes.length > 1000}
+          helperText={errors.notes || (formData.notes.length > 1000 ? 'Max 1000 characters allowed' : '')}
         />
 
         <Box mt={1} display="flex" justifyContent="space-between" alignItems="center">

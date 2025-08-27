@@ -14,8 +14,9 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 const TimelineActivity = ({ timelineData }) => {
   return (
     <>
-      <Card sx={{ borderLeft: '1px solid #0000001A' }}>
-        <Timeline position="right">
+      <Card sx={{borderLeft: '1px solid #0000001A', display: 'flex', justifyContent: 'center',alignItems: 'center', minHeight: '100%'  }}>
+        <Box>
+        <Timeline position="center">
           {timelineData.map((item, index) => (
             <TimelineItem key={index}>
               <TimelineOppositeContent sx={{ flex: 0.15, paddingTop: '8px' }}>
@@ -93,6 +94,7 @@ const TimelineActivity = ({ timelineData }) => {
             </TimelineItem>
           ))}
         </Timeline>
+        </Box>
       </Card>
     </>
   );

@@ -35,6 +35,8 @@ const Mail = () => {
   });
   const [tagOptions, setTagOptions] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const tags = [
     { value: 'urgent', label: 'Urgent' },
@@ -78,7 +80,12 @@ const Mail = () => {
       if (tag && tag !== '') {
         queryParams.append('tag', tag);
       }
-
+      if (startDate) {
+        queryParams.append('startDate', new Date(startDate).toISOString());
+      }
+      if (endDate) {
+        queryParams.append('endDate', new Date(endDate).toISOString());
+      }
       if (searchQuery && searchQuery.trim() !== '') {
         queryParams.append('search', searchQuery.trim());
       }
@@ -125,10 +132,10 @@ const Mail = () => {
   };
 
   useEffect(() => {
-    if (listName || searchQuery || isFiltered || tag) {
+    if (listName || searchQuery || isFiltered || tag || startDate || endDate) {
       handleFilter();
     }
-  }, [listName || searchQuery || tag || value]);
+  }, [listName , searchQuery , tag , value , startDate , endDate]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -207,7 +214,11 @@ const Mail = () => {
                 onClick={() => setDialogOpen(true)}
                 sx={{
                   backgroundColor: '#009fc7',
-                  borderRadius: '4px',
+                  textTransform: 'none',
+                  whiteSpace: 'nowrap',
+                  paddingInline: '15px',
+                  paddingBlock: '7px',
+                  borderRadius: '10px',
                   width: '220px',
                   height: '35px',
                   display: 'flex',
@@ -349,8 +360,14 @@ const Mail = () => {
               setListNameFilter={(value) => setListName(value)}
               tags={tagOptions}
               tagFilter={tag}
+              startDate={startDate}
+              setStartDate={setStartDate}
+              endDate={endDate}
+              setEndDate={setEndDate}
               setTagFilter={(value) => setTag(value)}
-              selectedFilters={['listNameFilter', 'tagFilter']}
+              includeArchives={includeArchives}
+            setIncludeArchives={setIncludeArchives}
+              selectedFilters={['startDate','endDate','includeArchives']}
               onReset={handleReset}
             />
             <Grid item xs={9}>

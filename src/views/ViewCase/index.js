@@ -4,6 +4,7 @@ import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-g
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import FilterPanel from 'components/FilterPanel';
 import SearchIcon from '@mui/icons-material/Search';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Add, Visibility, VisibilityOff } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import LoopIcon from '@mui/icons-material/Loop';
@@ -21,12 +22,14 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 import { decodedToken } from 'utils/adminData.js';
 import StatusChip from 'views/AboutCase/StatusChip.js';
+import AboutCaseNote from 'views/AboutCaseNote/CaseNoteDialog.js';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(true);
   const [open, setOpen] = useState(false);
+  const [openNote, setOpenNote] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [showFilter, setShowFilter] = useState(true);
   const [dateOpenedFilter, setDateOpenedFilter] = useState('');
@@ -44,7 +47,7 @@ const CaseDetailsPage = () => {
   const [createdByFilter, setCreatedByFilter] = useState('');
   const [createdByOptions, setCreatedByOptions] = useState([]);
   const [AdminData, setAdminData] = useState([]);
-
+  const [selectedCaseNote, setSelectedCaseNote] = useState(null);
   const location = useLocation();
   const { id } = location.state || {};
 
@@ -169,7 +172,6 @@ const CaseDetailsPage = () => {
     setIsFiltered(false);
     fetchCaseNotes();
   };
-
   const handleFilter = async () => {
     try {
       const queryParams = new URLSearchParams();
@@ -373,7 +375,7 @@ const CaseDetailsPage = () => {
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <Card sx={{ mb: 2, backgroundColor: '#052c3f33', color: 'black', border: '1px solid #0080A1' }}>
+            <Card sx={{ mb: 2, backgroundColor: '#052c3f33', color: 'black', border: '1px solid #0080A1', minHeight: 171.5 }}>
               {loading ? (
                 <Box
                   sx={{
@@ -417,26 +419,30 @@ const CaseDetailsPage = () => {
                       }}
                     />
                   </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }} mt={1}>
+                    <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                       <span style={{ fontWeight: 600 }}>Name:</span> {serviceuserDetails?.personalInfo?.firstName || '-'}
                       {serviceuserDetails?.personalInfo?.lastName || ''}
                     </Typography>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>User ID:</span> {serviceuserDetails?.uniqueId || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>Gender:</span> {serviceuserDetails?.personalInfo?.gender || '-'}
                       </Typography>
                     </Box>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>Contact:</span> {serviceuserDetails?.contactInfo?.phone || '-'}
                       </Typography>
-                      <Typography sx={{ color: 'black', fontSize: '0.6rem' }}>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography sx={{ color: 'black', fontSize: '0.7rem' }}>
                         <span style={{ fontWeight: 600 }}>DOB:</span>
                         {serviceuserDetails?.personalInfo?.dateOfBirth
                           ? dayjs(serviceuserDetails.personalInfo.dateOfBirth).format('DD-MM-YYYY')
@@ -553,127 +559,77 @@ const CaseDetailsPage = () => {
               //   </TableContainer>
               // </Box>
 
-              <Box sx={{ backgroundColor: '#fff', width: '100%', borderRadius: '4px' }}>
-                <TableContainer component={Paper} elevation={0}>
-                  <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: 0 }}>
-                    <TableHead sx={{ backgroundColor: '#f5f5f5', padding: '20px' }}>
-                      <TableRow>
-                        {[
-                          'Case Id',
-                          'Service User',
-                          'Owner',
-                          'Date Opened',
-                          'Date Closed',
-                          'Attachments',
-                          'Total Hours',
-                          'Status',
-                          'View More'
-                        ].map((header) => (
-                          <TableCell
-                            key={header}
-                            sx={{
-                              fontSize: '12px',
-                              whiteSpace: 'nowrap',
-                              padding: '4px',
-                              borderBottom: 'none',
-                              height: '50px',
-                              ...(header === 'Total Hours' && { pr: 3 })
-                            }}
-                          >
-                            {header}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
+              <Box
+                sx={{
+                  backgroundColor: '#fff',
+                  width: '100%',
+                  borderRadius: '8px',
+                  p: 2,
+                  border: '1px solid #e0e0e0'
+                }}
+              >
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                  <Typography fontWeight="600">Case Information</Typography>
+                  <IconButton size="small" onClick={handleClick}>
+                    <InfoOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Case Id</Typography>
+                    <Typography color="text.secondary">{caseData?.uniqueId || '-'}</Typography>
+                  </Grid>
 
-                    <TableBody
-                      sx={{
-                        height: '73px',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor: 'grey.200'
-                        }
-                      }}
-                      onClick={handleClick}
-                    >
-                      <TableRow key={row.caseId}>
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                          {serviceuserDetails?.uniqueId || '-'}
-                        </TableCell>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Service User</Typography>
+                    <Typography color="text.secondary">
+                      {serviceuserDetails?.personalInfo?.firstName || ''} {serviceuserDetails?.personalInfo?.lastName || ''}
+                    </Typography>
+                  </Grid>
 
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                            {serviceuserDetails?.personalInfo?.firstName || '-'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                            {serviceuserDetails?.personalInfo?.lastName || ''}
-                          </Typography>
-                        </TableCell>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Owner</Typography>
+                    <Typography color="text.secondary">{caseData?.caseOwnerDetails?.[0]?.name || ''} </Typography>
+                  </Grid>
 
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                            {caseData?.caseOwnerDetails?.[0]?.personalInfo?.firstName || '-'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: '12px' }}>
-                            {caseData?.caseOwnerDetails?.[0]?.personalInfo?.lastName || ''}
-                          </Typography>
-                        </TableCell>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Date Opened</Typography>
+                    <Typography color="text.secondary">{caseData?.caseOpened ? formatDate(caseData.caseOpened) : '-'}</Typography>
+                  </Grid>
 
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                          {formatDate(caseData?.caseOpened || '')}
-                        </TableCell>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Date Closed</Typography>
+                    <Typography color="text.secondary">{caseData?.caseClosed ? formatDate(caseData.caseClosed) : '-'}</Typography>
+                  </Grid>
 
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                          {formatDate(caseData?.caseClosed || '')}
-                        </TableCell>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Attachments</Typography>
+                    <Typography color="text.secondary">
+                      {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
+                    </Typography>
+                  </Grid>
 
-                        <TableCell sx={{ fontSize: '12px', padding: '6px', borderBottom: 'none' }}>
-                          {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
-                        </TableCell>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Total hours</Typography>
+                    <Typography color="text.secondary">
+                      {(() => {
+                        if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
+                        const startDate = new Date(caseData.caseOpened);
+                        const endDate = new Date(caseData.caseClosed);
+                        const diffTime = Math.abs(endDate - startDate);
+                        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+                        return `${diffHours} hrs`;
+                      })()}
+                    </Typography>
+                  </Grid>
 
-                        <TableCell
-                          sx={{
-                            fontSize: '12px',
-                            padding: '6px',
-                            borderBottom: 'none',
-                            pr: 3
-                          }}
-                        >
-                          {(() => {
-                            if (!caseData?.caseOpened || !caseData?.caseClosed) return '0 hrs';
-                            const startDate = new Date(caseData.caseOpened);
-                            const endDate = new Date(caseData.caseClosed);
-                            const diffTime = Math.abs(endDate - startDate);
-                            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-                            return `${diffHours} hrs`;
-                          })()}
-                        </TableCell>
-
-                        <TableCell
-                          sx={{
-                            fontSize: '14px',
-                            padding: '2px',
-                            borderBottom: 'none'
-                          }}
-                        >
-                          <StatusChip status={caseData?.status.charAt(0).toUpperCase() + caseData?.status.slice(1).toLowerCase()} />
-                        </TableCell>
-
-                        <TableCell
-                          sx={{
-                            fontSize: '14px',
-                            padding: '4px',
-                            borderBottom: 'none'
-                          }}
-                        >
-                          <IconButton>
-                            <Visibility />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Status</Typography>
+                    <Typography color="text.secondary">
+                      {caseData?.status ? caseData.status.charAt(0).toUpperCase() + caseData.status.slice(1).toLowerCase() : '-'}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Box>
             )}
           </Grid>
@@ -714,8 +670,12 @@ const CaseDetailsPage = () => {
                 rowHeight={70}
                 getRowId={(row) => row.id}
                 onRowClick={(row) => {
-                  navigate('/about-case-note', { state: { caseData: row?.row } });
+                  setSelectedCaseNote(row?.row);
+                  setOpenNote(true);
                 }}
+                // onRowClick={(row) => {
+                // navigate('/about-case-note', { state: { caseData: row?.row } });
+                // }}
                 slots={{
                   toolbar: () => <CustomHeader />,
                   loadingOverlay: () => (
@@ -756,6 +716,12 @@ const CaseDetailsPage = () => {
         onSubmit={handleSave}
         title="Add Case Note"
         caseid={id}
+      />
+      <AboutCaseNote
+        open={openNote}
+        onClose={() => setOpenNote(false) }
+        caseData={selectedCaseNote}
+        setSelectedCaseNote={setSelectedCaseNote}
       />
       <UserProfileDialog open={open} handleClose={() => setOpen(false)} user={UserDetails} userView={fullImageUrl} />
     </>

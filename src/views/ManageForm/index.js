@@ -106,7 +106,7 @@ const Lead = () => {
       label: item?.type
     }));
     setFormTypes(optionsType);
-    setFormTitles(options)
+    setFormTitles(options);
   };
   useEffect(() => {
     getFormTypes();
@@ -173,7 +173,11 @@ const Lead = () => {
                   onClick={() => handleOpenAdd()}
                   sx={{
                     backgroundColor: '#009fc7',
-                    borderRadius: '4px',
+                    textTransform: 'none',
+                    whiteSpace: 'nowrap',
+                    paddingInline: '15px',
+                    paddingBlock: '7px',
+                    borderRadius: '10px',
                     width: '220px',
                     height: '35px',
                     display: 'flex',
@@ -262,9 +266,9 @@ const Lead = () => {
                     loading
                       ? []
                       : rows.map((row, index) => ({
-                        ...row,
-                        sNo: paginationModel.page * paginationModel.pageSize + index + 1
-                      }))
+                          ...row,
+                          sNo: paginationModel.page * paginationModel.pageSize + index + 1
+                        }))
                   }
                   columns={columns}
                   loading={loading}

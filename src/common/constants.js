@@ -110,7 +110,7 @@ export const permissionsList = [
   { label: 'Mailing List', key: 'mailingList' }
 ];
 
-export const channelOptions = ['telephone', 'email', 'letter', 'sms', 'whatsapp', 'donorTag'];
+export const channelOptions = ['telephone', 'email', 'letter', 'sms', 'whatsapp', 'donor_tag'];
 
 export const fieldOptions = [
   // Personal Info

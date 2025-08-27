@@ -998,7 +998,7 @@ const AddDonorForm = () => {
                         <Grid item xs={12} md={6}>
                           <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
                             <Typography variant="subtitle1" mb={4}>
-                              Donor Tag
+                              Donor Tags
                             </Typography>
 
                             <Grid container spacing={2}>

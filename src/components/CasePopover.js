@@ -28,7 +28,7 @@ import toast from 'react-hot-toast';
 import { postApi, updateApiPatch } from 'common/apiClient';
 import CaseNoteDialog from 'components/AddCaseNote';
 
-const CasePopover = ({ open, anchorEl, onClose, data }) => {
+const CasePopover = ({ open, anchorEl, onClose, data,closeNote }) => {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [confirmArchiveOpen, setConfirmArchiveOpen] = useState(false);
   const [archiveReason, setArchiveReason] = useState('');
@@ -54,17 +54,21 @@ const CasePopover = ({ open, anchorEl, onClose, data }) => {
       case 'Edit':
         setOpenCaseDialog(true);
         onClose();
+        closeNote();
         break;
       case 'Archive':
         setConfirmArchiveOpen(true);
         onClose();
+        closeNote();
         break;
       case 'Delete':
         setConfirmDeleteOpen(true);
         onClose();
+        closeNote();
         break;
       default:
         onClose();
+        closeNote();
     }
   };
 

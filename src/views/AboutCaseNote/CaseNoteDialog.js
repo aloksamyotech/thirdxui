@@ -168,7 +168,7 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
           </Stack>
         </DialogContent>
       </Dialog>
-      <CasePopover open={openDialog} anchorEl={anchorEl} onClose={handleClose} data={caseData} />
+      <CasePopover open={openDialog} anchorEl={anchorEl} onClose={handleClose} data={caseData} closeNote={handleCloseTow} />
     </>
   );
 };

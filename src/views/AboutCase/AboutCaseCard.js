@@ -127,7 +127,6 @@ const AboutCaseCard = ({ sessionData, caseId }) => {
                 {durationInHours.toFixed(2)} hr
               </Box>
             </Typography>
-
             <Typography>
               <Box component="span" sx={{ fontWeight: '600', fontSize: '12px', lineHeight: '24px', marginRight: '8px' }}>
                 Case Status :

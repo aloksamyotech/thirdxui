@@ -133,6 +133,39 @@ const AboutCaseNote = ({ open, onClose, caseData, setSelectedCaseNote }) => {
               </Typography>
             </>
           )}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'flex-end',
+              mt: 1,
+              mb: 1,
+              mr: 1
+            }}
+          >
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  fontSize: '12px'
+                }}
+              >
+                Created by {caseNoteData?.createdBy?.firstName || '-'} {caseNoteData?.createdBy?.lastName || ''}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  color: 'text.secondary',
+                  fontSize: '12px'
+                }}
+              >
+                On {caseNoteData?.date ? moment(caseNoteData.date).format('DD/MM/YYYY') : '-'}
+              </Typography>
+            </Box>
+          </Box>
+
           <Stack direction="row" justifyContent="flex-end" spacing={2} mt={3}>
             <Button
               variant="contained"

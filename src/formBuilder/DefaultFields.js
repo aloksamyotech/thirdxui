@@ -1,4 +1,17 @@
-import { Box, Button, FormControl, FormHelperText, FormLabel, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Switch,
+  Typography
+} from '@mui/material';
 import React, { useState } from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { toast } from 'react-toastify';
@@ -1036,28 +1049,32 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose, setF
         { id: 'donor_group', value: 'Donor Group' },
     ]
 
-    const validationSchema = yup.object({
-        formType: yup.
-            string()
-            .required('Form Type is Required.'),
-        // formTitle: yup.
-        //     string()
-        //     .max(50, "Form Title Cannot Exeed 50 Characters.")
-        //     .required('Form Title is Required.'),
-        // formRecord: yup.
-        //     string()
-        //     .required('Form Record is Required.'),
-        description: yup
-            .string()
-            .max(50, "Description Cannot Exceed 50 Characters.")
-    });
+  const validationSchema = yup.object({
+    formType: yup.string().required('Form Type is Required.'),
+    // formTitle: yup.
+    //     string()
+    //     .max(50, "Form Title Cannot Exeed 50 Characters.")
+    //     .required('Form Title is Required.'),
+    // formRecord: yup.
+    //     string()
+    //     .required('Form Record is Required.'),
+    description: yup.string().max(50, 'Description Cannot Exceed 50 Characters.'),
+    formRecord: yup.string().test('required-if-switch-true', 'Form Record is Required.', function (value) {
+      const { createRecord } = this.parent; 
+      if (createRecord) {
+        return !!value; 
+      }
+      return true;
+    })
+  });
 
-    const initialValues = {
-        formType: '',
-        // formTitle: '',
-        description: '',
-        formRecord: ''
-    };
+  const initialValues = {
+    formType: '',
+    // formTitle: '',
+    description: '',
+    formRecord: '',
+    createRecord: false
+  };
 
     const formik = useFormik({
         initialValues,
@@ -1091,36 +1108,40 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose, setF
         fetchData();
     }, [])
 
-    return (
-        <div style={{
-            padding: '10px 20px',
-        }}>
-            <p style={{ textAlign: 'start' }}>ADD FORM</p>
-            <Grid container spacing={2} rowSpacing={2} sx={{ pb: '20px' }}>
-                <Grid item xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id='formType'>Form Type</InputLabel>
-                        <Select
-                            labelId='formType'
-                            label='Form Type'
-                            id="formType"
-                            name="formType"
-                            size="small"
-                            value={formik.values.formType}
-                            onChange={formik.handleChange}
-                            error={formik.touched.formType && Boolean(formik.errors.formType)}
-                        >
-                            {/* {templates.map((template) => (
+  return (
+    <div
+      style={{
+        padding: '10px 20px'
+      }}
+    >
+      <p style={{ textAlign: 'start' }}>ADD FORM</p>
+      <Grid container spacing={2} rowSpacing={2} sx={{ pb: '20px' }}>
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <InputLabel id="formType">Form Type</InputLabel>
+            <Select
+              labelId="formType"
+              label="Form Type"
+              id="formType"
+              name="formType"
+              size="small"
+              value={formik.values.formType}
+              onChange={formik.handleChange}
+              error={formik.touched.formType && Boolean(formik.errors.formType)}
+            >
+              {/* {templates.map((template) => (
                                 <MenuItem value={template?.id} key={template?.id}>{template?.name}</MenuItem>
                             ))} */}
-                            {formTypes.map((template) => (
-                                <MenuItem value={template?.name} key={template?._id}>{template?.name}</MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.formType && formik?.errors?.formType}</FormHelperText>
-                    </FormControl>
-                </Grid>
-                {/* <Grid item xs={6}>
+              {formTypes.map((template) => (
+                <MenuItem value={template?.name} key={template?._id}>
+                  {template?.name}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.formType && formik?.errors?.formType}</FormHelperText>
+          </FormControl>
+        </Grid>
+        {/* <Grid item xs={6}>
                     <FormControl fullWidth>
                         <Select
                             labelId='title'
@@ -1149,57 +1170,86 @@ const DefaultFields = ({ templateData, setTemplateData, setPreset, onClose, setF
                         <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.formTitle && formik?.errors?.formTitle}</FormHelperText>
                     </FormControl>
                 </Grid> */}
-                <Grid item xs={12}>
-                    <FormControl fullWidth>
-                        <TextField
-                            id="description"
-                            name="description"
-                            size="small"
-                            placeholder='Form Description'
-                            value={formik.values.description}
-                            onChange={formik.handleChange}
-                            error={formik.touched.description && Boolean(formik.errors.description)}
-                        />
-                        <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.description && formik?.errors?.description}</FormHelperText>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                    <FormControl fullWidth>
-                        <InputLabel id='record'>Choose the type of record</InputLabel>
-                        <Select
-                            labelId='record'
-                            label='Choose the type of record'
-                            id="formRecord"
-                            name="formRecord"
-                            size="small"
-                            value={formik.values.formRecord}
-                            onChange={formik.handleChange}
-                            error={formik.touched.formRecord && Boolean(formik.errors.formRecord)}
-                        >
-                            {records.map((template, i) => (
-                                <MenuItem value={template?.id} key={i}>{template?.value}</MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.formRecord && formik?.errors?.formRecord}</FormHelperText>
-                    </FormControl>
-                </Grid>
-            </Grid>
-            <div style={{ display: 'flex', gap: '20px', justifyContent: 'flex-end' }}>
-                <Button
-                    variant='contained'
-                    sx={{ bgcolor: '#053146', color: '#fff' }}
-                    onClick={formik.handleSubmit}
-                >
-                    Save Changes</Button>
-                <Button
-                    variant='outlined'
-                    sx={{ color: '#8287ff', border: '1px solid #8287ff' }}
-                    onClick={() => { formik.resetForm; onClose() }}
-                >
-                    Cancel</Button>
-            </div>
-        </div>
-    );
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <TextField
+              id="description"
+              name="description"
+              size="small"
+              placeholder="Form Description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              error={formik.touched.description && Boolean(formik.errors.description)}
+            />
+            <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.description && formik?.errors?.description}</FormHelperText>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <InputLabel id="record">Choose the type of record</InputLabel>
+            <Select
+              labelId="record"
+              label="Choose the type of record"
+              id="formRecord"
+              name="formRecord"
+              size="small"
+              value={formik.values.formRecord}
+              onChange={formik.handleChange}
+              error={formik.touched.formRecord && Boolean(formik.errors.formRecord)}
+            >
+              {records.map((template, i) => (
+                <MenuItem value={template?.id} key={i}>
+                  {template?.value}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText sx={{ color: '#e74c3c' }}>{formik?.touched?.formRecord && formik?.errors?.formRecord}</FormHelperText>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mt: 3,
+          p: 1
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Will This Form Be Used To Create A Persons Record?
+          </Typography>
+          <Switch
+            checked={formik.values.createRecord}
+            onChange={(e) => formik.setFieldValue('createRecord', e.target.checked)}
+            color="primary"
+          />
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button variant="contained" sx={{ bgcolor: '#053146', color: '#fff', textTransform: 'none' }} onClick={formik.handleSubmit}>
+            Save Changes
+          </Button>
+
+          <Button
+            variant="outlined"
+            sx={{
+              color: '#8287ff',
+              border: '1px solid #8287ff',
+              textTransform: 'none'
+            }}
+            onClick={() => {
+              formik.resetForm();
+              onClose();
+            }}
+          >
+            Cancel
+          </Button>
+        </Box>
+      </Box>
+    </div>
+  );
 };
 
 export default DefaultFields;

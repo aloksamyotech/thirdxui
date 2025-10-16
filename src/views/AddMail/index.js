@@ -189,6 +189,7 @@ const MailingListForm = () => {
     setFilters(validatedFilters);
   };
 
+  const getLabel = (field) => field?.replace('personalInfo.', '')?.replace('contactInfo.', '')?.replace('emergencyContact.', '');
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -364,6 +365,7 @@ const MailingListForm = () => {
                       value={filter.field || null}
                       onChange={(event, newValue) => handleFilterChange(filter.id, 'field', newValue)}
                       disableClearable
+                      getOptionLabel={(option) => getLabel(option)}
                       renderInput={(params) => (
                         <TextField
                           {...params}

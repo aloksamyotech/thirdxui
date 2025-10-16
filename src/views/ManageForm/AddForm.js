@@ -8,37 +8,43 @@ import TemplateThree from 'formBuilder/TemplateThree';
 import { useEffect } from 'react';
 import DefaultFields from 'formBuilder/DefaultFields';
 
-const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
-
+const AddFormModal = ({ open = false, onClose = () => {}, getAllForms }) => {
   const [formData, setFormData] = useState(() => {
-    const savedData = localStorage.getItem("formData");
+    const savedData = localStorage.getItem('formData');
     return savedData ? JSON.parse(savedData) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem("formData", JSON.stringify(formData));
+    localStorage.setItem('formData', JSON.stringify(formData));
   }, [formData]);
 
   const [preset, setPreset] = useState(true);
   const [preview, setPreview] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [templateData, setTemplateData] = useState([]);
-  const [formValues, setFormValues] = useState()
+  const [formValues, setFormValues] = useState();
+  useEffect(() => {
+    if (open) {
+      setPreset(true);
+      setPreview(false);
+      setSelectedTemplate(null);
+      setTemplateData([]);
+      setFormValues(undefined);
+    }
+  }, [open]);
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='md'>
-      {
-        preset &&
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      {preset && (
         <DefaultFields
           templateData={templateData}
           setTemplateData={setTemplateData}
           setPreset={setPreset}
           onClose={onClose}
           setFormValues={setFormValues}
-        />}
-      {
-        !preview &&
-        !preset &&
+        />
+      )}
+      {!preview && !preset && (
         <FormBuilder
           setFormData={setFormData}
           formData={formData}
@@ -46,17 +52,13 @@ const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
           onClose={onClose}
           templateData={templateData}
           setTemplateData={setTemplateData}
-          setPreset={setPreset} />}
-      {
-        preview &&
-        !selectedTemplate &&
-        <SelectTemplate
-          setPreview={setPreview}
-          setSelectedTemplate={setSelectedTemplate}
-          onClose={onClose}
-          setPreset={setPreset} />}
-      {
-        selectedTemplate === 1 &&
+          setPreset={setPreset}
+        />
+      )}
+      {preview && !selectedTemplate && (
+        <SelectTemplate setPreview={setPreview} setSelectedTemplate={setSelectedTemplate} onClose={onClose} setPreset={setPreset} />
+      )}
+      {selectedTemplate === 1 && (
         <TemplateOne
           formValues={formValues}
           formData={formData}
@@ -65,19 +67,11 @@ const AddFormModal = ({ open = false, onClose = () => { }, getAllForms }) => {
           setPreview={setPreview}
           setPreset={setPreset}
           onClose={onClose}
-          getAllForms={getAllForms} />}
-      {
-        selectedTemplate === 2 &&
-        <TemplateTwo
-          formData={formData}
-          setSelectedTemplate={setSelectedTemplate}
-          setPreview={setPreview} />}
-      {
-        selectedTemplate === 3 &&
-        <TemplateThree
-          formData={formData}
-          setSelectedTemplate={setSelectedTemplate}
-          setPreview={setPreview} />}
+          getAllForms={getAllForms}
+        />
+      )}
+      {selectedTemplate === 2 && <TemplateTwo formData={formData} setSelectedTemplate={setSelectedTemplate} setPreview={setPreview} />}
+      {selectedTemplate === 3 && <TemplateThree formData={formData} setSelectedTemplate={setSelectedTemplate} setPreview={setPreview} />}
     </Dialog>
   );
 };

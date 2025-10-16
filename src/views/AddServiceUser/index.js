@@ -637,6 +637,7 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
+                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -648,6 +649,7 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
+                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -659,6 +661,7 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
+                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -670,6 +673,7 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
+                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />
@@ -681,6 +685,7 @@ const AddCaseForm = ({ onCancel }) => {
                   marginRight: 2,
                   fontSize: '14px',
                   minWidth: 120,
+                  fontWeight: 'bold',
                   textTransform: 'none'
                 })}
               />

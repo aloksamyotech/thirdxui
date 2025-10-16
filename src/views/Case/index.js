@@ -94,7 +94,14 @@ const Case = () => {
       field: 'dateClosed',
       headerName: 'Date Closed',
       width: 105,
-      valueGetter: (params) => params.value || '-'
+      valueGetter: (params) => {
+        const status = params.row.status;
+        const dateClosed = params.row.dateClosed;
+        if (status === 'close' && dateClosed) {
+          return dateClosed;
+        }
+        return '-';
+      }
     }
   ];
 
@@ -174,7 +181,7 @@ const Case = () => {
   };
 
   useEffect(() => {
-    if (serviceType || status || caseOwner || dateOpenedFilter ||startDate||endDate|| searchQuery || isFiltered) {
+    if (serviceType || status || caseOwner || dateOpenedFilter || startDate || endDate || searchQuery || isFiltered) {
       handleFilter();
     }
   }, [serviceType, status, caseOwner, dateOpenedFilter, searchQuery, startDate, endDate]);

@@ -113,7 +113,8 @@ export const urls = Object.freeze({
     create: `${baseUrl}/attendees/addAttendee`,
     getAttendeesBySession: `${baseUrl}/attendees/getattendeeBySession`,
     fetchWithPagination: `${baseUrl}/attendees/getwithpagination`,
-    fetch: `${baseUrl}/attendees/getwithpagination`
+    fetch: `${baseUrl}/attendees/getwithpagination`,
+    delete: `${baseUrl}/attendees`
   },
   dashboard: {
     getTotalDonation: `${baseUrl}/dashboard/totalDonantion`,
@@ -162,11 +163,11 @@ export const urls = Object.freeze({
   duplicate: {
     getallDuplicateUsers: `${baseUrl}/duplicate/getallduplicate`
   },
-  list:{
+  list: {
     create: `${baseUrl}/list/addList`,
     fetch: `${baseUrl}/list/getallList`,
     fetchWithPagination: `${baseUrl}/list/allwithpagination`,
     fetchListData: `${baseUrl}/list/getList`,
-    assignTagToEntities:`${baseUrl}/list/addBulkTags`,
+    assignTagToEntities: `${baseUrl}/list/addBulkTags`
   }
 });

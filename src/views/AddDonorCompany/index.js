@@ -37,11 +37,11 @@ import config from '../../config';
 import { stateStyles } from 'common/constants';
 
 const contactMethodInitial = {
-  donerTag: 0,
+  // donerTag: 0,
+  Whatsapp: 0,
   Email: 0,
-  Letter: 0,
   SMS: 0,
-  Whatsapp: 0
+  Letter: 0
 };
 
 const AddCaseForm = ({ onCancel }) => {
@@ -113,7 +113,7 @@ const AddCaseForm = ({ onCancel }) => {
       referrerEmail: editdata?.referrer?.email || '',
       referrerPhone: editdata?.referrer?.phone || '',
       referralType: editdata?.referrer?.referralType || '',
-      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
+      // donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
       letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
@@ -301,7 +301,7 @@ const AddCaseForm = ({ onCancel }) => {
 
     fd.append('contactPreferences[contactMethods][email]', data.email ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
+    // fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
     fd.append('companyInformation[companyName]', data.companyname || '');
@@ -387,7 +387,7 @@ const AddCaseForm = ({ onCancel }) => {
       const contactMethods = editdata?.contactPreferences?.contactMethods || {};
 
       setContactMethodStates({
-        donerTag: booleanToState(contactMethods?.donor),
+        // donerTag: booleanToState(contactMethods?.donor),
         Email: booleanToState(contactMethods?.email),
         SMS: booleanToState(contactMethods?.sms),
         Whatsapp: booleanToState(contactMethods?.whatsapp),
@@ -461,7 +461,7 @@ const AddCaseForm = ({ onCancel }) => {
               }}
             >
               <Tab
-                label="Personal Details"
+                label="Details"
                 sx={(theme) => ({
                   backgroundColor: tabIndex === 0 ? '#e3f2fd' : 'transparent',
                   transition: 'background-color 0.3s ease',

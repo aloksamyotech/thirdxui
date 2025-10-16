@@ -429,7 +429,7 @@ const Financial = () => {
                       toolbar: () => (
                         <CustomHeader
                           entityType="donationTransaction"
-                          title="Donation Transactions"
+                          title="Transaction Information"
                           selectedIds={selectedIds}
                           enableBulkActions={false}
                           exportEnabled={true}

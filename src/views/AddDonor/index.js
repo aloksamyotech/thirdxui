@@ -37,11 +37,11 @@ import config from '../../config';
 import { stateStyles } from 'common/constants';
 import { validateFile } from 'utils/filevalidator';
 const contactMethodInitial = {
-  donerTag: 0,
+  // donerTag: 0,
+  Whatsapp: 0,
   Email: 0,
-  letter: 0,
   SMS: 0,
-  Whatsapp: 0
+  letter: 0
 };
 
 const AddDonorForm = () => {
@@ -85,13 +85,17 @@ const AddDonorForm = () => {
       title: editdata?.personalInfo?.title || '',
       firstname: editdata?.personalInfo?.firstName || '',
       lastname: editdata?.personalInfo?.lastName || '',
+      preferredName: editdata?.personalInfo?.preferredName || '',
+      otherId: editdata?.personalInfo?.otherId || '',
       phone: editdata?.contactInfo?.phone || '',
       mobilePhone: editdata?.contactInfo?.homePhone || '',
       Contact_email: editdata?.contactInfo?.email || '',
       gender: editdata?.personalInfo?.gender || '',
       dob: editdata?.personalInfo?.dateOfBirth ? dayjs(editdata.personalInfo.dateOfBirth) : null,
       address: editdata?.contactInfo?.addressLine1 || '',
+      address3: editdata?.contactInfo?.addressLine3 || '',
       address2: editdata?.contactInfo?.addressLine2 || '',
+      town: editdata?.contactInfo?.town || '',
       district: editdata?.contactInfo?.district || '',
       pinCode: editdata?.contactInfo?.postcode || '',
       country: editdata?.contactInfo?.country || '',
@@ -106,7 +110,7 @@ const AddDonorForm = () => {
       emailConsent: editdata?.contactPreferences?.contactMethods?.email ?? false,
       sms: editdata?.contactPreferences?.contactMethods?.sms ?? false,
       whatsapp: editdata?.contactPreferences?.contactMethods?.whatsapp ?? false,
-      donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
+      // donerTag: editdata?.contactPreferences?.contactMethods?.donor ?? false,
       letter: editdata?.contactPreferences?.contactMethods?.letter ?? false,
       socialmedia: editdata?.companyInformation?.socialMediaLinks || '',
       Recruitmentcampaign: editdata?.companyInformation?.recruitmentCampaign?._id || '',
@@ -263,12 +267,16 @@ const AddDonorForm = () => {
     fd.append('personalInfo[title]', data.title || '');
     fd.append('personalInfo[firstName]', data.firstname || '');
     fd.append('personalInfo[lastName]', data.lastname || '');
+    fd.append('personalInfo[preferredName]', data.preferredName || '');
+    fd.append('personalInfo[otherId]', data.otherId || '');
     fd.append('personalInfo[gender]', data.gender || '');
     fd.append('personalInfo[dateOfBirth]', data.dob ? new Date(data.dob).toISOString() : '');
     fd.append('contactInfo[phone]', data.phone || '');
     fd.append('contactInfo[homePhone]', data.mobilePhone || '');
     fd.append('contactInfo[email]', data.Contact_email || '');
     fd.append('contactInfo[addressLine1]', data.address || '');
+    fd.append('contactInfo[addressLine3]', data.address3 || '');
+    fd.append('contactInfo[town]', data.town || '');
     fd.append('contactInfo[addressLine2]', data.address2 || '');
     fd.append('contactInfo[district]', data.district || '');
     fd.append('contactInfo[postcode]', data.pinCode || '');
@@ -298,7 +306,7 @@ const AddDonorForm = () => {
     fd.append('contactPreferences[contactMethods][sms]', data.sms ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][whatsapp]', data.whatsapp ? 'true' : 'false');
     fd.append('contactPreferences[contactMethods][letter]', data.letter ? 'true' : 'false');
-    fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
+    // fd.append('contactPreferences[contactMethods][donor]', data.donertag ? 'true' : 'false');
 
     fd.append('companyInformation[socialMediaLinks]', data.socialmedia || '');
     if (data.Recruitmentcampaign) {
@@ -358,7 +366,7 @@ const AddDonorForm = () => {
       const contactMethods = editdata?.contactPreferences?.contactMethods || {};
 
       setContactMethodStates({
-        donerTag: booleanToState(contactMethods?.donor),
+        // donerTag: booleanToState(contactMethods?.donor),
         Email: booleanToState(contactMethods?.email),
         SMS: booleanToState(contactMethods?.sms),
         Whatsapp: booleanToState(contactMethods?.whatsapp),
@@ -610,6 +618,57 @@ const AddDonorForm = () => {
                               />
                             </Grid>
 
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="preferredName"
+                                control={control}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Preferred Name ( nickname )"
+                                    size="small"
+                                    error={!!errors.preferredName}
+                                    helperText={errors.preferredName?.message}
+                                    inputProps={{
+                                      pattern: onlyLetters.source,
+                                      onKeyPress: (e) => {
+                                        if (!onlyLetters.test(e.key)) {
+                                          e.preventDefault();
+                                        }
+                                      }
+                                    }}
+                                    {...field}
+                                  />
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="otherId"
+                                control={control}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Other Id"
+                                    size="small"
+                                    error={!!errors.otherId}
+                                    helperText={errors.otherId?.message}
+                                    inputProps={{
+                                      pattern: /^[A-Za-z0-9\s'-]+$/.source,
+                                      onKeyPress: (e) => {
+                                        const allowed = /^[A-Za-z0-9\s'-]$/;
+                                        if (!allowed.test(e.key)) {
+                                          e.preventDefault();
+                                        }
+                                      }
+                                    }}
+                                    {...field}
+                                  />
+                                )}
+                              />
+                            </Grid>
+
                             <Grid item xs={12}>
                               <Controller
                                 name="dob"
@@ -823,6 +882,60 @@ const AddDonorForm = () => {
                                     size="small"
                                     error={!!errors.address2}
                                     helperText={errors.address2?.message}
+                                    inputProps={{
+                                      pattern: onlyLettersAndNumbers.source
+                                    }}
+                                    {...field}
+                                  />
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="address3"
+                                control={control}
+                                rules={{
+                                  minLength: {
+                                    value: 5,
+                                    message: 'Address must be at least 5 characters'
+                                  },
+                                  maxLength: {
+                                    value: 100,
+                                    message: 'Address cannot exceed 100 characters'
+                                  },
+                                  pattern: {
+                                    value: /^[a-zA-Z0-9\s.,\-/#&()']+$/,
+                                    message: 'Address can only contain letters, numbers, spaces, and valid special characters'
+                                  }
+                                }}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Address Line 3"
+                                    size="small"
+                                    error={!!errors.address3}
+                                    helperText={errors.address3?.message}
+                                    inputProps={{
+                                      pattern: onlyLettersAndNumbers.source
+                                    }}
+                                    {...field}
+                                  />
+                                )}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Controller
+                                name="town"
+                                control={control}
+                                render={({ field }) => (
+                                  <TextField
+                                    fullWidth
+                                    label="Town"
+                                    size="small"
+                                    error={!!errors.town}
+                                    helperText={errors.town?.message}
                                     inputProps={{
                                       pattern: onlyLettersAndNumbers.source
                                     }}

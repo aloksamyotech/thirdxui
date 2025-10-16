@@ -240,7 +240,7 @@ const MailingListForm = () => {
             <Controller
               name="tags"
               control={control}
-              rules={{ required: 'This field is required' }}
+              // rules={{ required: 'This field is required' }}
               render={({ field, fieldState }) => (
                 <Autocomplete
                   multiple

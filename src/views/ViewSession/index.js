@@ -2,13 +2,14 @@ import React from 'react';
 import { Box, Grid, Typography, Paper, Chip, Button, IconButton, Divider, Stack, Tooltip } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TagIcon from '@mui/icons-material/LocalOffer';
+import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useEffect, useState } from 'react';
 import { urls } from 'common/urls';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { getApi } from 'common/apiClient';
+import { getApi, updateApi } from 'common/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import HomeRepairServiceOutlinedIcon from '@mui/icons-material/HomeRepairServiceOutlined';
@@ -22,6 +23,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SingleRowLoader from 'ui-component/Loader/SingleRowLoader';
 import toast from 'react-hot-toast';
 import AddAttendeeDialog from 'components/AddAttendeeDialog';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 const ServiceDetails = () => {
   const location = useLocation();
@@ -61,7 +63,7 @@ const ServiceDetails = () => {
 
   const fetchpeopleAttendee = async () => {
     if (!sessionId) return;
-    setLoading(true)
+    setLoading(true);
     try {
       const queryParams = new URLSearchParams({
         page: paginationModel.page + 1,
@@ -88,8 +90,28 @@ const ServiceDetails = () => {
       setTotalRows(response?.data?.meta?.total || 0);
     } catch (error) {
       toast.error('Failed to load attendees');
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = async (attendee) => {
+    try {
+      const attendeeId = attendee?.id;
+      if (!sessionId || !attendeeId) {
+        toast.error('Failed to Delete Attendee');
+        return;
+      }
+      const response = await updateApi(`${urls.attendees.delete}/${sessionId}/${attendeeId}`);
+      if (response?.message == 'Success') {
+        toast.success('Attendee Deleted Successfully');
+      } else {
+        toast.success('Failed to Delete Attendee');
+      }
+    } catch {
+      toast.error('Failed to Delete Attendee');
+    } finally {
+      fetchpeopleAttendee();
     }
   };
 
@@ -180,11 +202,24 @@ const ServiceDetails = () => {
               </Typography>
             </Box>
           </Stack>
-          <Tooltip title="Info" arrow>
-            <IconButton>
-              <InfoIcon sx={{ color: '#49494c' }} />
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="Info" arrow>
+              <IconButton>
+                <InfoIcon sx={{ color: '#49494c' }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete" arrow>
+              <IconButton
+                sx={{ color: '#49494c' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteClick(params.row);
+                }}
+              >
+                <DeleteIcon sx={{ color: 'red' }} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Stack>
       )
     }
@@ -237,14 +272,19 @@ const ServiceDetails = () => {
                     borderRadius: '6px',
                     width: '12%',
                     height: 'auto',
-                    fontSize: '12px',
+                    fontSize: '14px',
                     backgroundColor: '#009fc7',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
                     '&:hover': {
                       backgroundColor: '#009fc7'
                     }
                   }}
                 >
-                  MANAGE
+                  <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                  Edit
                 </Button>
               </Box>
               <Divider sx={{ mb: 2 }} />

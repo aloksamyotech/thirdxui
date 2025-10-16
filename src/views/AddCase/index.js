@@ -326,275 +326,283 @@ const AddCaseForm = () => {
         <Card sx={{ padding: 2, marginTop: 2 }}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="serviceUserId"
-                    control={control}
-                    rules={{ required: 'Service user is required' }}
-                    render={({ field }) => {
-                      const selectedUser = rows.find((user) => user.id === field.value);
-
-                      return (
-                        <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
-                          <Autocomplete
-                            value={selectedUser || null}
-                            onChange={(_, value) => field.onChange(value?.id || '')}
-                            // onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
-                            options={rows}
-                            getOptionLabel={(option) => option.name || ''}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Service User" variant="outlined" size="small" error={!!errors.serviceUserId} />
-                            )}
-                          />
-                          {errors.serviceUserId && (
-                            <Typography color="error" variant="caption">
-                              {errors.serviceUserId.message}
-                            </Typography>
-                          )}
-                        </FormControl>
-                      );
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="serviceId"
-                    control={control}
-                    rules={{ required: 'Service is required' }}
-                    render={({ field }) => {
-                      const selectedService = services?.find((service) => service._id === field.value) || null;
-
-                      return (
-                        <FormControl fullWidth size="small" error={!!errors.serviceId}>
-                          <Autocomplete
-                            value={selectedService}
-                            onChange={(_, value) => field.onChange(value ? value._id : '')}
-                            onInputChange={(_, newInputValue) => setSearchQueryService(newInputValue)}
-                            options={services || []}
-                            getOptionLabel={(option) => option.name || ''}
-                            isOptionEqualToValue={(option, value) => option._id === value._id}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Service" variant="outlined" size="small" error={!!errors.serviceId} />
-                            )}
-                          />
-                          {errors.serviceId && (
-                            <Typography color="error" variant="caption">
-                              {errors.serviceId.message}
-                            </Typography>
-                          )}
-                        </FormControl>
-                      );
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="caseOwner"
-                    control={control}
-                    rules={{ required: 'Case owner is required' }}
-                    render={({ field }) => {
-                      const selectedOwner = caseOwner.find((owner) => owner.id === field.value);
-
-                      return (
-                        <FormControl fullWidth size="small" error={!!errors.caseOwner}>
-                          <Autocomplete
-                            value={selectedOwner || null}
-                            onChange={(_, value) => field.onChange(value?.id || '')}
-                            // onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
-                            options={caseOwner}
-                            getOptionLabel={(option) => option.name || ''}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            renderInput={(params) => (
-                              <TextField {...params} label="Case Owner" variant="outlined" size="small" error={!!errors.caseOwner} />
-                            )}
-                          />
-                          {errors.caseOwner && (
-                            <Typography color="error" variant="caption">
-                              {errors.caseOwner.message}
-                            </Typography>
-                          )}
-                        </FormControl>
-                      );
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="serviceStatus"
-                    control={control}
-                    defaultValue="pending"
-                    render={({ field }) => (
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Status</InputLabel>
-                        <Select
-                          {...field}
-                          label="Status"
-                          value={field.value || 'pending'}
-                          disabled // 🔹 ye line add karo
-                          renderValue={(selected) => {
-                            if (selected === 'open') return 'Open';
-                            if (selected === 'closed') return 'Closed';
-                            return 'Pending';
-                          }}
-                        >
-                          <MenuItem value="open">
-                            <Chip
-                              label="Open"
-                              sx={{
-                                backgroundColor: '#E0F4FF',
-                                color: '#26C6F9',
-                                borderRadius: '16px',
-                                fontWeight: 500,
-                                px: 1.5,
-                                fontSize: '12px'
-                              }}
-                            />
-                          </MenuItem>
-
-                          <MenuItem value="closed">
-                            <Chip
-                              label="Closed"
-                              sx={{
-                                backgroundColor: '#FFE0E0',
-                                color: '#F44336',
-                                borderRadius: '16px',
-                                fontWeight: 500,
-                                px: 1.5,
-                                fontSize: '12px'
-                              }}
-                            />
-                          </MenuItem>
-
-                          <MenuItem value="pending">
-                            <Chip
-                              label="Pending"
-                              sx={{
-                                backgroundColor: '#FFF4E0',
-                                color: '#FF9800',
-                                borderRadius: '16px',
-                                fontWeight: 500,
-                                px: 1.5,
-                                fontSize: '12px'
-                              }}
-                            />
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="caseOpened"
-                    control={control}
-                    rules={{ required: 'Start date is required' }}
-                    render={({ field }) => (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Date Case Opened"
-                          value={field.value}
-                          onChange={(newValue) => field.onChange(newValue)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              fullWidth
-                              size="small"
-                              error={!!errors.caseOpened}
-                              helperText={errors.caseOpened?.message}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="caseClosed"
-                    control={control}
-                    rules={{
-                      required: 'End date is required',
-
-                      validate: (value) =>
-                        !value || !getValues('caseOpened') || value.isAfter(getValues('caseOpened'))
-                          ? true
-                          : 'End date must be after start date'
-                    }}
-                    render={({ field }) => (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          label="Date Case Closed"
-                          value={field.value}
-                          minDate={getValues('caseOpened') || undefined}
-                          onChange={(newValue) => field.onChange(newValue)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              fullWidth
-                              size="small"
-                              error={!!errors.caseClosed}
-                              helperText={errors.caseClosed?.message}
-                            />
-                          )}
-                        />
-                      </LocalizationProvider>
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={12}>
-                  <Box mb={2} display="flex" justifyContent="space-between">
+              <Paper elevation={2} sx={{ p: 2, height: '400px', overflow: 'auto' }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
                     <Controller
-                      name="file"
+                      name="serviceUserId"
                       control={control}
-                      rules={{
-                        validate: (file) => validateFile(file)
+                      rules={{ required: 'Service user is required' }}
+                      render={({ field }) => {
+                        const selectedUser = rows.find((user) => user.id === field.value);
+
+                        return (
+                          <FormControl fullWidth size="small" error={!!errors.serviceUserId}>
+                            <Autocomplete
+                              value={selectedUser || null}
+                              onChange={(_, value) => field.onChange(value?.id || '')}
+                              // onInputChange={(_, newInputValue) => setSearchQuery(newInputValue)}
+                              options={rows}
+                              getOptionLabel={(option) => option.name || ''}
+                              isOptionEqualToValue={(option, value) => option.id === value.id}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label="Service User"
+                                  variant="outlined"
+                                  size="small"
+                                  error={!!errors.serviceUserId}
+                                />
+                              )}
+                            />
+                            {errors.serviceUserId && (
+                              <Typography color="error" variant="caption">
+                                {errors.serviceUserId.message}
+                              </Typography>
+                            )}
+                          </FormControl>
+                        );
                       }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="serviceId"
+                      control={control}
+                      rules={{ required: 'Service is required' }}
+                      render={({ field }) => {
+                        const selectedService = services?.find((service) => service._id === field.value) || null;
+
+                        return (
+                          <FormControl fullWidth size="small" error={!!errors.serviceId}>
+                            <Autocomplete
+                              value={selectedService}
+                              onChange={(_, value) => field.onChange(value ? value._id : '')}
+                              onInputChange={(_, newInputValue) => setSearchQueryService(newInputValue)}
+                              options={services || []}
+                              getOptionLabel={(option) => option.name || ''}
+                              isOptionEqualToValue={(option, value) => option._id === value._id}
+                              renderInput={(params) => (
+                                <TextField {...params} label="Service" variant="outlined" size="small" error={!!errors.serviceId} />
+                              )}
+                            />
+                            {errors.serviceId && (
+                              <Typography color="error" variant="caption">
+                                {errors.serviceId.message}
+                              </Typography>
+                            )}
+                          </FormControl>
+                        );
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="caseOwner"
+                      control={control}
+                      rules={{ required: 'Case owner is required' }}
+                      render={({ field }) => {
+                        const selectedOwner = caseOwner.find((owner) => owner.id === field.value);
+
+                        return (
+                          <FormControl fullWidth size="small" error={!!errors.caseOwner}>
+                            <Autocomplete
+                              value={selectedOwner || null}
+                              onChange={(_, value) => field.onChange(value?.id || '')}
+                              // onInputChange={(_, newInputValue) => setSearchQueryCaseOwner(newInputValue)}
+                              options={caseOwner}
+                              getOptionLabel={(option) => option.name || ''}
+                              isOptionEqualToValue={(option, value) => option.id === value.id}
+                              renderInput={(params) => (
+                                <TextField {...params} label="Case Owner" variant="outlined" size="small" error={!!errors.caseOwner} />
+                              )}
+                            />
+                            {errors.caseOwner && (
+                              <Typography color="error" variant="caption">
+                                {errors.caseOwner.message}
+                              </Typography>
+                            )}
+                          </FormControl>
+                        );
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="serviceStatus"
+                      control={control}
+                      defaultValue="pending"
                       render={({ field }) => (
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
-                          placeholder="Attachments"
-                          InputProps={{
-                            readOnly: true,
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <AttachFileIcon fontSize="small" />
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <Button component="label" sx={{ minWidth: 0, p: 0 }}>
-                                  <Link component="span">Upload</Link>
-                                  <input
-                                    type="file"
-                                    hidden
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      field.onChange(file);
-                                    }}
-                                  />
-                                </Button>
-                              </InputAdornment>
-                            )
-                          }}
-                          error={!!errors.file}
-                          helperText={errors.file?.message}
-                        />
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Status</InputLabel>
+                          <Select
+                            {...field}
+                            label="Status"
+                            value={field.value || 'pending'}
+                            disabled // 🔹 ye line add karo
+                            renderValue={(selected) => {
+                              if (selected === 'open') return 'Open';
+                              if (selected === 'closed') return 'Closed';
+                              return 'Pending';
+                            }}
+                          >
+                            <MenuItem value="open">
+                              <Chip
+                                label="Open"
+                                sx={{
+                                  backgroundColor: '#E0F4FF',
+                                  color: '#26C6F9',
+                                  borderRadius: '16px',
+                                  fontWeight: 500,
+                                  px: 1.5,
+                                  fontSize: '12px'
+                                }}
+                              />
+                            </MenuItem>
+
+                            <MenuItem value="closed">
+                              <Chip
+                                label="Closed"
+                                sx={{
+                                  backgroundColor: '#FFE0E0',
+                                  color: '#F44336',
+                                  borderRadius: '16px',
+                                  fontWeight: 500,
+                                  px: 1.5,
+                                  fontSize: '12px'
+                                }}
+                              />
+                            </MenuItem>
+
+                            <MenuItem value="pending">
+                              <Chip
+                                label="Pending"
+                                sx={{
+                                  backgroundColor: '#FFF4E0',
+                                  color: '#FF9800',
+                                  borderRadius: '16px',
+                                  fontWeight: 500,
+                                  px: 1.5,
+                                  fontSize: '12px'
+                                }}
+                              />
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
                       )}
                     />
-                  </Box>
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="caseOpened"
+                      control={control}
+                      rules={{ required: 'Start date is required' }}
+                      render={({ field }) => (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            label="Date Case Opened"
+                            value={field.value}
+                            onChange={(newValue) => field.onChange(newValue)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                fullWidth
+                                size="small"
+                                error={!!errors.caseOpened}
+                                helperText={errors.caseOpened?.message}
+                              />
+                            )}
+                          />
+                        </LocalizationProvider>
+                      )}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="caseClosed"
+                      control={control}
+                      rules={{
+                        required: 'End date is required',
+
+                        validate: (value) =>
+                          !value || !getValues('caseOpened') || value.isAfter(getValues('caseOpened'))
+                            ? true
+                            : 'End date must be after start date'
+                      }}
+                      render={({ field }) => (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            label="Date Case Closed"
+                            value={field.value}
+                            minDate={getValues('caseOpened') || undefined}
+                            onChange={(newValue) => field.onChange(newValue)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                fullWidth
+                                size="small"
+                                error={!!errors.caseClosed}
+                                helperText={errors.caseClosed?.message}
+                              />
+                            )}
+                          />
+                        </LocalizationProvider>
+                      )}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={12}>
+                    <Box mb={2} display="flex" justifyContent="space-between">
+                      <Controller
+                        name="file"
+                        control={control}
+                        rules={{
+                          validate: (file) => validateFile(file)
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={field.value ? (typeof field.value === 'string' ? field.value : field.value.name) : ''}
+                            placeholder="Attachments"
+                            InputProps={{
+                              readOnly: true,
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <AttachFileIcon fontSize="small" />
+                                </InputAdornment>
+                              ),
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <Button component="label" sx={{ minWidth: 0, p: 0 }}>
+                                    <Link component="span">Upload</Link>
+                                    <input
+                                      type="file"
+                                      hidden
+                                      accept=".pdf,.doc,.docx"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        field.onChange(file);
+                                      }}
+                                    />
+                                  </Button>
+                                </InputAdornment>
+                              )
+                            }}
+                            error={!!errors.file}
+                            helperText={errors.file?.message}
+                          />
+                        )}
+                      />
+                    </Box>
+                  </Grid>
                 </Grid>
-              </Grid>
+              </Paper>
             </Grid>
 
             {/* <Grid container spacing={2} sx={{ p: 2 }}> */}
@@ -639,27 +647,26 @@ const AddCaseForm = () => {
               </Grid> */}
             {/* </Grid> */}
           </Grid>
+          <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
+            <Grid item>
+              <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'SAVE CHANGES'}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => {
+                  reset();
+                  navigate(-1);
+                }}
+              >
+                CANCEL
+              </Button>
+            </Grid>
+          </Grid>
         </Card>
-
-        <Grid container spacing={2} sx={{ justifyContent: 'flex-end', mt: 1, pr: 2 }}>
-          <Grid item>
-            <Button type="submit" variant="contained" sx={{ background: '#053146' }} disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'SAVE CHANGES'}
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => {
-                reset();
-                navigate(-1);
-              }}
-            >
-              CANCEL
-            </Button>
-          </Grid>
-        </Grid>
       </form>
     </Card>
   );

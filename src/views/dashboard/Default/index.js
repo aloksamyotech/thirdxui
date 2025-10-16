@@ -173,7 +173,7 @@ const Dashboard = () => {
               <DashboardCard title="Total Donations" num1={`$${totalDonation}`} num2="62" loading={isLoading} />
             </Grid>
             <Grid item marginInline={5}>
-              <Shortcut2 icon={4} title="Add Donor" path="/add-donor" />
+              <Shortcut2 icon={4} title="Add Donation" path="/financial" />
             </Grid>
           </Grid>
         </Grid>

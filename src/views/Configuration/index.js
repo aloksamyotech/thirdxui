@@ -37,7 +37,6 @@ const defaultTabTypes = [
   'Location',
   'Reason',
   'Service Types',
-  'Form Types',
   'Product',
   'Currency'
 ];
@@ -194,12 +193,8 @@ const TabbedDataGrid = () => {
       setInputError('This field is required');
       return false;
     }
-    if (!/^[A-Za-z0-9\s]+$/.test(value)) {
-      setInputError('Only letters, numbers and spaces are allowed');
-      return false;
-    }
-    if (value.length < 1 || value.length > 25) {
-      setInputError('Length must be between 1 and 25 characters');
+    if (value.length < 1 || value.length > 50) {
+      setInputError('Length must be between 1 and 50 characters');
       return false;
     }
     setInputError('');
@@ -558,7 +553,7 @@ const TabbedDataGrid = () => {
               error={!!inputError}
               helperText={inputError}
               inputProps={{
-                maxLength: 25,
+                maxLength: 50,
                 style: {
                   fontSize: '14px',
                   padding: '10px 12px'

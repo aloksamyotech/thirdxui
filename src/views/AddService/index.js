@@ -421,6 +421,39 @@ const AddCaseForm = () => {
               <Grid item xs={12} md={6}>
                 <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
                   <Grid container spacing={2}>
+                    {/* Notes */}
+                    <Grid item xs={12}>
+                      <Controller
+                        name="notes"
+                        control={control}
+                        rules={{
+                          validate: (value) => {
+                            if (!value) return true;
+
+                            if (value.length < 12) return 'Notes must be at least 10 characters long';
+                            const wordCount = value.trim().split(/\s+/).length;
+                            if (wordCount > 500) return 'Notes cannot exceed 500 words';
+                            if (!/^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value))
+                              return 'Notes can only contain letters, numbers, and common punctuation';
+
+                            return true;
+                          }
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Notes"
+                            multiline
+                            minRows={13}
+                            fullWidth
+                            variant="outlined"
+                            error={!!errors.notes}
+                            helperText={errors.notes?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+
                     {/* Attachments Field */}
                     <Grid item xs={12} md={12}>
                       <Controller
@@ -462,39 +495,6 @@ const AddCaseForm = () => {
                             }}
                             error={!!errors.attachment}
                             helperText={errors.attachment?.message}
-                          />
-                        )}
-                      />
-                    </Grid>
-
-                    {/* Notes */}
-                    <Grid item xs={12}>
-                      <Controller
-                        name="notes"
-                        control={control}
-                        rules={{
-                          validate: (value) => {
-                            if (!value) return true;
-
-                            if (value.length < 12) return 'Notes must be at least 10 characters long';
-                            const wordCount = value.trim().split(/\s+/).length;
-                            if (wordCount > 500) return 'Notes cannot exceed 500 words';
-                            if (!/^[A-Za-z0-9\s.,'"\-():!@#$%^&*]+$/.test(value))
-                              return 'Notes can only contain letters, numbers, and common punctuation';
-
-                            return true;
-                          }
-                        }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            label="Notes"
-                            multiline
-                            minRows={13}
-                            fullWidth
-                            variant="outlined"
-                            error={!!errors.notes}
-                            helperText={errors.notes?.message}
                           />
                         )}
                       />

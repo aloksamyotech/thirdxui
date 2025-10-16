@@ -211,7 +211,7 @@ const CaseNoteDialog = ({ open, fetchdata, handleClose, onSubmit, title = 'Add C
               select
               fullWidth
               size="small"
-              label="Contact Purpose"
+              label="Contact Type"
               name="contactPurpose"
               value={formData.contactPurpose}
               onChange={handleChange}

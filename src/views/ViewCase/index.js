@@ -23,6 +23,7 @@ import SectionSkeleton from 'ui-component/Loader/SectionSkeleton.js';
 import { decodedToken } from 'utils/adminData.js';
 import StatusChip from 'views/AboutCase/StatusChip.js';
 import AboutCaseNote from 'views/AboutCaseNote/CaseNoteDialog.js';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const CaseDetailsPage = () => {
   const navigate = useNavigate();
@@ -591,7 +592,12 @@ const CaseDetailsPage = () => {
                     <Typography fontWeight={500}>Owner</Typography>
                     <Typography color="text.secondary">{caseData?.caseOwnerDetails?.[0]?.name || ''} </Typography>
                   </Grid>
-
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography fontWeight={500}>Status</Typography>
+                    <Typography color="text.secondary">
+                      {caseData?.status ? caseData.status.charAt(0).toUpperCase() + caseData.status.slice(1).toLowerCase() : '-'}
+                    </Typography>
+                  </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography fontWeight={500}>Date Opened</Typography>
                     <Typography color="text.secondary">{caseData?.caseOpened ? formatDate(caseData.caseOpened) : '-'}</Typography>
@@ -601,12 +607,14 @@ const CaseDetailsPage = () => {
                     <Typography fontWeight={500}>Date Closed</Typography>
                     <Typography color="text.secondary">{caseData?.caseClosed ? formatDate(caseData.caseClosed) : '-'}</Typography>
                   </Grid>
-
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography fontWeight={500}>Attachments</Typography>
-                    <Typography color="text.secondary">
-                      {caseData?.attachments?.length || 0} {caseData?.attachments?.length === 1 ? 'File' : 'Files'}
-                    </Typography>
+
+                    {caseData?.file ? (
+                      <DescriptionIcon sx={{ fontSize: 26, color: '#555' }} />
+                    ) : (
+                      <Typography color="text.secondary">0 Files</Typography>
+                    )}
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={3}>
@@ -620,13 +628,6 @@ const CaseDetailsPage = () => {
                         const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
                         return `${diffHours} hrs`;
                       })()}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography fontWeight={500}>Status</Typography>
-                    <Typography color="text.secondary">
-                      {caseData?.status ? caseData.status.charAt(0).toUpperCase() + caseData.status.slice(1).toLowerCase() : '-'}
                     </Typography>
                   </Grid>
                 </Grid>

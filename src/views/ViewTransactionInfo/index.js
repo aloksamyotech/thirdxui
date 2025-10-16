@@ -41,7 +41,7 @@ const ViewTransaction = () => {
             <IconButton onClick={() => navigate(-1)}>
               <KeyboardBackspaceIcon sx={{ fontSize: 20, color: 'black' }} />
             </IconButton>
-            Transaction Info.
+            Transaction Information
           </Typography>
         </Stack>
       </Grid>
@@ -60,11 +60,11 @@ const ViewTransaction = () => {
               <>
                 {/* Payment Information */}
                 <Typography fontWeight="600" mb={2}>
-                  Payment Information
+                  Payment Details
                 </Typography>
                 <Grid container spacing={2} mb={2}>
                   <Grid item xs={12} sm={6} md={3}>
-                    <Typography fontWeight={500}>Job Role</Typography>
+                    <Typography fontWeight={500}>Assigned To</Typography>
                     <Typography color="text.secondary">{transactionData?.donorId?.role || '-'}</Typography>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
@@ -101,7 +101,7 @@ const ViewTransaction = () => {
 
                 {/* Allocation Information */}
                 <Typography fontWeight="600" mb={2}>
-                  Allocation Information
+                  Allocation Details
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6} md={4}>
